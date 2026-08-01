@@ -1,30 +1,48 @@
 <?php
 
 // Request input, formerly supplied by register_globals.
+//
+// Prefixed, because each of these names means two different things in this
+// file. The parameter is only ever a flag -- "the player clicked Build Long
+// Sword" -- tested with IsSet() and never read for its value. Forty lines
+// later the branch it opened assigns the SAME name the build time in ticks,
+// and that is what the UPDATE writes:
+//
+//     $longsword = 14;    // ticks to make
+//     mysqli_query($db, "UPDATE military SET longsword =\"$longsword\" ...
+//
+// So the request value never reaches a query, and the file reads as though it
+// does. Two names rather than one, and the audit stops reporting all
+// twenty-two of these as injectable when none of them are.
 include("include/request.php");
-$bastardsword = mb_input('bastardsword');
-$bowoftion    = mb_input('bowoftion');
-$broadsword   = mb_input('broadsword');
-$dynefian     = mb_input('dynefian');
-$eldamarstar  = mb_input('eldamarstar');
-$ferricbow    = mb_input('ferricbow');
-$flail        = mb_input('flail');
-$footmanflail = mb_input('footmanflail');
-$gandalara    = mb_input('gandalara');
-$heartsong    = mb_input('heartsong');
-$isidole      = mb_input('isidole');
-$keldarsarms  = mb_input('keldarsarms');
-$longsword    = mb_input('longsword');
-$morningstar  = mb_input('morningstar');
-$romsfury     = mb_input('romsfury');
-$scimitar     = mb_input('scimitar');
-$scourge      = mb_input('scourge');
-$shortbow     = mb_input('shortbow');
-$shortsword   = mb_input('shortsword');
-$shyrscream   = mb_input('shyrscream');
-$splensight   = mb_input('splensight');
-$thyorastear  = mb_input('thyorastear');
-$zakarum      = mb_input('zakarum');
+$build_bastardsword = mb_input('bastardsword');
+$build_bowoftion    = mb_input('bowoftion');
+$build_broadsword   = mb_input('broadsword');
+$build_dynefian     = mb_input('dynefian');
+$build_eldamarstar  = mb_input('eldamarstar');
+$build_ferricbow    = mb_input('ferricbow');
+$build_flail        = mb_input('flail');
+$build_footmanflail = mb_input('footmanflail');
+$build_gandalara    = mb_input('gandalara');
+$build_heartsong    = mb_input('heartsong');
+$build_isidole      = mb_input('isidole');
+$build_keldarsarms  = mb_input('keldarsarms');
+$build_longsword    = mb_input('longsword');
+// The Mace button posts `_mace`, not `mace` -- see include/buttons.php:26. The
+// leading underscore is why Phase 2 missed this one read and left the button
+// inert: the register_globals audit skips every name beginning with `_` so it
+// does not report the superglobals, and this looked like one of them.
+$build_mace         = mb_input('_mace');
+$build_morningstar  = mb_input('morningstar');
+$build_romsfury     = mb_input('romsfury');
+$build_scimitar     = mb_input('scimitar');
+$build_scourge      = mb_input('scourge');
+$build_shortbow     = mb_input('shortbow');
+$build_shortsword   = mb_input('shortsword');
+$build_shyrscream   = mb_input('shyrscream');
+$build_splensight   = mb_input('splensight');
+$build_thyorastear  = mb_input('thyorastear');
+$build_zakarum      = mb_input('zakarum');
 
 
 include("include/igtop.php");
@@ -40,7 +58,7 @@ echo "
 ## warrior weapons
 ###############
 
-if(!IsSet($shortsword))	{
+if(!IsSet($build_shortsword))	{
 }
 else
 {    
@@ -80,7 +98,7 @@ else
 ?>
 
 <?php
-	if(!IsSet($longsword))
+	if(!IsSet($build_longsword))
 {
 ?>
 			
@@ -121,7 +139,7 @@ else
 ?>
 
 <?php
-	if(!IsSet($bastardsword))
+	if(!IsSet($build_bastardsword))
 {
 ?>
 				
@@ -164,7 +182,7 @@ else
 }
 ?>
 <?php
-	if(!IsSet($scourge))
+	if(!IsSet($build_scourge))
 {
 ?>
 					
@@ -210,7 +228,7 @@ else
 }
 ?>
 <?php
-	if(!IsSet($scimitar))
+	if(!IsSet($build_scimitar))
 {
 ?>
 					
@@ -259,7 +277,7 @@ else
 }
 ?>
 <?php
-	if(!IsSet($romsfury))
+	if(!IsSet($build_romsfury))
 {
 ?>
 					
@@ -311,7 +329,7 @@ else
 }
 ?>
 <?php
-	if(!IsSet($broadsword))
+	if(!IsSet($build_broadsword))
 {
 ?>
 					
@@ -369,7 +387,7 @@ else
 }
 ?>
 <?php
-	if(!IsSet($gandalara))
+	if(!IsSet($build_gandalara))
 {
 ?>
 					
@@ -435,7 +453,7 @@ else
 ################
 ?>
 <?php
-	if(!IsSet($_mace))
+	if(!IsSet($build_mace))
 {
 ?>
 				
@@ -479,7 +497,7 @@ else
 }
 ?>
 <?php
-	if(!IsSet($flail))
+	if(!IsSet($build_flail))
 {
 ?>
 					
@@ -525,7 +543,7 @@ else
 }
 ?>
 <?php
-	if(!IsSet($zakarum))
+	if(!IsSet($build_zakarum))
 {
 ?>
 					
@@ -574,7 +592,7 @@ else
 }
 ?>
  <?php
-	if(!IsSet($footmanflail))
+	if(!IsSet($build_footmanflail))
 {
 ?>
 					
@@ -626,7 +644,7 @@ else
 }
 ?>
  <?php
-	if(!IsSet($morningstar))
+	if(!IsSet($build_morningstar))
 {
 ?>
 					
@@ -681,7 +699,7 @@ else
 }
 ?>
  <?php
-	if(!IsSet($thyorastear))
+	if(!IsSet($build_thyorastear))
 {
 ?>
 					
@@ -739,7 +757,7 @@ else
 }
 ?>
  <?php
-	if(!IsSet($isidole))
+	if(!IsSet($build_isidole))
 {
 ?>
 					
@@ -803,7 +821,7 @@ else
 }
 ?>
  <?php
-	if(!IsSet($eldamarstar))
+	if(!IsSet($build_eldamarstar))
 {
 ?>
 					
@@ -875,7 +893,7 @@ else
 ###############
 ?>
 <?php
-	if(!IsSet($shortbow))
+	if(!IsSet($build_shortbow))
 {
 ?>
 					
@@ -915,7 +933,7 @@ else
 }
 ?>
 <?php
-	if(!IsSet($ferricbow))
+	if(!IsSet($build_ferricbow))
 {
 ?>
 					
@@ -961,7 +979,7 @@ else
 }
 ?>
 <?php
-	if(!IsSet($keldarsarms))
+	if(!IsSet($build_keldarsarms))
 {
 ?>
 					
@@ -1007,7 +1025,7 @@ else
 }
 ?>
 <?php
-	if(!IsSet($splensight))
+	if(!IsSet($build_splensight))
 {
 ?>
 					
@@ -1056,7 +1074,7 @@ else
 }
 ?>
 <?php
-	if(!IsSet($bowoftion))
+	if(!IsSet($build_bowoftion))
 {
 ?>
 					
@@ -1108,7 +1126,7 @@ else
 }
 ?>
 <?php
-	if(!IsSet($dynefian))
+	if(!IsSet($build_dynefian))
 {
 ?>
 					
@@ -1163,7 +1181,7 @@ else
 }
 ?>
 <?php
-	if(!IsSet($heartsong))
+	if(!IsSet($build_heartsong))
 {
 ?>
 					
@@ -1224,7 +1242,7 @@ else
 }
 ?>
 <?php
-	if(!IsSet($shyrscream))
+	if(!IsSet($build_shyrscream))
 {
 ?>
 					

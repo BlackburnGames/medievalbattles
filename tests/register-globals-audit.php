@@ -92,8 +92,18 @@ function mb_scan_globals($src)
         if (!is_array($tok) || $tok[0] !== T_VARIABLE) {
             continue;
         }
+        // Superglobals only. This used to skip every name starting with `_`,
+        // which is a wider net than it needs and it caught a real one:
+        // wconstruct.php read $_mace, injected by a button that posts `_mace`,
+        // and the Phase 2 port never saw it because the audit never listed it.
+        // The Mace was the first priest weapon and the prerequisite for the
+        // six above it, so the whole branch of the tree went quiet.
         $name = substr($tok[1], 1);
-        if ($name === 'this' || $name === 'GLOBALS' || $name[0] === '_') {
+        $superglobals = array(
+            'this', 'GLOBALS', '_GET', '_POST', '_COOKIE', '_REQUEST',
+            '_SERVER', '_SESSION', '_FILES', '_ENV',
+        );
+        if (in_array($name, $superglobals, true)) {
             continue;
         }
 
