@@ -292,8 +292,64 @@ that the category is in its own column, that the payload renders inert, that
 `[i]Medieval style[/i]` italicises while a typed `<i>` does not, and that an
 unknown category falls back to `yellow` rather than landing raw in the unquoted
 attribute.
-- **Passwords.** Unsalted MD5, denormalized into four tables alongside the
-  email that identifies the row.
+- ~~**Passwords.**~~ **Done.** Unsalted MD5, denormalized into six tables
+  alongside the email that identifies the row. It is bcrypt now —
+  `app/include/password.php` — and the interesting part is what did *not* have
+  to change with it.
+
+  **The hash has two jobs and only one of them was broken.** It protects the
+  account, and it is also the bearer token: `$_SESSION['pw']` holds the stored
+  hash and ~1300 queries filter `WHERE email='$email' AND pw='$pw'`. Rewriting
+  that second job means touching every file in the game. But what those queries
+  need is equality against the stored string, which a bcrypt hash satisfies
+  exactly as an MD5 digest did — so the token stayed, and the digest under it
+  changed. Nothing above `password.php` knows which format it is holding.
+
+  **`PASSWORD_BCRYPT`, not `PASSWORD_DEFAULT`.** The hash is interpolated bare
+  into those 1300 queries and validated on the way out of the session by
+  `credentials.php`, so its alphabet is load-bearing: bcrypt emits only
+  `[./A-Za-z0-9$]`, none of which means anything inside a SQL string literal.
+  `PASSWORD_DEFAULT` is documented to change, and the argon2 formats it may
+  change to contain `=`, `,` and `+`. Pinning it keeps `credentials.php`
+  asserting a fact rather than a hope.
+
+  **Legacy rows still log in, once.** There is exactly one corpus of this
+  game's data and it is not this repo's fixture, so a login that stopped
+  working for every existing account would be a behaviour change nothing here
+  could catch. An MD5 row verifies, is rehashed, and is written back through
+  the same six `UPDATE`s `preferences.php` has always run — which is why those
+  moved into `password.php`. Two copies of a six-table list is how one of them
+  ends up short, and a short one is invisible: the session token keeps matching
+  `user` while the table it missed goes quietly empty. The fixture keeps two of
+  its three accounts on MD5 so that path runs on every crawl.
+
+  Three things came off with it:
+
+  - **`==` on two digests.** `checklogin.php` compared the stored hash to the
+    computed one with `==`, which compares numeric-looking strings as numbers —
+    and a hex digest is numeric-looking whenever it contains no letters, so
+    every `0e…`-shaped digest equalled every other one. It is `hash_equals()`
+    on the legacy arm and `password_verify()` on the other.
+  - **The activation code was the password digest.** `checksignup.php` stored
+    `$pw` as `emailvalidate.code` and mailed it in the activation link, so the
+    URL carried the exact string that `WHERE … AND pw='$pw'` accepts as the
+    credential. It generates its own random code now — which it had to, since
+    the column is `varchar(50)` and a bcrypt hash is 60.
+  - **A dead check in `preferences.php`.** The account-deletion branch hashed
+    the typed password and *then* tested it against `""`, and `md5("")` is not
+    the empty string, so "you must specify a password" could never appear. Both
+    branches refuse the deletion; only one of them says why.
+
+  The address check moved to the front of `checklogin.php` at the same time.
+  It is the one credential site reached by an unauthenticated POST, so the
+  address goes into `WHERE email='$email'` having never been through
+  `session.php`'s rule — and since signup and preferences both refuse to store
+  an address this would reject, checking it here can only refuse a login that
+  could not have matched a row.
+
+  What is still true: the hash is a bearer token with no expiry, no rotation
+  and no CSRF protection around it, and it is in six places. That is the auth
+  model, and replacing it is its own change.
 - ~~**Error handling.**~~ **Done.** `mysqli_report()` is back on as
   `MYSQLI_REPORT_ERROR` (warnings, not exceptions), the smoke crawl and the tick
   both fail on a query error, and `tests/broken-queries.txt` is empty. Going

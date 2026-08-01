@@ -440,6 +440,91 @@ crawl($member, array('main.php?pageid=news'), $MAX_MEMBER_PAGES);
  */
 prefsEmailChange($member);
 
+/*
+ * Passwords: the legacy hash, the rehash, and a change.
+ *
+ * The fixture carries both formats on purpose -- idle@ is bcrypt, tester@ and
+ * poor@ are the unsalted MD5 the game stored until this change -- so the
+ * logins above have already driven both arms of mb_password_verify(). What
+ * they cannot show is what happened afterwards: an upgraded row is rewritten
+ * across six tables, and if one of them is missed the session's token stops
+ * matching there and only that table's pages go quietly empty.
+ *
+ * So the credential is used again, after the upgrade, on a fresh session. A
+ * second login proves `user` was rewritten consistently with what the session
+ * carries, and a page that reads a different table proves the rest were.
+ *
+ * On idle2@ rather than the primary tester: the crawl leaves the tester's
+ * fixture spent, and this is the account the email change above just moved.
+ */
+passwordChange($BASE, 'idle2@example.com', $MEMBER_PASS, 'newpass4');
+
+/**
+ * Change a password through preferences.php, then log in with it.
+ *
+ * Three assertions, and the middle one is the reason this is not just a form
+ * submission: the wrong current password must be refused, the change must
+ * report success, and -- the part no HTTP status reveals -- the new credential
+ * must actually authenticate on a session that knows nothing about this one.
+ */
+function passwordChange($base, $email, $oldPass, $newPass)
+{
+    global $failures;
+
+    $client = login($base, $email, $oldPass);
+
+    $body = postForm($client, 'preferences.php', array(
+        'changepw'  => 'Change',
+        'currentpw' => $oldPass . 'wrong',
+        'newpw'     => $newPass,
+        'cnewpw'    => $newPass,
+    ));
+    if (stripos($body, 'current password is not correct') === false) {
+        $failures['preferences.php | accepted the wrong current password'] =
+            'app/include/password.php: mb_password_verify() is not gating the change';
+    }
+
+    $body = postForm($client, 'preferences.php', array(
+        'changepw'  => 'Change',
+        'currentpw' => $oldPass,
+        'newpw'     => $newPass,
+        'cnewpw'    => $newPass,
+    ));
+    if (stripos($body, 'password has been changed') === false) {
+        $failures['preferences.php | rejected a valid password change'] = 'the change no longer completes';
+    }
+
+    // A new client, so nothing but the database decides this.
+    $after = new MbClient($base);
+    $after->get('/index.php');
+    $after->post('/checklogin.php', array('email' => $email, 'pw' => $newPass, 'login' => 'Login'));
+    if ($after->lastStatus !== 302) {
+        $failures['checklogin.php | the changed password does not authenticate'] =
+            'mb_password_store() and mb_password_verify() disagree, or a table was missed';
+        return;
+    }
+
+    // And a page whose query filters on a table other than `user`, which is the
+    // half a login cannot check: military.pw holding a stale hash renders an
+    // empty barracks rather than an error.
+    $body = $after->get('/main.php?pageid=news');
+    $visitedNote = stripos($body, 'IdleBaron');
+    if ($visitedNote === false) {
+        $failures['main.php | logged in but the account reads as empty after a password change'] =
+            'one of the six pw columns still holds the old hash';
+    }
+
+    // The old password must stop working. Same client, so this is purely the
+    // stored hash talking.
+    $stale = new MbClient($base);
+    $stale->get('/index.php');
+    $stale->post('/checklogin.php', array('email' => $email, 'pw' => $oldPass, 'login' => 'Login'));
+    if ($stale->lastStatus === 302) {
+        $failures['checklogin.php | the old password still authenticates'] =
+            'the change did not replace the stored hash';
+    }
+}
+
 /**
  * Both arms of preferences.php's email change.
  */

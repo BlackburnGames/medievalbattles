@@ -28,8 +28,14 @@
  *   - include/session.php, so a row that predates this file cannot log in and
  *     put one back into scope.
  *
- * The password half costs nothing: the app only ever stores md5(), so a
- * 32-character hex digest is not a restriction, it is a description.
+ * The password half costs nothing, and the reason is worth stating rather than
+ * assuming. The app stores what include/password.php produces, which is bcrypt
+ * -- pinned to PASSWORD_BCRYPT rather than PASSWORD_DEFAULT precisely so that
+ * its alphabet is known here. Bcrypt emits `$2y$`, a two-digit cost and 53
+ * characters of [./A-Za-z0-9], and none of that carries meaning inside a SQL
+ * string literal. The 32-character hex digest is the legacy md5 form, still
+ * accepted because a row that predates the change has to be able to log in
+ * once so that checklogin.php can rehash it.
  *
  * The address half does cost something, and it is worth being explicit about
  * it. An apostrophe is legal in the local part of a real address, and
@@ -43,11 +49,21 @@
 if (!function_exists('mb_valid_pw_hash')) {
     /**
      * @param  mixed $value
-     * @return bool  true for the 32-character hex digest md5() returns
+     * @return bool  true for a bcrypt hash, or for the legacy md5 digest
      */
     function mb_valid_pw_hash($value)
     {
-        return is_string($value) && preg_match('/^[0-9a-f]{32}$/i', $value) === 1;
+        if (!is_string($value)) {
+            return false;
+        }
+        // Bcrypt, as include/password.php produces it: $2y$ (or the $2a$/$2b$
+        // an older PHP wrote), a two-digit cost, and 53 characters of salt and
+        // digest from bcrypt's own alphabet. Nothing outside [./A-Za-z0-9$],
+        // which is the property the 1300 interpolations depend on.
+        if (preg_match('~^\$2[aby]\$[0-9]{2}\$[./A-Za-z0-9]{53}$~', $value) === 1) {
+            return true;
+        }
+        return preg_match('/^[0-9a-f]{32}$/i', $value) === 1;
     }
 }
 

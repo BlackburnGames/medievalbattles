@@ -45,12 +45,22 @@ loads the logged-in user's entire state into globals (`$gp`, `$civ`, `$land`,
 
 ## Auth
 
-`$_SESSION['email']` plus `$_SESSION['pw']` (the MD5 hash) act as a bearer
-credential, and nearly every query filters `WHERE email='$email' AND pw='$pw'`.
+`$_SESSION['email']` plus `$_SESSION['pw']` (the stored password hash) act as a
+bearer credential, and nearly every query filters
+`WHERE email='$email' AND pw='$pw'`.
 
-The email/hash pair is **denormalized into `buildings`, `military`, `research`
-and `explore`**, so changing the auth model means touching the schema and
-almost every query in the app.
+The hash is **bcrypt** as of Phase 3 — `app/include/password.php`, pinned to
+`PASSWORD_BCRYPT` rather than `PASSWORD_DEFAULT` because
+`include/credentials.php` asserts the alphabet on the way out of the session.
+Rows still holding the old unsalted MD5 verify once and are rehashed in place
+by `checklogin.php`. What did *not* change is the hash's second job: it is the
+bearer token, and every query still compares it for equality, which bcrypt
+satisfies exactly as MD5 did.
+
+The email/hash pair is **denormalized into `buildings`, `military`, `research`,
+`returntbl` and `explore`**, so changing the auth model means touching the
+schema and almost every query in the app — and so a password change is six
+`UPDATE`s, which is why they live in one function rather than at each site.
 
 `app/include/session.php` is the single bootstrap: it starts the session and
 loads `$login`/`$email`/`$pw`, and every page that needs the credential

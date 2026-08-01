@@ -375,6 +375,20 @@ one. That is also why `attackm.php` is not driven: it is the same file shape as
 `attackr.php`, and giving the fixture a third general would hand
 `calculations.php` a fifth army for four return slots.
 
+**The fixture carries two password formats, and that is coverage rather than
+untidiness.** `idle@` is bcrypt — what `app/include/password.php` writes now —
+while `tester@` and `poor@` keep the unsalted MD5 the game stored until Phase 3,
+so every run drives both arms of `mb_password_verify()` *and* the rehash that
+follows a legacy login. That rehash is six `UPDATE`s across six tables, and a
+missed one is invisible from the outside: the session token keeps matching
+`user` while the table it missed goes quietly empty. Deleting the MD5 rows would
+delete the only coverage that path has.
+
+`passwordChange()` closes the other half, on `idle2@` after the email change.
+It refuses a wrong current password, changes the password, and then logs in on
+a **new client** — nothing but the database decides that one — checks a page
+that reads past `user`, and confirms the old password has stopped working.
+
 The email change in `preferences.php` is driven on the *member*, not the
 primary tester: it rewrites six tables and the session, and every fixture the
 primary pass depends on is keyed on that address. Both arms are asserted — an

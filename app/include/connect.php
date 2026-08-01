@@ -38,6 +38,15 @@ require_once __DIR__ . '/html.php';
 require_once __DIR__ . '/news.php';
 
 /**
+ * And the password helpers, which need mb_sql_str() for the same reason.
+ *
+ * Only three files hash or verify a password, but one of them is
+ * checklogin.php, which upgrades a legacy hash in place -- six UPDATEs that
+ * have to run before anything else queries with the credential.
+ */
+require_once __DIR__ . '/password.php';
+
+/**
  * Query errors are reported again, as of Phase 3.
  *
  * PHP 8.1 made mysqli throw on error instead of returning false. Phase 2 turned

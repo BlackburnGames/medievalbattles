@@ -16,9 +16,14 @@ $aim = $_POST['aim'];
 
 if ($signup) {
 
+  // The password stays as typed until the checks below have run.
+  //
+  // It used to be md5()d on these three lines, and the "passwords don't match"
+  // check compared the two digests -- which worked only because an unsalted
+  // digest of a given password is always the same string. include/password.php
+  // salts per call, so two hashes of one password never match; the comparison
+  // has to happen on the plaintext, and the hashing once, after it.
   $opw = $pw;
-  $cpw = md5($cpw);
-  $pw = md5($pw);
 
   echo "Signups for v6: Kupo Remix Edition will start February 19, 2007 @ 9am PST. Ticks will commence 24 hours later.";
 
@@ -103,9 +108,20 @@ if ($signup) {
   $newbuserid = $buserid + 1;
 
   //  create activation code - bypassing validation for now
-  $db->query("INSERT INTO emailvalidate (userid, code, `check`) VALUES ('$newbuserid', '$pw', '2') ");
+  //
+  // Its own random value. This used to store the password digest and then mail
+  // it out as the activate_account.php link, so the activation URL carried the
+  // exact string that "WHERE email=... AND pw=..." accepts as the credential --
+  // and emailvalidate.code is varchar(50), which a bcrypt hash does not fit
+  // into anyway.
+  $act_code = md5(uniqid(rand(), true));
+  $db->query("INSERT INTO emailvalidate (userid, code, `check`) VALUES ('$newbuserid', '$act_code', '2') ");
 
   if (($email === $cemail) and ($pw === $cpw) and ($email != "") and ($cemail != "") and ($pw != "") and ($cpw != ""))  {
+    // Hashed here, once, after every comparison that needed the plaintext. Six
+    // INSERTs below write it, because `pw` is denormalized across six tables.
+    $pw = mb_password_hash($pw);
+
     $part1 = rand(250, 350);
     $part2 = rand(000, 999);
 
@@ -180,7 +196,7 @@ if ($signup) {
     Password: [$opw]
 
     You will need your email and password to login. But before you can login, you must activate your account. To activate your account, click here:
-    http://www.medievalbattles.com/activate_account.php?activate=true&act_userid=$newbuserid&act_code=$pw
+    http://www.medievalbattles.com/activate_account.php?activate=true&act_userid=$newbuserid&act_code=$act_code
 
     If you have any questions you can email us at support@medievalbattles.com";
 

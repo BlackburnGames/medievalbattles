@@ -7,10 +7,21 @@
 -- numbers on the 5.6 baseline than on 8.x. Seeding users directly keeps the
 -- golden-master comparisons valid across PHP versions.
 --
--- Passwords are unsalted MD5 because that is what the app computes:
 --   tester@example.com / test1234
 --   idle@example.com   / pass2
 --   poor@example.com   / pass3
+--
+-- Two hash formats on purpose, because there are two live code paths. idle@
+-- carries a bcrypt hash, which is what include/password.php writes now.
+-- tester@ and poor@ keep the unsalted MD5 the game stored until this change,
+-- so that every crawl exercises checklogin.php's legacy verify and the rehash
+-- that follows it -- six UPDATEs across six tables, and a session token that
+-- has to become the new value or nothing after the redirect matches a row.
+-- Deleting the MD5 rows would delete the only coverage that path has.
+--
+-- The `emailvalidate` codes below are unchanged: they are activation codes and
+-- happen to look like the digests because signup used to store the password
+-- hash as the code. checksignup.php generates a distinct one now.
 --
 -- User ids are deliberately 1-3. The tick loops from 0 to max(userid) rather
 -- than over the rows that exist, so its cost is driven by the highest id, not
@@ -39,12 +50,12 @@ INSERT INTO `user`
    setid, csnum, userid, online, safemode, countdown, guild, lastlogin, signup_comp_id)
 VALUES
   ('tester@example.com', '16d7a4fca7442dda3ad93c9a726597e4', 'TestLord',  'Human', 'Warrior', 300000, 5000, 4000, 1000, 1500, 250, 200, 1, 1, 1, 0, 0,  336, 'None', '1/1/03, 12:00am', 'seed'),  -- fleets set below
-  ('idle@example.com',   'c1572d05424d0ecb2a65ec6a82aeacbf', 'IdleBaron', 'Demon', 'Cleric',  120000, 6200, 3100,  400, 1500, 250, 200, 1, 1, 2, 0, 0,    2, 'None', '1/1/03, 12:00am', 'seed'),
+  ('idle@example.com',   '$2y$10$zwzsLaBoYCYRMC8wR2Df7eJT1lrq6IjnsIHKElvgu9rGzrSxwyoEW', 'IdleBaron', 'Demon', 'Cleric',  120000, 6200, 3100,  400, 1500, 250, 200, 1, 1, 2, 0, 0,    2, 'None', '1/1/03, 12:00am', 'seed'),
   ('poor@example.com',   '3afc79b597f88a72528e864cf81856d2', 'PoorSerf',  'Giant', 'Ranger',       0,    0,    0,    0,    0, 250, 200, 2, 2, 3, 0, 0,  336, 'None', '1/1/03, 12:00am', 'seed');
 
 INSERT INTO `buildings` (email, pw, home, barrack, farm, wp, gm, im, aland, amts, userid) VALUES
   ('tester@example.com', '16d7a4fca7442dda3ad93c9a726597e4', 50, 50, 50, 0, 50, 50, 100, 100, 1),
-  ('idle@example.com',   'c1572d05424d0ecb2a65ec6a82aeacbf', 50, 50, 50, 0, 50, 50, 100, 100, 2),
+  ('idle@example.com',   '$2y$10$zwzsLaBoYCYRMC8wR2Df7eJT1lrq6IjnsIHKElvgu9rGzrSxwyoEW', 50, 50, 50, 0, 50, 50, 100, 100, 2),
   ('poor@example.com',   '3afc79b597f88a72528e864cf81856d2',  1,  1,  1, 0,  1,  1, 100, 100, 3);
 
 INSERT INTO `military`
@@ -58,7 +69,7 @@ INSERT INTO `military`
    pridef, warspeeda, wizspeeda, prispeeda, archers, suicide, sages)
 VALUES
   ('tester@example.com', '16d7a4fca7442dda3ad93c9a726597e4', 1200, 200, 3, 3, 3, 200, 1, 2, 6, 'Dagger', 3, 4, 'Magic Missile', 2, 4, 'Quarterstaff', 'Bow', 4, 2, 'Studded Leather', 'Robe', 'Leather', 1, 1, 2, 0, 0, 1, 0, 0, 8),
-  ('idle@example.com',   'c1572d05424d0ecb2a65ec6a82aeacbf', 1300, 250, 5, 0, 5, 300, 2, 2, 6, 'Dagger', 3, 4, 'Magic Missile', 2, 4, 'Quarterstaff', 'Bow', 4, 2, 'Studded Leather', 'Robe', 'Leather', 1, 1, 2, 0, 0, 1, 0, 0, 0),
+  ('idle@example.com',   '$2y$10$zwzsLaBoYCYRMC8wR2Df7eJT1lrq6IjnsIHKElvgu9rGzrSxwyoEW', 1300, 250, 5, 0, 5, 300, 2, 2, 6, 'Dagger', 3, 4, 'Magic Missile', 2, 4, 'Quarterstaff', 'Bow', 4, 2, 'Studded Leather', 'Robe', 'Leather', 1, 1, 2, 0, 0, 1, 0, 0, 0),
   ('poor@example.com',   '3afc79b597f88a72528e864cf81856d2',    0,   0, 0, 0, 0, 100, 3, 2, 6, 'Dagger', 3, 4, 'Magic Missile', 2, 4, 'Quarterstaff', 'Bow', 4, 2, 'Studded Leather', 'Robe', 'Leather', 1, 1, 2, 0, 0, 1, 5, 0, 0);
 
 -- r1/r15 are sages ASSIGNED to a project; r1pts/r15pts are the points they have
@@ -67,7 +78,7 @@ VALUES
 -- is how the schema being four columns short went unnoticed for the whole port.
 INSERT INTO `research` (email, pw, userid, r1, r15, r1pts, r13pts, r14pts) VALUES
   ('tester@example.com', '16d7a4fca7442dda3ad93c9a726597e4', 1, 5, 2, 0, 0, 0),
-  ('idle@example.com',   'c1572d05424d0ecb2a65ec6a82aeacbf', 2, 0, 0, 0, 0, 0),
+  ('idle@example.com',   '$2y$10$zwzsLaBoYCYRMC8wR2Df7eJT1lrq6IjnsIHKElvgu9rGzrSxwyoEW', 2, 0, 0, 0, 0, 0),
   ('poor@example.com',   '3afc79b597f88a72528e864cf81856d2', 3, 0, 0, 0, 125000, 0);
 
 -- An army in the field, so the tick's return path is exercised.
@@ -79,7 +90,7 @@ INSERT INTO `research` (email, pw, userid, r1, r15, r1pts, r13pts, r14pts) VALUE
 DELETE FROM `returntbl` WHERE userid IN (1, 2, 3);
 INSERT INTO `returntbl` (email, pw, userid, war1, wiz1, pri1, arch1, golem1, irongolem1, time1, war2, golem2, time2) VALUES
   ('tester@example.com', '16d7a4fca7442dda3ad93c9a726597e4', 1, 40, 2, 1, 3, 2, 1, 1, 25, 1, 3),
-  ('idle@example.com',   'c1572d05424d0ecb2a65ec6a82aeacbf', 2,  0, 0, 0, 0, 0, 0, 0,  0, 0, 0),
+  ('idle@example.com',   '$2y$10$zwzsLaBoYCYRMC8wR2Df7eJT1lrq6IjnsIHKElvgu9rGzrSxwyoEW', 2,  0, 0, 0, 0, 0, 0, 0,  0, 0, 0),
   ('poor@example.com',   '3afc79b597f88a72528e864cf81856d2', 3,  0, 0, 0, 0, 0, 0, 0,  0, 0, 0);
 
 -- user.fleets counts generals still AVAILABLE, not armies in the field: sending
@@ -90,7 +101,7 @@ UPDATE `user` SET fleets = 2 WHERE userid = 1;
 
 INSERT INTO `explore` (email, pw, userid) VALUES
   ('tester@example.com', '16d7a4fca7442dda3ad93c9a726597e4', 1),
-  ('idle@example.com',   'c1572d05424d0ecb2a65ec6a82aeacbf', 2),
+  ('idle@example.com',   '$2y$10$zwzsLaBoYCYRMC8wR2Df7eJT1lrq6IjnsIHKElvgu9rGzrSxwyoEW', 2),
   ('poor@example.com',   '3afc79b597f88a72528e864cf81856d2', 3);
 
 -- A guild exists so the guild and guild-forum pages are reachable. Without

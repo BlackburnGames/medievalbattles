@@ -32,7 +32,7 @@ CREATE TABLE `barter` (
 
 CREATE TABLE `buildings` (
   `email` varchar(50) NOT NULL default '',
-  `pw` varchar(50) NOT NULL default '',
+  `pw` varchar(255) NOT NULL default '',
   `amts` bigint(255) NOT NULL default '0',
   `aland` bigint(255) NOT NULL default '0',
   `home` bigint(255) NOT NULL default '0',
@@ -118,7 +118,7 @@ CREATE TABLE `empnews` (
 
 CREATE TABLE `explore` (
   `email` varchar(50) NOT NULL default '',
-  `pw` varchar(50) NOT NULL default '',
+  `pw` varchar(255) NOT NULL default '',
   `userid` bigint(20) NOT NULL default '0',
   `expland` bigint(20) NOT NULL default '0',
   `expmt` bigint(20) NOT NULL default '0',
@@ -344,7 +344,7 @@ CREATE TABLE `messages` (
 
 CREATE TABLE `military` (
   `email` varchar(50) NOT NULL default '',
-  `pw` varchar(50) NOT NULL default '',
+  `pw` varchar(255) NOT NULL default '',
   `warriors` bigint(255) unsigned NOT NULL default '0',
   `wizards` bigint(255) unsigned NOT NULL default '0',
   `priests` bigint(255) unsigned NOT NULL default '0',
@@ -462,7 +462,7 @@ CREATE TABLE `military` (
 
 CREATE TABLE `research` (
   `email` varchar(50) NOT NULL default '',
-  `pw` varchar(50) NOT NULL default '',
+  `pw` varchar(255) NOT NULL default '',
   `userid` bigint(255) NOT NULL default '0',
   `r1` bigint(255) NOT NULL default '0',
   `r2` bigint(255) NOT NULL default '0',
@@ -525,7 +525,7 @@ CREATE TABLE `research` (
 
 CREATE TABLE `returntbl` (
   `email` varchar(50) NOT NULL default '',
-  `pw` varchar(50) NOT NULL default '',
+  `pw` varchar(255) NOT NULL default '',
   `userid` bigint(255) NOT NULL default '0',
   `war1` bigint(255) NOT NULL default '0',
   `war2` bigint(255) NOT NULL default '0',
@@ -683,7 +683,7 @@ INSERT INTO settlement () VALUES (), (), (), (), (), (), (), (), (), ();
 
 CREATE TABLE `user` (
   `email` varchar(50) NOT NULL default '',
-  `pw` varchar(50) NOT NULL default '',
+  `pw` varchar(255) NOT NULL default '',
   `ename` varchar(255) NOT NULL default '',
   `race` varchar(255) NOT NULL default '',
   `class` varchar(255) NOT NULL default '',

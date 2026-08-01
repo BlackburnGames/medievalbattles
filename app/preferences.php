@@ -53,9 +53,13 @@ if(!IsSet($changepw))	{
 }
 else	{
 	include("include/S_SINFOS.php");
-	$md5currentpw = md5($currentpw);
-			
-	if($md5currentpw != $pw)	{
+
+	// Verified against the stored hash rather than compared to it. $pw IS the
+	// stored hash -- it is what the session carries and what every query in the
+	// game filters on -- so with md5 the check could be digest == digest. A
+	// salted hash cannot be recomputed from the password alone, which is the
+	// point of it, so the plaintext goes to include/password.php instead.
+	if(!mb_password_verify($currentpw, $pw))	{
 		echo"<div align=center><font class=yellow>Your current password is not correct.</font></div>";
 		include("include/chngpw_table.php");
 		include("include/S_PREF.php");
@@ -76,21 +80,20 @@ else	{
 	// characters and always was, but with the request value and the hash of it
 	// sharing one name, that is only true if you read all three lines in order.
 	//
-	// md5($newpw), not md5(htmlspecialchars($newpw)). Escaping the password
-	// before hashing it was the same 2003 reflex as escaping everything else on
-	// the way in, and here it locked people out: checksignup.php and
+	// mb_password_hash($newpw), not md5(htmlspecialchars($newpw)). Escaping the
+	// password before hashing it was the same 2003 reflex as escaping everything
+	// else on the way in, and here it locked people out: checksignup.php and
 	// checklogin.php both hash the raw string, so a password containing & < > "
 	// or ' was stored as the digest of a value login could never reproduce.
 	// credentials.php constrains the hash, not the password, so nothing stopped
 	// it. The line above it did the same thing to the *current* password check
 	// and was harmless only because the next line immediately overwrote it.
-	$newpw_hash = md5($newpw);
-	mysqli_query($db, "UPDATE user SET pw='$newpw_hash' WHERE $q_cred") or die(mysqli_error($db));
-	mysqli_query($db, "UPDATE buildings SET pw='$newpw_hash' WHERE $q_cred") or die(mysqli_error($db));
- 	mysqli_query($db, "UPDATE military SET pw='$newpw_hash' WHERE $q_cred") or die(mysqli_error($db));
- 	mysqli_query($db, "UPDATE research SET pw='$newpw_hash' WHERE $q_cred") or die(mysqli_error($db));
- 	mysqli_query($db, "UPDATE returntbl SET pw='$newpw_hash' WHERE $q_cred") or die(mysqli_error($db));
- 	mysqli_query($db, "UPDATE explore SET pw='$newpw_hash' WHERE $q_cred") or die(mysqli_error($db));
+	//
+	// The six UPDATEs moved to include/password.php, because checklogin.php has
+	// to run exactly the same set when it rehashes a legacy row, and two copies
+	// of a six-table list is how one of them ends up short.
+	$newpw_hash = mb_password_hash($newpw);
+	mb_password_store($db, $email, $pw, $newpw_hash);
 	$pw = $newpw_hash;
 	$_SESSION['pw'] = $pw;
 
@@ -175,7 +178,11 @@ if(!IsSet($delete))	{
 }
 else	{
 
-	$dpw = md5($dpw);
+	// Checked as typed. The digest was taken on the line above this test, and
+	// md5("") is a 32-character string rather than an empty one -- so the "you
+	// must specify a password" branch could never run and an empty box fell
+	// through to the mismatch message below it. Both refuse the deletion; only
+	// one of them says why.
 	if($dpw == "")	{
 		echo"<div align=center><font class=yellow>In order to delete, you must specify a password.</font></div>";
 		include("include/chngpw_table.php");
@@ -183,7 +190,7 @@ else	{
 		include("include/S_PD.php");
 		die();
 	}
-	elseif($pw != $dpw)	{
+	elseif(!mb_password_verify($dpw, $pw))	{
 		echo"<div align=center><font class=yellow>Incorrect password.</font><div>";
 		include("include/chngpw_table.php");
 		include("include/S_PREF.php");
