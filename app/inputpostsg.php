@@ -22,25 +22,31 @@ include("include/session.php");
 include("commong.php");	
 include("include/clock.php");
 
+$q_topic   = mb_sql_str($db, $topic);
+$q_message = mb_sql_str($db, $message);
+$q_ename   = mb_sql_str($db, $ename);
+$q_guild   = mb_sql_str($db, $empireguild);
+$q_topicid = mb_sql_int($topicid);
+
 if ($addtopic) {
 
-	$result = mysqli_query($db, "INSERT INTO guildthreads (name, topic, message, datestamp, guildname)		VALUES ('$ename', '$topic', '$message', '$clock', '$empireguild')");
+	$result = mysqli_query($db, "INSERT INTO guildthreads (name, topic, message, datestamp, guildname)		VALUES ($q_ename, $q_topic, $q_message, '$clock', $q_guild)");
 
-	$result4 = mysqli_query($db, "UPDATE guildthreads SET lastpost='$clock' WHERE topic='$topic' AND guildname = '$empireguild'");
-	$result6 = mysqli_query($db, "UPDATE guildthreads SET lastposter='$ename' WHERE topic='$topic' AND guildname = '$empireguild'");
+	$result4 = mysqli_query($db, "UPDATE guildthreads SET lastpost='$clock' WHERE topic=$q_topic AND guildname = $q_guild");
+	$result6 = mysqli_query($db, "UPDATE guildthreads SET lastposter=$q_ename WHERE topic=$q_topic AND guildname = $q_guild");
 
-	header ("Location: gforums.php"); 
+	header ("Location: gforums.php");
 }
 
 elseif ($addreply) {
 
-	$query1 = mysqli_query($db, "INSERT INTO guildmsgs (name, topic, topicid, message, datestamp)	VALUES ('$ename', '$topic', '$topicid', '$message', '$clock')");
+	// See input.posts.php: the INSERT was being run twice, the second time with
+	// its own return value as the query string.
+	$result1 = mysqli_query($db, "INSERT INTO guildmsgs (name, topic, topicid, message, datestamp)	VALUES ($q_ename, $q_topic, $q_topicid, $q_message, '$clock')");
+	$lastid = mysqli_insert_id($db);
 
-	$result1 = mysqli_query($db, $query1);
-	$lastid = mysqli_insert_id($db);	
-
-	$result5 = mysqli_query($db, "UPDATE guildthreads SET lastpost='$clock' WHERE topicid='$topicid'");
-	$result2 = mysqli_query($db, "UPDATE guildthreads SET lastposter='$ename' WHERE topicid='$topicid'");
+	$result5 = mysqli_query($db, "UPDATE guildthreads SET lastpost='$clock' WHERE topicid=$q_topicid");
+	$result2 = mysqli_query($db, "UPDATE guildthreads SET lastposter=$q_ename WHERE topicid=$q_topicid");
 
 
 	header ("Location: topicg.php?topicid=$topicid");

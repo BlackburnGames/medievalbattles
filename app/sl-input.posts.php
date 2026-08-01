@@ -32,22 +32,27 @@ if($sl == 'yes')	{
 }
 
 
+$q_topic   = mb_sql_str($db, $topic);
+$q_message = mb_sql_str($db, $message);
+$q_ename   = mb_sql_str($db, $ename);
+$q_topicid = mb_sql_int($topicid);
+
 if ($addtopic) {
-	$result = mysqli_query($db, "INSERT INTO setforums (setid, name, topic, replies, message, datestamp)	VALUES ('$setid', '$ename', '$topic', '$replies', '$message', '$clock')");
+	$result = mysqli_query($db, "INSERT INTO setforums (setid, name, topic, replies, message, datestamp)	VALUES ('$setid', $q_ename, $q_topic, '$replies', $q_message, '$clock')");
 
-	$topic_lastpost = mysqli_query($db, "UPDATE setforums SET lastpost='$clock' WHERE topic='$topic' AND setid='$setid'");
-	$topic_lastposter = mysqli_query($db, "UPDATE setforums SET lastposter='$ename' WHERE topic='$topic' AND setid='$setid'");
+	$topic_lastpost = mysqli_query($db, "UPDATE setforums SET lastpost='$clock' WHERE topic=$q_topic AND setid='$setid'");
+	$topic_lastposter = mysqli_query($db, "UPDATE setforums SET lastposter=$q_ename WHERE topic=$q_topic AND setid='$setid'");
 
-	header ("Location: sl-forum.php"); 
+	header ("Location: sl-forum.php");
 }
 elseif ($addreply) {
-	$query1 = mysqli_query($db, "INSERT INTO setforumsmsgs (setid, name, topic, topicid, message, datestamp)	 VALUES ('$setid', '$ename', '$topic', '$topicid', '$message', '$clock')");
+	// See input.posts.php: the INSERT was being run twice, the second time with
+	// its own return value as the query string.
+	$result1 = mysqli_query($db, "INSERT INTO setforumsmsgs (setid, name, topic, topicid, message, datestamp)	 VALUES ('$setid', $q_ename, $q_topic, $q_topicid, $q_message, '$clock')");
+	$lastid = mysqli_insert_id($db);
 
-	$result1 = mysqli_query($db, $query1);
-	$lastid = mysqli_insert_id($db);	
-
-	$reply_lastpost = mysqli_query($db, "UPDATE setforums SET lastpost='$clock' WHERE topicid='$topicid' AND setid='$setid'");
-	$reply_lastposter = mysqli_query($db, "UPDATE setforums SET lastposter='$ename' WHERE topicid='$topicid' AND setid='$setid'");
+	$reply_lastpost = mysqli_query($db, "UPDATE setforums SET lastpost='$clock' WHERE topicid=$q_topicid AND setid='$setid'");
+	$reply_lastposter = mysqli_query($db, "UPDATE setforums SET lastposter=$q_ename WHERE topicid=$q_topicid AND setid='$setid'");
 
 	header ("Location: sl-topic.php?topicid=$topicid");
 }

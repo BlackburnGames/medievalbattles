@@ -29,32 +29,44 @@ include("include/clock.php");
 $gresult = mysqli_query($db, "SELECT owner FROM guild WHERE owner='$userid'");
 $gnamecheck = mysqli_fetch_array($gresult);
 			
-if ($addtopic) {
-	
-	$replies = "0";
-	$result = mysqli_query($db, "INSERT INTO guildthreads (name, topic, replies, message, datestamp, guildname) VALUES ('$ename', '$topic', '$replies', '$message', '$clock', '$empireguild')");
+$q_topic   = mb_sql_str($db, $topic);
+$q_message = mb_sql_str($db, $message);
+$q_ename   = mb_sql_str($db, $ename);
+$q_guild   = mb_sql_str($db, $empireguild);
+$q_topicid = mb_sql_int($topicid);
 
-	$query4 = "UPDATE guildthreads SET lastpost='$clock' WHERE topic='$topic' AND guildname = '$empireguild'";
+if ($addtopic) {
+
+	$replies = "0";
+	$result = mysqli_query($db, "INSERT INTO guildthreads (name, topic, replies, message, datestamp, guildname) VALUES ($q_ename, $q_topic, '$replies', $q_message, '$clock', $q_guild)");
+
+	$query4 = "UPDATE guildthreads SET lastpost='$clock' WHERE topic=$q_topic AND guildname = $q_guild";
 	$result4 = mysqli_query($db, $query4);
 
-	$query6 = "UPDATE guildthreads SET lastposter='$ename' WHERE topic='$topic' AND guildname = '$empireguild'";
+	$query6 = "UPDATE guildthreads SET lastposter=$q_ename WHERE topic=$q_topic AND guildname = $q_guild";
 	$result6 = mysqli_query($db, $query6);
-echo $query4 . "<BR>" . $query6;
-	header ("Location: gl-forum.php"); 
+	// A debug echo of both UPDATE statements stood here, printing the SQL to
+	// the page on every guild-leader post since 2003.
+	header ("Location: gl-forum.php");
 }
 
 elseif ($addreply) {
-	$query1 = mysqli_query($db, "INSERT INTO guildmsgs (name, topic, topicid, message, datestamp) VALUES ('$ename', '$topic', '$topicid', '$message', $clock')");
-	$result1 = mysqli_query($db, $query1);
-	$lastid = mysqli_insert_id($db);	
+	// Two bugs on one line, and this page was never reached by the suite so
+	// neither showed. The INSERT was missing the opening quote on $clock --
+	// "..., $clock')" -- so it has always been a syntax error and no guild
+	// leader has ever managed to reply to a thread. Then its return value was
+	// passed straight back to mysqli_query() as a second query, which is the
+	// same double-execute the other three post handlers carry.
+	$result1 = mysqli_query($db, "INSERT INTO guildmsgs (name, topic, topicid, message, datestamp) VALUES ($q_ename, $q_topic, $q_topicid, $q_message, '$clock')");
+	$lastid = mysqli_insert_id($db);
 
-	$query5 = "UPDATE guildthreads SET lastpost='$clock' WHERE topicid='$topicid'";
+	$query5 = "UPDATE guildthreads SET lastpost='$clock' WHERE topicid=$q_topicid";
 	$result5 = mysqli_query($db, $query5);
-	
-	$query2 = "UPDATE guildthreads SET lastposter= '$ename' WHERE topicid= '$topicid'";
+
+	$query2 = "UPDATE guildthreads SET lastposter= $q_ename WHERE topicid= $q_topicid";
 	$result2 = mysqli_query($db, $query2);
 
-	$query3 = "UPDATE guildthreads SET replies=replies+1 WHERE topicid='$topicid'";
+	$query3 = "UPDATE guildthreads SET replies=replies+1 WHERE topicid=$q_topicid";
 	$result3 = mysqli_query($db, $query3);
 	header ("Location: gl-topic.php?topicid=$topicid");
 }

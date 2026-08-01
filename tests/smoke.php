@@ -134,14 +134,10 @@ $UNREACHABLE = array(
     'commong.php'          => 'include: guild helpers, pulled in by the g* pages',
     'functions.php'        => 'include: loads the logged-in user state into globals',
 
-    // Reached only by submitting a form, which the crawler does not do -- it
-    // follows links. Covering these means driving the forms, not seeding data.
+    // Reached only by submitting a form. The four thread handlers are driven
+    // by postForm() now; these two are not.
     'checklogin.php'       => 'POST handler: exercised by the login that starts this run',
     'checksignup.php'      => 'POST handler: creates a user from rand(), see docs/testing.md',
-    'input.posts.php'      => 'POST handler: creates a settlement forum thread',
-    'inputpostsg.php'      => 'POST handler: creates a guild forum thread',
-    'sl-input.posts.php'   => 'POST handler: settlement-leader thread creation',
-    'gl-inputposts.php'    => 'POST handler: guild-leader thread creation',
     'gl-topic.php'         => 'POST handler: guild-leader thread moderation view',
 
     // Deliberately skipped: destructive by plain GET. See $SKIP.
@@ -180,7 +176,35 @@ $unfinished  = 0;
 $anon = new MbClient($BASE);
 crawl($anon, array('index.php', 'index.php?page=about_us'), $MAX_ANON_PAGES);
 
-crawl(login($BASE, $EMAIL, $PASS), array('main.php?pageid=news'), $MAX_PAGES);
+/*
+ * The primary tester: leads Testguild and settlement 1, so both leader-only
+ * forum surfaces are theirs.
+ *
+ * The forms go first, before the crawl rather than after it, so the threads
+ * they create are on the board when the crawl reaches the listings -- the reply
+ * handlers then get exercised against a thread this run wrote, not only against
+ * the seeded ones. Apostrophes in every field on purpose: an unescaped
+ * interpolation loses the row silently, which is exactly the failure this
+ * suite exists to catch, and none of these handlers checks a return value.
+ */
+$tester = login($BASE, $EMAIL, $PASS);
+foreach (array('gl-inputposts.php', 'sl-input.posts.php', 'input.posts.php') as $handler) {
+    // Both arms of every handler. addtopic and addreply are separate branches
+    // running separate queries against separate tables, and gl-inputposts.php's
+    // reply branch was broken in a way its topic branch was not.
+    postForm($tester, $handler, array(
+        'addtopic' => 'Post this message',
+        'topic'    => "A leader's topic ($handler)",
+        'message'  => "Muster at O'Brien's ford.",
+    ));
+    postForm($tester, $handler, array(
+        'addreply' => 'Reply with this message',
+        'topicid'  => 1,
+        'topic'    => "A leader's reply ($handler)",
+        'message'  => "O'Brien is holding the ford.",
+    ));
+}
+crawl($tester, array('main.php?pageid=news'), $MAX_PAGES);
 
 /*
  * A second identity, run last and on a smaller budget.
@@ -194,7 +218,21 @@ crawl(login($BASE, $EMAIL, $PASS), array('main.php?pageid=news'), $MAX_PAGES);
  * Last because the crawl mutates game state through plain GET links, and the
  * primary pass should see the fixture world rather than whatever this one left.
  */
-crawl(login($BASE, $MEMBER_EMAIL, $MEMBER_PASS), array('main.php?pageid=news'), $MAX_MEMBER_PAGES);
+$member = login($BASE, $MEMBER_EMAIL, $MEMBER_PASS);
+// inputpostsg.php is the rank-and-file guild post handler; gl-inputposts.php
+// above is the leader's. They are separate files with separate queries.
+postForm($member, 'inputpostsg.php', array(
+    'addtopic' => 'Post this message',
+    'topic'    => "A member's topic",
+    'message'  => "Where is O'Brien?",
+));
+postForm($member, 'inputpostsg.php', array(
+    'addreply' => 'Reply with this message',
+    'topicid'  => 1,
+    'topic'    => "A member's reply",
+    'message'  => "O'Brien is at the ford.",
+));
+crawl($member, array('main.php?pageid=news'), $MAX_MEMBER_PAGES);
 
 /**
  * Authenticate a fresh client, or abort the run.
@@ -251,45 +289,7 @@ function crawl(MbClient $client, array $seeds, $maxPages)
         $scriptsHit[strtok($path, '?')] = true;
         creditFragment($path, $scriptsHit);
 
-        $status = $client->lastStatus;
-        if ($status !== 200 && $status !== 302) {
-            $failures[] = array($path, "HTTP $status");
-        }
-
-        // Diagnostics must be matched against the stripped text, not the raw
-        // body: with html_errors on, PHP emits "<b>Notice</b>:  ..." and any
-        // pattern expecting "Notice:" silently matches nothing. That produces a
-        // green run that proves absolutely nothing, which is worse than a red one.
-        $text = html_entity_decode(strip_tags($body), ENT_QUOTES);
-
-        if (preg_match_all($FAIL_PATTERN, $text, $matches, PREG_SET_ORDER)) {
-            foreach ($matches as $m) {
-                // PHP 8 raises the old uninitialised-read notices to warnings;
-                // count them as notices so the severity policy means the same
-                // thing on both versions. See $SEVERITY_DEMOTED.
-                if (preg_match($SEVERITY_DEMOTED, $m[2])) {
-                    $noticeCount++;
-                    continue;
-                }
-                $signature = signature($m[1], $m[2]);
-
-                // Query-audit mode: collect the mysqli failures instead of
-                // failing on them. They only appear at all when connect.php is
-                // running with MB_REPORT_QUERIES=1, which the normal stack is
-                // not, so this branch is inert in an ordinary run.
-                if ($QUERY_AUDIT && preg_match($QUERY_ERROR_PATTERN, $m[2])) {
-                    $queryErrors[$signature][$path] = true;
-                    continue;
-                }
-
-                $observed[$signature] = true;
-                if (!isset($baseline[$signature])) {
-                    $failures[$signature] = $path;
-                }
-            }
-        }
-
-        $noticeCount += preg_match_all($NOTICE_PATTERN, $text, $ignored);
+        inspect($path, $body, $client->lastStatus);
 
         foreach (extractLinks($body) as $link) {
             if (isSkipped($link, $SKIP)) {
@@ -305,6 +305,84 @@ function crawl(MbClient $client, array $seeds, $maxPages)
     // Reported rather than silent: a phase that ran out of budget with work
     // left did not prove the pages it never opened were fine.
     $unfinished += count($queue);
+}
+
+/**
+ * Assert on one response, whatever fetched it.
+ *
+ * Lifted out of crawl() so a form submission gets exactly the same treatment as
+ * a followed link. A POST handler that emits a warning has to fail the run for
+ * the same reason a page does, and there is no version of that which should be
+ * decided by how the request was made.
+ */
+function inspect($path, $body, $status)
+{
+    global $FAIL_PATTERN, $NOTICE_PATTERN, $SEVERITY_DEMOTED;
+    global $QUERY_AUDIT, $QUERY_ERROR_PATTERN, $queryErrors;
+    global $baseline, $failures, $observed, $noticeCount;
+
+    if ($status !== 200 && $status !== 302) {
+        $failures[] = array($path, "HTTP $status");
+    }
+
+    // Diagnostics must be matched against the stripped text, not the raw
+    // body: with html_errors on, PHP emits "<b>Notice</b>:  ..." and any
+    // pattern expecting "Notice:" silently matches nothing. That produces a
+    // green run that proves absolutely nothing, which is worse than a red one.
+    $text = html_entity_decode(strip_tags($body), ENT_QUOTES);
+
+    if (preg_match_all($FAIL_PATTERN, $text, $matches, PREG_SET_ORDER)) {
+        foreach ($matches as $m) {
+            // PHP 8 raises the old uninitialised-read notices to warnings;
+            // count them as notices so the severity policy means the same
+            // thing on both versions. See $SEVERITY_DEMOTED.
+            if (preg_match($SEVERITY_DEMOTED, $m[2])) {
+                $noticeCount++;
+                continue;
+            }
+            $signature = signature($m[1], $m[2]);
+
+            // Query-audit mode: collect the mysqli failures instead of
+            // failing on them. They only appear at all when connect.php is
+            // running with MB_REPORT_QUERIES=1, which the normal stack is
+            // not, so this branch is inert in an ordinary run.
+            if ($QUERY_AUDIT && preg_match($QUERY_ERROR_PATTERN, $m[2])) {
+                $queryErrors[$signature][$path] = true;
+                continue;
+            }
+
+            $observed[$signature] = true;
+            if (!isset($baseline[$signature])) {
+                $failures[$signature] = $path;
+            }
+        }
+    }
+
+    $noticeCount += preg_match_all($NOTICE_PATTERN, $text, $ignored);
+}
+
+/**
+ * Submit one form, and count the handler as reached.
+ *
+ * The crawler follows links, so every POST handler in the game sat outside the
+ * net -- including the four that write forum threads, which between them hold
+ * most of what is left on the SQL injection worklist. Rewriting a page the
+ * suite does not visit is a guess, so they are driven here instead.
+ *
+ * Deliberately not seeded through the DB: the point is to exercise the handler,
+ * and an INSERT written by hand into the fixture proves nothing about the code
+ * that was supposed to write it.
+ */
+function postForm(MbClient $client, $path, array $fields)
+{
+    global $scriptsHit, $visited;
+
+    $body = $client->post('/' . $path, $fields);
+    $visited++;
+    $scriptsHit[strtok($path, '?')] = true;
+    inspect($path, $body, $client->lastStatus);
+
+    return $body;
 }
 
 /**
