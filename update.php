@@ -16,8 +16,10 @@ include("app/include/clock.php");
  *
  * An inverted value's citation changes direction with it: gamedata.php is the
  * definition now and the comment says who reads it.
+ *
+ * $GAMEDATA arrives with connect.php above, which is the one include every
+ * reader of it already has.
  */
-include("app/include/gamedata.php");
 $ECON = $GAMEDATA['economy'];
 
 echo "<p>Starting update process</p>";
@@ -535,14 +537,22 @@ This email is automated. Your reply will not be recieved.";
   mysqli_query($db, "UPDATE messages SET age = age + 1");
   mysqli_query($db, "UPDATE setnews SET age = age + 1");
   mysqli_query($db, "UPDATE guildnews SET age = age + 1");
-  mysqli_query($db, "DELETE FROM messages WHERE age='192'");
-  mysqli_query($db, "DELETE FROM setnews WHERE age='192'");
-  mysqli_query($db, "DELETE FROM guildnews WHERE age='192'");
+  // Housekeeping constants, read rather than repeated. The message and news
+  // tables share one lifetime, which is why it is one value.
+  $msg_ttl   = $GAMEDATA['timers']['message_ttl_ticks'];
+  $exp_floor = $GAMEDATA['timers']['exp_floor'];
 
-  mysqli_query($db, "UPDATE user SET exp = 1000 WHERE exp < 1000");
+  mysqli_query($db, "DELETE FROM messages WHERE age='$msg_ttl'");
+  mysqli_query($db, "DELETE FROM setnews WHERE age='$msg_ttl'");
+  mysqli_query($db, "DELETE FROM guildnews WHERE age='$msg_ttl'");
+
+  mysqli_query($db, "UPDATE user SET exp = $exp_floor WHERE exp < $exp_floor");
   mysqli_query($db, "UPDATE game_info SET tick = 'no'");
 
-  while($SET_INC < 31)  {
+  // The strength recalculation walks settlement ids rather than rows, so it is
+  // bounded by the count rather than by the table. See the quirk in
+  // gamedata.php: this number and the schema disagree.
+  while($SET_INC < $GAMEDATA['settlements']['count'] + 1)  {
     $SET_STRENGTH = mysqli_query($db, "SELECT sum(exp) FROM user WHERE setid = '$SET_INC'");
       $S_STRENGTH = mb_db_result($SET_STRENGTH, 0, 0);
     mysqli_query($db, "UPDATE settlement SET setstrength = '$S_STRENGTH' WHERE setid='$SET_INC'");

@@ -47,6 +47,22 @@ require_once __DIR__ . '/news.php';
 require_once __DIR__ . '/password.php';
 
 /**
+ * And gamedata.php, now that the engine reads it rather than being transcribed
+ * into it.
+ *
+ * $GAMEDATA is data, not helpers, so this is the odd one out in the list -- but
+ * it is here for the same reason the rest are. The values are read from the
+ * tick, from the settlement range checks and from manual.php, which have no
+ * include in common except this one, and a page that needs a game constant is
+ * a page that was going to run a query about it.
+ *
+ * require_once matters more here than above: this file assigns rather than
+ * declares, so plain include() would rebuild the array on every one of the
+ * repeated connect.php includes the codebase makes per request.
+ */
+require_once __DIR__ . '/gamedata.php';
+
+/**
  * Query errors are reported again, as of Phase 3.
  *
  * PHP 8.1 made mysqli throw on error instead of returning false. Phase 2 turned

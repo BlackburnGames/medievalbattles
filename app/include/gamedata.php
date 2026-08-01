@@ -386,11 +386,14 @@ $GAMEDATA['intel'] = array(
  * Timers, protection, housekeeping.
  * ------------------------------------------------------------------ */
 $GAMEDATA['timers'] = array(
-    'safemode_ticks'     => 48,   // checksignup.php:140-141, update.php:368
-    'activation_ticks'   => 48,   // db.sql emailvalidate.clock, update.php:208-233
-    'inactivity_ticks'   => 336,  // db.sql user.countdown, update.php:238-263
-    'message_ttl_ticks'  => 192,  // update.php:484-489 -- messages and news
-    'exp_floor'          => 1000, // update.php:491
+    // Still transcribed: both are schema column defaults, and the tick only
+    // counts them down -- there is no literal in the engine to invert.
+    'safemode_ticks'     => 48,   // checksignup.php:140-141
+    'activation_ticks'   => 48,   // db.sql emailvalidate.clock
+    'inactivity_ticks'   => 336,  // db.sql user.countdown
+    // Inverted.
+    'message_ttl_ticks'  => 192,  // read by update.php -- messages and both news tables
+    'exp_floor'          => 1000, // read by update.php
 );
 
 $GAMEDATA['guilds'] = array(
@@ -399,7 +402,11 @@ $GAMEDATA['guilds'] = array(
 );
 
 $GAMEDATA['settlements'] = array(
-    'count' => 30,  // update.php:494, include/S_INTEL.php:6
+    // Read by update.php's strength loop and by the three settlement range
+    // checks that carried the literal: include/S_INTEL.php, include/S_MESS.php
+    // and include/attack/scattack.php. See the quirk below -- the number and
+    // the schema do not agree, and this file records what the code does.
+    'count' => 30,
 );
 
 /* ------------------------------------------------------------------ *
@@ -426,5 +433,6 @@ $GAMEDATA['quirks'] = array(
     'The explore page shows special rates for Angels (fewer explorers needed) and Demons (more needed), but the tick only implements the Human rate; everyone else gets the default. (include/S_EXPLORE.php:33-36 vs update.php:88)',
     'Night Elves are dealt 4-10 archers at signup, but the free Archery research is immediately overwritten unless they are also Rangers. (checksignup.php:130-134)',
     'The attacker\'s race/class combat modifier is applied to the defender\'s power as well as their own. (attack/defANDoff.php:42-44)',
+    'The game does not agree with itself about how many settlements there are. db.sql ships ten, and settlement.php and the three attack drop-downs ask the schema -- max(setid) -- so they offer ten. The intel, messaging and settlement-attack range checks carried a hardcoded 30 instead, and the tick recalculates strength for ids 0 to 30, so twenty of those passes match no row. Settlements 11-30 are therefore selectable on three screens and empty on all of them. ($GAMEDATA[settlements][count] vs db.sql:672)',
     'Sage accounting disagrees with itself about how many research projects there are. Points accrue across all eighteen, the assigned-sage totals on the status and research screens count the first sixteen, and your score counts only the first fourteen -- so a sage on Animation or Advanced Animation is invisible to both totals, and one on Advanced Farming or Advanced Construction is invisible to your score. (update.php:203 vs functions.php:244 and cresearch.php:112 vs update.php:292)',
 );

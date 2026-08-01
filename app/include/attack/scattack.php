@@ -9,7 +9,10 @@ $snum   = mb_input('snum');
 
 if($setchg == 1)	{
 
-	if($snum > 30 OR $snum <= 0)	{
+	// The settlement count is gamedata's; see the quirk there about it
+	// disagreeing with the schema, and about the four sibling sites that ask
+	// max(setid) instead.
+	if($snum > $GAMEDATA['settlements']['count'] OR $snum <= 0)	{
 		echo"<font class=yellow><div align=center>Settlement " . mb_h($snum) . " does not exist.</font></div><br><br>";
 		die();
 	}

@@ -543,6 +543,31 @@ attribute.
   now, and the comment names the reader. Uninverted entries keep their `file:line`
   and the block says which is which.
 
+  The tick's housekeeping constants went the same way — the message and news
+  lifetime, the experience floor — and with them the settlement count, which is
+  read by the strength loop and by the three range checks that carried the
+  literal. `$GAMEDATA` arrives with `connect.php`, alongside `db.php`,
+  `html.php`, `news.php` and `password.php`, for the reason those are there: it
+  is the one include every reader already has.
+
+  **Two of the timers cannot be inverted and the block says so.** The activation
+  and inactivity clocks are schema column defaults; the tick only counts them
+  down, so there is no literal in the engine to take away.
+
+  Inverting the settlement count surfaced a disagreement, now recorded as a
+  quirk. `db.sql` ships **ten** settlements, and `settlement.php` and the three
+  attack drop-downs ask `max(setid)` — so they offer ten. The intel, messaging
+  and settlement-attack range checks said 30, and the tick recalculates strength
+  for ids 0 to 30. Settlements 11–30 are selectable on three screens and empty
+  on all of them. Nothing here changed that; the number moved into one place and
+  the contradiction became visible instead of being spread across four files.
+
+  The three range checks are driven from the crawl now, both arms. They are
+  forms, so the crawler never reached them — and the failure mode the inversion
+  introduces is silent: a `$GAMEDATA` that fails to arrive turns the bound into
+  `$snum > null`, which refuses every settlement in the game on a page that
+  still renders.
+
 ### The barter system, switched back on
 
 `barter.php` opened with an echo and a `die()` above every other statement in

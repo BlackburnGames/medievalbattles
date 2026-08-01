@@ -272,6 +272,38 @@ foreach (array(
 }
 
 /*
+ * The settlement range check, on the three screens that carry it.
+ *
+ * Driven by hand because the crawler follows links and these are forms. That
+ * matters more than it looks: the bound is $GAMEDATA['settlements']['count']
+ * now, and all three files read it out of a global their includer supplies. If
+ * it ever fails to arrive the comparison becomes "$snum > null", which refuses
+ * every settlement in the game -- and the crawl would not notice, because the
+ * pages still render.
+ *
+ * snum=1 rather than the tester's neighbour: the accepted arm writes csnum, and
+ * 1 is what it already holds, so which settlement the crawl below sees does not
+ * depend on this.
+ */
+foreach (array('intel.php', 'messaging.php', 'scattack.php') as $page) {
+    $body = $tester->get('/' . $page . '?setchg=1&snum=1');
+    $visited++;
+    inspect($page . '?snum=1', $body, $tester->lastStatus);
+    if (stripos($body, 'does not exist') !== false) {
+        $failures[$page . ' | refused a settlement that exists'] =
+            'the range check bound is missing or zero -- is $GAMEDATA in scope?';
+    }
+
+    $body = $tester->get('/' . $page . '?setchg=1&snum=31');
+    $visited++;
+    inspect($page . '?snum=31', $body, $tester->lastStatus);
+    if (stripos($body, 'does not exist') === false) {
+        $failures[$page . ' | accepted a settlement past the end'] =
+            'the range check is not bounded by $GAMEDATA[settlements][count]';
+    }
+}
+
+/*
  * The two barter boards, which were switched off in 2003 and are back.
  *
  * Every path is driven by hand rather than followed: listing is a form, and
