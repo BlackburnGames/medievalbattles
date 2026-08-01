@@ -1,8 +1,13 @@
 <?php
 
-session_register('login');
-session_register('email');
-session_register('pw');
+// The admin area has its own include root, so it cannot reach the app's
+// include/session.php; this is the same bootstrap inlined.
+if (session_status() !== PHP_SESSION_ACTIVE && !headers_sent()) {
+	session_start();
+}
+$login = isset($_SESSION['login']) ? $_SESSION['login'] : '';
+$email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
+$pw    = isset($_SESSION['pw'])    ? $_SESSION['pw']    : '';
 
 function callback($buffer) {
 	return ($buffer);

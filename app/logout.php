@@ -2,8 +2,9 @@
 
 include("include/connect.php");
 
-$email = $_SESSION['email'];
-$pw = $_SESSION['pw'];
+// Was a bare $_SESSION read with no session_start(), so the unsets below hit an
+// empty array and logging out never marked the player offline.
+include("include/session.php");
 
 mysqli_query($db, "UPDATE user SET online='0' WHERE email='$email' AND pw='$pw'");
 

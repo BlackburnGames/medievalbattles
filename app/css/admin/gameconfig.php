@@ -8,23 +8,18 @@ function callback($buffer) {
 ob_start("callback");
 
 /*
-session_register('pw');
-session_register('login');
-
-if($pw == melvin)	 {
-
-}
-else	{
-	header("Location: index.php");
-	exit;
-}
-*/
+ * The page's only authentication was here and was already commented out in
+ * 2003: it restored $pw from the session and compared it to a hardcoded
+ * password, redirecting to index.php on a mismatch. As it stands anyone who
+ * can reach this file can drop every account, message and news table in the
+ * game. Restoring a real check on the admin pages is Phase 3.
+ *
+ * if ($pw == "melvin") { } else { header("Location: index.php"); exit; }
+ */
 ?>
 
 <?php
 if($deletem)	{
-	session_register('pw');
-	session_register('login');
 
 	include("include/connect.php");
 
@@ -70,8 +65,6 @@ if(!IsSet($deleten))
 		else
 		{	
 
-			session_register('pw');
-			session_register('login');
 
 	include("include/connect.php");
 
@@ -120,8 +113,6 @@ if(!IsSet($deletea))
 		{	
 
 
-			session_register('pw');
-			session_register('login');
 	include("include/connect.php");
 
 
@@ -168,8 +159,6 @@ if(!IsSet($deleteg))
 		{	
 
 
-			session_register('pw');
-			session_register('login');
 		include("include/connect.php");
 
 			mysqli_query($db, "DELETE FROM guild"); 
@@ -206,8 +195,6 @@ if(!IsSet($deletef))
 		else
 		{	
 
-			session_register('pw');
-			session_register('login');
 
 include("include/connect.php");
 
@@ -265,8 +252,6 @@ if(!IsSet($deletes))
 		else
 		{	
 
-			session_register('pw');
-			session_register('login');
 
 		include("include/connect.php");
 
@@ -321,8 +306,6 @@ if(!IsSet($daccount))
 							$clock = date(" d F h:i:s a",time() + $timeadjust);
 		$dbnam= "medievalbattles_com";
 
-			session_register('pw');
-			session_register('login');
 include("include/connect.php");
 
 		//SELECTING SETID
@@ -375,8 +358,6 @@ if(!IsSet($reseta))
 		else
 		{	
 
-			session_register('pw');
-			session_register('login');
 include("include/connect.php");
 
 // Reset User Table

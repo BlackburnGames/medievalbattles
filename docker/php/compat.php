@@ -8,52 +8,16 @@
  * ported, and the file shrinking to nothing is the signal that Phase 2 is done.
  *
  * Retired so far: mysql_db_query() and mysql_result() (the whole mysql_*
- * extension is gone from the sources) and ereg_replace(). Left: sessions and
- * register_globals, both of which need call-site changes rather than renames.
+ * extension is gone from the sources), ereg_replace(), and the
+ * session_register() family (call sites now use app/include/session.php and
+ * $_SESSION directly). Left: register_globals, the last item of Phase 2.
  *
  * Deliberately does NOT paper over unquoted array keys ($row[email]), which
  * are fatal from PHP 8; those were fixed at the source in Phase 2.
  */
 
 // ---------------------------------------------------------------------------
-// 1. session_register() family -- removed in PHP 5.4, still called ~51 times.
-//
-//    In PHP 4 this aliased a global to a session slot in both directions: the
-//    value survived the request, and came back as a global on the next one.
-//    Callers (common.php, act_igtop.php) rely on the read direction to restore
-//    $login/$email/$pw, so emulating only the write direction would silently
-//    log everyone out. Exit condition: call sites read $_SESSION directly.
-// ---------------------------------------------------------------------------
-if (!function_exists('session_register')) {
-    function session_register($name)
-    {
-        if (session_id() === '' && !headers_sent()) {
-            session_start();
-        }
-        foreach (func_get_args() as $key) {
-            if (isset($_SESSION[$key])) {
-                $GLOBALS[$key] = $_SESSION[$key];          // session -> global
-            } elseif (isset($GLOBALS[$key])) {
-                $_SESSION[$key] = $GLOBALS[$key];          // global -> session
-            }
-        }
-        return true;
-    }
-
-    function session_unregister($name)
-    {
-        unset($_SESSION[$name], $GLOBALS[$name]);
-        return true;
-    }
-
-    function session_is_registered($name)
-    {
-        return isset($_SESSION[$name]);
-    }
-}
-
-// ---------------------------------------------------------------------------
-// 2. mb_db_result() -- the replacement for mysql_result(), removed in PHP 7.0,
+// 1. mb_db_result() -- the replacement for mysql_result(), removed in PHP 7.0,
 //    and for the ~15 broken mysqli_field_seek() call sites that needed a value
 //    and got a bool. Unlike the rest of this file it is not a shim for a
 //    removed function, so it is the one section that outlives Phase 2; it
@@ -106,7 +70,7 @@ if (!function_exists('mb_db_result')) {
 }
 
 // ---------------------------------------------------------------------------
-// 3. mb_client_hostname() -- extracted from common.php / commong.php.
+// 2. mb_client_hostname() -- extracted from common.php / commong.php.
 //    Both declared their own gethostname(), which became a PHP built-in in
 //    5.3, so loading either was an instant fatal (and loading both, a second
 //    one). Hosted here so there is a single definition.
@@ -126,7 +90,7 @@ if (!function_exists('mb_client_hostname')) {
 }
 
 // ---------------------------------------------------------------------------
-// 4. register_globals -- switched off in PHP 5.4.
+// 3. register_globals -- switched off in PHP 5.4.
 //
 //    This is the single most invasive shim and the reason the stack is bound
 //    to localhost. Injecting request data into the global scope IS the

@@ -1,9 +1,7 @@
 <?php
 include("include/connect.php");
 
-$login = $_SESSION['login'];
-$email = $_SESSION['email'];
-$pw = $_SESSION['pw'];
+include("include/session.php");
 
 // check and make sure email exists
 $EMAIL_RESULT = $db->query("SELECT email FROM user WHERE email='$email' AND pw='$pw'");

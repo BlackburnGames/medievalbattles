@@ -12,7 +12,13 @@ else	{
 	}
 	else	{
 
-		$guild_name = mysqli_query($db, "SELECT gname FROM guild WHERE gid='$gid'");	
+		// The "message guild leader" form below posts no gid, so the target
+		// guild is carried across the round trip in the session. Under PHP 4's
+		// register_globals a session variable was injected back into the global
+		// scope by session_start(), which is where $gid used to come from here.
+		$gid = isset($_SESSION['gid']) ? $_SESSION['gid'] : '';
+
+		$guild_name = mysqli_query($db, "SELECT gname FROM guild WHERE gid='$gid'");
 			$g_name = mb_db_result($guild_name,"g_name");
 		$owner_g = mysqli_query($db, "SELECT owner FROM guild WHERE gid='$gid'");	
 			$owner = mb_db_result($owner_g,"owner");
@@ -31,12 +37,17 @@ else	{
 		mysqli_query($db, "INSERT INTO messages (origin, datesent, yourid, message, mid)		VALUES	('$ename', '$clock', '$owner', '$umessage', '$ymid') ");
 	
 		echo "<div align=center><font class=yellow><b>Your message has been sent to the Guild Leader of $g_name.</b></font></div></center>";
-		session_unregister('gid'); 
+		unset($_SESSION['gid']);
 	}
 }
 
 if ($pageid == 'mgl')	{
-	session_register('gid');
+	// Stash the guild being messaged for the POST above to pick up. The link
+	// that reaches this branch supplies gid, so the request wins over any
+	// stale session value -- session_register() preferred the session, which
+	// meant a second mgl link opened while one was pending messaged the first
+	// guild's leader.
+	$_SESSION['gid'] = $gid;
 		$guild_name = mysqli_query($db, "SELECT gname FROM guild WHERE gid='$gid'");	
 			$g_name = mb_db_result($guild_name,"g_name");
 	echo "<div align=center><font class=yellow><b>You are messaging the Guild Leader of <u>$g_name</u>.</b></font></div>";
@@ -52,7 +63,7 @@ if ($pageid == 'mgl')	{
 <? 
 	die();
 }
-session_unregister('gid');
+unset($_SESSION['gid']);
 
 
 if($request == 'yes')	{

@@ -1,9 +1,5 @@
 <?php
-session_start();
-
-$login = $_SESSION['login'];
-$email = $_SESSION['email'];
-$pw = $_SESSION['pw'];
+include("include/session.php");
 
 function callback($buffer)
 {

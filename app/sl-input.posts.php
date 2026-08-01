@@ -8,9 +8,7 @@ ob_start("callback");
 
 include("include/connect.php");
 		
-session_register('login');
-session_register('email');
-session_register('pw');	
+include("include/session.php");
 
 $uename = mysqli_query($db, "SELECT ename FROM user WHERE email='$email' AND pw='$pw'");
 	$ename = mb_db_result($uename,"ename");

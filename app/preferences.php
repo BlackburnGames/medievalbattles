@@ -45,9 +45,8 @@ else	{
  	mysqli_query($db, "UPDATE research SET pw='$newpw' WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
  	mysqli_query($db, "UPDATE returntbl SET pw='$newpw' WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
  	mysqli_query($db, "UPDATE explore SET pw='$newpw' WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
-	session_unregister('pw');
 	$pw = $newpw;
-	session_register('pw');
+	$_SESSION['pw'] = $pw;
 
 	echo"<div align=center><font class=yellow>Your password has been changed.</font></div>";
 	include("include/chngpw_table.php");
@@ -84,9 +83,8 @@ else	{
  	mysqli_query($db, "UPDATE research SET email='$newemail' WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
  	mysqli_query($db, "UPDATE returntbl SET email='$newemail' WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
  	mysqli_query($db, "UPDATE explore SET email='$newemail' WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
-	session_unregister('email');
 	$email = $newemail;
-	session_register('email');
+	$_SESSION['email'] = $email;
 			
 	// update aim and msn
 	mysqli_query($db, "UPDATE user SET aim='$newaim' WHERE email='$email' AND pw='$pw'");
@@ -176,9 +174,8 @@ else	{
 		mysqli_query($db, "DELETE FROM explore WHERE email='$email' AND pw='$pw'");
 		mysqli_query($db, "UPDATE user SET votefor='None' WHERE votefor='$ename'");
 		
-		session_unregister('login');
-		session_unregister('email');
-		session_unregister('pw');
+		unset($_SESSION['login'], $_SESSION['email'], $_SESSION['pw']);
+		$login = $email = $pw = '';
 
 		header("Location: index.php");
 	}	 

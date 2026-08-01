@@ -8,9 +8,7 @@ ob_start("callback");
 
  include("include/connect.php");
 
-session_register('login');
-session_register('email');
-session_register('pw');	
+include("include/session.php");
 
 include("commong.php");	
 include("include/clock.php");

@@ -1,8 +1,6 @@
 <?php
 
-session_register('login');
-session_register('email');
-session_register('pw');
+include("include/session.php");
 
 function callback($buffer) 
 {
