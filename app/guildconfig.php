@@ -65,6 +65,24 @@ else	{
 	$current_guild_query = mysqli_query($db, "SELECT guild FROM user WHERE userid=$q_auserid");
 		$current_guild = mysqli_fetch_array($current_guild_query);
 
+	/*
+	 * Did this player actually apply to THIS guild?
+	 *
+	 * Nothing asked. include/guild_request.php draws the Accept link only for
+	 * rows matching "gl_userid='$userid'", so the link is always honest -- but
+	 * the handler took auserid off the URL and wrote the membership on that
+	 * alone, so a leader could conscript any guildless empire in the game by
+	 * typing the id. The reject branch below has always scoped its DELETE with
+	 * "AND gl_userid='$userid'", which is what says this was an omission rather
+	 * than a design.
+	 */
+	$request_check = mysqli_query($db, "SELECT applicant FROM guildrequests WHERE applicant=$q_auserid AND gl_userid='$userid'");
+
+	if(!$request_check || !mysqli_num_rows($request_check))	{
+		echo "<div align=center><font class=yellow>That empire has not asked to join your guild.</font></div>";
+		die();
+	}
+
 	if($guild_members > 14)	{
 		echo "<div align=center><font class=yellow>Your guild is full! You cannot allow any more members in!</font></div>";
 		die();

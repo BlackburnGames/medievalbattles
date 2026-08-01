@@ -420,6 +420,43 @@ forumRefuses($target, 'input.posts.php', array(
     'message'  => 'Posted from outside the settlement.',
 ), 'not in your settlement', 'app/input.posts.php: the reply is not scoped to the caller\'s own board');
 
+/*
+ * Joining a guild, end to end, and the arm where nobody asked.
+ *
+ * guildconfig.php's accept branch wrote the membership from the auserid in the
+ * URL without looking for a request row, so a leader could conscript any
+ * guildless empire in the game. The refusal is driven FIRST, while PoorSerf has
+ * genuinely not applied -- the assertion is only worth anything before the row
+ * exists.
+ *
+ * Then the request is made through gc.php rather than seeded into the fixture,
+ * which is what puts that branch on the crawl: the accept is only known to work
+ * against a row the game itself wrote.
+ */
+$body = $tester->get('/guildconfig.php?accept=true&auserid=3');
+$visited++;
+inspect('guildconfig.php?accept (no request)', $body, $tester->lastStatus);
+if (stripos($body, 'has not asked to join') === false) {
+    $failures['guildconfig.php | accepted an empire that never applied'] =
+        'app/guildconfig.php: the accept branch does not check guildrequests';
+}
+
+$body = $target->get('/gc.php?request=yes&req_guild=Testguild');
+$visited++;
+$scriptsHit['gc.php'] = true;
+inspect('gc.php?request=yes', $body, $target->lastStatus);
+if (stripos($body, 'has been sent') === false) {
+    $failures['gc.php | the join request was not filed'] = 'app/gc.php: the request=yes branch no longer inserts';
+}
+
+$body = $tester->get('/guildconfig.php?accept=true&auserid=3');
+$visited++;
+inspect('guildconfig.php?accept', $body, $tester->lastStatus);
+if (stripos($body, 'has been accepted into the guild') === false) {
+    $failures['guildconfig.php | rejected a genuine join request'] =
+        'app/guildconfig.php: the new guildrequests check is refusing a real applicant';
+}
+
 crawl($tester, array('main.php?pageid=news'), $MAX_PAGES);
 
 /*

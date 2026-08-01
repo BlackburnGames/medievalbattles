@@ -423,6 +423,18 @@ attribute.
   written inline in the two moderation pages, which is one copy too many for a
   rule six pages share.
 
+  **Guild membership was the same omission one page over.**
+  `guildconfig.php`'s accept branch wrote `user.guild` from the `auserid` in the
+  URL and never looked for a request row, so a leader could conscript any
+  guildless empire in the game by typing an id. `include/guild_request.php`
+  draws the Accept link only for rows matching `gl_userid='$userid'`, so the
+  link was always honest and the handler behind it was not — and the reject
+  branch beside it has always scoped its `DELETE` with `AND gl_userid`, which is
+  what says this was an omission rather than a design. The join is a round trip
+  on the crawl now: the refusal is asserted first, while PoorSerf genuinely has
+  not applied, and the request that follows is filed through `gc.php` rather
+  than seeded, so the accept is proved against a row the game itself wrote.
+
   **Every guard is driven from the arm it refuses.** That is what this needed
   and what the suite could not do before: the primary tester leads Testguild and
   settlement 1, so every request they make is allowed, and a gate that answers
