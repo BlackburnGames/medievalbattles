@@ -14,9 +14,10 @@ include("functions.php");
 include("include/hostname.php");
 $hostaddress = mb_client_hostname();
 $datestamp = date("d F H:i");
-// Was nl2br(strip_tags($message,"<i>,<b>")). Same two allowed tags, but an
-// allowed tag kept its attributes -- see mb_post_html() in include/html.php.
-$message = nl2br(mb_post_html($message));
+// The body is stored as exactly what was typed. It used to be stored as
+// HTML -- nl2br(strip_tags($message,"<i>,<b>")) -- which is what made it
+// unescapable at every page that renders it. mb_rich() does the breaks
+// and the [b]/[i] tags at render time now; see include/html.php.
 $color1 = "#303030";
 $color2 = "#460101";
 $color3 = "#303030";

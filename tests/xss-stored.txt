@@ -33,7 +33,6 @@ app/gforums.php	r	text
 app/gforums.php	topic_replies	text
 app/gl-forum.php	r	text
 app/gl-forum.php	topic_replies	text
-app/gl-topic.php	r_message	text
 app/gmembers.php	guild_strength_total	text
 app/gmembers.php	row	text
 app/gmembers.php	t_setid	text
@@ -50,7 +49,6 @@ app/include/S_SET.php	row	text
 app/include/S_SET.php	settlename	text
 app/include/S_VMESS.php	datesent	text
 app/include/S_VMESS.php	link	text
-app/include/S_VMESS.php	message	text
 app/include/S_WEP.php	bastardtime	text
 app/include/S_WEP.php	bowoftiontime	text
 app/include/S_WEP.php	broadswordtime	text
@@ -95,9 +93,6 @@ app/sguild.php	guildmem	text
 app/sguild.php	row	text
 app/sl-forum.php	r	text
 app/sl-forum.php	treplies	text
-app/sl-topic.php	r_message	text
 app/snews.php	row	text
 app/stats.php	avg_units	text
 app/stats.php	avg_users	text
-app/topic.php	r_message	text
-app/topicg.php	r_message	text

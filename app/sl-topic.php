@@ -42,7 +42,7 @@ echo "
 			<td bgcolor=$color3></td>
 		</tr>
 		<tr>
-			<td bgcolor=$color2 valign=top colspan=4><pre>" . mb_h($r_lastpost) . "</pre>$r_message<br><br></td>
+			<td bgcolor=$color2 valign=top colspan=4><pre>" . mb_h($r_lastpost) . "</pre>" . mb_rich($r_message) . "<br><br></td>
 		</tr>";
 	} 
 
@@ -69,7 +69,7 @@ echo	"
 			<td bgcolor=$color3><strong class=white><a href=" . mb_attr("sl-delposts.php?delpost=true&mid=$messageid&tid=$topicid") . "><font size=-2> &nbsp; Delete</a></strong></td>
 		</tr>
 		<tr>
-			<td bgcolor=$color2 valign=top colspan=4><pre>" . mb_h($r_datestamp) . "</pre>$r_message<br><br></td>
+			<td bgcolor=$color2 valign=top colspan=4><pre>" . mb_h($r_datestamp) . "</pre>" . mb_rich($r_message) . "<br><br></td>
 		</tr>";
 	} 
 

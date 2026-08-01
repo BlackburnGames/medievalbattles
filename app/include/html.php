@@ -35,36 +35,39 @@ if (!function_exists('mb_h')) {
     }
 }
 
-if (!function_exists('mb_post_html')) {
+if (!function_exists('mb_rich')) {
     /**
-     * A forum post or message body, safe to store and echo as markup.
+     * A forum post or message body, rendered.
      *
-     * The forum has always allowed two tags. common.php and commong.php ran the
-     * body through
+     * The bodies are stored as **exactly what the player typed** -- no tags, no
+     * entities, no <br>. Everything below happens at render time, which is the
+     * whole point: the database holds text, and only this function decides what
+     * that text looks like as markup.
      *
-     *     strip_tags($message, "<i>,<b>")
+     * It did not use to. common.php and commong.php ran the body through
+     * nl2br(strip_tags($message, "<i>,<b>")) on the way in, so the stored value
+     * was HTML -- which is why the pages rendering it could not simply escape
+     * it, and why an allowed tag kept its attributes and <i onmouseover=...>
+     * passed through whole.
      *
-     * on the way in, which is why the stored value is HTML and why the pages
-     * that render it cannot simply escape it -- doing so would show every post's
-     * line breaks as a literal <br>.
+     * The forum has always allowed two tags and still does, written [b] and
+     * [i]. Brackets rather than angle brackets for one reason that matters:
+     * mb_h() runs first, so a player who types <b> gets &lt;b&gt; and sees it
+     * as text, while [ and ] are not HTML metacharacters and survive escaping
+     * untouched. The markup cannot be forged, because forging it would require
+     * emitting a character the escaper has already dealt with.
      *
-     * strip_tags() is the wrong tool for the allow-list, though: an allowed tag
-     * keeps its attributes, so <i onmouseover=alert(1)> passes through whole.
-     * Escaping everything and then restoring exactly the two bare tags gets the
-     * same feature with no hole, because the restore matches the escaped form
-     * and an attribute makes it not match.
-     *
-     * Two visible differences, both in the safe direction. A disallowed tag used
-     * to vanish and is now shown as text, and <i class=x> used to be italic and
-     * is now shown as text. Neither can happen to a post that was not either an
-     * attack or malformed.
+     * Order is escape, then break, then tags. nl2br() after mb_h() is safe --
+     * it only inserts <br />, it does not interpret anything -- and running the
+     * tag pass last means it can only ever match the literal bracket sequences.
      *
      * @param mixed $value
      * @return string
      */
-    function mb_post_html($value)
+    function mb_rich($value)
     {
-        return preg_replace('~&lt;(/?)(i|b)&gt;~i', '<$1$2>', mb_h($value));
+        $out = nl2br(mb_h($value), false);
+        return preg_replace('~\[(/?)(i|b)\]~i', '<$1$2>', $out);
     }
 }
 

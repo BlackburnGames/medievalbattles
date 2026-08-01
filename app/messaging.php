@@ -47,7 +47,7 @@ else	{
 
 		$ymid = $ymid + 1;
 		$thenum = $T_MNO + 1;
-		$umessage = nl2br(strip_tags($umessage,"<i>,<b>"));
+		// Stored as typed; mb_rich() renders it. See include/html.php.
 
 		mysqli_query($db, "UPDATE user SET mno='$thenum' WHERE userid=$q_empvalue");
 		mysqli_query($db, "INSERT INTO messages (origin, datesent, yourid, message, mid)		VALUES	('$ename', '$clock', $q_empvalue, " . mb_sql_str($db, $umessage) . ", '$ymid') ");

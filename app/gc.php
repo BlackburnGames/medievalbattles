@@ -46,7 +46,7 @@ else	{
 	  
 		mysqli_query($db, "UPDATE user SET mno ='$thenum' WHERE userid='$owner'");
 
-		$umessage = "<font class=red><b>Sent by Guild Center:</b></font>&nbsp;&nbsp;" . "$umessage";
+		$umessage = "[b]Sent by Guild Center:[/b]  " . $umessage;
 
 		mysqli_query($db, "INSERT INTO messages (origin, datesent, yourid, message, mid)		VALUES	('$ename', '$clock', '$owner', " . mb_sql_str($db, $umessage) . ", '$ymid') ");
 	

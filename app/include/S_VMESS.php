@@ -29,7 +29,7 @@ while ($row = mysqli_fetch_array($result_id))	{
 	echo "
 		<tr align='center' valign='top' colspan='6'>
 			<td bgcolor='#404040'>$link</td>
-			<td bgcolor='#404040' align='left' width='75%'>$message<br><br><font size='1px' class='orange'><i>Recieved $datesent</i></font></td>\n";
+			<td bgcolor='#404040' align='left' width='75%'>" . mb_rich($message) . "<br><br><font size='1px' class='orange'><i>Recieved $datesent</i></font></td>\n";
 }
 echo "
 	</table><br>";

@@ -77,7 +77,7 @@ $MB_XSS_CALLS = $stored ? $MB_STORED_CALLS : $MB_SOURCE_CALLS;
  */
 $MB_HTML_SANITIZERS = array_merge($MB_SANITIZERS, array(
     'htmlspecialchars', 'htmlentities', 'urlencode', 'rawurlencode',
-    'number_format', 'date', 'mb_h', 'mb_attr',
+    'number_format', 'date', 'mb_h', 'mb_attr', 'mb_rich',
 ));
 
 /** How bad each context is, worst last. */

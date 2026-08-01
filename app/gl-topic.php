@@ -50,7 +50,7 @@ if ($result1) {
 			<td bgcolor=$color3 width=85% align=left><b class=forum>" . mb_h($r_topic) . "</b></td>
 		</tr>
 		<tr>
-			<td bgcolor=$color2 valign=top colspan=3><pre>" . mb_h($r_lastpost) . "</pre>$r_message<br><br></td>
+			<td bgcolor=$color2 valign=top colspan=3><pre>" . mb_h($r_lastpost) . "</pre>" . mb_rich($r_message) . "<br><br></td>
 		</tr>	";
 	} 
 echo "
@@ -74,7 +74,7 @@ echo "
 			<td bgcolor=$color3 width=85% align=left><b class=forum>" . mb_h($r_topic) . "</b></td>
 		</tr>
 		<tr>
-			<td bgcolor=$color2 valign=top colspan=3><pre>" . mb_h($r_datestamp) . "</pre>$r_message<br><br></td>
+			<td bgcolor=$color2 valign=top colspan=3><pre>" . mb_h($r_datestamp) . "</pre>" . mb_rich($r_message) . "<br><br></td>
 		</tr>
 		<tr>
 			<td></td>
