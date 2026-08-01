@@ -1,4 +1,7 @@
 <?php
+// mb_valid_email(), shared with preferences.php and include/session.php.
+require_once __DIR__ . '/include/credentials.php';
+
 $signup = $_POST['signup'];
 
 $email = $_POST['email'];
@@ -49,7 +52,12 @@ if ($signup) {
 
   if($enamecheck1 == $ename1 AND $ename != "")  { echo "$ename is already being used!"; die();   }
   elseif($emnamecheck1 == $email1 AND $email != "") { echo "$email is already being used!";  die(); }
-  // elseif (!preg_match("([[:alnum:]\.\-]+)(\@[[:alnum:]\.\-]+\.+)", $email)) { echo "Email address is invalid!";  die(); }
+  // The address check was commented out in 2003, so anything at all could be
+  // signed up with -- and the address is then written to six tables and
+  // interpolated into every "WHERE email='$email'" the account ever loads.
+  // include/credentials.php holds the rule, shared with preferences.php and
+  // include/session.php so all three agree on what an address may be.
+  elseif (!mb_valid_email($email)) { echo "Email address is invalid!";  die(); }
   elseif($class == 'ns')  { echo "You must have a class to play the game!"; die();   }
   elseif($race == 'ns') { echo "You must have a race to play the game!";  die();   }
   elseif($ename == "")  { echo "You must have an empire name to play the game!";  die();   }
