@@ -46,7 +46,7 @@ include("functions.php");
  </TD>
  <TD width="85%">
 
-<div align=center><font class=yellow size=2px>There are going to be bugs obviously as this is deprecated code. If you come across a bug, go ahead and report it to <a href="mailto:shoxfusion@gmail.com?subject=v6+Bug">shoxfusion@gmail.com</a> and we'll see what we can do to fix it. Don't get your hopes up, however.</font></div><br>
+<div align=center><font class=yellow size=2px>There are going to be bugs obviously as this is deprecated code. If you come across a bug, go ahead and <a href="https://github.com/BlackburnGames/medievalbattles/issues" target="newwindow">open an issue on GitHub</a> and we'll see what we can do to fix it. Don't get your hopes up, however.</font></div><br>
 
 <?php
 // safe mode notice
