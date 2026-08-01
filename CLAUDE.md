@@ -26,7 +26,8 @@ The reference material lives in `docs/`. Read the relevant one before working in
 Four things load-bearing enough to repeat here:
 
 - **`mb_db_result()`'s column-0 fallback is deliberate**, not defensive. Resolving field names strictly returns null across signup, login and the guild code, and has already silently disabled the entire game tick once. Read the trap writeup in [docs/porting-notes.md](docs/porting-notes.md) before changing it.
-- **`tests/known-issues.txt`, `tests/register-globals.txt`, `tests/broken-queries.txt` and `tests/sql-injection.txt` may only ever shrink.** They are ratchets, and the last three double as Phase 3 bug lists. `sql-injection.txt` is regenerated with `php tests/sql-injection-audit.php --accept`.
+- **`tests/known-issues.txt`, `tests/register-globals.txt`, `tests/broken-queries.txt` and `tests/sql-injection.txt` may only ever shrink.** They are ratchets, and the last three double as Phase 3 bug lists. `sql-injection.txt` is regenerated with `php tests/sql-injection-audit.php --accept`. It is **empty**, and it stays that way only if new queries go through `mb_sql_str()` / `mb_sql_int()` — note the audit is per-file, so moving a query into an include away from its `mb_input()` clears the entry without fixing anything.
+- **The credential is validated, not escaped, at `app/include/session.php`.** `$email` and `$pw` are interpolated bare into ~1300 `WHERE` clauses, so `app/include/credentials.php` constrains what they may be instead, at signup, at the preferences change and on the way back out of the session. Loosening that rule re-opens every one of those call sites.
 - **`connect.php` reports query errors as warnings, not exceptions**, and the crawl and the tick both fail on one. Going further to `MYSQLI_REPORT_STRICT` needs the ~1300 call sites to check their return values first. `bash tests/query-audit.sh` regenerates the combined inventory.
 - **`app/include/gamedata.php` is the only place a game value may be written**, and every value carries a `file:line` citation. Change a cited engine line and the citation must change with it.
 
@@ -63,5 +64,7 @@ docker compose exec -w /repo web php update.php
 ```
 
 Fixture logins are `tester@example.com` / `test1234` (plus `idle@` / `pass2`, `poor@` / `pass3`).
+
+The admin area is `http://127.0.0.1:8080/admin/`, logging in with `MB_ADMIN_USER` / `MB_ADMIN_PASSWORD` — `mako` / `quickshot` unless the environment overrides them. The defaults are the 2003 hardcoded pair and are public; they exist so nothing that worked before the gate stops working.
 
 **On Windows, prefix `docker compose exec` with `MSYS_NO_PATHCONV=1`** when passing container paths, or Git Bash rewrites `/repo/...` into a Windows path and the command fails. The scripts in `tests/` already set it.

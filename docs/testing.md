@@ -98,6 +98,17 @@ codebase's only query entry point. Baselined in `tests/sql-injection.txt`.
 Re-accept with `--accept`. Entries carry no line numbers on purpose: a fix
 elsewhere in the file would otherwise read as one entry removed and one added.
 
+**It is at zero, and zero is not the same as clean.** Two limits are in the
+script's own header and both still hold: it is first-order, so a tainted value
+written to the database and read back into a later query is invisible to it,
+and it is per-file, so a parameter read in one file and interpolated in another
+is too. That second one is a live hazard now rather than a theoretical one —
+**moving code into an include is a way to launder a page off this list without
+fixing anything.** `app/include/barter_handler.php` keeps its `mb_input()`
+reads beside its queries for exactly that reason; if it had taken them as
+arguments from the two pages that include it, the audit would have found no
+taint and reported nothing.
+
 Each entry records the quoting context, because it decides the fix.
 `mb_sql_str()` for a value between quotes; `mb_sql_int()` for one interpolated
 bare, where escaping is useless because there is no quote to break out of.
@@ -176,14 +187,18 @@ restarts the container twice; run it by hand after touching request handling.
 
 ## Coverage
 
-The crawl reaches **57 of the 69 scripts in `app/`**, and the other 12 are
+The crawl reaches **58 of the 69 scripts in `app/`**, and the other 11 are
 listed in `$UNREACHABLE` in `smoke.php` with a reason each. That list is the
 third ratchet: an `app/` script that is neither reached nor explained **fails
 the run**, so a page falling out of the net is a regression rather than a
 silently smaller number. Entries that become reachable are reported so they can
 be deleted.
 
-The 12 fall into five groups:
+The denominator is `glob(app/*.php)`, so it counts neither the ten admin pages
+nor the includes. Those have their own accounting — see **The admin phase**
+below.
+
+The 11 fall into five groups:
 
 - **Includes** (3) — `common.php`, `commong.php`, `functions.php`. Not pages;
   this group is structural and will not shrink.
@@ -194,10 +209,10 @@ The 12 fall into five groups:
   `gl-topic.php` has nothing linking to it.
 - **Destructive, deliberately skipped** (2) — `disband.php` destroys the
   fixture army, `logout.php` ends the session the crawl depends on. See `$SKIP`.
-- **Dead in the shipped game** (2) — `guildbarter.php` (`barter.php` dies at
-  line 17; the barter system was switched off in 2003) and `scoreboard.php`
-  (orphaned — nothing links to it and `index.php` has its Scores link
-  commented out).
+- **Dead in the shipped game** (1) — `scoreboard.php`, orphaned; nothing links
+  to it and `index.php` has its Scores link commented out. `guildbarter.php`
+  was the other one and came off the list when the barter system was switched
+  back on.
 - **Auth flow** (2) — the activation pages, which need a live emailed code.
 
 ### Driving forms
@@ -224,3 +239,41 @@ holds the most votes; nobody in the fixture votes, so the crawler merely
 opening that page deposes the tester. Anything afterwards that needs settlement
 leadership is refused, silently, because a refusal renders a message rather
 than a warning.
+
+The same reasoning covers the barter boards. Listing is a form, and buying and
+cancelling are GET links that consume the row they point at, so `$SKIP` keeps
+the crawler off them and all three are driven by hand — before the crawl,
+because buying needs gold and iron and the crawl spends both on buildings. The
+seeded listings are numbered 1–3 so the URLs are stable: 1 and 2 belong to
+other empires and are the buy path (2's seller is a guild-mate, because
+`guildbarter.php` refuses anyone else), 3 is the tester's own and is the cancel
+path.
+
+The email change in `preferences.php` is driven on the *member*, not the
+primary tester: it rewrites six tables and the session, and every fixture the
+primary pass depends on is keyed on that address. Both arms are asserted — an
+address containing a quote must be refused, a valid one must go through — and
+then the next request is checked for still being logged in, which is what
+catches `include/session.php` and `preferences.php` disagreeing about what an
+address may be.
+
+### The admin phase
+
+Runs **last**, and is the one exception to the rule above. It logs into
+`app/admin/` and drives `gameconfig.php`'s bulk actions, which is the only way
+to find out whether they work — thirty of that page's statements named tables
+this schema has never had, so "delete all news" and "delete all forums" had
+never once done anything. Running them leaves the fixture spent, so nothing may
+be added after it.
+
+Two passes, and the first is the one that matters. Before logging in, every
+entry point in `$ADMIN_PAGES` is fetched twice: once by a client with no
+session and once by a **logged-in player**. Both must be refused. Without that
+second arm a gate keyed on the wrong session slot would pass. The list is
+checked against `glob(app/admin/*.php)` minus the login pair, so an admin page
+added and left ungated fails the run.
+
+The crawl is confined to `admin/`. `extractLinks()` normalises every href to a
+path from the docroot, and the admin navbar's links are relative — so without
+the confinement the pass followed `href="main.php"` out into the game as a
+client with no player session.

@@ -39,7 +39,7 @@ emptied down to the one disabled block that remains.
 
 In progress. The known work, in no committed order:
 
-- **SQL injection.** **In progress: 161 entries down to 36.** All ~1300 queries
+- ~~**SQL injection.**~~ **The audit is at zero: 161 entries down to none.** All ~1300 queries
   are built by string interpolation with no escaping. This is the reason the
   app must not be exposed to a network. `tests/sql-injection-audit.php` finds
   the reachable half of it — request input that survives into a
@@ -56,19 +56,31 @@ In progress. The known work, in no committed order:
   every site can be checked by a suite that proves behaviour did not move;
   rewriting 1300 interpolations into bind calls cannot.
 
-  What is left is 36 entries, and it is not a random 36:
+  The last 36 were not a random 36, and none of the three groups was closed by
+  escaping alone:
 
-  - **26 are in `barter.php` and `guildbarter.php`**, which are dead. `barter.php`
-    dies at line 17 and has since 2003. Real code, unreachable code, and not
-    worth rewriting blind — if the barter system is ever switched back on, it
-    needs the crawl before it needs the escaping.
-  - **9 are in `app/css/admin/`**, which no test touches at all. The admin area
-    has its own login and sits outside both crawl roots.
-  - **1 is `preferences.php`'s `$email`**, and it is honest. A player-chosen
-    address is written to six tables and then assigned to `$email`, which later
-    queries interpolate. Fixing it properly means escaping `$email` and `$pw` at
-    the session boundary they come from, which is a change to about 1300 `WHERE`
-    clauses rather than to one file.
+  - **26 were in `barter.php` and `guildbarter.php`**, which were dead —
+    `barter.php` died at line 17 and had since 2003. Rewriting an unreachable
+    page is a guess, so the barter system was **switched back on and put on the
+    crawl first**; see below.
+  - **9 were in `app/css/admin/`**, which no test touched. That area is now
+    `app/admin/`, has a real gate, and is crawled; see below.
+  - **1 was `preferences.php`'s `$email`**, and it was the honest one. A
+    player-chosen address is written to six tables and then assigned to
+    `$email` — the name that ~1300 `WHERE email='$email' AND pw='$pw'` clauses
+    interpolate. Escaping 1300 call sites was never the move, so the boundary
+    moved instead. `app/include/credentials.php` says what an address and a
+    password hash may be, and three places enforce it: `checksignup.php` (whose
+    own address check had been commented out since 2003, so *any* string could
+    be stored), `preferences.php`, and `include/session.php`, which discards a
+    credential that fails on the way back out. That makes all 1300
+    interpolations safe by construction and keeps them safe as they are
+    rewritten. `preferences.php`'s own twenty are escaped as well, because a
+    page that changes the value should not lean on a rule enforced elsewhere.
+
+    It costs something and the cost is stated in that file: an apostrophe is
+    legal in a real address and `o'brien@example.com` is now refused. That
+    restriction can be lifted the day those queries bind their parameters.
 
   Two shapes of false positive turned up often enough to name. Both are one
   variable meaning two things, which a flow-insensitive audit cannot tell apart
@@ -132,13 +144,28 @@ In progress. The known work, in no committed order:
   closing the coverage gap put them on the crawl. Anywhere the suite still does
   not reach, adding a check is a guess about what the check should permit.
 
-  **The admin area under `app/css/admin/` has no gate at all.** `adminlogin.php`
-  compares against a hardcoded `mako` / `quickshot` and, on success, prints a
-  link to `main.php`. That is the entire mechanism: no session is written, and
-  nothing in the area asks whether one exists, so every page in it serves to
-  anyone who types the URL. Deciding what should replace it is a design
-  question, not a port — the credentials, the session and the ~1300-query
-  surface it exposes all need answering together.
+  ~~**The admin area has no gate at all.**~~ **Done.** It was under
+  `app/css/admin/` — a stylesheet directory — and `adminlogin.php` compared
+  against a hardcoded `mako` / `quickshot` and, on success, printed a link to
+  `main.php`. That was the entire mechanism: no session was written and nothing
+  in the area asked whether one existed, so every page served to anyone who
+  typed the URL. It is `app/admin/` now, and:
+
+  - `app/admin/include/auth.php` holds one credential, read from
+    `MB_ADMIN_USER` / `MB_ADMIN_PASSWORD` and defaulting to the historical pair
+    so nothing that worked stops working. A match records the session and
+    regenerates its id; `mb_admin_require()` answers 403 to everything else.
+  - Every page calls it — through `include/igtop.php` for the eight that have
+    it, and directly in `gameconfig.php` and `newgame.php`, which do not.
+    Those two were the ones with no check at all, which is not a coincidence.
+  - The smoke crawl has an admin phase, and its first pass asserts that every
+    entry point refuses both a stranger **and a logged-in player** — a gate
+    keyed on the wrong session slot passes without that second arm.
+    `$ADMIN_PAGES` is checked against `glob(app/admin/*.php)`, so a new page
+    added and not gated fails the run.
+
+  This does not make the area safe to expose. What is behind the gate still
+  interpolates, still echoes raw, and still deletes the world from one link.
 
 - **Two blind spots in `register-globals-audit.php`,** both of which hid a
   read the Phase 2 port then missed. One is fixed and one is not:
@@ -150,19 +177,79 @@ In progress. The known work, in no committed order:
   - **It credits a shared include for a name even in files that do not include
     it.** `adminlogin.php` reads `$pw`, which `include/session.php` assigns —
     but that file includes nothing except `request.php`, so the read was
-    suppressed and the port missed it. The admin login has rejected every
-    attempt since. Fixing the audit means resolving includes per file rather
-    than globally, and it will surface entries the ratchet has to absorb.
+    suppressed and the port missed it. Fixing the audit means resolving
+    includes per file rather than globally, and it will surface entries the
+    ratchet has to absorb.
+
+    The login itself is repaired, and the repair is worth reading before you
+    fix the audit, because restoring the missing read was **not** enough.
+    `adminlogin.php` now includes `auth.php`, which includes `session.php`,
+    which sets `$pw` from the session — so reading the form into `$pw` would
+    have been silently overwritten by the logged-out empty string. Two
+    different secrets shared one name, which is what made the read look
+    satisfied to the audit in the first place. The posted password is
+    `$admin_pw` now, and the collision is gone rather than sequenced around.
 - **Invert the manual dependency** so the engine reads `$GAMEDATA` rather than
   its inline literals.
+
+### The barter system, switched back on
+
+`barter.php` opened with an echo and a `die()` above every other statement in
+the file — a 2003 notice saying the barter would return in v6 — and
+`guildbarter.php` carried its own copy announcing that the guild barter would
+not. Nothing below either line had run since. That is why the two files held 26
+of the last 36 injection entries: real code, unreachable, and not worth
+escaping blind.
+
+They are one file now. `app/include/barter_handler.php` holds the board and the
+two pages are three lines each, because they were 430-line copies of each other
+that had drifted:
+
+- `guildbarter.php` checked `$archer` where it meant `$archers`, so the guild
+  board never verified you owned the archers you were listing.
+- Neither buy handler scoped its lookup to its own board. `S_BARTER.php` lists
+  `page != 'guild'` and `guild_barter.php` lists `page = 'guild'`, but both
+  handlers matched on `barterid` alone — so a guild listing's id passed to
+  `barter.php` sold it to anyone, skipping the same-guild check that is the
+  entire point of the guild board.
+- `include/guild_barter.php`'s **Barter** and **End** links both pointed at
+  `barter.php`, which is how you would have found that out.
+
+And what the handler itself was doing:
+
+- The type was validated on the add branch and not at all on the buy branch, so
+  a listing whose type matched none of the ten `if`s transferred nothing, was
+  paid for anyway, and was still deleted and announced as a sale.
+- The **Scientist** it offered has not existed for a long time. The game calls
+  that unit a **Sage** everywhere current — `functions.php` reads
+  `military.sages` into `$sages` — while `$scientists` is set by nothing, so
+  the sale was gated on 0 and a bought one landed in a column nothing reads.
+  `military` still has both.
+- The archery requirement on the add branch tested `$b_type`, which is the type
+  of the listing being *bought* and is not set there.
+- The "fill every field in" check read `$gp`, the seller's own gold, where
+  `$cost` belongs, so it never looked at the price field.
+- The seller's news line interpolated `$b_method`, which never existed, and
+  quoted a different number from the buyer's copy.
+
+The stock movement was three ten-way switches per page — sixty near-identical
+`UPDATE`s across the pair, each its own chance to interpolate something
+unescaped. It is one table and one function, which is what made escaping this
+reviewable rather than sixty separate judgement calls.
+
+Both boards are on the crawl. Listing, buying and cancelling are driven
+explicitly rather than followed, because buying and cancelling are GET links
+that consume the row they point at.
 
 ### Prerequisite: coverage — done
 
 The smoke crawl reached 39 of 69 top-level scripts when Phase 3 opened. It
-reaches 57, and every one of the twelve it does not reach has a reason recorded
-in `$UNREACHABLE` that is checked on each run. Rewriting a page the suite does
-not visit is not a port, it is a guess, so this came first — and it kept paying
-out, because each page that came into the net arrived with defects attached.
+reaches 58, and every one of the eleven it does not reach has a reason recorded
+in `$UNREACHABLE` that is checked on each run. It also covers all ten admin
+pages and both barter boards, neither of which is in that count — the
+denominator is `app/*.php`. Rewriting a page the suite does not visit is not a
+port, it is a guess, so this came first — and it kept paying out, because each
+page that came into the net arrived with defects attached.
 
 Three steps got there:
 
@@ -174,13 +261,28 @@ Three steps got there:
    outside the net. `postForm()` now submits both arms of the four forum thread
    handlers, and the moderation handlers are called directly.
 
-The remaining twelve are three includes, two POST handlers with no safe
+The remaining eleven are three includes, three POST handlers with no safe
 fixture (`checksignup.php` creates a user from `rand()`), `disband.php` and
-`logout.php` (both destroy what the run depends on), two dead files, and the
-two-step account activation flow.
+`logout.php` (both destroy what the run depends on), one dead file
+(`scoreboard.php`), and the two-step account activation flow. `guildbarter.php`
+came off the list when the barter system was switched back on.
 
-One thing learned doing it: **destructive requests have to run before the
-crawl, not after.** `govt.php:20` clears `sl` for every member of a settlement
-on each visit and re-elects whoever holds the most votes, and nobody in the
-fixture votes — so the crawler merely opening the page deposes the tester, and
-anything afterwards that needs settlement leadership is refused.
+Two things learned doing it.
+
+**Destructive requests have to run before the crawl, not after.**
+`govt.php:20` clears `sl` for every member of a settlement on each visit and
+re-elects whoever holds the most votes, and nobody in the fixture votes — so
+the crawler merely opening the page deposes the tester, and anything afterwards
+that needs settlement leadership is refused. The same reasoning puts the barter
+buy and cancel calls before the crawl: they need gold and iron, and the crawl
+spends both.
+
+**A crawl that follows links needs to know where it is allowed to go.**
+`extractLinks()` normalises every href to a path from the docroot, so the admin
+navbar's relative `href="main.php"` walked the admin pass straight out into the
+game as a client with no player session — and quietly pulled `activate_code.php`
+into coverage with a broken query attached. `crawl()` takes a path prefix now.
+The admin phase is the one exception to the rule above: it runs dead last,
+because driving `gameconfig.php`'s bulk actions is the only way to learn that
+thirty of its statements named tables which have never existed in this schema,
+and it leaves the fixture spent.

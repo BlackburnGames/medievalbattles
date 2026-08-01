@@ -17,8 +17,17 @@ work when served with `app/` as the working directory. `update.php` sits at the
 repo root and includes `app/include/...`, so it needs the repo root as CWD
 instead — this is why the tick has to be run with `-w /repo`.
 
-The admin area under `app/css/admin/` has its own include root and carries
-inlined copies of several includes rather than reaching up.
+The admin area is `app/admin/`. It has its own include root — served from that
+folder, `include/...` resolves inside it — whose files are thin forwarders to
+`app/include/` rather than the copies they used to be. It lived under
+`app/css/admin/`, inside the stylesheet directory, until Phase 3.
+
+Its gate is `app/admin/include/auth.php`: one credential from `MB_ADMIN_USER` /
+`MB_ADMIN_PASSWORD`, recorded in `$_SESSION['mb_admin']`, checked by
+`mb_admin_require()`. That slot is separate from the player session on purpose
+— being logged into the game is not being an admin, and the smoke crawl asserts
+both refusals. Pages inherit the call through `include/igtop.php`;
+`gameconfig.php` and `newgame.php` do not include it and call it themselves.
 
 ## Page flow
 
