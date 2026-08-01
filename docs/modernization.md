@@ -41,6 +41,19 @@ Not started. The known work, in no committed order:
 
 - **SQL injection.** All ~1300 queries are built by string interpolation with
   no escaping. This is the reason the app must not be exposed to a network.
+  `tests/sql-injection-audit.php` finds the reachable half of it — request
+  input that survives into a `mysqli_query()` — and baselines it in
+  `tests/sql-injection.txt` as a third ratchet. 161 entries at the start.
+
+  The fix is `mb_sql_str()` and `mb_sql_int()` in `app/include/db.php`, and
+  which one a site needs is the interesting part. The audit records the quoting
+  context because escaping only helps inside quotes: `WHERE topicid=$topicid`
+  is interpolated bare, so no amount of escaping closes it and the value has to
+  be cast instead. Roughly a third of the list is in that shape.
+
+  Prepared statements are the better answer and are not this change. Escaping
+  every site can be checked by a suite that proves behaviour did not move;
+  rewriting 1300 interpolations into bind calls cannot.
 - **Unescaped output.** Every template echoes user data raw.
 - **Passwords.** Unsalted MD5, denormalized into four tables alongside the
   email that identifies the row.

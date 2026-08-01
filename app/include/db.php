@@ -1,6 +1,6 @@
 <?php
 /**
- * Data-access helper.
+ * Data-access helpers.
  *
  * Lived in the container's compat layer while Phase 2 was in flight, because
  * that layer was auto-prepended and so needed no include line at ~47 call
@@ -9,6 +9,62 @@
  * lives here and is pulled in by connect.php, which every query path already
  * reaches.
  */
+
+if (!function_exists('mb_sql_str')) {
+    /**
+     * A string literal, escaped and quoted, ready to interpolate.
+     *
+     * The quotes are part of what this returns, deliberately. Every one of the
+     * ~1300 queries in this codebase is a double-quoted string with variables
+     * dropped into it, so the natural conversion of
+     *
+     *     "... WHERE ename='$name'"
+     *
+     * is to lift the value out of the string rather than leave the quotes
+     * behind for the next reader to get wrong:
+     *
+     *     "... WHERE ename=" . mb_sql_str($db, $name)
+     *
+     * Prepared statements would be better and are not what this is. Rewriting
+     * 1300 interpolated queries into bind calls is a different change of a
+     * different size; this one closes the hole at every site without moving any
+     * behaviour, which is the property the characterization suite can check.
+     *
+     * @param mysqli $db
+     * @param mixed  $value cast to string, so null becomes '' as interpolation did
+     * @return string including the surrounding single quotes
+     */
+    function mb_sql_str($db, $value)
+    {
+        return "'" . mysqli_real_escape_string($db, (string) $value) . "'";
+    }
+}
+
+if (!function_exists('mb_sql_int')) {
+    /**
+     * An integer literal, ready to interpolate outside quotes.
+     *
+     * Escaping does nothing for "... WHERE topicid=$topicid": the payload never
+     * needs a quote to break out, because there is no quote to break out of.
+     * Numeric parameters have to be cast instead, which is what this is for.
+     *
+     * PHP's own cast is the whole implementation -- (int)"5 OR 1=1" is 5 and
+     * (int)"" is 0. The value of having a function is that the audit can see
+     * it: tests/sql-injection-audit.php treats a call to this as the fix, so
+     * every converted site drops off the worklist.
+     *
+     * Note 0 for a parameter that was not sent, where interpolating null used
+     * to emit nothing and leave MySQL with a syntax error. A query that matches
+     * no rows is the better of the two, and neither ever matched anything.
+     *
+     * @param mixed $value
+     * @return string
+     */
+    function mb_sql_int($value)
+    {
+        return (string) (int) $value;
+    }
+}
 
 if (!function_exists('mb_db_result')) {
     /**

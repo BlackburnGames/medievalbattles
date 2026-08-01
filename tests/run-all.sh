@@ -33,6 +33,12 @@ if ! docker compose exec -T web php /repo/tests/register-globals-audit.php; then
 fi
 
 echo
+echo "=== SQL injection audit ==="
+if ! docker compose exec -T web php /repo/tests/sql-injection-audit.php; then
+  status=1
+fi
+
+echo
 if [ "$status" = "0" ]; then
   echo "ALL TESTS PASSED"
 else
