@@ -42,7 +42,12 @@ $q_ename   = mb_sql_str($db, $ename);
 $q_topicid = mb_sql_int($topicid);
 
 if ($addtopic) {
-	$result = mysqli_query($db, "INSERT INTO setforums (setid, name, topic, replies, message, datestamp)	VALUES ('$setid', $q_ename, $q_topic, '$replies', $q_message, '$datestamp')");
+	// $clock, not $datestamp. Only commong.php sets $datestamp, and this page
+	// includes common.php -- the settlement half -- so a new settlement topic
+	// was stamped with the empty string and displayed a blank date ever after.
+	// The reply below, and both branches of sl-input.posts.php writing the same
+	// two tables, have always used $clock.
+	$result = mysqli_query($db, "INSERT INTO setforums (setid, name, topic, replies, message, datestamp)	VALUES ('$setid', $q_ename, $q_topic, '$replies', $q_message, '$clock')");
 
 	$topic_lastpost = mysqli_query($db, "UPDATE setforums SET lastpost='$clock' WHERE topic=$q_topic AND setid='$setid'");
 	$topic_lastposter = mysqli_query($db, "UPDATE setforums SET lastposter=$q_ename WHERE topic=$q_topic AND setid='$setid'");

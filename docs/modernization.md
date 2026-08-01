@@ -167,22 +167,56 @@ In progress. The known work, in no committed order:
   This does not make the area safe to expose. What is behind the gate still
   interpolates, still echoes raw, and still deletes the world from one link.
 
-- **Two blind spots in `register-globals-audit.php`,** both of which hid a
-  read the Phase 2 port then missed. One is fixed and one is not:
+- ~~**Two blind spots in `register-globals-audit.php`,**~~ **both fixed.** Each
+  hid a read the Phase 2 port then missed:
 
   - ~~It skipped every name beginning with `_`~~ to avoid reporting the
     superglobals, and caught `$_mace` with it. **Fixed** — it names the nine
     superglobals now. That read being missing left the Mace button inert, and
     with it the six priest weapons that check the Mace as a prerequisite.
-  - **It credits a shared include for a name even in files that do not include
-    it.** `adminlogin.php` reads `$pw`, which `include/session.php` assigns —
-    but that file includes nothing except `request.php`, so the read was
-    suppressed and the port missed it. Fixing the audit means resolving
-    includes per file rather than globally, and it will surface entries the
-    ratchet has to absorb.
+  - ~~It credits a shared include for a name even in files that do not include
+    it.~~ **Fixed** — it resolves includes per file now. `adminlogin.php` read
+    `$pw`, which `include/session.php` assigns, but that file included nothing
+    except `request.php`, so the read was suppressed and the port missed it.
 
-    The login itself is repaired, and the repair is worth reading before you
-    fix the audit, because restoring the missing read was **not** enough.
+    Two things had to be right for the per-file form to be usable at all.
+
+    **A file that is only ever included sees its includer's scope.** Half the
+    codebase is a panel template under `include/` that renders `$race` and `$gp`
+    while including nothing itself; scoring those against their own closure
+    reported 345 new entries, all noise. A file's visible set is the union of
+    the include closures of every file that reaches it, itself among them —
+    which is why `adminlogin.php` is still reported and `S_ARMOR.php` is not.
+
+    **Includes here are CWD-relative, and the CWD is the requested page's
+    directory.** That is what lets `app/admin/include/igtop.php` say
+    `include("connect.php")` and reach the admin one, while
+    `app/admin/dusers.php` says `include("include/igtop.php")` and also reaches
+    the admin one rather than the game's. `mb_resolve_include()` tries the entry
+    page's directory, then the including file's, then the app root.
+
+    It also follows `include($mb_panel)` by looking up the literal `.php`
+    strings assigned to that name in the same file. Without it, `barter.php`'s
+    two board templates looked like entry points reading `$db` and `$ename` out
+    of nowhere.
+
+    The ratchet grew by three, the only time it has: `attack.php`,
+    `attackm.php` and `attackr.php` read `$gid` to file guild news, and only
+    `commong.php` assigns it. None of the three includes it, so the attacker's
+    guild has never heard about an attack — and `$tgid`, the defender's, was
+    already on the list because nothing anywhere assigns it. Both sides of the
+    feature are dead, both are guarded by `if($x[0] != "")` so nothing is
+    written wrong, and repairing them means deciding what the feature should do
+    rather than restoring a read.
+
+    One entry came off instead of on. `input.posts.php` stamped a new
+    settlement forum topic with `$datestamp`, which is `commong.php`'s — the
+    guild half — while this page includes `common.php`. Topics were stored with
+    an empty date and displayed one. The reply below it, and both branches of
+    `sl-input.posts.php` writing the same two tables, have always used `$clock`.
+
+    The login itself was repaired earlier, and that repair is worth reading,
+    because restoring the missing read was **not** enough.
     `adminlogin.php` now includes `auth.php`, which includes `session.php`,
     which sets `$pw` from the session — so reading the form into `$pw` would
     have been silently overwritten by the logged-out empty string. Two

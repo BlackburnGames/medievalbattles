@@ -5,6 +5,7 @@ app/attack.php	cdefense
 app/attack.php	evb
 app/attack.php	evpower
 app/attack.php	evu
+app/attack.php	gid
 app/attack.php	ltally
 app/attack.php	tgid
 app/attack.php	your_losses
@@ -12,6 +13,7 @@ app/attackm.php	cdefense
 app/attackm.php	evb
 app/attackm.php	evpower
 app/attackm.php	evu
+app/attackm.php	gid
 app/attackm.php	mgain
 app/attackm.php	mtally
 app/attackm.php	tgid
@@ -21,6 +23,7 @@ app/attackr.php	cdefense
 app/attackr.php	evm
 app/attackr.php	evpower
 app/attackr.php	evu
+app/attackr.php	gid
 app/attackr.php	tgid
 app/attackr.php	tsetid
 app/attackr.php	your_losses
