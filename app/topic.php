@@ -17,6 +17,14 @@ if($setid != $settlement_check['setid'])	{
 	die();
 }
 
+// The reply form below prefills its Topic field from $topic, which until now
+// meant two things at once: the request parameter read above, and whatever the
+// last row of the loops below left behind. The row won whenever the thread had
+// any posts, which is every case that matters. Both meanings are kept -- the
+// row overwrites the seed -- but they have separate names now, so the escaping
+// is decidable and the audit can see it.
+$r_topic = $topic;
+
 $result1 = mysqli_query($db, "SELECT name, topic, message, lastpost FROM setforums WHERE topicid='$topicid' AND setid='$setid'") or die("Error! " . mysqli_error($db));
 
 if ($result1) { 
@@ -24,15 +32,15 @@ echo"
 	<table border=0 class=f align=center cellspacing=1 cellpadding=1 width=95%>";
 									
 	while ($r1 = mysqli_fetch_array($result1)) {
-	$name = $r1['name']; $topic = $r1['topic']; $message = $r1['message']; $lastpost = $r1['lastpost'];
+	$r_name = $r1['name']; $r_topic = $r1['topic']; $r_message = $r1['message']; $r_lastpost = $r1['lastpost'];
 
 	echo "
 		<tr>
-			<td bgcolor=$color3 width=15% align=left><b class=forum>$name</b></td>			
-			<td bgcolor=$color3 width=85% align=left><b class=forum>$topic</b></td>
+			<td bgcolor=$color3 width=15% align=left><b class=forum>" . mb_h($r_name) . "</b></td>			
+			<td bgcolor=$color3 width=85% align=left><b class=forum>" . mb_h($r_topic) . "</b></td>
 		</tr>
 		<tr>
-			<td bgcolor=$color2 valign=top colspan=4><pre>$lastpost</pre>$message<br><br></td>
+			<td bgcolor=$color2 valign=top colspan=4><pre>" . mb_h($r_lastpost) . "</pre>$r_message<br><br></td>
 		</tr>";
 	} 
 
@@ -49,15 +57,15 @@ echo	"
 	<table border=0 class=f width=95% align=center cellspacing=1 cellpadding=1>";
 	
 	while ($r2 = mysqli_fetch_array($result2)) {
-	$name = $r2['name']; $topic = $r2['topic']; $message = $r2['message']; $datestamp = $r2['datestamp'];
+	$r_name = $r2['name']; $r_topic = $r2['topic']; $r_message = $r2['message']; $r_datestamp = $r2['datestamp'];
 
 	echo "
 		<tr>
-			<td bgcolor=$color3 width=15% align=left><b class=forum>$name</b></td>
-			<td bgcolor=$color3 width=85% align=left><b class=forum>$topic</b></td>
+			<td bgcolor=$color3 width=15% align=left><b class=forum>" . mb_h($r_name) . "</b></td>
+			<td bgcolor=$color3 width=85% align=left><b class=forum>" . mb_h($r_topic) . "</b></td>
 		</tr>
 		<tr>
-			<td bgcolor=$color2 valign=top colspan=4><pre>$datestamp</pre>$message<br><br></td>
+			<td bgcolor=$color2 valign=top colspan=4><pre>" . mb_h($r_datestamp) . "</pre>$r_message<br><br></td>
 		</tr>";
 	} 
 
@@ -75,7 +83,7 @@ echo "
 	</tr>
 	<tr>
 		<td align=right><strong class=black>Topic:&nbsp;</strong></td>  
-		<td><input type="text" name="topic" maxlength=40 class="black-normal" value="<? echo $topic; ?>"></td>	
+		<td><input type="text" name="topic" maxlength=40 class="black-normal" value="<? echo mb_h($r_topic); ?>"></td>	
 		<td align=right>&nbsp;</td>
 	</tr>	
 	<tr>

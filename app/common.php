@@ -15,7 +15,9 @@ include("functions.php");
 // the clash with the identical copy in commong.php.
 include("include/hostname.php");
 $hostaddress = mb_client_hostname();
-$message = nl2br(strip_tags($message,"<i>,<b>"));
+// Was nl2br(strip_tags($message,"<i>,<b>")). Same two allowed tags, but an
+// allowed tag kept its attributes -- see mb_post_html() in include/html.php.
+$message = nl2br(mb_post_html($message));
 $color1 = "#303030";
 $color2 = "#460101";
 $color3 = "#303030";

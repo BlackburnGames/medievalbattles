@@ -12,14 +12,6 @@ app/equip.php	uwararmor	text
 app/equip.php	uwarrior	text
 app/equip.php	uwizarmor	text
 app/gc.php	creating_guild_name	text
-app/gl-topic.php	message	text
-app/gl-topic.php	topic	attr-quoted
 app/include/S_PREF.php	msn	attr-quoted
 app/include/barter_handler.php	type	text
 app/preferences.php	mailsend	text
-app/sl-topic.php	message	text
-app/sl-topic.php	topic	attr-quoted
-app/topic.php	message	text
-app/topic.php	topic	attr-quoted
-app/topicg.php	message	text
-app/topicg.php	topic	attr-quoted
