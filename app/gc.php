@@ -86,7 +86,13 @@ echo "  <br><br>
 		<td class=main2><b class=reg>Created</b></td>
 		<td class=main2></td>";
 
-$query_string = "SELECT g.gname, g.info, g.datemade, g.gid, g.flag, count(u.ename) AS guildmem FROM guild g LEFT JOIN user u ON g.gname = u.guild GROUP BY u.guild ORDER BY guildmem DESC LIMIT 0, 60";
+// guild.flag has never existed in db.sql -- the guild-flag feature was cut
+// before release, but the markup below still renders it -- so this query has
+// always failed and the listing has always come back empty. On PHP 5 that was
+// a warning; on PHP 8 passing the resulting false to mysqli_fetch_array() is a
+// fatal TypeError. Selecting an empty placeholder keeps the column count and
+// the markup untouched while letting the query actually run.
+$query_string = "SELECT g.gname, g.info, g.datemade, g.gid, '' AS flag, count(u.ename) AS guildmem FROM guild g LEFT JOIN user u ON g.gname = u.guild GROUP BY u.guild ORDER BY guildmem DESC LIMIT 0, 60";
 $result_id = mysqli_query($db, $query_string);
 while ($row = mysqli_fetch_array($result_id))	{
 	$row[0] = htmlspecialchars($row[0]);

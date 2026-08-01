@@ -9,6 +9,19 @@
  * request, so connecting is guarded.
  */
 
+/**
+ * PHP 8.1 made mysqli throw on error instead of returning false. That is the
+ * better default, but it is not what this code was written against: it fires
+ * ~1300 unchecked queries, several of which have never succeeded (the guild
+ * listing selects a column that is not in db.sql, and update.php's first loop
+ * iteration interpolates empty values into arithmetic). Under exceptions each
+ * one becomes a fatal, which is a behaviour change, not a port.
+ *
+ * Restoring the silent-false contract keeps Phase 2 mechanical. Turning this
+ * back on -- and handling the errors it surfaces -- is Phase 3 work.
+ */
+mysqli_report(MYSQLI_REPORT_OFF);
+
 $dbnam      = getenv('MB_DB_NAME') ? getenv('MB_DB_NAME') : 'mbv6';
 $mb_db_host = getenv('MB_DB_HOST') ? getenv('MB_DB_HOST') : '127.0.0.1';
 $mb_db_user = getenv('MB_DB_USER') ? getenv('MB_DB_USER') : 'mb';

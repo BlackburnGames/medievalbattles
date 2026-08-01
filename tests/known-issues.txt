@@ -1,10 +1,8 @@
 # Warnings present before the port began. Only ever remove lines.
 # Regenerate with: MB_WRITE_BASELINE=1 php tests/smoke.php
 #
-# Was 21 entries. The mysqli conversion retired 20 of them: they were all
-# mysql_result() rejecting a field name passed in the row position, which
-# mb_db_result() accepts by design. The survivor is not a port artifact -- the
-# guild listing selects guild.flag, a column that has never existed in db.sql,
-# so the query has always returned false. Fixing the query is Phase 3 work
-# because it changes what the page renders.
-gc.php:91 | Warning: mysqli_fetch_array() expects parameter 1 to be mysqli_result, boolean given
+# Empty as of the PHP 8 port. It held 21 entries at the end of Phase 1: 20 were
+# mysql_result() rejecting a field name passed in the row position, retired by
+# the move to mb_db_result(), and the last was the guild listing selecting a
+# column that has never existed in db.sql, fixed in gc.php because on PHP 8 it
+# escalated from a warning to a fatal TypeError.

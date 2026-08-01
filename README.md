@@ -20,9 +20,8 @@ MySQL or Composer install required on the host.
 docker compose up -d --build
 ```
 
-That builds a PHP 5.6 + Apache container (the last version this 2003 code runs
-on unmodified) and a MySQL 5.7 container, and loads the schema plus a small
-deterministic test world on first start.
+That builds a PHP 8.3 + Apache container and a MySQL 5.7 container, and loads
+the schema plus a small deterministic test world on first start.
 
 Then open:
 
@@ -71,9 +70,18 @@ rewrite the path and the command will fail.
 The revival is staged:
 
 - **Phase 1 — done.** Running, test-covered baseline on PHP 5.6 in Docker.
-- **Phase 2 — in progress.** Mechanical port to PHP 8: `mysql_*` → `mysqli`,
-  quoted array keys, removing the `register_globals` emulation.
+- **Phase 2 — mostly done.** The game runs on PHP 8.3. All `mysql_*` calls are
+  converted to `mysqli`, array keys and bare-word constants are quoted, and
+  `ereg_replace` is gone. The suite passes on both 8.3 and 5.6 against the same
+  golden master. Still outstanding: `session_register()` and the
+  `register_globals` emulation, which need call-site changes.
 - **Phase 3 — not started.** Structural and security rewrite.
+
+The 5.6 image is kept buildable as the behavioural reference:
+
+```bash
+docker compose build --build-arg PHP_VERSION=5.6-apache web
+```
 
 See [CLAUDE.md](CLAUDE.md) for the architecture notes and the traps worth
 knowing before changing anything.

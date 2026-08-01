@@ -1,17 +1,23 @@
-# PHP 5.6 is the last version where this codebase can run at all: the ~89
-# files still on the mysql_* extension are fatal from PHP 7.0 onward. This is
-# the Phase 1 baseline used as the behavioural reference for the port, not a
-# target to stay on.
+# Build for either PHP version:
 #
-# The 5.6 images are archived, and their Debian jessie apt repos are dead, so
-# this image deliberately installs nothing via apt. The mysql and mysqli
-# extensions build against bundled mysqlnd and need no system packages.
-FROM php:5.6-apache
+#   docker compose build                          # 8.3, the Phase 2 target
+#   docker compose build --build-arg PHP_VERSION=5.6-apache
+#
+# 5.6 was the Phase 1 baseline because the mysql_* extension is fatal from PHP
+# 7.0 onward. Those call sites are converted, so 8.3 is now the default and 5.6
+# stays buildable only as the behavioural reference the golden master came from.
+#
+# Nothing is installed via apt: the 5.6 images are archived and their Debian
+# jessie repos are dead, so any apt call breaks that build. mysqli builds
+# against bundled mysqlnd and needs no system packages on either version.
+ARG PHP_VERSION=8.3-apache
+FROM php:${PHP_VERSION}
 
-RUN docker-php-ext-install mysql mysqli
+RUN docker-php-ext-install mysqli
 
 COPY php.ini /usr/local/etc/php/conf.d/zz-medievalbattles.ini
 COPY compat.php /opt/mb/compat.php
+COPY prepend.php /opt/mb/prepend.php
 
 # app/.htaccess sets error_reporting to 1 (E_ERROR only), which would hide the
 # warnings and deprecations the smoke tests assert on. Leaving AllowOverride

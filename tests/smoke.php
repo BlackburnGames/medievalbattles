@@ -62,7 +62,16 @@ $SKIP = array(
  * variables everywhere by design, so failing on them would mean a permanently
  * red suite that nobody reads. Track the count instead -- it should trend
  * down during the port, never up.
+ *
+ * PHP 8 promoted reading an undefined variable, array key or string offset
+ * from E_NOTICE to E_WARNING. Those are the exact diagnostics the paragraph
+ * above is about, so they are demoted back to notice class here: on 8.3 they
+ * number in the hundreds and are the same lines that were notices on the 5.6
+ * baseline, not anything the port introduced. Everything else PHP calls a
+ * warning still fails, including the mysqli ones that matter.
  */
+$SEVERITY_DEMOTED = '/(Undefined (variable|array key|index|offset|property)|Trying to access array offset on)/i';
+
 $FAIL_PATTERN  = '/\b(Fatal error|Parse error|Catchable fatal error|Recoverable fatal error|Warning)\s*:\s*(.{0,200})/i';
 $NOTICE_PATTERN = '/\b(Notice|Deprecated)\s*:\s*(.{0,200})/i';
 
@@ -114,6 +123,13 @@ while ($queue && $visited < $MAX_PAGES) {
 
     if (preg_match_all($FAIL_PATTERN, $text, $matches, PREG_SET_ORDER)) {
         foreach ($matches as $m) {
+            // PHP 8 raises the old uninitialised-read notices to warnings;
+            // count them as notices so the severity policy means the same
+            // thing on both versions. See $SEVERITY_DEMOTED.
+            if (preg_match($SEVERITY_DEMOTED, $m[2])) {
+                $noticeCount++;
+                continue;
+            }
             $signature = signature($m[1], $m[2]);
             $observed[$signature] = true;
             if (!isset($baseline[$signature])) {
