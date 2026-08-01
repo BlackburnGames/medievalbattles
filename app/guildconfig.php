@@ -17,6 +17,14 @@ $remp    = mb_input('remp');
 
 include("include/igtop.php");
 
+// Both name a row in `user`, and every query below matches on one of them.
+// Cast once here rather than at each of the thirteen sites -- and after
+// igtop.php, which is what pulls in connect.php and with it mb_sql_int(). The
+// raw values are still read further down by the 'ns' and self-kick checks,
+// which compare strings.
+$q_auserid = mb_sql_int($auserid);
+$q_remp    = mb_sql_int($remp);
+
 // are they a guild leader?
 	$guild_owner_result = mysqli_query($db, "SELECT owner FROM guild WHERE owner='$userid'");
 	$guild_owner = mysqli_fetch_array($guild_owner_result);
@@ -51,10 +59,10 @@ else	{
 	$guild_members_query = mysqli_query($db, "SELECT count(ename) FROM user WHERE guild='$guild_info[gname]'");
 		$guild_members = mb_db_result($guild_members_query, "guild_members");
 	// get their empire name
-	$applicant_ename_query = mysqli_query($db, "SELECT ename FROM user WHERE userid='$auserid'");
+	$applicant_ename_query = mysqli_query($db, "SELECT ename FROM user WHERE userid=$q_auserid");
 		$applicant_ename = mysqli_fetch_array($applicant_ename_query);
 	// get their current guild
-	$current_guild_query = mysqli_query($db, "SELECT guild FROM user WHERE userid='$auserid'");
+	$current_guild_query = mysqli_query($db, "SELECT guild FROM user WHERE userid=$q_auserid");
 		$current_guild = mysqli_fetch_array($current_guild_query);
 
 	if($guild_members > 14)	{
@@ -62,15 +70,15 @@ else	{
 		die();
 	}
 	elseif($current_guild['guild'] == 'None')	{
-		mysqli_query($db, "UPDATE user SET guild='$guild_info[gname]' WHERE userid='$auserid'");
-		mysqli_query($db, "INSERT INTO empnews (date, news, yourid) VALUES	('$clock', '<font class=blue>You were accepted into $guild_info[gname].</font>', '$auserid') ");
+		mysqli_query($db, "UPDATE user SET guild='$guild_info[gname]' WHERE userid=$q_auserid");
+		mysqli_query($db, "INSERT INTO empnews (date, news, yourid) VALUES	('$clock', '<font class=blue>You were accepted into $guild_info[gname].</font>', $q_auserid) ");
 
 		$Guild_MaxID = mysqli_query($db, "SELECT max(gnid) FROM guildnews");
 			$mgnid = mb_db_result($Guild_MaxID, "mgnid");
 			$gnid = $mgnid + 1;
 	
 		mysqli_query($db, "INSERT INTO guildnews (date, news, gid, gnid)	VALUES	('$clock', '<font class=blue>$applicant_ename[ename] has joined $empireguild</font>', '$guild_info[gid]' , '$gnid') ");
-		mysqli_query($db, "DELETE FROM guildrequests WHERE applicant='$auserid'");
+		mysqli_query($db, "DELETE FROM guildrequests WHERE applicant=$q_auserid");
 
 		echo "<div align=center><font class=yellow><b>$applicant_ename[ename] has been accepted into the guild!</b></font></div>";
 		die();
@@ -87,15 +95,15 @@ else	{
 	$guild_info_query = mysqli_query($db, "SELECT * FROM guild WHERE owner='$userid'");
 		$guild_info = mysqli_fetch_array($guild_info_query);
 	// get their empire name
-	$applicant_ename_query = mysqli_query($db, "SELECT ename FROM user WHERE userid='$auserid'");
+	$applicant_ename_query = mysqli_query($db, "SELECT ename FROM user WHERE userid=$q_auserid");
 		$applicant_ename = mysqli_fetch_array($applicant_ename_query);
 	// get their current guild
-	$current_guild_query = mysqli_query($db, "SELECT guild FROM user WHERE userid='$auserid'");
+	$current_guild_query = mysqli_query($db, "SELECT guild FROM user WHERE userid=$q_auserid");
 		$current_guild = mysqli_fetch_array($current_guild_query);
 
 	if(($current_guild['guild'] == 'None') OR ($current_guild['guild'] != 'None'))	 {
-		mysqli_query($db, "INSERT INTO empnews (date, news, yourid) VALUES	('$clock', '<font class=blue>You were rejected from $guild_info[gname].</font>', '$auserid') ");
-		mysqli_query($db, "DELETE FROM guildrequests WHERE applicant='$auserid' AND gl_userid='$userid'");
+		mysqli_query($db, "INSERT INTO empnews (date, news, yourid) VALUES	('$clock', '<font class=blue>You were rejected from $guild_info[gname].</font>', $q_auserid) ");
+		mysqli_query($db, "DELETE FROM guildrequests WHERE applicant=$q_auserid AND gl_userid='$userid'");
 
 		echo "<div align=center><font class=yellow><b>$applicant_ename[ename] has been rejected from the guild!</b></font></div>";
 		die();
@@ -110,9 +118,9 @@ if(!IsSet($change))	{
 }
 else	{
 	include("include/S_SINFOS.php");
-	mysqli_query($db, "UPDATE guild SET info='$info' WHERE owner='$userid'");
-	mysqli_query($db, "UPDATE guild SET notice='$notice' WHERE owner='$userid'");
-	mysqli_query($db, "UPDATE guild SET flag='$flag' WHERE owner='$userid'");
+	mysqli_query($db, "UPDATE guild SET info=" . mb_sql_str($db, $info) . " WHERE owner='$userid'");
+	mysqli_query($db, "UPDATE guild SET notice=" . mb_sql_str($db, $notice) . " WHERE owner='$userid'");
+	mysqli_query($db, "UPDATE guild SET flag=" . mb_sql_str($db, $flag) . " WHERE owner='$userid'");
 	echo "<div align=center><font class=yellow><br>Guild Settings Updated!</font></div>";
 	include("include/S_GCONFIG.php");
 	include("include/S_GKICK.php");
@@ -131,10 +139,10 @@ else	{
 	$guild_info_query = mysqli_query($db, "SELECT * FROM guild WHERE owner='$userid'");
 		$guild_info = mysqli_fetch_array($guild_info_query);
 	// get their empire name
-	$empire_info_query = mysqli_query($db, "SELECT ename FROM user WHERE userid='$remp'");
+	$empire_info_query = mysqli_query($db, "SELECT ename FROM user WHERE userid=$q_remp");
 		$empire_info = mysqli_fetch_array($empire_info_query);
 	// get their current guild
-	$current_guild_query = mysqli_query($db, "SELECT guild FROM user WHERE userid='$remp'");
+	$current_guild_query = mysqli_query($db, "SELECT guild FROM user WHERE userid=$q_remp");
 		$current_guild = mysqli_fetch_array($current_guild_query);
 
 	if($remp == 'ns')		{
@@ -157,10 +165,10 @@ else	{
 	}
 	else	{
 		$new_mem = $guild_info['mem'] - 1;
-		mysqli_query($db, "UPDATE user SET guild='None' WHERE userid='$remp'");
+		mysqli_query($db, "UPDATE user SET guild='None' WHERE userid=$q_remp");
 		mysqli_query($db, "UPDATE guild SET mem='$new_mem' WHERE owner='$userid'");	
 		mysqli_query($db, "DELETE FROM barter WHERE seller='$empire_info[0]' AND guild='$empireguild'");
-		mysqli_query($db, "INSERT INTO empnews (date, news, yourid) VALUES	('$clock', '<font class=blue>You were removed from $guild_info[gname].</font>', '$remp') ");
+		mysqli_query($db, "INSERT INTO empnews (date, news, yourid) VALUES	('$clock', '<font class=blue>You were removed from $guild_info[gname].</font>', $q_remp) ");
 		mysqli_query($db, "INSERT INTO guildnews (date, news, guildid) VALUES	('$clock', '<font class=blue>$empire_info[0] has been removed from the guild.</font>', '$guild_info[gid]') ");
 
 		echo"<div align=center><font class=yellow>$empire_info[0] has been removed from your guild.</font></div>";

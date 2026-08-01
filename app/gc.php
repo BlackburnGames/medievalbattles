@@ -32,9 +32,9 @@ else	{
 		// scope by session_start(), which is where $gid used to come from here.
 		$gid = isset($_SESSION['gid']) ? $_SESSION['gid'] : '';
 
-		$guild_name = mysqli_query($db, "SELECT gname FROM guild WHERE gid='$gid'");
+		$guild_name = mysqli_query($db, "SELECT gname FROM guild WHERE gid=" . mb_sql_int($gid));
 			$g_name = mb_db_result($guild_name,"g_name");
-		$owner_g = mysqli_query($db, "SELECT owner FROM guild WHERE gid='$gid'");	
+		$owner_g = mysqli_query($db, "SELECT owner FROM guild WHERE gid=" . mb_sql_int($gid));	
 			$owner = mb_db_result($owner_g,"owner");
 		$THE_MNO = mysqli_query($db, "SELECT mno FROM user WHERE userid='$owner'");	
 			$T_MNO = mb_db_result($THE_MNO,"T_MNO");
@@ -48,7 +48,7 @@ else	{
 
 		$umessage = "<font class=red><b>Sent by Guild Center:</b></font>&nbsp;&nbsp;" . "$umessage";
 
-		mysqli_query($db, "INSERT INTO messages (origin, datesent, yourid, message, mid)		VALUES	('$ename', '$clock', '$owner', '$umessage', '$ymid') ");
+		mysqli_query($db, "INSERT INTO messages (origin, datesent, yourid, message, mid)		VALUES	('$ename', '$clock', '$owner', " . mb_sql_str($db, $umessage) . ", '$ymid') ");
 	
 		echo "<div align=center><font class=yellow><b>Your message has been sent to the Guild Leader of $g_name.</b></font></div></center>";
 		unset($_SESSION['gid']);
@@ -63,7 +63,7 @@ if ($pageid == 'mgl')	{
 	// guild's leader.
 	$gid = mb_input('gid');
 	$_SESSION['gid'] = $gid;
-		$guild_name = mysqli_query($db, "SELECT gname FROM guild WHERE gid='$gid'");	
+		$guild_name = mysqli_query($db, "SELECT gname FROM guild WHERE gid=" . mb_sql_int($gid));	
 			$g_name = mb_db_result($guild_name,"g_name");
 	echo "<div align=center><font class=yellow><b>You are messaging the Guild Leader of <u>$g_name</u>.</b></font></div>";
 ?>
@@ -83,7 +83,7 @@ unset($_SESSION['gid']);
 
 if($request == 'yes')	{
 
-	$guild_info_query = mysqli_query($db, "SELECT * FROM guild WHERE gname='$req_guild'");
+	$guild_info_query = mysqli_query($db, "SELECT * FROM guild WHERE gname=" . mb_sql_str($db, $req_guild));
 		$guild_info = mysqli_fetch_array($guild_info_query);
 	$gl_check_query = mysqli_query($db, "SELECT * FROM guild WHERE owner='$userid'");
 		$gl_check = mysqli_fetch_array($gl_check_query);
@@ -150,7 +150,7 @@ else	{
 	// parse whitespace out
 		$creating_guild_name = trim($gname);
 	// check to see if guild name is being used
-		$result = mysqli_query($db, "SELECT gname FROM guild WHERE gname='$creating_guild_name'");
+		$result = mysqli_query($db, "SELECT gname FROM guild WHERE gname=" . mb_sql_str($db, $creating_guild_name));
 		$namecheck = mysqli_fetch_array($result);
  	// check to see if they are a GL
 		$check_owner_result = mysqli_query($db, "SELECT owner FROM guild WHERE owner='$ename'");
@@ -211,8 +211,8 @@ else	{
 		$gid = $mgid + 1;
 		
 		include("include/connect.php");
-		mysqli_query($db, "INSERT INTO guild (gname, info, gid, datemade, cpw, owner)	 VALUES	('$creating_guild_name', '$info', '$gid', '$clock', '$cpw', '$userid') ");
-		mysqli_query($db, "UPDATE user SET guild='$gname' WHERE email='$email' AND pw='$pw'");
+		mysqli_query($db, "INSERT INTO guild (gname, info, gid, datemade, cpw, owner)	 VALUES	(" . mb_sql_str($db, $creating_guild_name) . ", " . mb_sql_str($db, $info) . ", '$gid', '$clock', " . mb_sql_str($db, $cpw) . ", '$userid') ");
+		mysqli_query($db, "UPDATE user SET guild=" . mb_sql_str($db, $gname) . " WHERE email='$email' AND pw='$pw'");
 		mysqli_query($db, "DELETE FROM guildrequests WHERE applicant='$userid'");
 						
 		echo"<div align=center><font class=yellow><b><u>$creating_guild_name</u> has been successfully created!</b></font></div>";
