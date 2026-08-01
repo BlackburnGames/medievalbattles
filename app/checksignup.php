@@ -50,8 +50,8 @@ if ($signup) {
   if($enamecheck1 == $ename1 AND $ename != "")  { echo "$ename is already being used!"; die();   }
   elseif($emnamecheck1 == $email1 AND $email != "") { echo "$email is already being used!";  die(); }
   // elseif (!preg_match("([[:alnum:]\.\-]+)(\@[[:alnum:]\.\-]+\.+)", $email)) { echo "Email address is invalid!";  die(); }
-  elseif($class == ns)  { echo "You must have a class to play the game!"; die();   }
-  elseif($race == ns) { echo "You must have a race to play the game!";  die();   }
+  elseif($class == 'ns')  { echo "You must have a class to play the game!"; die();   }
+  elseif($race == 'ns') { echo "You must have a race to play the game!";  die();   }
   elseif($ename == "")  { echo "You must have an empire name to play the game!";  die();   }
   elseif($noplayers >= 450) { echo "Game is full! Try again later!";  die();   }
   elseif (($email == "") and ($cemail == "")) { echo "You must have an email to play!"; die();   }

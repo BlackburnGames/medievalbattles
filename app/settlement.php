@@ -8,8 +8,8 @@
 <form method="post" action="settlement.php">
 <center>
 <?php
-$maxset0 = mysql_db_query($dbnam, "SELECT max(setid) AS maxset FROM settlement");
-$maxset = mysql_result($maxset0, 0, "maxset");
+$maxset0 = mysqli_query($db, "SELECT max(setid) AS maxset FROM settlement");
+$maxset = mb_db_result($maxset0, "maxset", 0);
 
 if($snum != "")	 {	$csnum = $snum - 1;	}
 
@@ -43,7 +43,7 @@ else	{
 	if($snum != "")	 {	$N_NUM = $snum;	}
 	if($snum == "")	{	$N_NUM = $csnum;	}
 
-	mysql_query("UPDATE user SET csnum='$N_NUM' WHERE email='$email'");
+	mysqli_query($db, "UPDATE user SET csnum='$N_NUM' WHERE email='$email'");
 
 	include("include/S_SET.php");
 }

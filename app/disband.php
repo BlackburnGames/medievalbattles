@@ -14,22 +14,22 @@ else	{
 
 	include("include/nexplode.php");
 
-	if($uarcher > 0 AND $res[r13pts] < 125000)	{
+	if($uarcher > 0 AND $res['r13pts'] < 125000)	{
 		echo"<div align=center><font class=yellow>You do not have Archers!</font></div>"; 
 		include("include/disband_table.php");
 		die();
 	}
-	elseif($uwizard > 0 AND $class == Ranger)	{
+	elseif($uwizard > 0 AND $class == 'Ranger')	{
 		echo"<div align=center><font class=yellow>You do not have Wizards!</div></font>";
 		include("include/disband_table.php");
 		die();
 	}
-	elseif($uwizard > 0 AND $class == Insurrectionist)	{
+	elseif($uwizard > 0 AND $class == 'Insurrectionist')	{
 		echo"<div align=center><font class=yellow>You do not have Wizards!</div></font>";
 		include("include/disband_table.php");
 		die();
 	}
-	elseif($upriest > 0 AND $class == Demon)	{
+	elseif($upriest > 0 AND $class == 'Demon')	{
 		echo"<div align=center><font class=yellow>You do not have Priests!</div></font>";
 		include("include/disband_table.php");
 		die();
@@ -49,7 +49,7 @@ else	{
 		include("include/disband_table.php");
 		die(); 
 	} 
-	elseif($upriest > 0 AND $uwizard > 0 AND $race == Giant)	{
+	elseif($upriest > 0 AND $uwizard > 0 AND $race == 'Giant')	{
 		echo"<div align=center><font class=yellow>You do not have Wizards or Priests!</font></div>";
 		include("include/disband_table.php");
 		die(); 
@@ -57,10 +57,10 @@ else	{
 	
 	$gp = $gp - (($uthief + $usage + $uexplorer + $upriest + $uwizard + $uwarrior + $uarcher) * 200);	
 	$gp = round($gp);
-	mysql_query("UPDATE user SET gp='$gp' WHERE email='$email' AND pw='$pw'"); 
+	mysqli_query($db, "UPDATE user SET gp='$gp' WHERE email='$email' AND pw='$pw'"); 
 
 	$new_recruits = $recruits + ($uthief + $usage + $uexplorer + $upriest + $uwizard + $uwarrior + $uarcher);
-	mysql_query("UPDATE military SET recruits='$new_recruits' WHERE email='$email' AND pw='$pw'");
+	mysqli_query($db, "UPDATE military SET recruits='$new_recruits' WHERE email='$email' AND pw='$pw'");
 
 	$new_thieves = $thieves - $uthief;
 	$new_sages = $sages - $usage;
@@ -70,13 +70,13 @@ else	{
 	$new_warriors = $warriors - $uwarrior;
 	$new_archers = $archers - $uarcher;
 
-	mysql_query("UPDATE military SET thieves='$new_thieves' WHERE email='$email' AND pw='$pw'");
-	mysql_query("UPDATE military SET sages='$new_sages' WHERE email='$email' AND pw='$pw'");
-	mysql_query("UPDATE military SET explorers='$new_explorers' WHERE email='$email' AND pw='$pw'");
-	mysql_query("UPDATE military SET priests='$new_priests' WHERE email='$email' AND pw='$pw'");
-	mysql_query("UPDATE military SET wizards='$new_wizards' WHERE email='$email' AND pw='$pw'");
-	mysql_query("UPDATE military SET warriors='$new_warriors' WHERE email='$email' AND pw='$pw'");
-	mysql_query("UPDATE military SET archers='$new_archers' WHERE email='$email' AND pw='$pw'");
+	mysqli_query($db, "UPDATE military SET thieves='$new_thieves' WHERE email='$email' AND pw='$pw'");
+	mysqli_query($db, "UPDATE military SET sages='$new_sages' WHERE email='$email' AND pw='$pw'");
+	mysqli_query($db, "UPDATE military SET explorers='$new_explorers' WHERE email='$email' AND pw='$pw'");
+	mysqli_query($db, "UPDATE military SET priests='$new_priests' WHERE email='$email' AND pw='$pw'");
+	mysqli_query($db, "UPDATE military SET wizards='$new_wizards' WHERE email='$email' AND pw='$pw'");
+	mysqli_query($db, "UPDATE military SET warriors='$new_warriors' WHERE email='$email' AND pw='$pw'");
+	mysqli_query($db, "UPDATE military SET archers='$new_archers' WHERE email='$email' AND pw='$pw'");
 
 	echo"<div align=center><font class=yellow>The specified units have been disbanded.</font></div>";
 	include("include/disband_table.php");

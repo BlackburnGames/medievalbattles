@@ -12,26 +12,26 @@ echo "
 			<td class='main2'><b class='reg'>Votes Received</b></td>
 			<td class='main2'><b class='reg'>Voting For</b></td>";
 $query_string = "SELECT ename, aim, msn, lastlogin, vote, votefor, sl, userid FROM user WHERE setid='$setid' ORDER BY userid ASC";
-$result_id = mysql_query($query_string, $var);
-while ($row = mysql_fetch_row($result_id))	{
+$result_id = mysqli_query($db, $query_string);
+while ($row = mysqli_fetch_row($result_id))	{
 	//	Check to see if AIM is not blank
-		$A_result = mysql_db_query($dbnam, "SELECT aim FROM user WHERE aim='$row[aim]'");
-		$AIMcheck = mysql_fetch_array($A_result);
+		$A_result = mysqli_query($db, "SELECT aim FROM user WHERE aim='$row[aim]'");
+		$AIMcheck = mysqli_fetch_array($A_result);
 			if($AIMcheck[0] != "")	{
-				$AIM_SELECT = mysql_db_query($dbnam, "SELECT aim FROM user WHERE ename='$row[0]'");	
-	   			$AIM_S = mysql_result($AIM_SELECT, "AIM_S");
+				$AIM_SELECT = mysqli_query($db, "SELECT aim FROM user WHERE ename='$row[0]'");	
+	   			$AIM_S = mb_db_result($AIM_SELECT, "AIM_S");
 				$row[1] = urlencode($row[1]);
 				$AIM_VAR = "<a href=\"aim:goim?screenname=$row[1]&message=Hey+its+$ename\"><img src=\"images/aim.gif\" border=\"0\"></a>";
 			}
 	//	Check to see if SL is there
-		$SL_result = mysql_db_query($dbnam, "SELECT sl FROM user WHERE ename='$row[0]'");
-		$SLcheck = @mysql_fetch_array($SL_result);
-			if($SLcheck[0] == yes)	 {
+		$SL_result = mysqli_query($db, "SELECT sl FROM user WHERE ename='$row[0]'");
+		$SLcheck = @mysqli_fetch_array($SL_result);
+			if($SLcheck[0] == 'yes')	 {
 				$color = "#632910";
-				$SL_SELECT = mysql_db_query($dbnam, "SELECT ename FROM user WHERE sl='yes' AND setid='$setid'");
-    			$SL_S = mysql_result($SL_SELECT,"SL_S");
+				$SL_SELECT = mysqli_query($db, "SELECT ename FROM user WHERE sl='yes' AND setid='$setid'");
+    			$SL_S = mb_db_result($SL_SELECT,"SL_S");
 			}
-			if($SLcheck[0] != yes)	{
+			if($SLcheck[0] != 'yes')	{
 				$color = "#404040";
 			}
 	echo "

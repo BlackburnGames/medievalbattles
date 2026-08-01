@@ -1,10 +1,10 @@
 <?php
-$ssettlementpic = mysql_db_query($dbnam, "SELECT setpic FROM settlement WHERE setid = '$setid'");	
-	$settlepic = mysql_result($ssettlementpic,"settlepic");	
-$ssettlementname = mysql_db_query($dbnam, "SELECT setname FROM settlement WHERE setid = '$setid'");	
-	$settlename = mysql_result($ssettlementname,"settlename"); 
-$setnotice = mysql_db_query($dbnam, "SELECT setnotice FROM settlement WHERE setid = '$setid'");	
-	$notice = mysql_result($setnotice,"notice");
+$ssettlementpic = mysqli_query($db, "SELECT setpic FROM settlement WHERE setid = '$setid'");	
+	$settlepic = mb_db_result($ssettlementpic,"settlepic");	
+$ssettlementname = mysqli_query($db, "SELECT setname FROM settlement WHERE setid = '$setid'");	
+	$settlename = mb_db_result($ssettlementname,"settlename"); 
+$setnotice = mysqli_query($db, "SELECT setnotice FROM settlement WHERE setid = '$setid'");	
+	$notice = mb_db_result($setnotice,"notice");
 
 echo "
 <form type='post' action='sl.php'>

@@ -8,15 +8,15 @@ if($setchg == 1)	{
 		die();
 	}
 
-	mysql_query("UPDATE user SET csnum='$snum' WHERE email='$email' AND pw='$pw'");
+	mysqli_query($db, "UPDATE user SET csnum='$snum' WHERE email='$email' AND pw='$pw'");
 	echo "
 		<font class='inner2'>You are viewing Settlement $snum</font><br><br>
 		<select name='empvalue'>
 			<option selected value='ns'>-Select an Empire-</option>";
 
 	$query_string = "SELECT userid, ename FROM user WHERE setid='$snum'";
-	$result_id = mysql_query($query_string, $var);
-	while ($row = mysql_fetch_row($result_id))	{
+	$result_id = mysqli_query($db, $query_string);
+	while ($row = mysqli_fetch_row($result_id))	{
 		echo "<option value='$row[0]' ";
 		if($row[0] == $send_to)	{	echo "selected";	}
 		echo " >$row[1]</option>";
@@ -34,8 +34,8 @@ if($setchg == 1)	{
 			<option selected value='ns'>-Select an Empire-</option>";
 
 		$query_string = "SELECT userid, ename FROM user WHERE setid='$csnum'";
-		$result_id = mysql_query($query_string, $var);
-		while ($row = mysql_fetch_row($result_id))	{
+		$result_id = mysqli_query($db, $query_string);
+		while ($row = mysqli_fetch_row($result_id))	{
 			echo "<option value='$row[0]' ";
 			if($row[0] == $send_to)	{	echo "selected";	}
 			echo " >$row[1]</option>";

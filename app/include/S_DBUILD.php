@@ -1,10 +1,10 @@
 <?php
 
-if($res[r11pts] >= 100000)   { $adv_gold_mines = "Adv. Gold Mines"; }
+if($res['r11pts'] >= 100000)   { $adv_gold_mines = "Adv. Gold Mines"; }
   else  { $adv_gold_mines = "Gold Mines"; }
-if($res[r12pts] >= 100000)   { $adv_iron_mines = "Adv. Iron Mines"; }
+if($res['r12pts'] >= 100000)   { $adv_iron_mines = "Adv. Iron Mines"; }
   else  { $adv_iron_mines = "Iron Mines"; }
-if($res[r15pts] >= 100000)   { $adv_farm_buildings = "Plantation"; }
+if($res['r15pts'] >= 100000)   { $adv_farm_buildings = "Plantation"; }
   else  { $adv_farm_buildings = "Plantation"; }
 
 echo "
@@ -33,14 +33,14 @@ echo "
           <td class='inner2'>$adv_farm_buildings</td>
           <td class='inner2'>$farm</td>
           <td class='inner2'><input type='number' name='ufarm' size='5'></td>";
-if($race != Orc)  {
+if($race != 'Orc')  {
   echo"
         <tr>
           <td class='inner2'>Wooden Platform</td>
           <td class='inner2'>$wp</td>
           <td class='inner2'><input type='number' name='uwp' size='5'></td>";
 }
-if($res[r13pts] >= 125000)   {
+if($res['r13pts'] >= 125000)   {
   echo"
         <tr>
           <td class='inner2'>Lumber Mill</td>

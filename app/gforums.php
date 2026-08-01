@@ -4,17 +4,17 @@ include("include/igtop.php");
 
 
 //	determine guild name
-$empire_guild_query = mysql_db_query($dbnam, "SELECT guild FROM user WHERE email='$email' AND pw='$pw'");	
-	$empireguild = mysql_result($empire_guild_query,"empireguild");
+$empire_guild_query = mysqli_query($db, "SELECT guild FROM user WHERE email='$email' AND pw='$pw'");	
+	$empireguild = mb_db_result($empire_guild_query,"empireguild");
 
-if($empireguild == None)	{
+if($empireguild == 'None')	{
 	echo"<div align=center><font class=yellow><b>You must be the member of a guild to view this page.</b></font></div>";
 	die();
 }
 
 //	determine owner
-$guild_owner_query = mysql_db_query($dbnam, "SELECT owner FROM guild WHERE gname='$empireguild'");	
-	$owner_query = mysql_result($guild_owner_query,"owner_query");
+$guild_owner_query = mysqli_query($db, "SELECT owner FROM guild WHERE gname='$empireguild'");	
+	$owner_query = mb_db_result($guild_owner_query,"owner_query");
 
 if($owner_query == $userid)	{
 	echo "<script type=javascript>location.href=gl-forum.php;</script>";
@@ -24,7 +24,7 @@ if($owner_query == $userid)	{
 include("commong.php");
 
 $query = "SELECT topicid, name, topic, replies, lastpost, lastposter FROM guildthreads WHERE guildname='$empireguild' ORDER by lastpost DESC";
-$result= mysql_query($query) or die("Error in query! " . mysql_error());
+$result= mysqli_query($db, $query) or die("Error in query! " . mysqli_error($db));
 
 if ($result) { 
 echo "
@@ -39,11 +39,11 @@ echo "
 						<td align=center><b class=forum>REPLIES</strong></td>
 						<td align=center><b class=forum>LAST POST</strong></td>
 					</tr>";									
-	while ($r = mysql_fetch_array($result)) {
+	while ($r = mysqli_fetch_array($result)) {
 	extract ($r);
 	
-	$topic_replies_query = mysql_db_query($dbnam, "SELECT count(topicid) FROM guildmsgs WHERE topicid=$topicid");
-		$topic_replies = mysql_result($topic_replies_query, "topic_replies");
+	$topic_replies_query = mysqli_query($db, "SELECT count(topicid) FROM guildmsgs WHERE topicid=$topicid");
+		$topic_replies = mb_db_result($topic_replies_query, "topic_replies");
 	
 echo "
 					<tr bgcolor=$color2>
@@ -61,8 +61,7 @@ echo "
 		</tr>
 	</table>";  
     
-mysql_free_result($result);
-MYSQL_CLOSE();	
+mysqli_free_result($result);
 ?>
 
 

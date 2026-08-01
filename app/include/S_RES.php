@@ -13,7 +13,7 @@ echo "
 		<td class='main2'><b class='reg'>Progress</b></td>
 		<td class='main2'><b class='reg'>Send Sages</b></td>";
 
-if($race != Giant AND $class != Ranger AND $class != Insurrectionist)	{
+if($race != 'Giant' AND $class != 'Ranger' AND $class != 'Insurrectionist')	{
 echo"
 	<tr>
 		<td class='inner2'>Fireball</td>
@@ -57,7 +57,7 @@ echo"
 		<td class='inner2'>$res[r7]</td>
 		<td class='inner2'>$flaming_sphere</td>
 		<td class='inner2'><input type='number' name='ur7' size='8' maxlength='10'></td>";
-if($class == Mage)	{ 
+if($class == 'Mage')	{ 
 echo"
 	<tr>
 		<td class='inner2'>Cloud Kill</td>
@@ -116,7 +116,7 @@ echo "
 		<td class='inner2'>$res[r14]</td>
 		<td class='inner2'>$demolitions</td>
 		<td class='inner2'><input type='number' name='ur14' size='8' maxlength='10'></td>";
-if($race != Giant AND $class != Ranger AND $class != Insurrectionist)	{
+if($race != 'Giant' AND $class != 'Ranger' AND $class != 'Insurrectionist')	{
 	echo "
 	<tr>
 		<td class='inner2'>Animation</td>

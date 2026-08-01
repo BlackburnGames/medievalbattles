@@ -2,21 +2,21 @@
 include("include/igtop.php");
 include("common.php");
 
-$result= mysql_query("SELECT topicid, setid FROM setforums WHERE setid='$setid' AND topicid='$topicid'") or die("Error! " . mysql_error());
-$settlement_check = mysql_fetch_array($result);
+$result= mysqli_query($db, "SELECT topicid, setid FROM setforums WHERE setid='$setid' AND topicid='$topicid'") or die("Error! " . mysqli_error($db));
+$settlement_check = mysqli_fetch_array($result);
 
-if($setid != $settlement_check[setid])	{
+if($setid != $settlement_check['setid'])	{
 	echo"<div align=center><font class=yellow>You cannot view forum posts in other settlements!</font></div>";
 	die();
 }
 
-$result1 = mysql_query("SELECT name, topic, message, lastpost FROM setforums WHERE topicid='$topicid' AND setid='$setid'") or die("Error! " . mysql_error());
+$result1 = mysqli_query($db, "SELECT name, topic, message, lastpost FROM setforums WHERE topicid='$topicid' AND setid='$setid'") or die("Error! " . mysqli_error($db));
 
 if ($result1) { 
 echo"
 	<table border=0 class=f align=center cellspacing=1 cellpadding=1 width=95%>";
 									
-	while ($r1 = mysql_fetch_array($result1)) {
+	while ($r1 = mysqli_fetch_array($result1)) {
 	extract ($r1);
 
 	echo "
@@ -31,17 +31,17 @@ echo"
 
 echo "
 	</table>";
-	mysql_free_result($result1);	
+	mysqli_free_result($result1);	
 }
 
 $query2 = "SELECT * FROM setforumsmsgs WHERE topicid='$topicid' AND setid='$setid' ORDER BY messageid ASC";
-$result2 = mysql_query($query2) or die("Could not execute the query!");
+$result2 = mysqli_query($db, $query2) or die("Could not execute the query!");
 
 if ($result2) { 
 echo	"
 	<table border=0 class=f width=95% align=center cellspacing=1 cellpadding=1>";
 	
-	while ($r2 = mysql_fetch_array($result2)) {
+	while ($r2 = mysqli_fetch_array($result2)) {
 	extract ($r2);
 	
 	echo "
@@ -56,9 +56,8 @@ echo	"
 
 echo "
 	</table><br><br>";	
-	mysql_free_result($result2);
+	mysqli_free_result($result2);
 }
-MYSQL_CLOSE();
 ?>
 
 <form action="input.posts.php" method="post" name="reply">

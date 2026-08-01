@@ -10,18 +10,18 @@ echo "  <br><br>
 			<td class='main2' width='80%'><b class=reg>Message</b></td>";
 
 $query_string = "SELECT origin, datesent, message, mid FROM messages WHERE yourid='$userid' ORDER BY datesent DESC";
-$result_id = mysql_db_query($dbnam, $query_string);
-while ($row = mysql_fetch_array($result_id))	{
+$result_id = mysqli_query($db, $query_string);
+while ($row = mysqli_fetch_array($result_id))	{
 	extract ($row);
 	$link = $origin;
 	
 	// check to see if he/shes allready a GL
-	$sresult = mysql_db_query($dbnam, "SELECT setid FROM user WHERE ename='$origin'");
-	$setcheck = mysql_fetch_array($sresult);
+	$sresult = mysqli_query($db, "SELECT setid FROM user WHERE ename='$origin'");
+	$setcheck = mysqli_fetch_array($sresult);
 	
 	if($setcheck[0] != "")	{
-		$their_set = mysql_db_query($dbnam, "SELECT setid FROM user WHERE ename='$origin'");	
-			$snum = mysql_result($their_set,"snum");
+		$their_set = mysqli_query($db, "SELECT setid FROM user WHERE ename='$origin'");	
+			$snum = mb_db_result($their_set,"snum");
 		$sender = urlencode($origin);
 		$link = "<a href=messaging.php?value=$sender&snum=$snum&setchg=1>$origin($snum)</a>";
 	}

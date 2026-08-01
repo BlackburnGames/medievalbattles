@@ -4,18 +4,18 @@ include("include/igtop.php");
 echo "<div align=center><font class=yellow><b>Statistics page is still being worked on.</b></font></div>";
 die();
 
-$avg_players_query = mysql_db_query($dbnam, "SELECT count(ename) FROM user");
-	$avg_players = mysql_fetch_array($avg_players_query);
+$avg_players_query = mysqli_query($db, "SELECT count(ename) FROM user");
+	$avg_players = mysqli_fetch_array($avg_players_query);
 
-$avg_users_query = mysql_db_query($dbnam, "SELECT count(ename) FROM user");
-	$avg_users = mysql_fetch_array($avg_users_query);
-$avg_units_query = mysql_db_query($dbnam, "SELECT * FROM military");
-	$avg_units = mysql_fetch_array($avg_units_query);
+$avg_users_query = mysqli_query($db, "SELECT count(ename) FROM user");
+	$avg_users = mysqli_fetch_array($avg_users_query);
+$avg_units_query = mysqli_query($db, "SELECT * FROM military");
+	$avg_units = mysqli_fetch_array($avg_units_query);
 
-$avg_units[thieves] = $avg_units[thieves] / $avg_players[0];
-$avg_units[sages] = $avg_units[sages] / $avg_players[0];
-$avg_units[explorers] = $avg_units[explorers] / $avg_players[0];
-$avg_units[civ] = $avg_units[civ] / $avg_players[0];
+$avg_units['thieves'] = $avg_units['thieves'] / $avg_players[0];
+$avg_units['sages'] = $avg_units['sages'] / $avg_players[0];
+$avg_units['explorers'] = $avg_units['explorers'] / $avg_players[0];
+$avg_units['civ'] = $avg_units['civ'] / $avg_players[0];
 
 echo "
 <div align=center><b class=reg>[ <a href='esscores.php'>Strongest Empires</a> ]</b></div>

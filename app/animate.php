@@ -1,7 +1,7 @@
 <? 
 include("include/igtop.php");
 
-if(($race != Giant) AND ($race != Angel) AND ($class != Ranger) AND ($class != Insurrectionist))	{
+if(($race != 'Giant') AND ($race != 'Angel') AND ($class != 'Ranger') AND ($class != 'Insurrectionist'))	{
 
 	if(!IsSet($trains))	 {
 		include("include/animate_table.php");
@@ -9,7 +9,7 @@ if(($race != Giant) AND ($race != Angel) AND ($class != Ranger) AND ($class != I
 	else	{
 		include("include/nexplode.php");
 
-		if(($uirongolem > 0 AND $res[r18pts] < 125000) OR ($ugolem > 0 AND $res[r17pts] < 125000))	{
+		if(($uirongolem > 0 AND $res['r18pts'] < 125000) OR ($ugolem > 0 AND $res['r17pts'] < 125000))	{
 			echo"<div align=center><font class=yellow>You have to research Animation/Advanced Animation first!</font></div>"; 
 			include("include/animate_table.php");
 			die();
@@ -34,17 +34,17 @@ if(($race != Giant) AND ($race != Angel) AND ($class != Ranger) AND ($class != I
 			include("include/animate_table.php");
 			die(); 
 		}
-		elseif($ugolem > 0 AND $uirongolem > 0 AND $race == Giant)	{
+		elseif($ugolem > 0 AND $uirongolem > 0 AND $race == 'Giant')	{
 			echo"<div align=center><font class=yellow>You can't train these because you're a Giant!</font></div>";
 			include("include/animate_table.php");
 			die();	
 		}
-		elseif($ugolem > 0 AND $uirongolem > 0 AND $class == Ranger)	{
+		elseif($ugolem > 0 AND $uirongolem > 0 AND $class == 'Ranger')	{
 			echo"<div align=center><font class=yellow>You can't train these because you're a Ranger!</font></div>";
 			include("include/animate_table.php");
 			die(); 
 		}
-		elseif($ugolem > 0 AND $uirongolem > 0 AND $class == Insurrectionist)	{
+		elseif($ugolem > 0 AND $uirongolem > 0 AND $class == 'Insurrectionist')	{
 			echo"<div align=center><font class=yellow>You can't train these because you're an Insurrectionist!</font></div>";
 			include("include/animate_table.php");
 			die(); 
@@ -59,12 +59,12 @@ if(($race != Giant) AND ($race != Angel) AND ($class != Ranger) AND ($class != I
 		 	$dbgolem = $dbgolem + $ugolem;
 		 	$dbirongolem = $dbirongolem + $uirongolem;
 		
-			mysql_query("UPDATE user SET gp='$gp' WHERE email='$email' AND pw='$pw'");  
-			mysql_query("UPDATE user SET iron='$iron' WHERE email='$email' AND pw='$pw'");  
-		  	mysql_query("UPDATE military SET wizards='$wizards' WHERE email='$email' AND pw='$pw'");
+			mysqli_query($db, "UPDATE user SET gp='$gp' WHERE email='$email' AND pw='$pw'");  
+			mysqli_query($db, "UPDATE user SET iron='$iron' WHERE email='$email' AND pw='$pw'");  
+		  	mysqli_query($db, "UPDATE military SET wizards='$wizards' WHERE email='$email' AND pw='$pw'");
 	 
-		  	mysql_query("UPDATE military SET dbgolem='$dbgolem' WHERE email='$email' AND pw='$pw'");
-		  	mysql_query("UPDATE military SET dbirongolem='$dbirongolem' WHERE email='$email' AND pw='$pw'");
+		  	mysqli_query($db, "UPDATE military SET dbgolem='$dbgolem' WHERE email='$email' AND pw='$pw'");
+		  	mysqli_query($db, "UPDATE military SET dbirongolem='$dbirongolem' WHERE email='$email' AND pw='$pw'");
 
 			echo"<div align=center><font class=yellow>Your orders have been carried out.</font></div>";
 			include("include/animate_table.php");

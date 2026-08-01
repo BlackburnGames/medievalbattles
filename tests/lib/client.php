@@ -37,7 +37,10 @@ class MbClient
     {
         $url = $this->absolute($path);
 
-        $headers = array('Connection: close');
+        // Opts this request into display_errors, so PHP diagnostics land in the
+        // response body where the crawler can assert on them. Browsers do not
+        // send it and get a readable page instead. See docker/php/prepend.php.
+        $headers = array('Connection: close', 'X-MB-Show-Errors: 1');
         if ($this->cookies) {
             $pairs = array();
             foreach ($this->cookies as $name => $value) {

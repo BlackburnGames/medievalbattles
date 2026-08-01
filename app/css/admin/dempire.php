@@ -19,19 +19,19 @@ else	{
 	$clock = date("m/d/y, H:ia");
 
 	//SELECTING SETID
-		$empreset = mysql_db_query($dbnam, "SELECT setid FROM user WHERE ename='$empre'");
-		$esetid = mysql_result($empreset,"esetid");
+		$empreset = mysqli_query($db, "SELECT setid FROM user WHERE ename='$empre'");
+		$esetid = mb_db_result($empreset,"esetid");
 	//SELECTING EMAIL
-		$theiremail = mysql_db_query($dbnam, "SELECT email FROM user WHERE ename='$empre'");
-		$tmail = mysql_result($theiremail,"tmail");
-	mysql_query("INSERT INTO setnews (date, news, setid) 	VALUES	('$clock', '<font class=red><b>$empre</b> has been deleted by an administrator</font>', '$esetid') ");			
+		$theiremail = mysqli_query($db, "SELECT email FROM user WHERE ename='$empre'");
+		$tmail = mb_db_result($theiremail,"tmail");
+	mysqli_query($db, "INSERT INTO setnews (date, news, setid) 	VALUES	('$clock', '<font class=red><b>$empre</b> has been deleted by an administrator</font>', '$esetid') ");			
 
-	mysql_query("DELETE FROM buildings WHERE email='$tmail'"); 
-	mysql_query("DELETE FROM military WHERE email='$tmail'");
-	mysql_query("DELETE FROM returntbl WHERE email='$tmail'"); 
-	mysql_query("DELETE FROM research WHERE email='$tmail'");
-	mysql_query("DELETE FROM explore WHERE email='$tmail'"); 
-	mysql_query("DELETE FROM user WHERE email='$tmail'");
+	mysqli_query($db, "DELETE FROM buildings WHERE email='$tmail'"); 
+	mysqli_query($db, "DELETE FROM military WHERE email='$tmail'");
+	mysqli_query($db, "DELETE FROM returntbl WHERE email='$tmail'"); 
+	mysqli_query($db, "DELETE FROM research WHERE email='$tmail'");
+	mysqli_query($db, "DELETE FROM explore WHERE email='$tmail'"); 
+	mysqli_query($db, "DELETE FROM user WHERE email='$tmail'");
 
 	echo "<center>$empre has been deleted.<br>";
 	die();

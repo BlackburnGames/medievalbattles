@@ -2,8 +2,8 @@
 
 <?	
 	$SN_query = ("SELECT setid FROM setnews WHERE setid='$setid'");
-	$SN_result = mysql_query($SN_query);
-	$SN_check = mysql_fetch_array($SN_result); 
+	$SN_result = mysqli_query($db, $SN_query);
+	$SN_check = mysqli_fetch_array($SN_result); 
 		if($SN_check[0] == "" OR $SN_check[0] == 0)
 			{echo"<div align=center><font class=yellow>Your settlement does not have any news to display.</font></div>";die();}
 ?>	   
@@ -20,17 +20,20 @@
 
 <?php
 	include("include/connect.php");
-	$tablename = user;
-	function display_db_table($tablename, $var)
-	{	
-			Global $setid;
+	$tablename = 'user';
+	// $tablename was always ignored -- the query below hardcodes setnews -- and
+	// the second parameter used to be the legacy mysql link, which mysqli takes
+	// from the shared $db handle instead.
+	function display_db_table($tablename)
+	{
+			Global $setid, $db;
 
 			$query_string = "SELECT date, news FROM setnews  WHERE setid='$setid' ORDER BY date DESC";
-			$result_id = mysql_query($query_string, $var);
-			$column_count = mysql_num_fields($result_id);
+			$result_id = mysqli_query($db, $query_string);
+			$column_count = mysqli_num_fields($result_id);
 
 			 
-			while ($row = mysql_fetch_row($result_id))
+			while ($row = mysqli_fetch_row($result_id))
 		
 			{
 				print("<TR ALIGN=center VALIGN=TOP>");
@@ -56,7 +59,7 @@
 		<td class=main2 width="20%" align=left><b class=reg>Date/Time</b></td>
 		<td class=main2 align=left><b class=reg width="80%">News</b></td>
 		
-	  <?php display_db_table("user", $var);?>
+	  <?php display_db_table("user");?>
 
 <!-- body ends here -->
 </TD>

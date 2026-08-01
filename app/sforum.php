@@ -8,11 +8,11 @@ include("include/connect.php");
 
 if (empty($offset))  {  $offset=0;  }
 
-$numresults=mysql_query("SELECT topicid FROM setforums WHERE setid=$setid");
-$numrows=mysql_num_rows($numresults);
+$numresults=mysqli_query($db, "SELECT topicid FROM setforums WHERE setid=$setid");
+$numrows=mysqli_num_rows($numresults);
 
 $query = "SELECT topicid, name, topic, replies, lastpost, lastposter FROM setforums WHERE setid='$setid' ORDER by topicid DESC";
-$result= mysql_query($query) or die("Could not run the database query!");
+$result= mysqli_query($db, $query) or die("Could not run the database query!");
 
 if ($result) { 
 echo "
@@ -27,11 +27,11 @@ echo "
 						<td align=center><b class=forum>Last Post by</b></td>
 						<td align=center><b class=forum>Last Post</b></td>
 					</tr>";										
-	while ($r = mysql_fetch_array($result)) {	
+	while ($r = mysqli_fetch_array($result)) {	
 	extract ($r);	
 
-		$topicreplies = mysql_db_query($dbnam, "SELECT count(topicid) FROM setforumsmsgs WHERE topicid=$topicid");
-		$treplies = mysql_result($topicreplies, "treplies");
+		$topicreplies = mysqli_query($db, "SELECT count(topicid) FROM setforumsmsgs WHERE topicid=$topicid");
+		$treplies = mb_db_result($topicreplies, "treplies");
 
 echo "
 					<tr bgcolor=$color2>
@@ -49,8 +49,7 @@ echo "
 		</tr>
 	</table>";  
   
-mysql_free_result($result);
-MYSQL_CLOSE();
+mysqli_free_result($result);
 
 ?>
 <br><br>

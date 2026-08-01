@@ -18,7 +18,7 @@ if(!IsSet($update)) {
 else  {
   include("include/nexplode.php");
 
-  if($ulmill > 0 && $res[r13pts] < 125000)  {
+  if($ulmill > 0 && $res['r13pts'] < 125000)  {
     echo"<div align=center><font class=yellow>You have to research Archery before this building becomes available to demolish.</font></div>";
     include("include/S_BUILD.php");
     die();
@@ -43,7 +43,7 @@ else  {
     include("include/S_DBUILD.php");
     die();
   }
-  elseif($uwp > 0 && $race == Orc) {
+  elseif($uwp > 0 && $race == 'Orc') {
     echo"<div align=center><font class=yellow>Being that you are an orc, you cannot construct the wooden platform.</font></div>";
     include("include/S_BUILD.php");
     die();
@@ -68,17 +68,17 @@ else  {
     $gm = $gm - $ugm;
     $im = $im - $uim;
 
-    mysql_query("UPDATE buildings SET amts='$amts' WHERE email='$email' AND pw='$pw'");
-      mysql_query("UPDATE buildings SET aland='$aland' WHERE email='$email' AND pw='$pw'");
+    mysqli_query($db, "UPDATE buildings SET amts='$amts' WHERE email='$email' AND pw='$pw'");
+      mysqli_query($db, "UPDATE buildings SET aland='$aland' WHERE email='$email' AND pw='$pw'");
 
-    mysql_query("UPDATE buildings SET home='$home' WHERE email='$email' AND pw='$pw'");
-      mysql_query("UPDATE buildings SET barrack='$barrack' WHERE email='$email' AND pw='$pw'");
-      mysql_query("UPDATE buildings SET farm='$farm' WHERE email='$email' AND pw='$pw'");
-      mysql_query("UPDATE buildings SET wp='$wp' WHERE email='$email' AND pw='$pw'");
-    mysql_query("UPDATE buildings SET lmill='$lmill' WHERE email='$email' AND pw='$pw'");
+    mysqli_query($db, "UPDATE buildings SET home='$home' WHERE email='$email' AND pw='$pw'");
+      mysqli_query($db, "UPDATE buildings SET barrack='$barrack' WHERE email='$email' AND pw='$pw'");
+      mysqli_query($db, "UPDATE buildings SET farm='$farm' WHERE email='$email' AND pw='$pw'");
+      mysqli_query($db, "UPDATE buildings SET wp='$wp' WHERE email='$email' AND pw='$pw'");
+    mysqli_query($db, "UPDATE buildings SET lmill='$lmill' WHERE email='$email' AND pw='$pw'");
 
-    mysql_query("UPDATE buildings SET gm='$gm' WHERE email='$email' AND pw='$pw'");
-      mysql_query("UPDATE buildings SET im='$im' WHERE email='$email' AND pw='$pw'");
+    mysqli_query($db, "UPDATE buildings SET gm='$gm' WHERE email='$email' AND pw='$pw'");
+      mysqli_query($db, "UPDATE buildings SET im='$im' WHERE email='$email' AND pw='$pw'");
 
     echo"<div align=center><font class=yellow>Your orders have been carried out.</font></div>";
     include("include/S_DBUILD.php");

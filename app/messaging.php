@@ -15,7 +15,7 @@ if(!IsSet($sendmessage))	{
 }
 else	{
 	
-	if($empvalue == ns)		{
+	if($empvalue == 'ns')		{
 		echo"<div align=center><font class=yellow>You did not select an empire to message.</font></div>"; 
 		include("include/S_MESS.php"); 
 		die();
@@ -27,21 +27,21 @@ else	{
 	}
 	else	{
 
-		$empattacked = mysql_db_query($dbnam, "SELECT ename FROM user WHERE userid='$empvalue'");	
-		$empireattacked = mysql_result($empattacked,"empireattacked");
+		$empattacked = mysqli_query($db, "SELECT ename FROM user WHERE userid='$empvalue'");	
+		$empireattacked = mb_db_result($empattacked,"empireattacked");
 
-		$THE_MNO = mysql_db_query($dbnam, "SELECT mno FROM user WHERE userid='$empvalue'");	
-		$T_MNO = mysql_result($THE_MNO,"T_MNO");
+		$THE_MNO = mysqli_query($db, "SELECT mno FROM user WHERE userid='$empvalue'");	
+		$T_MNO = mb_db_result($THE_MNO,"T_MNO");
 
-		$yourmid = mysql_db_query($dbnam, "SELECT max(mid) FROM messages");	
-		$ymid = mysql_result($yourmid,"ymid");
+		$yourmid = mysqli_query($db, "SELECT max(mid) FROM messages");	
+		$ymid = mb_db_result($yourmid,"ymid");
 
 		$ymid = $ymid + 1;
 		$thenum = $T_MNO + 1;
 		$umessage = nl2br(strip_tags($umessage,"<i>,<b>"));
 
-		mysql_query("UPDATE user SET mno='$thenum' WHERE userid='$empvalue'");
-		mysql_query("INSERT INTO messages (origin, datesent, yourid, message, mid)		VALUES	('$ename', '$clock', '$empvalue', '$umessage', '$ymid') ");
+		mysqli_query($db, "UPDATE user SET mno='$thenum' WHERE userid='$empvalue'");
+		mysqli_query($db, "INSERT INTO messages (origin, datesent, yourid, message, mid)		VALUES	('$ename', '$clock', '$empvalue', '$umessage', '$ymid') ");
 	
 		echo"<div align=center><font class=yellow>Your message has been sent to $empireattacked.</font></div></center>";
 		include("include/S_MESS.php"); 

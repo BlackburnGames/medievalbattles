@@ -18,23 +18,23 @@ else	{
 
 	$clock = date("m/d/y, H:ia");
 
-	$result = mysql_query("SELECT * FROM user WHERE ename='$empre'");
-		$evu = mysql_fetch_array($result);
+	$result = mysqli_query($db, "SELECT * FROM user WHERE ename='$empre'");
+		$evu = mysqli_fetch_array($result);
 
-	$result1 = mysql_query("SELECT * FROM military WHERE userid='$evu[userid]'");
-		$evm = mysql_fetch_array($result1);
+	$result1 = mysqli_query($db, "SELECT * FROM military WHERE userid='$evu[userid]'");
+		$evm = mysqli_fetch_array($result1);
 	
-	$result2 = mysql_query("SELECT * FROM buildings WHERE userid='$evu[userid]'");
-		$evb = mysql_fetch_array($result2);
+	$result2 = mysqli_query($db, "SELECT * FROM buildings WHERE userid='$evu[userid]'");
+		$evb = mysqli_fetch_array($result2);
 
-	$result3 = mysql_query("SELECT * FROM returntbl WHERE userid='$evu[userid]'");
-		$evr = mysql_fetch_array($result3);
+	$result3 = mysqli_query($db, "SELECT * FROM returntbl WHERE userid='$evu[userid]'");
+		$evr = mysqli_fetch_array($result3);
 
-	$result4 = mysql_query("SELECT * FROM research WHERE userid='$evu[userid]'");
-		$evres = mysql_fetch_array($result4);
+	$result4 = mysqli_query($db, "SELECT * FROM research WHERE userid='$evu[userid]'");
+		$evres = mysqli_fetch_array($result4);
 
-	$result5 = mysql_query("SELECT * FROM explore WHERE userid='$evu[userid]'");
-		$eve = mysql_fetch_array($result5);
+	$result5 = mysqli_query($db, "SELECT * FROM explore WHERE userid='$evu[userid]'");
+		$eve = mysqli_fetch_array($result5);
 	
 echo"
 		<table border=1 bordercolor=#000000 align=center cellpadding=0 cellspacing=0 width=80%>
@@ -151,8 +151,8 @@ echo"
 			</tr>
 			</table><br>";
 
-	$empnews_sel = mysql_db_query($dbnam, "SELECT count(yourid) FROM empnews WHERE yourid='$userid'");	
-	$emp_sel = mysql_result($empnews_sel,"emp_sel");
+	$empnews_sel = mysqli_query($db, "SELECT count(yourid) FROM empnews WHERE yourid='$userid'");	
+	$emp_sel = mb_db_result($empnews_sel,"emp_sel");
 	
 	if($emp_sel == 0 OR $emp_sel == "")	{
 		echo"<div align=center><font class=yellow>This user has no news to be displayed.</font></div>";
@@ -168,8 +168,8 @@ echo "
 				<td class=inner22><b>News</b></td>";
 
 	$query_string = "SELECT date, news FROM empnews WHERE yourid='$evu[userid]' ORDER BY date DESC";
-	$result_id = mysql_query($query_string, $var);
-	while ($row = mysql_fetch_row($result_id))	{
+	$result_id = mysqli_query($db, $query_string);
+	while ($row = mysqli_fetch_row($result_id))	{
 		echo "
 			<tr align=left valign=TOP>
 				<td bgcolor=404040>$row[0]</td>

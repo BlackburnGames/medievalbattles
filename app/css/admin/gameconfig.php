@@ -1,7 +1,7 @@
 <?php
 function callback($buffer) {
 
-  return (ereg_replace("nothing", "nothing", $buffer));
+  return ($buffer);
 
 }
 
@@ -28,7 +28,7 @@ if($deletem)	{
 
 	include("include/connect.php");
 
-	mysql_query("DELETE FROM messages"); 
+	mysqli_query($db, "DELETE FROM messages"); 
 	echo "<center>All of the messages have been deleted.<br><a href=gameconfig.php>Return</a></center>";
 }
 else	{	
@@ -76,16 +76,16 @@ if(!IsSet($deleten))
 	include("include/connect.php");
 
 
-			mysql_query("DELETE FROM setnews1"); 
-			mysql_query("DELETE FROM setnews2");
-			mysql_query("DELETE FROM setnews3"); 
-			mysql_query("DELETE FROM setnews4");
-			mysql_query("DELETE FROM setnews5"); 
-			mysql_query("DELETE FROM setnews6");
-			mysql_query("DELETE FROM setnews7"); 
-			mysql_query("DELETE FROM setnews8");
-			mysql_query("DELETE FROM setnews9"); 
-			mysql_query("DELETE FROM setnews10");
+			mysqli_query($db, "DELETE FROM setnews1"); 
+			mysqli_query($db, "DELETE FROM setnews2");
+			mysqli_query($db, "DELETE FROM setnews3"); 
+			mysqli_query($db, "DELETE FROM setnews4");
+			mysqli_query($db, "DELETE FROM setnews5"); 
+			mysqli_query($db, "DELETE FROM setnews6");
+			mysqli_query($db, "DELETE FROM setnews7"); 
+			mysqli_query($db, "DELETE FROM setnews8");
+			mysqli_query($db, "DELETE FROM setnews9"); 
+			mysqli_query($db, "DELETE FROM setnews10");
 			echo"<center>All settlement news have been deleted.<br>
 				<a href=http://www.medievalbattles.com/gameconfig.php>Return</a></center>";
 		}
@@ -125,12 +125,12 @@ if(!IsSet($deletea))
 	include("include/connect.php");
 
 
-			mysql_query("DELETE FROM buildings"); 
-			mysql_query("DELETE FROM military");
-			mysql_query("DELETE FROM return"); 
-			mysql_query("DELETE FROM research");
-			mysql_query("DELETE FROM explore"); 
-			mysql_query("DELETE FROM user");
+			mysqli_query($db, "DELETE FROM buildings"); 
+			mysqli_query($db, "DELETE FROM military");
+			mysqli_query($db, "DELETE FROM return"); 
+			mysqli_query($db, "DELETE FROM research");
+			mysqli_query($db, "DELETE FROM explore"); 
+			mysqli_query($db, "DELETE FROM user");
 		
 			echo"<center>All accounts have been deleted.<br>
 				<a href=http://www.medievalbattles.com/gameconfig.php>Return</a></center>";
@@ -172,7 +172,7 @@ if(!IsSet($deleteg))
 			session_register('login');
 		include("include/connect.php");
 
-			mysql_query("DELETE FROM guild"); 
+			mysqli_query($db, "DELETE FROM guild"); 
 			echo"<center>All guilds have been deleted.<br>
 				<a href=http://www.medievalbattles.com/gameconfig.php>Return</a></center>";
 		}
@@ -212,26 +212,26 @@ if(!IsSet($deletef))
 include("include/connect.php");
 
 
-			mysql_query("DELETE FROM setmain1"); 
-			mysql_query("DELETE FROM setmsgs1");
-			mysql_query("DELETE FROM setmain2"); 
-			mysql_query("DELETE FROM setmsgs2");
-			mysql_query("DELETE FROM setmain3"); 
-			mysql_query("DELETE FROM setmsgs3");
-			mysql_query("DELETE FROM setmain4"); 
-			mysql_query("DELETE FROM setmsgs4");
-			mysql_query("DELETE FROM setmain5"); 
-			mysql_query("DELETE FROM setmsgs5");
-			mysql_query("DELETE FROM setmain6"); 
-			mysql_query("DELETE FROM setmsgs6");
-			mysql_query("DELETE FROM setmain7"); 
-			mysql_query("DELETE FROM setmsgs7");
-			mysql_query("DELETE FROM setmain8"); 
-			mysql_query("DELETE FROM setmsgs8");
-			mysql_query("DELETE FROM setmain9"); 
-			mysql_query("DELETE FROM setmsgs9");
-			mysql_query("DELETE FROM setmain10"); 
-			mysql_query("DELETE FROM setmsgs10");
+			mysqli_query($db, "DELETE FROM setmain1"); 
+			mysqli_query($db, "DELETE FROM setmsgs1");
+			mysqli_query($db, "DELETE FROM setmain2"); 
+			mysqli_query($db, "DELETE FROM setmsgs2");
+			mysqli_query($db, "DELETE FROM setmain3"); 
+			mysqli_query($db, "DELETE FROM setmsgs3");
+			mysqli_query($db, "DELETE FROM setmain4"); 
+			mysqli_query($db, "DELETE FROM setmsgs4");
+			mysqli_query($db, "DELETE FROM setmain5"); 
+			mysqli_query($db, "DELETE FROM setmsgs5");
+			mysqli_query($db, "DELETE FROM setmain6"); 
+			mysqli_query($db, "DELETE FROM setmsgs6");
+			mysqli_query($db, "DELETE FROM setmain7"); 
+			mysqli_query($db, "DELETE FROM setmsgs7");
+			mysqli_query($db, "DELETE FROM setmain8"); 
+			mysqli_query($db, "DELETE FROM setmsgs8");
+			mysqli_query($db, "DELETE FROM setmain9"); 
+			mysqli_query($db, "DELETE FROM setmsgs9");
+			mysqli_query($db, "DELETE FROM setmain10"); 
+			mysqli_query($db, "DELETE FROM setmsgs10");
 			echo"<center>All forums have been deleted.<br>
 				<a href=http://www.medievalbattles.com/gameconfig.php>Return</a></center>";
 		}
@@ -271,15 +271,15 @@ if(!IsSet($deletes))
 		include("include/connect.php");
 
 
-			mysql_query("UPDATE settlement SET setname = \"None\"") or die(mysql_error('Error'));
-			mysql_query("UPDATE settlement SET setpic = \"http://www.medievalbattles.com/setpic.gif\"") or die(mysql_error('Error'));
-			mysql_query("UPDATE settlement SET setguild = \"None\"") or die(mysql_error('Error'));
+			mysqli_query($db, "UPDATE settlement SET setname = \"None\"") or die(mysqli_error($db));
+			mysqli_query($db, "UPDATE settlement SET setpic = \"http://www.medievalbattles.com/setpic.gif\"") or die(mysqli_error($db));
+			mysqli_query($db, "UPDATE settlement SET setguild = \"None\"") or die(mysqli_error($db));
 
-			mysql_query("UPDATE settlement SET setstrength = \"0\"") or die(mysql_error('Error'));
-			mysql_query("UPDATE settlement SET userid = \"0\"") or die(mysql_error('Error'));
-			mysql_query("UPDATE settlement SET fgold = \"0\"") or die(mysql_error('Error'));
-			mysql_query("UPDATE settlement SET firon = \"0\"") or die(mysql_error('Error'));
-			mysql_query("UPDATE settlement SET nap = \"None\"") or die(mysql_error('Error'));
+			mysqli_query($db, "UPDATE settlement SET setstrength = \"0\"") or die(mysqli_error($db));
+			mysqli_query($db, "UPDATE settlement SET userid = \"0\"") or die(mysqli_error($db));
+			mysqli_query($db, "UPDATE settlement SET fgold = \"0\"") or die(mysqli_error($db));
+			mysqli_query($db, "UPDATE settlement SET firon = \"0\"") or die(mysqli_error($db));
+			mysqli_query($db, "UPDATE settlement SET nap = \"None\"") or die(mysqli_error($db));
 echo"<center>Settlement table has been restored to normal.<br>
 				<a href=http://www.medievalbattles.com/gameconfig.php>Return</a></center>";
 		}
@@ -327,22 +327,22 @@ include("include/connect.php");
 
 		//SELECTING SETID
 			$empreset = mysql($dbnam, "SELECT setid FROM user WHERE ename='$empre'");
-			$esetid = mysql_result($empreset,"esetid");
+			$esetid = mb_db_result($empreset,"esetid");
 		//SELECTING EMAIL
 			$theiremail = mysql($dbnam, "SELECT email FROM user WHERE ename='$empre'");
-			$tmail = mysql_result($theiremail,"tmail");
+			$tmail = mb_db_result($theiremail,"tmail");
 		//UPDATE NEWS
 			$settable = "setnews" . "$esetid";
-		mysql_query("INSERT INTO $settable (date, news) 
+		mysqli_query($db, "INSERT INTO $settable (date, news) 
 			VALUES	('$clock', '<font class=red><b>$empre</b> has been deleted by an administrator</font>') ");			
 
 
-			mysql_query("DELETE FROM buildings WHERE email='$tmail'"); 
-			mysql_query("DELETE FROM military WHERE email='$tmail'");
-			mysql_query("DELETE FROM returntbl WHERE email='$tmail'"); 
-			mysql_query("DELETE FROM research WHERE email='$tmail'");
-			mysql_query("DELETE FROM explore WHERE email='$tmail'"); 
-			mysql_query("DELETE FROM user WHERE email='$tmail'");
+			mysqli_query($db, "DELETE FROM buildings WHERE email='$tmail'"); 
+			mysqli_query($db, "DELETE FROM military WHERE email='$tmail'");
+			mysqli_query($db, "DELETE FROM returntbl WHERE email='$tmail'"); 
+			mysqli_query($db, "DELETE FROM research WHERE email='$tmail'");
+			mysqli_query($db, "DELETE FROM explore WHERE email='$tmail'"); 
+			mysqli_query($db, "DELETE FROM user WHERE email='$tmail'");
 
 echo"<center>$empre has been deleted.<br>
 				<a href=http://www.medievalbattles.com/gameconfig.php>Return</a></center>";die();
@@ -380,128 +380,128 @@ if(!IsSet($reseta))
 include("include/connect.php");
 
 // Reset User Table
-mysql_query("UPDATE user SET gp = \"500000\"");
-mysql_query("UPDATE user SET iron = \"10000\"");
-mysql_query("UPDATE user SET exp = \"10000\"");
-mysql_query("UPDATE user SET food = \"500\"");
-mysql_query("UPDATE user SET land = \"300\"");
-mysql_query("UPDATE user SET mts = \"200\"");
-mysql_query("UPDATE user SET vote = \"0\"");
-mysql_query("UPDATE user SET votefor = \"None\"");
-mysql_query("UPDATE user SET sl = \"no\"");
-mysql_query("UPDATE user SET exp2 = \"0\"");
-mysql_query("UPDATE user SET fleets = \"4\"");
-mysql_query("UPDATE user SET rectime = \"0\"");
-mysql_query("UPDATE user SET mno = \"0\"");
+mysqli_query($db, "UPDATE user SET gp = \"500000\"");
+mysqli_query($db, "UPDATE user SET iron = \"10000\"");
+mysqli_query($db, "UPDATE user SET exp = \"10000\"");
+mysqli_query($db, "UPDATE user SET food = \"500\"");
+mysqli_query($db, "UPDATE user SET land = \"300\"");
+mysqli_query($db, "UPDATE user SET mts = \"200\"");
+mysqli_query($db, "UPDATE user SET vote = \"0\"");
+mysqli_query($db, "UPDATE user SET votefor = \"None\"");
+mysqli_query($db, "UPDATE user SET sl = \"no\"");
+mysqli_query($db, "UPDATE user SET exp2 = \"0\"");
+mysqli_query($db, "UPDATE user SET fleets = \"4\"");
+mysqli_query($db, "UPDATE user SET rectime = \"0\"");
+mysqli_query($db, "UPDATE user SET mno = \"0\"");
 
 // Reset Buildings Table
-mysql_query("UPDATE buildings SET home = \"50\"");
-mysql_query("UPDATE buildings SET barrack = \"75\"");
-mysql_query("UPDATE buildings SET farm = \"50\"");
-mysql_query("UPDATE buildings SET lab = \"75\"");
-mysql_query("UPDATE buildings SET gm = \"50\"");
-mysql_query("UPDATE buildings SET im = \"50\"");
-mysql_query("UPDATE buildings SET aland = \"50\"");
-mysql_query("UPDATE buildings SET amts = \"100\"");
-mysql_query("UPDATE buildings SET dhome = \"0\"");
-mysql_query("UPDATE buildings SET dbarrack = \"0\"");
-mysql_query("UPDATE buildings SET dfarm = \"0\"");
-mysql_query("UPDATE buildings SET dlab = \"0\"");
-mysql_query("UPDATE buildings SET dgm = \"0\"");
-mysql_query("UPDATE buildings SET dim = \"0\"");
-mysql_query("UPDATE buildings SET Hhrs = \"0\"");
-mysql_query("UPDATE buildings SET Bhrs = \"0\"");
-mysql_query("UPDATE buildings SET Lhrs = \"0\"");
-mysql_query("UPDATE buildings SET Fhrs = \"0\"");
-mysql_query("UPDATE buildings SET Ghrs = \"0\"");
-mysql_query("UPDATE buildings SET Ihrs = \"0\"");
+mysqli_query($db, "UPDATE buildings SET home = \"50\"");
+mysqli_query($db, "UPDATE buildings SET barrack = \"75\"");
+mysqli_query($db, "UPDATE buildings SET farm = \"50\"");
+mysqli_query($db, "UPDATE buildings SET lab = \"75\"");
+mysqli_query($db, "UPDATE buildings SET gm = \"50\"");
+mysqli_query($db, "UPDATE buildings SET im = \"50\"");
+mysqli_query($db, "UPDATE buildings SET aland = \"50\"");
+mysqli_query($db, "UPDATE buildings SET amts = \"100\"");
+mysqli_query($db, "UPDATE buildings SET dhome = \"0\"");
+mysqli_query($db, "UPDATE buildings SET dbarrack = \"0\"");
+mysqli_query($db, "UPDATE buildings SET dfarm = \"0\"");
+mysqli_query($db, "UPDATE buildings SET dlab = \"0\"");
+mysqli_query($db, "UPDATE buildings SET dgm = \"0\"");
+mysqli_query($db, "UPDATE buildings SET dim = \"0\"");
+mysqli_query($db, "UPDATE buildings SET Hhrs = \"0\"");
+mysqli_query($db, "UPDATE buildings SET Bhrs = \"0\"");
+mysqli_query($db, "UPDATE buildings SET Lhrs = \"0\"");
+mysqli_query($db, "UPDATE buildings SET Fhrs = \"0\"");
+mysqli_query($db, "UPDATE buildings SET Ghrs = \"0\"");
+mysqli_query($db, "UPDATE buildings SET Ihrs = \"0\"");
 
 // Reset Military Table
-mysql_query("UPDATE military SET civ = \"5000\"");
-mysql_query("UPDATE military SET recruits = \"250\"");
-mysql_query("UPDATE military SET wizards = \"10\"");
-mysql_query("UPDATE military SET warriors = \"10\"");
-mysql_query("UPDATE military SET priests = \"10\"");
-mysql_query("UPDATE military SET scientists = \"0\"");
-mysql_query("UPDATE military SET thieves = \"0\"");
-mysql_query("UPDATE military SET explorers = \"0\"");
-mysql_query("UPDATE military SET maxciv = \"350\"");
-mysql_query("UPDATE military SET ssword = \"0\"");
-mysql_query("UPDATE military SET lsword = \"0\"");
-mysql_query("UPDATE military SET axe = \"0\"");
-mysql_query("UPDATE military SET gaxe = \"0\"");
-mysql_query("UPDATE military SET club = \"0\"");
-mysql_query("UPDATE military SET cweapon = \"Dagger\"");
-mysql_query("UPDATE military SET cspell = \"Magic Missile\"");
-mysql_query("UPDATE military SET cstaff = \"Quarter Staff\"");
-mysql_query("UPDATE military SET icesword = \"0\"");
-mysql_query("UPDATE military SET wararmor = \"Studded Leather\"");
-mysql_query("UPDATE military SET wizarmor = \"Robe\"");
-mysql_query("UPDATE military SET priarmor = \"Leather\"");
-mysql_query("UPDATE military SET cs = \"0\"");
-mysql_query("UPDATE military SET cm = \"0\"");
-mysql_query("UPDATE military SET bp = \"0\"");
-mysql_query("UPDATE military SET fp = \"0\"");
-mysql_query("UPDATE military SET fullp = \"0\"");
-mysql_query("UPDATE military SET sm = \"0\"");
-mysql_query("UPDATE military SET warspeedw = \"0\"");
-mysql_query("UPDATE military SET wizspeeds = \"0\"");
-mysql_query("UPDATE military SET prispeedw = \"0\"");
-mysql_query("UPDATE military SET warpower = \"3\"");
-mysql_query("UPDATE military SET wizpower = \"2\"");
-mysql_query("UPDATE military SET pripower = \"2\"");
-mysql_query("UPDATE military SET priout = \"0\"");
-mysql_query("UPDATE military SET warspeeda = \"0\"");
-mysql_query("UPDATE military SET wizspeeda = \"0\"");
-mysql_query("UPDATE military SET prispeeda = \"0\"");
-mysql_query("UPDATE military SET wardef = \"6\"");
-mysql_query("UPDATE military SET wizdef = \"10\"");
-mysql_query("UPDATE military SET prideef = \"8\"");
-mysql_query("UPDATE military SET dbwar = \"0\"");
-mysql_query("UPDATE military SET dbwiz = \"0\"");
-mysql_query("UPDATE military SET dbpri = \"0\"");
-mysql_query("UPDATE military SET dbwar2 = \"0\"");
-mysql_query("UPDATE military SET dbwiz2 = \"0\"");
-mysql_query("UPDATE military SET dbpri2 = \"0\"");
-mysql_query("UPDATE military SET dbscientist = \"0\"");
-mysql_query("UPDATE military SET dbexplorer = \"0\"");
-mysql_query("UPDATE military SET dbthief = \"0\"");
+mysqli_query($db, "UPDATE military SET civ = \"5000\"");
+mysqli_query($db, "UPDATE military SET recruits = \"250\"");
+mysqli_query($db, "UPDATE military SET wizards = \"10\"");
+mysqli_query($db, "UPDATE military SET warriors = \"10\"");
+mysqli_query($db, "UPDATE military SET priests = \"10\"");
+mysqli_query($db, "UPDATE military SET scientists = \"0\"");
+mysqli_query($db, "UPDATE military SET thieves = \"0\"");
+mysqli_query($db, "UPDATE military SET explorers = \"0\"");
+mysqli_query($db, "UPDATE military SET maxciv = \"350\"");
+mysqli_query($db, "UPDATE military SET ssword = \"0\"");
+mysqli_query($db, "UPDATE military SET lsword = \"0\"");
+mysqli_query($db, "UPDATE military SET axe = \"0\"");
+mysqli_query($db, "UPDATE military SET gaxe = \"0\"");
+mysqli_query($db, "UPDATE military SET club = \"0\"");
+mysqli_query($db, "UPDATE military SET cweapon = \"Dagger\"");
+mysqli_query($db, "UPDATE military SET cspell = \"Magic Missile\"");
+mysqli_query($db, "UPDATE military SET cstaff = \"Quarter Staff\"");
+mysqli_query($db, "UPDATE military SET icesword = \"0\"");
+mysqli_query($db, "UPDATE military SET wararmor = \"Studded Leather\"");
+mysqli_query($db, "UPDATE military SET wizarmor = \"Robe\"");
+mysqli_query($db, "UPDATE military SET priarmor = \"Leather\"");
+mysqli_query($db, "UPDATE military SET cs = \"0\"");
+mysqli_query($db, "UPDATE military SET cm = \"0\"");
+mysqli_query($db, "UPDATE military SET bp = \"0\"");
+mysqli_query($db, "UPDATE military SET fp = \"0\"");
+mysqli_query($db, "UPDATE military SET fullp = \"0\"");
+mysqli_query($db, "UPDATE military SET sm = \"0\"");
+mysqli_query($db, "UPDATE military SET warspeedw = \"0\"");
+mysqli_query($db, "UPDATE military SET wizspeeds = \"0\"");
+mysqli_query($db, "UPDATE military SET prispeedw = \"0\"");
+mysqli_query($db, "UPDATE military SET warpower = \"3\"");
+mysqli_query($db, "UPDATE military SET wizpower = \"2\"");
+mysqli_query($db, "UPDATE military SET pripower = \"2\"");
+mysqli_query($db, "UPDATE military SET priout = \"0\"");
+mysqli_query($db, "UPDATE military SET warspeeda = \"0\"");
+mysqli_query($db, "UPDATE military SET wizspeeda = \"0\"");
+mysqli_query($db, "UPDATE military SET prispeeda = \"0\"");
+mysqli_query($db, "UPDATE military SET wardef = \"6\"");
+mysqli_query($db, "UPDATE military SET wizdef = \"10\"");
+mysqli_query($db, "UPDATE military SET prideef = \"8\"");
+mysqli_query($db, "UPDATE military SET dbwar = \"0\"");
+mysqli_query($db, "UPDATE military SET dbwiz = \"0\"");
+mysqli_query($db, "UPDATE military SET dbpri = \"0\"");
+mysqli_query($db, "UPDATE military SET dbwar2 = \"0\"");
+mysqli_query($db, "UPDATE military SET dbwiz2 = \"0\"");
+mysqli_query($db, "UPDATE military SET dbpri2 = \"0\"");
+mysqli_query($db, "UPDATE military SET dbscientist = \"0\"");
+mysqli_query($db, "UPDATE military SET dbexplorer = \"0\"");
+mysqli_query($db, "UPDATE military SET dbthief = \"0\"");
 
 // Reset Return Table
-mysql_query("UPDATE returntbl SET war1 = \"0\"");
-mysql_query("UPDATE returntbl SET war2 = \"0\"");
-mysql_query("UPDATE returntbl SET war3 = \"0\"");
-mysql_query("UPDATE returntbl SET war4 = \"0\"");
-mysql_query("UPDATE returntbl SET wiz1 = \"0\"");
-mysql_query("UPDATE returntbl SET wiz2 = \"0\"");
-mysql_query("UPDATE returntbl SET wiz3 = \"0\"");
-mysql_query("UPDATE returntbl SET wiz4 = \"0\"");
-mysql_query("UPDATE returntbl SET pri1 = \"0\"");
-mysql_query("UPDATE returntbl SET pri2 = \"0\"");
-mysql_query("UPDATE returntbl SET pri3 = \"0\"");
-mysql_query("UPDATE returntbl SET pri4 = \"0\"");
-mysql_query("UPDATE returntbl SET time1 = \"0\"");
-mysql_query("UPDATE returntbl SET time2 = \"0\"");
-mysql_query("UPDATE returntbl SET time3 = \"0\"");
-mysql_query("UPDATE returntbl SET time4 = \"0\"");
+mysqli_query($db, "UPDATE returntbl SET war1 = \"0\"");
+mysqli_query($db, "UPDATE returntbl SET war2 = \"0\"");
+mysqli_query($db, "UPDATE returntbl SET war3 = \"0\"");
+mysqli_query($db, "UPDATE returntbl SET war4 = \"0\"");
+mysqli_query($db, "UPDATE returntbl SET wiz1 = \"0\"");
+mysqli_query($db, "UPDATE returntbl SET wiz2 = \"0\"");
+mysqli_query($db, "UPDATE returntbl SET wiz3 = \"0\"");
+mysqli_query($db, "UPDATE returntbl SET wiz4 = \"0\"");
+mysqli_query($db, "UPDATE returntbl SET pri1 = \"0\"");
+mysqli_query($db, "UPDATE returntbl SET pri2 = \"0\"");
+mysqli_query($db, "UPDATE returntbl SET pri3 = \"0\"");
+mysqli_query($db, "UPDATE returntbl SET pri4 = \"0\"");
+mysqli_query($db, "UPDATE returntbl SET time1 = \"0\"");
+mysqli_query($db, "UPDATE returntbl SET time2 = \"0\"");
+mysqli_query($db, "UPDATE returntbl SET time3 = \"0\"");
+mysqli_query($db, "UPDATE returntbl SET time4 = \"0\"");
 
 // Reset Research Table
-mysql_query("UPDATE research SET r1 = \"0\"");
-mysql_query("UPDATE research SET r2 = \"0\"");
-mysql_query("UPDATE research SET r3 = \"0\"");
-mysql_query("UPDATE research SET r4 = \"0\"");
-mysql_query("UPDATE research SET r5 = \"0\"");
-mysql_query("UPDATE research SET r1pts = \"0\"");
-mysql_query("UPDATE research SET r2pts = \"0\"");
-mysql_query("UPDATE research SET r3pts = \"0\"");
-mysql_query("UPDATE research SET r4pts = \"0\"");
-mysql_query("UPDATE research SET r5pts = \"0\"");
+mysqli_query($db, "UPDATE research SET r1 = \"0\"");
+mysqli_query($db, "UPDATE research SET r2 = \"0\"");
+mysqli_query($db, "UPDATE research SET r3 = \"0\"");
+mysqli_query($db, "UPDATE research SET r4 = \"0\"");
+mysqli_query($db, "UPDATE research SET r5 = \"0\"");
+mysqli_query($db, "UPDATE research SET r1pts = \"0\"");
+mysqli_query($db, "UPDATE research SET r2pts = \"0\"");
+mysqli_query($db, "UPDATE research SET r3pts = \"0\"");
+mysqli_query($db, "UPDATE research SET r4pts = \"0\"");
+mysqli_query($db, "UPDATE research SET r5pts = \"0\"");
 
 // Reset Explore Table
-mysql_query("UPDATE explore SET expland = \"0\"");
-mysql_query("UPDATE explore SET expmt = \"0\"");
-mysql_query("UPDATE explore SET landhrs = \"0\"");
-mysql_query("UPDATE explore SET mthrs= \"0\"");
+mysqli_query($db, "UPDATE explore SET expland = \"0\"");
+mysqli_query($db, "UPDATE explore SET expmt = \"0\"");
+mysqli_query($db, "UPDATE explore SET landhrs = \"0\"");
+mysqli_query($db, "UPDATE explore SET mthrs= \"0\"");
 
 
 			echo"<center>All accounts have been reset.<br>
@@ -532,12 +532,12 @@ echo "
 
 
 		$query_string = "SELECT ename, pw, email, aim, msn, ip FROM user ORDER BY ip";
-		$result_id = mysql_query($query_string, $var);
-		while ($row = mysql_fetch_row($result_id))
+		$result_id = mysqli_query($db, $query_string);
+		while ($row = mysqli_fetch_row($result_id))
 		    {
 
 			$ONLINE_NO = mysql($dbnam, "SELECT online FROM user WHERE ename='$row[0]'");	
-				$OLINE = mysql_result($ONLINE_NO,"OLINE");
+				$OLINE = mb_db_result($ONLINE_NO,"OLINE");
 	
 			if($OLINE == 1)
 				{$O_line = "<font color=red>*</font>";}

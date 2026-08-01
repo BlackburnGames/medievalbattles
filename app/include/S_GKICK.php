@@ -1,8 +1,8 @@
 <?
 
 // Retrieve Guild Name
-$guild_name_query = mysql_db_query($dbnam, "SELECT gname FROM guild WHERE owner='$userid'");
-	$guild_name = mysql_result($guild_name_query, "guild_name");
+$guild_name_query = mysqli_query($db, "SELECT gname FROM guild WHERE owner='$userid'");
+	$guild_name = mb_db_result($guild_name_query, "guild_name");
 
 echo "
 <form type=get action=guildconfig.php>
@@ -15,8 +15,8 @@ echo "
 			<select name='remp'>
 			<option selected value='ns'>-- Select Empire To Remove --</option>";
 				$query_string = "SELECT userid, ename FROM user WHERE guild='$guild_name' ORDER BY userid ASC";
-				$result_id = mysql_db_query($dbnam, $query_string);
-				while ($row = mysql_fetch_row($result_id))	{
+				$result_id = mysqli_query($db, $query_string);
+				while ($row = mysqli_fetch_row($result_id))	{
 					echo "<option value=$row[0]>$row[1]</option>\n";
 				}
 echo "

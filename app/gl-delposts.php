@@ -2,14 +2,14 @@
 
 // Open buffer
 function callback($buffer) {
-  return (ereg_replace("nothing", "nothing", $buffer));
+  return ($buffer);
 }
 ob_start("callback");
 
-$guild_id = mysql_db_query($dbnam, "SELECT gid FROM guild WHERE gname='$empireguild'");	
-	$gid = mysql_result($setgid,"thesgid");
+$guild_id = mysqli_query($db, "SELECT gid FROM guild WHERE gname='$empireguild'");	
+	$gid = mb_db_result($setgid,"thesgid");
 
-$empireguild = ereg_replace(" ", "", "$empireguild");
+$empireguild = str_replace(" ", "", $empireguild);
 $topicdb = "$empireguild" . "main" . "$gid";
 $msgsdb = "$empireguild" . "msgs" . "$gid";
 
@@ -21,8 +21,8 @@ else	{
 	include("commong.php");
 	include("include/connect.php");
 
-	mysql_query("DELETE FROM guildthreads WHERE topicid='$tid'"); 
-	mysql_query("DELETE FROM guildmsgs WHERE topicid='$tid'"); 
+	mysqli_query($db, "DELETE FROM guildthreads WHERE topicid='$tid'"); 
+	mysqli_query($db, "DELETE FROM guildmsgs WHERE topicid='$tid'"); 
 
 	header ("Location: gl-forum.php"); 
 }
@@ -35,8 +35,8 @@ else	{
 	include("commong.php");
 	include("include/connect.php");
 
-	mysql_query("DELETE FROM guildthreads WHERE topicid='$postid'"); 
-	mysql_query("DELETE FROM guildmsgs WHERE topicid='$postid'"); 
+	mysqli_query($db, "DELETE FROM guildthreads WHERE topicid='$postid'"); 
+	mysqli_query($db, "DELETE FROM guildmsgs WHERE topicid='$postid'"); 
 
 	header ("Location: gl-topic.php"); 
 }

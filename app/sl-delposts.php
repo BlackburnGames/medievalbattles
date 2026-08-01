@@ -2,7 +2,7 @@
 
 // Open buffer
 function callback($buffer) {
-  return (ereg_replace("nothing", "nothing", $buffer));
+  return ($buffer);
 }
 ob_start("callback");
 
@@ -14,8 +14,8 @@ else	{
 	include("common.php");
 	include("include/connect.php");
 
-	mysql_query("DELETE FROM setforums WHERE topicid='$tid' AND setid='$setid'"); 
-	mysql_query("DELETE FROM setforumsmsgs WHERE topicid='$tid' AND setid='$setid'"); 
+	mysqli_query($db, "DELETE FROM setforums WHERE topicid='$tid' AND setid='$setid'"); 
+	mysqli_query($db, "DELETE FROM setforumsmsgs WHERE topicid='$tid' AND setid='$setid'"); 
 	echo "The post was successfully deleted<br>";
 	echo "Click <a href=index.php>here</a> to go back";
 
@@ -30,13 +30,13 @@ else	{
 	include("common.php");
 	include("include/connect.php");
 
-	mysql_query("DELETE FROM setforumsmsgs WHERE messageid='$mid'"); 
+	mysqli_query($db, "DELETE FROM setforumsmsgs WHERE messageid='$mid'"); 
 
 	$mreplies = "SELECT replies FROM setforums WHERE topicid=$tid";
-	$replies = mysql_query($mreplies);
+	$replies = mysqli_query($db, $mreplies);
 	
 	$ureplies = "UPDATE setforums SET replies=$replies-1 WHERE topicid='$tid'";
-	mysql_query($ureplies);
+	mysqli_query($db, $ureplies);
 
 	header ("Location: sl-topic.php?topicid=$tid"); 
 }

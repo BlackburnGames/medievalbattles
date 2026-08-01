@@ -3,21 +3,21 @@
 include("include/igtop.php");
 include("commong.php");
 
-$result= mysql_query("SELECT topicid, guildname FROM guildthreads WHERE guildname='$empireguild' AND topicid='$topicid'") or die("Error! " . mysql_error());
-$guild_check = mysql_fetch_array($result);
+$result= mysqli_query($db, "SELECT topicid, guildname FROM guildthreads WHERE guildname='$empireguild' AND topicid='$topicid'") or die("Error! " . mysqli_error($db));
+$guild_check = mysqli_fetch_array($result);
 
-if($empireguild != $guild_check[guildname])	{
+if($empireguild != $guild_check['guildname'])	{
 	echo"<div align=center><font class=yellow>You cannot view forum posts in other guilds!</font></div>";
 	die();
 }
 
-$result1 = mysql_query("SELECT name, topic, message, lastpost FROM guildthreads WHERE topicid='$topicid'") or die("Error!" . mysql_error());
+$result1 = mysqli_query($db, "SELECT name, topic, message, lastpost FROM guildthreads WHERE topicid='$topicid'") or die("Error!" . mysqli_error($db));
 
 if ($result1) { 
 	echo"
 	<table border=0 class=f align=center cellspacing=1 cellpadding=1 width=95%>";
 										
-	while ($r1 = mysql_fetch_array($result1)) {
+	while ($r1 = mysqli_fetch_array($result1)) {
 	extract ($r1);
 	echo "
 		<tr>
@@ -30,17 +30,17 @@ if ($result1) {
 	} 
 echo "
 	</table>";
-mysql_free_result($result1);	
+mysqli_free_result($result1);	
 }
 
 $query2 = "SELECT messageid, name, topic, message, datestamp FROM guildmsgs WHERE topicid='$topicid' ORDER BY messageid ASC";
-$result2 = mysql_query($query2) or die(mysql_error());
+$result2 = mysqli_query($db, $query2) or die(mysqli_error($db));
 
 if ($result2) { 
 echo "
 	<table border=0 class=f width=95% align=center cellspacing=1 cellpadding=1>";
 	
-	while ($r2 = mysql_fetch_array($result2)) {
+	while ($r2 = mysqli_fetch_array($result2)) {
 	extract ($r2);
 		
 echo "
@@ -58,8 +58,7 @@ echo "
 echo "
 	</table><br><br>";	
 }
-mysql_free_result($result2);
-MYSQL_CLOSE();
+mysqli_free_result($result2);
 ?>
 
 <form action="inputpostsg.php" method="post" name="reply">

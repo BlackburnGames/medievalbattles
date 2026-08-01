@@ -20,8 +20,8 @@ echo "
 		<td class='main2'><b class='reg' width='20%'>Experience</b></td>";
 
 	$query_string = "SELECT setname, setid, setstrength FROM settlement ORDER BY setstrength DESC LIMIT 0,20";
-	$result_id = mysql_query($query_string, $var);
-	while ($row = mysql_fetch_row($result_id))	{
+	$result_id = mysqli_query($db, $query_string);
+	while ($row = mysqli_fetch_row($result_id))	{
 
 		$placeno = $placeno + 1;
 		$row[2] = number_format($row[2]);

@@ -1,7 +1,7 @@
 <?php
 
 function callback($buffer) {
-  return (ereg_replace("nothing", "nothing", $buffer));
+  return ($buffer);
 }
 ob_start("callback");
 

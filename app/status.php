@@ -21,7 +21,7 @@ if ($pageid == 'production')  {
   else  { $civstatus = "doing well."; }
 
   $bnum = 50;
-  if($race == Human)  { $bnum = 35; }
+  if($race == 'Human')  { $bnum = 35; }
 
   $barrack = implode("", explode(",", $barrack));
   $dbwar = implode("", explode(",", $dbwar));
@@ -57,7 +57,7 @@ if ($pageid == 'production')  {
     <tr><td class='inner'><b class='reg'>New Civilians </b></td><td class='inner2'>$civhourly</td>
     <tr><td class='inner'><b class='reg'>New Recruits </b></td><td class='inner2'>$rechourly</td>
     <tr><td class='inner'><b class='reg'>Food Production</b></td><td class='inner2'>$foodhourly</td>";
-if($res[r13pts] >= 125000)   {
+if($res['r13pts'] >= 125000)   {
   echo "
     <tr><td class='inner'><b class='reg'>Lumber Production</b></td><td class='inner2'>$woodhourly</td>";
 }
@@ -83,15 +83,15 @@ if ($pageid == 'parties') {
     <td class=inner2><?php if($TIME_4 == 0){echo"---";}else{echo"$WAR_4";} ?></td>
 
 <?php
-if($race != Giant)  {
-  if($class != Insurrectionist) {
+if($race != 'Giant')  {
+  if($class != 'Insurrectionist') {
   echo"
     <tr>
     <td class=inner2><b class=reg>Wizard</b></td>
     <td class=inner2>"; if($WAR_4 > 0 OR  $WIZ_4 > 0 OR $PRI_4 > 0 OR $ARCH_4 > 0 OR $TIME_4 > 0){echo"Returning ($TIME_4 ticks)";}else{echo"Defending";}echo"</td>
     <td class=inner2>"; if($TIME_4 == 0){echo"---";}else{echo"$WIZ_4";}echo"</td>";
   }
-  if($race != Demon)  {
+  if($race != 'Demon')  {
   echo "
     <tr>
     <td class=inner2><b class=reg>Priest</b></td>
@@ -99,7 +99,7 @@ if($race != Giant)  {
     <td class=inner2>"; if($TIME_4 == 0){echo"---";}else{echo"$PRI_4";} echo"</td>  ";
   }
   }
-if($res[r13pts] >= 125000)   {
+if($res['r13pts'] >= 125000)   {
   echo"
   <tr>
     <td class=inner2><b class=reg>Archer</b></td>
@@ -115,15 +115,15 @@ if($res[r13pts] >= 125000)   {
     <td class=inner2><?php if($WAR_3 > 0 OR  $WIZ_3 > 0 OR $PRI_3 > 0 OR $ARCH_3 > 0 OR $TIME_3 > 0){echo"Returning ($TIME_3 ticks)";}else{echo"Defending";} ?></td>
     <td class=inner2><?php if($TIME_3 == 0){echo"---";}else{echo"$WAR_3";} ?></td>
 <?php
-  if($race != Giant)  {
-        if($class != Insurrectionist) {
+  if($race != 'Giant')  {
+        if($class != 'Insurrectionist') {
     echo"
    <tr>
     <td class=inner2><b class=reg>Wizard</b></td>
     <td class=inner2>"; if($WAR_3 > 0 OR  $WIZ_3 > 0 OR $PRI_3 > 0 OR $ARCH_3 > 0 OR $TIME_3 > 0){echo"Returning ($TIME_3 ticks)";}else{echo"Defending";}echo"</td>
     <td class=inner2>"; if($TIME_3 == 0){echo"---";}else{echo"$WIZ_3";}echo"</td>";
         }
-  if($race != Demon)  {
+  if($race != 'Demon')  {
     echo "
    <tr>
     <td class=inner2><b class=reg>Priest</b></td>
@@ -133,7 +133,7 @@ if($res[r13pts] >= 125000)   {
   }
 ?>
 
- <?php if($res[r13pts] >= 125000){
+ <?php if($res['r13pts'] >= 125000){
   echo"
   <tr>
     <td class=inner2><b class=reg>Archer</b></td>
@@ -150,15 +150,15 @@ if($res[r13pts] >= 125000)   {
     <td class=inner2><?php if($WAR_2 > 0 OR  $WIZ_2 > 0 OR $PRI_2 > 0 OR $ARCH_2 > 0 OR $TIME_2 > 0){echo"Returning ($TIME_2 ticks)";}else{echo"Defending";} ?></td>
     <td class=inner2><?php if($TIME_2 == 0){echo"---";}else{echo"$WAR_2";} ?></td>
 <?php
-  if($race != Giant){
-      if($class != Insurrectionist) {
+  if($race != 'Giant'){
+      if($class != 'Insurrectionist') {
       echo"
    <tr>
     <td class=inner2><b class=reg>Wizard</b></td>
     <td class=inner2>"; if($WAR_2 > 0 OR  $WIZ_2 > 0 OR $PRI_2 > 0 OR $ARCH_2 > 0 OR $TIME_2 > 0){echo"Returning ($TIME_2 ticks)";}else{echo"Defending";}echo"</td>
     <td class=inner2>"; if($TIME_2 == 0){echo"---";}else{echo"$WIZ_2";}echo"</td>";
       }
-   if($race != Demon) {
+   if($race != 'Demon') {
      echo "
    <tr>
     <td class=inner2><b class=reg>Priest</b></td>
@@ -169,7 +169,7 @@ if($res[r13pts] >= 125000)   {
 ?>
 
 <?php
-if($res[r13pts] >= 125000){
+if($res['r13pts'] >= 125000){
   echo"
   <tr>
     <td class=inner2><b class=reg>Archer</b></td>
@@ -184,15 +184,15 @@ if($res[r13pts] >= 125000){
     <td class=inner2><b class=reg>Warrior</b></td>
     <td class=inner2><?php if($WAR_1 > 0 OR  $WIZ_1 > 0 OR $PRI_1 > 0 OR $ARCH_1 > 0 OR $TIME_1 > 0){echo"Returning ($TIME_1 ticks)";}else{echo"Defending";} ?></td>
     <td class=inner2><?php if($TIME_1 == 0){echo"---";}else{echo"$WAR_1";} ?></td>
-<?php if($race != Giant){
-      if($class != Insurrectionist) {
+<?php if($race != 'Giant'){
+      if($class != 'Insurrectionist') {
       echo"
    <tr>
     <td class=inner2><b class=reg>Wizard</b></td>
     <td class=inner2>"; if($WAR_1 > 0 OR  $WIZ_1 > 0 OR $PRI_1 > 0 OR $ARCH_1 > 0 OR $TIME_1 > 0){echo"Returning ($TIME_1 ticks)";}else{echo"Defending";}echo"</td>
     <td class=inner2>"; if($TIME_1 == 0){echo"---";}else{echo"$WIZ_1";}echo"</td>";
       }
-   if($race != Demon) {
+   if($race != 'Demon') {
      echo "
    <tr>
     <td class=inner2><b class=reg>Priest</b></td>
@@ -202,7 +202,7 @@ if($res[r13pts] >= 125000){
    }
 ?>
 
-<?php if($res[r13pts] >= 125000){
+<?php if($res['r13pts'] >= 125000){
 echo"
   <tr>
     <td class=inner2><b class=reg>Archer</b></td>

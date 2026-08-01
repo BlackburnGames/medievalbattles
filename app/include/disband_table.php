@@ -36,15 +36,15 @@ echo "
 		<td class='inner2'>$warriors</td>
   		<td class='inner2'><input type='number' name='uwarrior' size='8'></td>";
 
-if($race != Giant)	{
-	if(($class != Ranger) AND ($class != Insurrectionist))	{
+if($race != 'Giant')	{
+	if(($class != 'Ranger') AND ($class != 'Insurrectionist'))	{
 	echo"
 	<tr>				
   		<td class='inner2' ><b class='reg'>Wizard</b></td>
 		<td class='inner2'>$wizards</td>
   		<td class='inner2'><input type='number' name='uwizard' size='8'></td>";
 	}
-	if($race != Demon)	{
+	if($race != 'Demon')	{
 	echo"
 	<tr>				 
   		<td class='inner2'><b class='reg'>Priest</b></td>
@@ -53,7 +53,7 @@ if($race != Giant)	{
 	}
 }
 
-if($res[r13pts] >= 125000)	 {
+if($res['r13pts'] >= 125000)	 {
 	echo"
 	<tr>				
   		<td class='inner2'><b class='reg'>Archer</b></td>

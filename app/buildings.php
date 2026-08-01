@@ -18,7 +18,7 @@ if(!IsSet($update)) {
 
   include("include/nexplode.php");
 
-  if($ulmill > 0 AND $res[r13pts] < 125000) {
+  if($ulmill > 0 AND $res['r13pts'] < 125000) {
     echo"<div align=center><font class=yellow>You can't construct Lumber Mills, because you haven't researched Archery yet!</font></div>";
     include("include/S_BUILD.php");
     die();
@@ -62,23 +62,23 @@ if(!IsSet($update)) {
   $max_land = $max_land - ($uhome + $ubarrack + $ufarm + $ulmill + $uwp);
   $max_mt = $max_mt - ($ugm + $uim);
 
-  mysql_query("UPDATE user SET gp ='$gp' WHERE email='$email' AND pw='$pw'");
-  mysql_query("UPDATE user SET exp2 ='$forexp2' WHERE email='$email' AND pw='$pw'");
+  mysqli_query($db, "UPDATE user SET gp ='$gp' WHERE email='$email' AND pw='$pw'");
+  mysqli_query($db, "UPDATE user SET exp2 ='$forexp2' WHERE email='$email' AND pw='$pw'");
 
-  mysql_query("UPDATE buildings SET amts='$amts' WHERE email='$email' AND pw='$pw'");
-  mysql_query("UPDATE buildings SET dgm='$dgm' WHERE email='$email' AND pw='$pw'");
-  mysql_query("UPDATE buildings SET dim='$dim' WHERE email='$email' AND pw='$pw'");
+  mysqli_query($db, "UPDATE buildings SET amts='$amts' WHERE email='$email' AND pw='$pw'");
+  mysqli_query($db, "UPDATE buildings SET dgm='$dgm' WHERE email='$email' AND pw='$pw'");
+  mysqli_query($db, "UPDATE buildings SET dim='$dim' WHERE email='$email' AND pw='$pw'");
 
-  mysql_query("UPDATE buildings SET aland='$aland' WHERE email='$email' AND pw='$pw'");
-  mysql_query("UPDATE buildings SET dhome='$dhome' WHERE email='$email' AND pw='$pw'");
-  mysql_query("UPDATE buildings SET dbarrack='$dbarrack' WHERE email='$email' AND pw='$pw'");
-  mysql_query("UPDATE buildings SET dfarm= '$dfarm' WHERE email='$email' AND pw='$pw'");
-  mysql_query("UPDATE buildings SET dwp='$dwp' WHERE email='$email' AND pw='$pw'");
-  mysql_query("UPDATE buildings SET dlmill='$dlmill' WHERE email='$email' AND pw='$pw'");
+  mysqli_query($db, "UPDATE buildings SET aland='$aland' WHERE email='$email' AND pw='$pw'");
+  mysqli_query($db, "UPDATE buildings SET dhome='$dhome' WHERE email='$email' AND pw='$pw'");
+  mysqli_query($db, "UPDATE buildings SET dbarrack='$dbarrack' WHERE email='$email' AND pw='$pw'");
+  mysqli_query($db, "UPDATE buildings SET dfarm= '$dfarm' WHERE email='$email' AND pw='$pw'");
+  mysqli_query($db, "UPDATE buildings SET dwp='$dwp' WHERE email='$email' AND pw='$pw'");
+  mysqli_query($db, "UPDATE buildings SET dlmill='$dlmill' WHERE email='$email' AND pw='$pw'");
 
 //  determines how long building are under development
 
-  if($res[r16pts] >= 100000)  { $adv_constr = 0.5;  }
+  if($res['r16pts'] >= 100000)  { $adv_constr = 0.5;  }
   else  { $adv_constr = 1;  }
   if($race == 'Night Elf')  { $constr_mod = 2;  }
   else  { $constr_mod = 1;  }
@@ -120,13 +120,13 @@ If($Lhrs > 20)  { $Lhrs = ((20 / $adv_const) * $constr_mod);   }
 If($Ghrs > 20)  { $Ghrs = ((20 / $adv_const) * $constr_mod);   }
 If($Ihrs > 20)  { $Ihrs = ((20 / $adv_const) * $constr_mod);   }
 
-  mysql_query("UPDATE buildings SET Hhrs ='$Hhrs' WHERE email='$email' AND pw='$pw'");
-  mysql_query("UPDATE buildings SET Bhrs ='$Bhrs' WHERE email='$email' AND pw='$pw'");
-  mysql_query("UPDATE buildings SET Fhrs ='$Fhrs' WHERE email='$email' AND pw='$pw'");
-  mysql_query("UPDATE buildings SET Whrs ='$Whrs' WHERE email='$email' AND pw='$pw'");
-  mysql_query("UPDATE buildings SET Lhrs ='$Lhrs' WHERE email='$email' AND pw='$pw'");
-  mysql_query("UPDATE buildings SET Ghrs ='$Ghrs' WHERE email='$email' AND pw='$pw'");
-  mysql_query("UPDATE buildings SET Ihrs ='$Ihrs' WHERE email='$email' AND pw='$pw'");
+  mysqli_query($db, "UPDATE buildings SET Hhrs ='$Hhrs' WHERE email='$email' AND pw='$pw'");
+  mysqli_query($db, "UPDATE buildings SET Bhrs ='$Bhrs' WHERE email='$email' AND pw='$pw'");
+  mysqli_query($db, "UPDATE buildings SET Fhrs ='$Fhrs' WHERE email='$email' AND pw='$pw'");
+  mysqli_query($db, "UPDATE buildings SET Whrs ='$Whrs' WHERE email='$email' AND pw='$pw'");
+  mysqli_query($db, "UPDATE buildings SET Lhrs ='$Lhrs' WHERE email='$email' AND pw='$pw'");
+  mysqli_query($db, "UPDATE buildings SET Ghrs ='$Ghrs' WHERE email='$email' AND pw='$pw'");
+  mysqli_query($db, "UPDATE buildings SET Ihrs ='$Ihrs' WHERE email='$email' AND pw='$pw'");
 
   echo"<div align=center><font class=yellow>Your orders have been carried out.</font></div>";
   include("include/S_BUILD.php");

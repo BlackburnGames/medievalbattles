@@ -2,12 +2,8 @@
 /**
  * Database connection.
  *
- * Provides four handles because the codebase is mid-migration and different
- * files expect different ones:
- *   $dbnam - database name, consumed by the ~184 mysql_db_query() calls
- *   $db    - mysqli handle, used by the ~9 files converted to mysqli
- *   (default mysql link) - relied on by the ~89 files still on mysql_*
- *   $var   - explicit mysql link, passed to mysql_query() in ~10 files
+ * $db is the mysqli handle, and now the only one: the legacy mysql_* link and
+ * the $dbnam-consuming mysql_db_query() call sites were converted in Phase 2.
  *
  * Pages include this with a relative path and often more than once per
  * request, so connecting is guarded.
@@ -31,15 +27,4 @@ if (!isset($db) || !($db instanceof mysqli)) {
     }
 
     mysqli_set_charset($db, 'utf8mb4');
-}
-
-// Legacy mysql_* extension. Most of the app is still on it and calls
-// mysql_query() without a link, which requires a default link to exist.
-if (function_exists('mysql_connect') && (!isset($var) || !is_resource($var))) {
-    $var = @mysql_connect($mb_db_host, $mb_db_user, $mb_db_pass);
-
-    if ($var) {
-        @mysql_select_db($dbnam, $var);
-        @mysql_set_charset('utf8mb4', $var);
-    }
 }

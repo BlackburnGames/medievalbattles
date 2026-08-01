@@ -45,12 +45,12 @@ if($login == 1 && $pw != "" && $email !="") {
 
 	// select research items
 	$research_query = "SELECT * FROM research WHERE email='$email' AND pw= '$pw'";
-	$res_query = $db->query($research_query) or die("Error: " . mysql_error());
+	$res_query = $db->query($research_query) or die("Error: " . mysqli_error($db));
 	$res = mysqli_fetch_array($res_query);
 
 	// select user items
 	$user_query = "SELECT * FROM user WHERE email='$email' AND pw= '$pw'";
-	$user_query = $db->query($user_query) or die("Error: " . mysql_error());
+	$user_query = $db->query($user_query) or die("Error: " . mysqli_error($db));
 	$user = mysqli_fetch_array($user_query);
 
 	$setid = $user['setid'];
@@ -79,7 +79,7 @@ if($login == 1 && $pw != "" && $email !="") {
 
 // select buildings items
 $buildings_query = "SELECT * FROM buildings WHERE email='$email' AND pw= '$pw'";
-$buildings_query = $db->query($buildings_query) or die("Error: " . mysql_error());
+$buildings_query = $db->query($buildings_query) or die("Error: " . mysqli_error($db));
 $buildings = mysqli_fetch_array($buildings_query);
 
 	$home = $buildings['home'];
@@ -110,7 +110,7 @@ $buildings = mysqli_fetch_array($buildings_query);
 
 // select military items
 $military_query = "SELECT * FROM military WHERE email='$email' AND pw= '$pw'";
-$military_query = $db->query($military_query) or die("Error: " . mysql_error());
+$military_query = $db->query($military_query) or die("Error: " . mysqli_error($db));
 $military = mysqli_fetch_array($military_query);
 
 	## current unit x
@@ -176,7 +176,7 @@ $military = mysqli_fetch_array($military_query);
 
 //	select explore items
 $explore_query = "SELECT * FROM explore WHERE email='$email' AND pw= '$pw'";
-$explore_query = $db->query($explore_query) or die("Error: " . mysql_error());
+$explore_query = $db->query($explore_query) or die("Error: " . mysqli_error($db));
 $explore = mysqli_fetch_array($explore_query);
 
 	$expland = $explore['expland'];
@@ -186,7 +186,7 @@ $explore = mysqli_fetch_array($explore_query);
 
 //	select data from return table
 $return_query = "SELECT * FROM returntbl WHERE email='$email' AND pw= '$pw'";
-$return_query = $db->query($return_query) or die("Error: " . mysql_error());
+$return_query = $db->query($return_query) or die("Error: " . mysqli_error($db));
 $return = mysqli_fetch_array($return_query);
 	## party 1
 		$war1 = $return['war1'];		$WAR_1 = $return['war1'];
@@ -226,19 +226,19 @@ $return = mysqli_fetch_array($return_query);
 
 //	total all units together
 	$warquery = "SELECT sum(amount) FROM barter WHERE seller='$ename' AND type='Warrior'";
-	$warresult = $db->query($warquery) or die("Error: " . mysql_error());
+	$warresult = $db->query($warquery) or die("Error: " . mysqli_error($db));
 	$warcheck = mysqli_fetch_array($warresult);
 
 	$wizquery = "SELECT sum(amount) FROM barter WHERE seller='$ename' AND type='Wizard'";
-	$wizresult = $db->query($wizquery) or die("Error: " . mysql_error());
+	$wizresult = $db->query($wizquery) or die("Error: " . mysqli_error($db));
 	$wizcheck = mysqli_fetch_array($wizresult);
 
 	$priquery = "SELECT sum(amount) FROM barter WHERE seller='$ename' AND type='Priest'";
-	$priresult = $db->query($priquery) or die("Error: " . mysql_error());
+	$priresult = $db->query($priquery) or die("Error: " . mysqli_error($db));
 	$pricheck = mysqli_fetch_array($priresult);
 
 	$archquery = "SELECT sum(amount) FROM barter WHERE seller='$ename' AND type='Archer'";
-	$archresult = $db->query($archquery) or die("Error: " . mysql_error());
+	$archresult = $db->query($archquery) or die("Error: " . mysqli_error($db));
 	$archcheck = mysqli_fetch_array($archresult);
 
 	$asages = $sages;
@@ -427,8 +427,8 @@ $amrbutton = "<form type=get action=aconstruct.php><input class=button type=subm
 		$civhourly == $home * .1;
 	}
 
-	if($class == Ranger)	{	$woodhourly = $lmill * 2.1;	 }	// wood production for rangers
-	if($race == Giant)	 {	$foodhourly = $farm * .6;	}	// food production for giants
+	if($class == 'Ranger')	{	$woodhourly = $lmill * 2.1;	 }	// wood production for rangers
+	if($race == 'Giant')	 {	$foodhourly = $farm * .6;	}	// food production for giants
 
 	$rechourly = $civ * .007;
 	$rechourly = round($rechourly);

@@ -2,7 +2,7 @@
 
 include("include/igtop.php");
 
-if($empireguild == None)	{
+if($empireguild == 'None')	{
 	echo "<div align=center><font class=yellow><b>You must be the member of a guild to view this page.</b></font></div>";
 	die();
 }
@@ -16,8 +16,8 @@ echo  "
 </div>";
 
 //	determine guild id
-$guild_id_query = mysql_db_query($dbnam, "SELECT gid FROM guild WHERE gname='$empireguild'");
-	$guild_id = mysql_fetch_array($guild_id_query);
+$guild_id_query = mysqli_query($db, "SELECT gid FROM guild WHERE gname='$empireguild'");
+	$guild_id = mysqli_fetch_array($guild_id_query);
 
 // display all news in said guild
 echo "  
@@ -30,8 +30,8 @@ echo "
 		<td class=main2 align=left><b class=reg width=80%>News</b></td>";
 
 $query_string = "SELECT date, news, gnid FROM guildnews WHERE gid='$guild_id[gid]' ORDER BY date DESC LIMIT 0, 60";
-$result_id = mysql_query($query_string, $var);
-while ($row = mysql_fetch_row($result_id))	{
+$result_id = mysqli_query($db, $query_string);
+while ($row = mysqli_fetch_row($result_id))	{
 	$num = $num + 1;
 echo "
 	<tr align=center valign=top colspan=6>

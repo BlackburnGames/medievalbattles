@@ -18,16 +18,16 @@
 			<select name="uwararmor">
 	    	<option selected value=ns>-Choose Armor-</option>
 			<option value="Studded Leather">Studded Leather</option>
-			<? if($armor[cs] == 1)	{	echo"<option value='Chain Shirt'>Chain Shirt</option>";	}
-			if($armor[cm] == 1)	{	echo"<option value='Chain Mail'>Chain Mail</option>";	}
-			if($armor[bp] == 1)	{	echo"<option value='Breast Plate'>Breast Plate</option>";	}
-	    	if($armor[fp] == 1)	 {	echo"<option value='Medieval Armor'>Medieval Armor</option>";	}?>
+			<? if($armor['cs'] == 1)	{	echo"<option value='Chain Shirt'>Chain Shirt</option>";	}
+			if($armor['cm'] == 1)	{	echo"<option value='Chain Mail'>Chain Mail</option>";	}
+			if($armor['bp'] == 1)	{	echo"<option value='Breast Plate'>Breast Plate</option>";	}
+	    	if($armor['fp'] == 1)	 {	echo"<option value='Medieval Armor'>Medieval Armor</option>";	}?>
 			</select>
 			</center>
 		</td>
 <? 
-if($race != Giant)	{
-	if($class != Ranger)	{
+if($race != 'Giant')	{
+	if($class != 'Ranger')	{
 	echo"
 	<tr>
 		<td class=inner2><b>Wizard</b></td>
@@ -39,14 +39,14 @@ if($race != Giant)	{
 			<select name=uwizarmor>
 	    	<option selected value=ns>-Choose Armor-</option>
 			<option value=Robe>Robe</option>";
-			if($armor[tr] == 1)	{	echo"<option value='Travellers Robe'>Travellers Robe</option>";	}
-			if($armor[mr] == 1)	{	echo"<option value='Magicians Robe'>Magicians Robe</option>";	}
-			if($armor[ma] == 1)	{	echo"<option value='Mythril Armor'>Mythril Armor</option>";	}
+			if($armor['tr'] == 1)	{	echo"<option value='Travellers Robe'>Travellers Robe</option>";	}
+			if($armor['mr'] == 1)	{	echo"<option value='Magicians Robe'>Magicians Robe</option>";	}
+			if($armor['ma'] == 1)	{	echo"<option value='Mythril Armor'>Mythril Armor</option>";	}
 	echo "
 			</select>
 		</td>";
 	}
-	if($race != Demon)	{
+	if($race != 'Demon')	{
 	echo"
  	<tr>
 		<td class=inner2><b>Priest</b></td>
@@ -58,15 +58,15 @@ if($race != Giant)	{
 			<select name=upriarmor>
 	    	<option selected value=ns>-Choose Armor-</option>
 			<option value=Leather>Leather</option>";
-			if($armor[ga] == 1)	{	echo"<option value='Golden Armor'>Golden Armor</option>";	}
-			if($armor[ba] == 1)	{	echo"<option value='Blessed Armor'>Blessed Armor</option>";	}
+			if($armor['ga'] == 1)	{	echo"<option value='Golden Armor'>Golden Armor</option>";	}
+			if($armor['ba'] == 1)	{	echo"<option value='Blessed Armor'>Blessed Armor</option>";	}
 echo"
 			</select>
 		</td>";
 	}
 }
 
-if($res[r13pts] >= 125000)	 {
+if($res['r13pts'] >= 125000)	 {
 	echo"
 	<tr>
 		<td class=inner2><b>Archer</b></td>
@@ -78,10 +78,10 @@ if($res[r13pts] >= 125000)	 {
 			<select name=uarcharmor>
 	    	<option selected value=ns>-Choose Armor-</option>
 			<option value=\"Studded Leather\">Studded Leather</option>";
-			if($armor[cs] == 1)		{	echo"<option value='Chain Shirt'>Chain Shirt</option>";	}
-			if($armor[cm] == 1)	{	echo"<option value='Chain Mail'>Chain Mail</option>";	}
-			if($armor[bp] == 1)	{	echo"<option value='Breast Plate'>Breast Plate</option>";	}
-	    	if($armor[fp] == 1)	 {	echo"<option value='Medieval Armor'>Medieval Armor</option>";	}
+			if($armor['cs'] == 1)		{	echo"<option value='Chain Shirt'>Chain Shirt</option>";	}
+			if($armor['cm'] == 1)	{	echo"<option value='Chain Mail'>Chain Mail</option>";	}
+			if($armor['bp'] == 1)	{	echo"<option value='Breast Plate'>Breast Plate</option>";	}
+	    	if($armor['fp'] == 1)	 {	echo"<option value='Medieval Armor'>Medieval Armor</option>";	}
 	echo"
 			</select>
 			</center>

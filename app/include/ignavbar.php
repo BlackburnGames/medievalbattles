@@ -13,7 +13,7 @@ include ("include/clock.php");
   if($gnamecheck[0] === $userid)  { $gforum_name = "<a href=gl-forum.php>Forums</a>"; }
   else  { $gforum_name = "<a href=gforums.php>Forums</a>";  }
 //  are they sl?
-  if($sl == yes)  { $sforum_name = "<a href=sl-forum.php>Forums</a>"; }
+  if($sl == 'yes')  { $sforum_name = "<a href=sl-forum.php>Forums</a>"; }
   else  { $sforum_name =  "<a href=sforum.php>Forums</a>";  }
 
 echo "

@@ -27,9 +27,9 @@ else	{
 	 	$expland = $expland - $cexploreland;
 	 	$expmt = $expmt - $cexploremt;
 
-		 mysql_query("UPDATE military SET explorers='$explorers' WHERE email='$email' AND pw='$pw'"); 
-		 mysql_query("UPDATE explore SET expland='$expland' WHERE email='$email' AND pw='$pw'");
-		 mysql_query("UPDATE explore SET expmt='$expmt' WHERE email='$email' AND pw='$pw'");
+		 mysqli_query($db, "UPDATE military SET explorers='$explorers' WHERE email='$email' AND pw='$pw'"); 
+		 mysqli_query($db, "UPDATE explore SET expland='$expland' WHERE email='$email' AND pw='$pw'");
+		 mysqli_query($db, "UPDATE explore SET expmt='$expmt' WHERE email='$email' AND pw='$pw'");
       
 		 echo"<div align=center><font class=yellow>You have successfully cancelled your explorers(s).</font></div>";
 		 include("include/S_CEXPLORE.php");

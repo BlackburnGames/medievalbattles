@@ -2,14 +2,14 @@
 include("include/igtop.php");
 echo "<br><br>";
 
-if($empireguild == None)	{
+if($empireguild == 'None')	{
 	echo"<div align=center>You have to be in a guild to view this page!</div>";
 	die();
 }
 
 //	are they a gl?
-$gresult = mysql_db_query($dbnam, "SELECT owner FROM guild WHERE owner='$userid'");
-$gnamecheck = mysql_fetch_array($gresult);
+$gresult = mysqli_query($db, "SELECT owner FROM guild WHERE owner='$userid'");
+$gnamecheck = mysqli_fetch_array($gresult);
 			
 if($gnamecheck[0] != $userid)	{
 	echo"<div align=center><font class=yellow>You are not a Guild Leader.</font></div>";
@@ -19,7 +19,7 @@ if($gnamecheck[0] != $userid)	{
 include("commong.php");
 
 $query = "SELECT topicid, name, topic, replies, lastpost, lastposter FROM guildthreads WHERE guildname='$empireguild' ORDER by lastpost DESC";
-$result= mysql_query($query) or die("Error in query! " . mysql_error());
+$result= mysqli_query($db, $query) or die("Error in query! " . mysqli_error($db));
 
 if ($result) { 
 echo "
@@ -35,11 +35,11 @@ echo "
 						<td align=center><b class=forum>Last Post</strong></td>
 						<td align=center><b class=forum>Delete</strong></td>
 					</tr>";									
-	while ($r = mysql_fetch_array($result)) {
+	while ($r = mysqli_fetch_array($result)) {
 	extract ($r);
 	
-	$topic_replies_query = mysql_db_query($dbnam, "SELECT count(topicid) FROM guildmsgs WHERE topicid=$topicid") or die(mysql_error());
-		$topic_replies = mysql_result($topic_replies_query, "topic_replies");
+	$topic_replies_query = mysqli_query($db, "SELECT count(topicid) FROM guildmsgs WHERE topicid=$topicid") or die(mysqli_error($db));
+		$topic_replies = mb_db_result($topic_replies_query, "topic_replies");
 	
 echo "
 					<tr bgcolor=$color2>
@@ -58,8 +58,7 @@ echo "
 		</tr>
 	</table>";  
     
-mysql_free_result($result);
-MYSQL_CLOSE();	
+mysqli_free_result($result);
 ?>
 
 

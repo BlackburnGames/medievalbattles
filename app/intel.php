@@ -24,7 +24,7 @@ else	{
 		include("include/attack/table.php");
 		die();
 	}
-	elseif($empvalue == ns)	 {
+	elseif($empvalue == 'ns')	 {
 		echo"<div align=center><font class=yellow>You did not specify anyone to gather information on.</font></div>"; 
 		include("include/S_INTEL.php");
 		die();
@@ -46,63 +46,63 @@ else	{
 	}
 	else	{
 
-		$result = mysql_query("SELECT * FROM user WHERE userid='$empvalue'");
-		$evu = mysql_fetch_array($result);
+		$result = mysqli_query($db, "SELECT * FROM user WHERE userid='$empvalue'");
+		$evu = mysqli_fetch_array($result);
 
-		$result1 = mysql_query("SELECT * FROM military WHERE userid='$empvalue'");
-		$evm = mysql_fetch_array($result1);
+		$result1 = mysqli_query($db, "SELECT * FROM military WHERE userid='$empvalue'");
+		$evm = mysqli_fetch_array($result1);
 
-		$result2 = mysql_query("SELECT wp FROM buildings WHERE userid='$empvalue'");
-		$evb = mysql_fetch_array($result2);
+		$result2 = mysqli_query($db, "SELECT wp FROM buildings WHERE userid='$empvalue'");
+		$evb = mysqli_fetch_array($result2);
 
-		if($evu[safemode] > 0)	{
+		if($evu['safemode'] > 0)	{
 			echo"<div align=center><font class=yellow>You cannot thieve someone that is in safe mode.</font></div>";
 			include("include/S_INTEL.php");
 			die();
 		}
-		if($evu[ename] == $ename)	{
+		if($evu['ename'] == $ename)	{
 			echo"<div align=center><font class=yellow>You cannot thieve yourself.</font></div>";
 			include("include/S_INTEL.php");
 			die();
 		}
-		if($send < $evm[thieves])	{
+		if($send < $evm['thieves'])	{
 			echo"<div align=center><font class=yellow>You have failed to gather information on $empireattacked and lost 10% of your thieves.</div></align>";
 		
-			mysql_query("UPDATE military SET thieves = round($thieves - ($send * .1)) WHERE email='$email' AND pw='$pw'");
-			mysql_query("UPDATE user SET nno = nno + 1 WHERE userid='$empvalue'");
-			mysql_query("INSERT INTO empnews (date, news, yourid)	VALUES	('$clock', '<font class=yellow>$ename ($setid) has failed to gather information on you</font>' , '$empvalue') ");
+			mysqli_query($db, "UPDATE military SET thieves = round($thieves - ($send * .1)) WHERE email='$email' AND pw='$pw'");
+			mysqli_query($db, "UPDATE user SET nno = nno + 1 WHERE userid='$empvalue'");
+			mysqli_query($db, "INSERT INTO empnews (date, news, yourid)	VALUES	('$clock', '<font class=yellow>$ename ($setid) has failed to gather information on you</font>' , '$empvalue') ");
 			
 			include("include/S_INTEL.php");
 			die();
 		}
 		else	{
 	
-			mysql_query("UPDATE military SET thieves = round($thieves - ($send * .03)) WHERE email='$email' AND pw='$pw'");
-			mysql_query("UPDATE user SET nno = nno + 1 WHERE userid='$empvalue'");
-			mysql_query("INSERT INTO empnews (date, news, yourid)	VALUES	('$clock', '<font class=yellow>Thieves have gathered intelligence on your empire</font>' , '$empvalue') ");
+			mysqli_query($db, "UPDATE military SET thieves = round($thieves - ($send * .03)) WHERE email='$email' AND pw='$pw'");
+			mysqli_query($db, "UPDATE user SET nno = nno + 1 WHERE userid='$empvalue'");
+			mysqli_query($db, "INSERT INTO empnews (date, news, yourid)	VALUES	('$clock', '<font class=yellow>Thieves have gathered intelligence on your empire</font>' , '$empvalue') ");
 
 			$tempmodifier = 1.00;
 
-			if($evu['class']== Fighter)	{	$tempmodifier = 1.05;	}
-			if($evu['class'] == Mage)	{	$tempmodifier = .95;		}
-			if($evu['class'] == Cleric)	{	$tempmodifier = 1.00;	}
-			if($evu['class'] == Ranger)	{	$tempmodifier = 1.00;	}
-			if($evu[race] == Giant)		{	$tempmodifier = $tempmodifier + .25;	 }
+			if($evu['class']== 'Fighter')	{	$tempmodifier = 1.05;	}
+			if($evu['class'] == 'Mage')	{	$tempmodifier = .95;		}
+			if($evu['class'] == 'Cleric')	{	$tempmodifier = 1.00;	}
+			if($evu['class'] == 'Ranger')	{	$tempmodifier = 1.00;	}
+			if($evu['race'] == 'Giant')		{	$tempmodifier = $tempmodifier + .25;	 }
 
-			$evdef = (($evm[warriors] * $evm[warpower]) + ($evm[wizards] * $evm[wizpower]) + ($evm[priests] * $evm[pripower]) + ($evm[archers] * $evm[archpower]) + ($evm[catapult] * 30) + ($evb[wp] * 10)) * $tempmodifier;
+			$evdef = (($evm['warriors'] * $evm['warpower']) + ($evm['wizards'] * $evm['wizpower']) + ($evm['priests'] * $evm['pripower']) + ($evm['archers'] * $evm['archpower']) + ($evm['catapult'] * 30) + ($evb['wp'] * 10)) * $tempmodifier;
 			$evdef = round($evdef);
 
-			$evu[gp] = number_format($evu[gp]);
-			$evu[iron]=number_format($evu[iron]);
-			$evu[lumber]=number_format($evu[lumber]);
-			$evm[civ]=number_format($evm[civ]);
-			$evm[thieves]=number_format($evm[thieves]);
-			$evb[wp]=number_format($evb[wp]);
-			$evm[warriors]=number_format($evm[warriors]);
-			$evm[wizards]=number_format($evm[wizards]);
-			$evm[priests]=number_format($evm[priests]);
-			$evm[archers]=number_format($evm[archers]);
-			$evm[catapult]=number_format($evm[catapult]);
+			$evu['gp'] = number_format($evu['gp']);
+			$evu['iron']=number_format($evu['iron']);
+			$evu['lumber']=number_format($evu['lumber']);
+			$evm['civ']=number_format($evm['civ']);
+			$evm['thieves']=number_format($evm['thieves']);
+			$evb['wp']=number_format($evb['wp']);
+			$evm['warriors']=number_format($evm['warriors']);
+			$evm['wizards']=number_format($evm['wizards']);
+			$evm['priests']=number_format($evm['priests']);
+			$evm['archers']=number_format($evm['archers']);
+			$evm['catapult']=number_format($evm['catapult']);
 			$evdef=number_format($evdef);
 
 echo"

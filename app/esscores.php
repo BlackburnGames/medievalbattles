@@ -21,13 +21,13 @@ echo "
 		<td class='main2'><b class='reg' width='20%'>Experience</b></td>";
 
 	$query_string = "SELECT ename, mts, land, exp, userid FROM user ORDER BY exp DESC LIMIT 0,40";
-	$result_id = mysql_query($query_string, $var);
-	while ($row = mysql_fetch_row($result_id))	{
+	$result_id = mysqli_query($db, $query_string);
+	while ($row = mysqli_fetch_row($result_id))	{
 
-		$SETID_SELECT = mysql_db_query($dbnam, "SELECT setid FROM user WHERE ename='$row[0]'");	
-	   		$SID_S = mysql_result($SETID_SELECT,"SID_S");
-		$EMPS_SET_GUILD = mysql_db_query($dbnam, "SELECT guild FROM user WHERE userid='$row[4]'");	
-	   		$E_S_G = mysql_result($EMPS_SET_GUILD,"E_S_G");
+		$SETID_SELECT = mysqli_query($db, "SELECT setid FROM user WHERE ename='$row[0]'");	
+	   		$SID_S = mb_db_result($SETID_SELECT,"SID_S");
+		$EMPS_SET_GUILD = mysqli_query($db, "SELECT guild FROM user WHERE userid='$row[4]'");	
+	   		$E_S_G = mb_db_result($EMPS_SET_GUILD,"E_S_G");
 		
 		$E_S_G = "[$E_S_G]";
 		if($E_S_G == "[None]")	{	$E_S_G = "";	}	

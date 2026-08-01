@@ -2,35 +2,21 @@
 /**
  * Legacy compatibility layer for Medieval Battles v6 (written for PHP 4).
  *
- * Loaded via auto_prepend_file so the 2003 sources can stay untouched while a
+ * Loaded via prepend.php so the 2003 sources can stay untouched while a
  * working baseline is established. Every section below is migration debt with
  * a defined exit condition -- delete each one as the code that needs it is
  * ported, and the file shrinking to nothing is the signal that Phase 2 is done.
  *
- * Deliberately does NOT paper over:
- *   - unquoted array keys ($row[email]), which are fatal from PHP 8
- *   - the mysqli_field_seek mis-conversion, which is a real bug, not an API gap
- * Both need real source fixes and are tracked in CLAUDE.md.
+ * Retired so far: mysql_db_query() and mysql_result() (the whole mysql_*
+ * extension is gone from the sources) and ereg_replace(). Left: sessions and
+ * register_globals, both of which need call-site changes rather than renames.
+ *
+ * Deliberately does NOT paper over unquoted array keys ($row[email]), which
+ * are fatal from PHP 8; those were fixed at the source in Phase 2.
  */
 
 // ---------------------------------------------------------------------------
-// 1. mysql_db_query() -- removed in PHP 5.3, still called ~184 times.
-//    Exit condition: those call sites move to mysqli/PDO.
-// ---------------------------------------------------------------------------
-if (!function_exists('mysql_db_query') && function_exists('mysql_query')) {
-    function mysql_db_query($database, $query, $link = null)
-    {
-        if ($link === null) {
-            @mysql_select_db($database);
-            return @mysql_query($query);
-        }
-        @mysql_select_db($database, $link);
-        return @mysql_query($query, $link);
-    }
-}
-
-// ---------------------------------------------------------------------------
-// 2. session_register() family -- removed in PHP 5.4, still called ~51 times.
+// 1. session_register() family -- removed in PHP 5.4, still called ~51 times.
 //
 //    In PHP 4 this aliased a global to a session slot in both directions: the
 //    value survived the request, and came back as a global on the next one.
@@ -67,24 +53,11 @@ if (!function_exists('session_register')) {
 }
 
 // ---------------------------------------------------------------------------
-// 3. ereg_replace() -- removed in PHP 7.0, used 14 times.
-//    Present natively on the 5.6 baseline, so this only arms itself on newer
-//    PHP. The POSIX-to-PCRE translation is naive, which is adequate only
-//    because every current call is the no-op ereg_replace("nothing", ...).
-//    Exit condition: call sites move to preg_replace.
-// ---------------------------------------------------------------------------
-if (!function_exists('ereg_replace')) {
-    function ereg_replace($pattern, $replacement, $string)
-    {
-        return preg_replace('/' . str_replace('/', '\\/', $pattern) . '/', $replacement, $string);
-    }
-}
-
-// ---------------------------------------------------------------------------
-// 4. mysql_result() -- removed in PHP 7.0.
-//    Also the correct replacement for the ~15 broken mysqli_field_seek() call
-//    sites, which need a value and currently get a bool. Source fixes call
-//    mb_db_result() instead; it is defined here so both paths share semantics.
+// 2. mb_db_result() -- the replacement for mysql_result(), removed in PHP 7.0,
+//    and for the ~15 broken mysqli_field_seek() call sites that needed a value
+//    and got a bool. Unlike the rest of this file it is not a shim for a
+//    removed function, so it is the one section that outlives Phase 2; it
+//    should move into the app once there is somewhere sensible to put it.
 // ---------------------------------------------------------------------------
 if (!function_exists('mb_db_result')) {
     /**
@@ -133,7 +106,7 @@ if (!function_exists('mb_db_result')) {
 }
 
 // ---------------------------------------------------------------------------
-// 5. mb_client_hostname() -- extracted from common.php / commong.php.
+// 3. mb_client_hostname() -- extracted from common.php / commong.php.
 //    Both declared their own gethostname(), which became a PHP built-in in
 //    5.3, so loading either was an instant fatal (and loading both, a second
 //    one). Hosted here so there is a single definition.
@@ -153,7 +126,7 @@ if (!function_exists('mb_client_hostname')) {
 }
 
 // ---------------------------------------------------------------------------
-// 6. register_globals -- switched off in PHP 5.4.
+// 4. register_globals -- switched off in PHP 5.4.
 //
 //    This is the single most invasive shim and the reason the stack is bound
 //    to localhost. Injecting request data into the global scope IS the

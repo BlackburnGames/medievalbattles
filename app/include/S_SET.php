@@ -3,10 +3,10 @@
 if($snum != "")  {  $N_NUM = $snum; }
 if($snum == "") { $N_NUM = $csnum;  }
 
-$ssettlementpic = mysql_db_query($dbnam, "SELECT setpic FROM settlement WHERE setid = '$N_NUM'");
-  $settlepic = mysql_result($ssettlementpic, 0, "setpic");
-$ssettlementname = mysql_db_query($dbnam, "SELECT setname FROM settlement WHERE setid = '$N_NUM'");
-  $settlename = mysql_result($ssettlementname, 0, "setname");
+$ssettlementpic = mysqli_query($db, "SELECT setpic FROM settlement WHERE setid = '$N_NUM'");
+  $settlepic = mb_db_result($ssettlementpic, "setpic", 0);
+$ssettlementname = mysqli_query($db, "SELECT setname FROM settlement WHERE setid = '$N_NUM'");
+  $settlename = mb_db_result($ssettlementname, "setname", 0);
 
 echo "
 <div align=center>
@@ -39,26 +39,26 @@ echo "
     <td class=main2 width=><b class=reg>Guild</b></td>";
 
 $query_string = "SELECT userid, ename, race, class, mts, land, exp, guild FROM user WHERE setid = '$N_NUM' ORDER BY userid ASC";
-$result_id = mysql_query($query_string, $var);
-while ($row = mysql_fetch_row($result_id))  {
+$result_id = mysqli_query($db, $query_string);
+while ($row = mysqli_fetch_row($result_id))  {
 
-  $ONLINE_NO = mysql_db_query($dbnam, "SELECT online FROM user WHERE userid='$row[0]'");
-    $OLINE = mysql_result($ONLINE_NO,"OLINE");
+  $ONLINE_NO = mysqli_query($db, "SELECT online FROM user WHERE userid='$row[0]'");
+    $OLINE = mb_db_result($ONLINE_NO,"OLINE");
 
   if($OLINE == 1) { $O_line = "<font class=red>*</font>";  }
   else  { $O_line = ""; }
 
   //  check to see if sl is there
-  $SL_result = mysql_db_query($dbnam, "SELECT sl FROM user WHERE userid='$row[0]'");
-    $SLcheck = mysql_fetch_array($SL_result);
+  $SL_result = mysqli_query($db, "SELECT sl FROM user WHERE userid='$row[0]'");
+    $SLcheck = mysqli_fetch_array($SL_result);
 
-  if($SLcheck[0] == yes)  {
-    $SL_SELECT = mysql_db_query($dbnam, "SELECT ename FROM user WHERE sl='yes' AND setid='$N_NUM'");
-      $SL_S = mysql_result($SL_SELECT,"SL_S");
+  if($SLcheck[0] == 'yes')  {
+    $SL_SELECT = mysqli_query($db, "SELECT ename FROM user WHERE sl='yes' AND setid='$N_NUM'");
+      $SL_S = mb_db_result($SL_SELECT,"SL_S");
   }
 
-  $SAFEMODECHECK = mysql_db_query($dbnam, "SELECT safemode FROM user WHERE  userid='$row[0]'");
-    $S_M_CHECK = mysql_result($SAFEMODECHECK,"S_M_CHECK");
+  $SAFEMODECHECK = mysqli_query($db, "SELECT safemode FROM user WHERE  userid='$row[0]'");
+    $S_M_CHECK = mb_db_result($SAFEMODECHECK,"S_M_CHECK");
 
   $color = "#404040";
   $yclass = "grey";
@@ -82,8 +82,8 @@ while ($row = mysql_fetch_row($result_id))  {
     <td bgcolor=$color><font class=$yclass>$row[7]</td>\n";
 }
 
-  $COUNT_MEMBERS = mysql_db_query($dbnam, "SELECT count(userid) FROM user WHERE setid = '$N_NUM'");
-    $C_MEM = mysql_result($COUNT_MEMBERS,"C_MEM");
+  $COUNT_MEMBERS = mysqli_query($db, "SELECT count(userid) FROM user WHERE setid = '$N_NUM'");
+    $C_MEM = mb_db_result($COUNT_MEMBERS,"C_MEM");
 
   $totT = $C_MEM;
 
@@ -102,8 +102,8 @@ while($C_MEM < 10 AND $totT < 10) {
 echo "
 </table><br>";
 
-$SET_STRENGTH = mysql_db_query($dbnam, "SELECT sum(exp) FROM user WHERE setid='$N_NUM'");
-  $S_STRENGTH = mysql_result($SET_STRENGTH,"S_STRENGTH");
+$SET_STRENGTH = mysqli_query($db, "SELECT sum(exp) FROM user WHERE setid='$N_NUM'");
+  $S_STRENGTH = mb_db_result($SET_STRENGTH,"S_STRENGTH");
   $S_STRENGTH = number_format($S_STRENGTH);
 
 echo "<br><div align=center><b><font class=red>Settlement Strength:</font></b> $S_STRENGTH</div></td></table>";

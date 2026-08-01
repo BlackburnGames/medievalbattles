@@ -50,9 +50,9 @@ else  {
 
     $maxciv = $maxciv - $urecruit;
     $recruits = $recruits + $urecruit;
-    mysql_query("UPDATE user SET gp='$gp' WHERE email='$email' AND pw='$pw'");
-      mysql_query("UPDATE military SET recruits='$recruits' WHERE email='$email' AND pw='$pw'");
-      mysql_query("UPDATE military SET maxciv='$maxciv' WHERE email='$email' AND pw='$pw'");
+    mysqli_query($db, "UPDATE user SET gp='$gp' WHERE email='$email' AND pw='$pw'");
+      mysqli_query($db, "UPDATE military SET recruits='$recruits' WHERE email='$email' AND pw='$pw'");
+      mysqli_query($db, "UPDATE military SET maxciv='$maxciv' WHERE email='$email' AND pw='$pw'");
 
     echo"<div align=center><font class=yellow>Your civilians have been recruited.</font></div>";
     include("include/S_RCIV.php");
@@ -70,25 +70,25 @@ else  {
 
   $totalunits =  $twarriors + $twizards + $tpriests + $tarchers + $dbwar2 + $dbwar + $dbwiz2 + $dbwiz + $dbpri2 + $dbpri + $dbarch2 + $dbarch;
   $barrack_cap = $barrack * 50;
-  if($race == Human)  { $barrack_cap = $barrack * 35; }
+  if($race == 'Human')  { $barrack_cap = $barrack * 35; }
 
 
-  if(($uarcher > 0 AND $res[r13pts] < 125000) OR ($ucatapult > 0 AND $res[r13pts] < 125000))  {
+  if(($uarcher > 0 AND $res['r13pts'] < 125000) OR ($ucatapult > 0 AND $res['r13pts'] < 125000))  {
     echo"<div align=center><font class=yellow>You have to research Archery before you get Archers!</font></div>";
     include("include/S_RSET.php");
     die();
   }
-  if($usuicide > 0 AND $res[r14pts] < 125000) {
+  if($usuicide > 0 AND $res['r14pts'] < 125000) {
     echo"<div align=center><font class=yellow>You have to research Demolitions before you get Suicide Civilians!</font></div>";
     include("include/S_RSET.php");
     die();
   }
-  elseif($uwizard > 0 AND $class == Ranger) {
+  elseif($uwizard > 0 AND $class == 'Ranger') {
     echo"<div align=center><font class=yellow>You can't train Wizards because you're a Ranger!</div></font>";
     include("include/S_RSET.php");
     die();
   }
-  elseif($uwizard > 0 AND $class == Insurrectionist)  {
+  elseif($uwizard > 0 AND $class == 'Insurrectionist')  {
     echo"<div align=center><font class=yellow>You can't train Wizards because you're an Insurrectionist!</div></font>";
     include("include/S_RSET.php");
     die();
@@ -113,12 +113,12 @@ else  {
     include("include/S_RSET.php");
     die();
   }
-  elseif($upriest > 0 AND $uwizard > 0 AND $race == Giant)  {
+  elseif($upriest > 0 AND $uwizard > 0 AND $race == 'Giant')  {
     echo"<div align=center><font class=yellow>You can't train Wizards or Priests because you're a Giant!</font></div>";
     include("include/S_RSET.php");
     die();
   }
-  elseif($upriest > 0 AND $race == Demon) {
+  elseif($upriest > 0 AND $race == 'Demon') {
     echo"<div align=center><font class=yellow>You can't train Priests because you're a Demon!</font></div>";
     include("include/S_RSET.php");
     die();
@@ -149,20 +149,20 @@ else  {
       $dbcatapult3 = $dbcatapult3 + $ucatapult;
       $dbsuicide3 = $dbsuicide3 + $usuicide;
 
-      mysql_query("UPDATE user SET gp='$gp' WHERE email='$email' AND pw='$pw'");
-      mysql_query("UPDATE user SET lumber='$lumber' WHERE email='$email' AND pw='$pw'");
-      mysql_query("UPDATE military SET recruits='$recruits' WHERE email='$email' AND pw='$pw'");
+      mysqli_query($db, "UPDATE user SET gp='$gp' WHERE email='$email' AND pw='$pw'");
+      mysqli_query($db, "UPDATE user SET lumber='$lumber' WHERE email='$email' AND pw='$pw'");
+      mysqli_query($db, "UPDATE military SET recruits='$recruits' WHERE email='$email' AND pw='$pw'");
 
-      mysql_query("UPDATE military SET dbsage='$dbsage' WHERE email='$email' AND pw='$pw'");
-      mysql_query("UPDATE military SET dbthief='$dbthief' WHERE email='$email' AND pw='$pw'");
-      mysql_query("UPDATE military SET dbexplorer='$dbexplorer' WHERE email='$email' AND pw='$pw'");
-      mysql_query("UPDATE military SET dbpri2='$dbpri2' WHERE email='$email' AND pw='$pw'");
-      mysql_query("UPDATE military SET dbwiz2='$dbwiz2' WHERE email='$email' AND pw='$pw'");
-      mysql_query("UPDATE military SET dbwar2='$dbwar2' WHERE email='$email' AND pw='$pw'");
-      mysql_query("UPDATE military SET dbarch2='$dbarch2' WHERE email='$email' AND pw='$pw'");
+      mysqli_query($db, "UPDATE military SET dbsage='$dbsage' WHERE email='$email' AND pw='$pw'");
+      mysqli_query($db, "UPDATE military SET dbthief='$dbthief' WHERE email='$email' AND pw='$pw'");
+      mysqli_query($db, "UPDATE military SET dbexplorer='$dbexplorer' WHERE email='$email' AND pw='$pw'");
+      mysqli_query($db, "UPDATE military SET dbpri2='$dbpri2' WHERE email='$email' AND pw='$pw'");
+      mysqli_query($db, "UPDATE military SET dbwiz2='$dbwiz2' WHERE email='$email' AND pw='$pw'");
+      mysqli_query($db, "UPDATE military SET dbwar2='$dbwar2' WHERE email='$email' AND pw='$pw'");
+      mysqli_query($db, "UPDATE military SET dbarch2='$dbarch2' WHERE email='$email' AND pw='$pw'");
 
-      mysql_query("UPDATE military SET dbcatapult3='$dbcatapult3' WHERE email='$email' AND pw='$pw'");
-      mysql_query("UPDATE military SET dbsuicide3='$dbsuicide3' WHERE email='$email' AND pw='$pw'");
+      mysqli_query($db, "UPDATE military SET dbcatapult3='$dbcatapult3' WHERE email='$email' AND pw='$pw'");
+      mysqli_query($db, "UPDATE military SET dbsuicide3='$dbsuicide3' WHERE email='$email' AND pw='$pw'");
 
 
       echo"<div align=center><font class=yellow>Your orders have been carried out.</font></div>";

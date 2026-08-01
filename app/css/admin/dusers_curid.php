@@ -17,8 +17,8 @@ echo "
 		<td><b>Guild</b></td>
 		<td><b>LastLogin</b></td>";
 
-$result_id = mysql_db_query($dbnam, "SELECT ename, email, ip, signup_comp_id, current_comp_id, exp, guild, lastlogin FROM user ORDER BY current_comp_id ASC");
-while ($row = mysql_fetch_row($result_id))	{
+$result_id = mysqli_query($db, "SELECT ename, email, ip, signup_comp_id, current_comp_id, exp, guild, lastlogin FROM user ORDER BY current_comp_id ASC");
+while ($row = mysqli_fetch_row($result_id))	{
 	echo "
 	<tr align=center valign=top colspan=10>
 		<td><tt>$row[0]</tt></td>

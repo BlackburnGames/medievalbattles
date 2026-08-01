@@ -1,23 +1,10 @@
 # Warnings present before the port began. Only ever remove lines.
 # Regenerate with: MB_WRITE_BASELINE=1 php tests/smoke.php
-S_SET.php:106 | Warning: mysql_result() expects parameter 2 to be long, string given
-S_SET.php:46 | Warning: mysql_result() expects parameter 2 to be long, string given
-S_SET.php:61 | Warning: mysql_result() expects parameter 2 to be long, string given
-S_SET.php:86 | Warning: mysql_result() expects parameter 2 to be long, string given
-commong.php:19 | Warning: mysql_result() expects parameter 2 to be long, string given
-emland.php:28 | Warning: mysql_result() expects parameter 2 to be long, string given
-emland.php:30 | Warning: mysql_result() expects parameter 2 to be long, string given
-emmountains.php:28 | Warning: mysql_result() expects parameter 2 to be long, string given
-emmountains.php:30 | Warning: mysql_result() expects parameter 2 to be long, string given
-esscores.php:28 | Warning: mysql_result() expects parameter 2 to be long, string given
-esscores.php:30 | Warning: mysql_result() expects parameter 2 to be long, string given
-gc.php:91 | Warning: mysql_fetch_array() expects parameter 1 to be resource, boolean given
-gforums.php:17 | Warning: mysql_result() expects parameter 2 to be long, string given
-gforums.php:8 | Warning: mysql_result() expects parameter 2 to be long, string given
-gmembers.php:53 | Warning: mysql_result() expects parameter 2 to be long, string given
-gmembers.php:55 | Warning: mysql_result() expects parameter 2 to be long, string given
-gmembers.php:75 | Warning: mysql_result() expects parameter 2 to be long, string given
-govt.php:10 | Warning: mysql_result(): _maxvoteno not found in MySQL result index N
-govt.php:13 | Warning: mysql_result(): MV_emp not found in MySQL result index N
-sguild.php:30 | Warning: mysql_result() expects parameter 2 to be long, string given
-vmessages.php:7 | Warning: mysql_result() expects parameter 2 to be long, string given
+#
+# Was 21 entries. The mysqli conversion retired 20 of them: they were all
+# mysql_result() rejecting a field name passed in the row position, which
+# mb_db_result() accepts by design. The survivor is not a port artifact -- the
+# guild listing selects guild.flag, a column that has never existed in db.sql,
+# so the query has always returned false. Fixing the query is Phase 3 work
+# because it changes what the page renders.
+gc.php:91 | Warning: mysqli_fetch_array() expects parameter 1 to be mysqli_result, boolean given

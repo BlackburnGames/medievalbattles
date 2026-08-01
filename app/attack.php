@@ -37,49 +37,49 @@ else	{
 		include("include/attack/table.php");
 		die();
 	}
-	elseif($empvalue == ns)	 {
+	elseif($empvalue == 'ns')	 {
 		echo"<div align=center><font class=yellow>You did not specify anyone to attack!<br><br></font></div>";
 		include("include/attack/ldrop.php");
 		include("include/attack/table.php");
 		die();
 	}
-	elseif(($uarcher > 0) AND ($res[r13pts] < 125000))	{
+	elseif(($uarcher > 0) AND ($res['r13pts'] < 125000))	{
 		echo"<div align=center><font class=yellow>You have to research Archery.<br><br></font></div>";
 		include("include/attack/ldrop.php");
 		include("include/attack/table.php");
 		die();
 	}
-	elseif(($ugolem > 0) AND ($res[r17pts] < 125000))	{
+	elseif(($ugolem > 0) AND ($res['r17pts'] < 125000))	{
 		echo"<div align=center><font class=yellow>You have to research Animation.<br><br></font></div>";
 		include("include/attack/ldrop.php");
 		include("include/attack/table.php");
 		die();
 	}
-	elseif(($uirongolem > 0) AND ($res[r18pts] < 125000))	{
+	elseif(($uirongolem > 0) AND ($res['r18pts'] < 125000))	{
 		echo"<div align=center><font class=yellow>You have to research Advanced Animation.<br><br></font></div>";
 		include("include/attack/ldrop.php");
 		include("include/attack/table.php");
 		die();
 	}
-	elseif($race == Giant AND $uwizard > 0)	{
+	elseif($race == 'Giant' AND $uwizard > 0)	{
 		echo"<div align=center><font class=yellow>Being that you are a Giant, you cannot attack with wizards.</div></font>";
 		include("include/attack/ldrop.php");
 		include("include/attack/table.php");
 		die();
 	}
-	elseif($race == Giant AND $upriest > 0)	{
+	elseif($race == 'Giant' AND $upriest > 0)	{
 		echo"<div align=center><font class=yellow>Being that you are a Giant, you cannot attack with priests.</div></font>";
 		include("include/attack/ldrop.php");
 		include("include/attack/table.php");
 		die();
 	}
-	elseif($race == Demon AND $upriest > 0)	{
+	elseif($race == 'Demon' AND $upriest > 0)	{
 		echo"<div align=center><font class=yellow>Being that you are a Giant, you cannot attack with priests.</div></font>";
 		include("include/attack/ldrop.php");
 		include("include/attack/table.php");
 		die();
 	}
-	elseif($class == Ranger AND $uwizard > 0)	{
+	elseif($class == 'Ranger' AND $uwizard > 0)	{
 		echo"<div align=center><font class=yellow>Being that you are a Ranger, you cannot attack with wizards.</div></font>";
 		include("include/attack/ldrop.php");
 		include("include/attack/table.php");
@@ -90,12 +90,12 @@ else	{
 	include("include/attack/defANDoff.php");
  						 
 	//	for attacker
-	if($evu[land] >= 200)	{	$landgain = round($evu[land] * .1);	 }
-	elseif($evu[land] < 200 AND $evu[land] >=10)	{	$landgain = 10;	}
-	else	{	$landgain = $evu[land];	 }
+	if($evu['land'] >= 200)	{	$landgain = round($evu['land'] * .1);	 }
+	elseif($evu['land'] < 200 AND $evu['land'] >=10)	{	$landgain = 10;	}
+	else	{	$landgain = $evu['land'];	 }
 					
-	$EMPs_guild_query = mysql_db_query($dbnam, "SELECT guild FROM user WHERE userid='$evu[userid]'");
-		$EMPs_guild = mysql_result($EMPs_guild_query,"EMPs_guild");
+	$EMPs_guild_query = mysqli_query($db, "SELECT guild FROM user WHERE userid='$evu[userid]'");
+		$EMPs_guild = mb_db_result($EMPs_guild_query,"EMPs_guild");
 
 	if($uwarrior == "" AND $uwizard == "" AND $upriest == "" AND $uarcher == "" AND $ugolem == "" AND $uirongolem = "")	{
 		echo"<div align=center><font class=yellow>You did not send anything into combat!</font></div><br><br>";
@@ -109,7 +109,7 @@ else	{
 		include("include/attack/table.php");
 		die();
 	}
-	elseif($evu[ename] === $ename)	{
+	elseif($evu['ename'] === $ename)	{
 		echo"<div align=center><font class=yellow>You cannot attack your ownself!</font></div><br><br>";
 		include("include/attack/ldrop.php");
 		include("include/attack/table.php");
@@ -131,30 +131,30 @@ else	{
 	
 		include("include/attack/calculations.php");
 					
-		$Setid_maxid = mysql_db_query($dbnam, "SELECT max(sid) FROM setnews");
-			$msid = mysql_result($Setid_maxid,"msid");
-		$Guild_MaxID = mysql_db_query($dbnam, "SELECT max(gnid) FROM guildnews");
-			$mgnid = mysql_result($Guild_MaxID,"mgnid");
+		$Setid_maxid = mysqli_query($db, "SELECT max(sid) FROM setnews");
+			$msid = mb_db_result($Setid_maxid,"msid");
+		$Guild_MaxID = mysqli_query($db, "SELECT max(gnid) FROM guildnews");
+			$mgnid = mb_db_result($Guild_MaxID,"mgnid");
 					
 		$sid = $msid + 1;
-		mysql_query("INSERT INTO setnews (date, news, setid, sid)	VALUES	('$clock', '<font class=yellow>$ename ($setid) failed to attack $evu[ename] ($evu[setid]) for land</font>', '$setid', '$sid') ");
+		mysqli_query($db, "INSERT INTO setnews (date, news, setid, sid)	VALUES	('$clock', '<font class=yellow>$ename ($setid) failed to attack $evu[ename] ($evu[setid]) for land</font>', '$setid', '$sid') ");
 					
 		if($gid[0] != "")	{
 			$gnid = $mgnid + 1;
-			mysql_query("INSERT INTO guildnews (date, news, gid, gnid)	VALUES	('$clock', '<font class=yellow>$ename ($setid) failed to attack $evu[ename] ($evu[setid]) for land</font>', '$gid[0]', '$gnid') ");
+			mysqli_query($db, "INSERT INTO guildnews (date, news, gid, gnid)	VALUES	('$clock', '<font class=yellow>$ename ($setid) failed to attack $evu[ename] ($evu[setid]) for land</font>', '$gid[0]', '$gnid') ");
 		}
 		
 		$sid = $msid + 1;
-		mysql_query("INSERT INTO setnews (date, news, setid, sid)	VALUES	('$clock', '<font class=orange>$evu[ename] ($evu[setid]) successfully defended their land against $ename ($setid)</font>', '$evu[setid]', '$sid') ");
+		mysqli_query($db, "INSERT INTO setnews (date, news, setid, sid)	VALUES	('$clock', '<font class=orange>$evu[ename] ($evu[setid]) successfully defended their land against $ename ($setid)</font>', '$evu[setid]', '$sid') ");
 					
 		if($tgid[0] != "")	{
 			$gnid = $mgnid + 2;
-			mysql_query("INSERT INTO guildnews (date, news, gid, gnid)	VALUES	('$clock', '<font class=orange>$evu[ename] ($evu[setid]) successfully defended their land against $ename ($setid)</font>', '$tgid[0]', '$gnid') ");
+			mysqli_query($db, "INSERT INTO guildnews (date, news, gid, gnid)	VALUES	('$clock', '<font class=orange>$evu[ename] ($evu[setid]) successfully defended their land against $ename ($setid)</font>', '$tgid[0]', '$gnid') ");
 		}
 						
-		mysql_query("UPDATE user SET nno = nno + 1 WHERE userid='$empvalue'");
+		mysqli_query($db, "UPDATE user SET nno = nno + 1 WHERE userid='$empvalue'");
 
-		mysql_query("INSERT INTO empnews (date, news, yourid)	VALUES	('$clock', '<font class=yellow>We have successfully defended our empire against $ename ($setid)</font>' , '$empvalue') ");
+		mysqli_query($db, "INSERT INTO empnews (date, news, yourid)	VALUES	('$clock', '<font class=yellow>We have successfully defended our empire against $ename ($setid)</font>' , '$empvalue') ");
 					
 		echo"<div align=center><font class=yellow>We have failed to attack $evu[ename]($evu[setid])!</font><br><br><font class=orange>$your_losses<br><br></font></div>";
 		include("include/attack/ldrop.php");
@@ -167,113 +167,113 @@ else	{
 		$lgain = $landgain;						
 		while($lgain > $ltally)	{
 		
-			if($evb[aland] > 0 AND $lgain > $ltally)	 {
-				$evb[aland] = $evb[aland] - 1;
+			if($evb['aland'] > 0 AND $lgain > $ltally)	 {
+				$evb['aland'] = $evb['aland'] - 1;
 				$ltally = $ltally + 1;
 			}
 		
-			if($evb[dhome] > 0 AND $lgain > $ltally AND $evb[aland] == 0)	 {
-				$evb[dhome] = $evb[dhome] - 1;
+			if($evb['dhome'] > 0 AND $lgain > $ltally AND $evb['aland'] == 0)	 {
+				$evb['dhome'] = $evb['dhome'] - 1;
 				$ltally = $ltally + 1;
 			}
-			if($evb[dbarrack] > 0 AND $lgain > $ltally AND $evb[aland] == 0)	{
-				$evb[dbarrack] = $evb[dbarrack] - 1;
+			if($evb['dbarrack'] > 0 AND $lgain > $ltally AND $evb['aland'] == 0)	{
+				$evb['dbarrack'] = $evb['dbarrack'] - 1;
 				$ltally = $ltally + 1;
 			}
-			if($evb[dfarm] > 0 AND $lgain > $ltally AND $evb[aland] == 0)	{
-				$evb[dfarm] = $evb[dfarm] - 1;
+			if($evb['dfarm'] > 0 AND $lgain > $ltally AND $evb['aland'] == 0)	{
+				$evb['dfarm'] = $evb['dfarm'] - 1;
 				$ltally = $ltally + 1;
 			}
-			if($evb[dwp] > 0 AND $lgain > $ltally AND $evb[aland] == 0)	{
-				$evb[dwp] = $evb[dwp] - 1;
+			if($evb['dwp'] > 0 AND $lgain > $ltally AND $evb['aland'] == 0)	{
+				$evb['dwp'] = $evb['dwp'] - 1;
 				$ltally = $ltally + 1;
 			}
-			if($evb[dlmill] > 0 AND $lgain > $ltally AND $evb[aland] == 0)	{
-				$evb[dlmill] = $evb[dlmill] - 1;
+			if($evb['dlmill'] > 0 AND $lgain > $ltally AND $evb['aland'] == 0)	{
+				$evb['dlmill'] = $evb['dlmill'] - 1;
 				$ltally = $ltally + 1;
 			}
 
-			if($evb[home] > 0 AND $lgain > $ltally AND $evb[aland] == 0 AND $evb[dhome] == 0 AND $evb[dbarrack] == 0 AND $evb[dfarm] == 0 AND $evb[dwp] == 0 AND $evb[dlmill] == 0)	{
-				$evb[home] = $evb[home] - 1;
+			if($evb['home'] > 0 AND $lgain > $ltally AND $evb['aland'] == 0 AND $evb['dhome'] == 0 AND $evb['dbarrack'] == 0 AND $evb['dfarm'] == 0 AND $evb['dwp'] == 0 AND $evb['dlmill'] == 0)	{
+				$evb['home'] = $evb['home'] - 1;
 				$ltally = $ltally + 1;
 			}
-			if($evb[barrack] > 0 AND $lgain > $ltally AND $evb[aland] == 0 AND $evb[dhome] == 0 AND $evb[dbarrack] == 0 AND $evb[dfarm] == 0 AND $evb[dwp] == 0 AND $evb[dlmill] == 0)	{
-				$evb[barrack] = $evb[barrack] - 1;
+			if($evb['barrack'] > 0 AND $lgain > $ltally AND $evb['aland'] == 0 AND $evb['dhome'] == 0 AND $evb['dbarrack'] == 0 AND $evb['dfarm'] == 0 AND $evb['dwp'] == 0 AND $evb['dlmill'] == 0)	{
+				$evb['barrack'] = $evb['barrack'] - 1;
 				$ltally = $ltally + 1;
 			}
-			if($evb[farm] > 0 AND $lgain > $ltally AND $evb[aland] == 0 AND $evb[dhome] == 0 AND $evb[dbarrack] == 0 AND $evb[dfarm] == 0 AND $evb[dwp] == 0 AND $evb[dlmill] == 0)	{
-				$evb[farm] = $evb[farm] - 1;
+			if($evb['farm'] > 0 AND $lgain > $ltally AND $evb['aland'] == 0 AND $evb['dhome'] == 0 AND $evb['dbarrack'] == 0 AND $evb['dfarm'] == 0 AND $evb['dwp'] == 0 AND $evb['dlmill'] == 0)	{
+				$evb['farm'] = $evb['farm'] - 1;
 				$ltally = $ltally + 1;
 			}
-			if($evb[wp] > 0 AND $lgain > $ltally AND $evb[aland] == 0 AND $evb[dhome] == 0 AND $evb[dbarrack] == 0 AND $evb[dfarm] == 0 AND $evb[dwp] == 0 AND $evb[dlmill] == 0)	{
-				$evb[wp] = $evb[wp] - 1;
+			if($evb['wp'] > 0 AND $lgain > $ltally AND $evb['aland'] == 0 AND $evb['dhome'] == 0 AND $evb['dbarrack'] == 0 AND $evb['dfarm'] == 0 AND $evb['dwp'] == 0 AND $evb['dlmill'] == 0)	{
+				$evb['wp'] = $evb['wp'] - 1;
 				$ltally = $ltally + 1;
 			}
-			if($evb[lmill] > 0 AND $lgain > $ltally AND $evb[aland] == 0 AND $evb[dhome] == 0 AND $evb[dbarrack] == 0 AND $evb[dfarm] == 0 AND $evb[dwp] == 0 AND $evb[dlmill] == 0)	{
-				$evb[lmill] = $evb[lmill] - 1;
+			if($evb['lmill'] > 0 AND $lgain > $ltally AND $evb['aland'] == 0 AND $evb['dhome'] == 0 AND $evb['dbarrack'] == 0 AND $evb['dfarm'] == 0 AND $evb['dwp'] == 0 AND $evb['dlmill'] == 0)	{
+				$evb['lmill'] = $evb['lmill'] - 1;
 				$ltally = $ltally + 1;
 			}
 	}
 	
-	mysql_query("UPDATE user SET land = land + $landgain WHERE email='$email' AND pw='$pw'");
-	mysql_query("UPDATE buildings SET aland = aland + $landgain WHERE email='$email' AND pw='$pw'");
+	mysqli_query($db, "UPDATE user SET land = land + $landgain WHERE email='$email' AND pw='$pw'");
+	mysqli_query($db, "UPDATE buildings SET aland = aland + $landgain WHERE email='$email' AND pw='$pw'");
 										
-	mysql_query("UPDATE user SET land = land - $landgain WHERE userid = '$empvalue'");
-	mysql_query("UPDATE buildings SET home=$evb[home], barrack=$evb[barrack], farm=$evb[farm], wp=$evb[wp], lmill=$evb[lmill], dhome=$evb[dhome], dbarrack=$evb[dbarrack], dfarm=$evb[dfarm], dwp=$evb[dwp], dlmill=$evb[dlmill], aland=$evb[aland] WHERE userid = '$empvalue'");
+	mysqli_query($db, "UPDATE user SET land = land - $landgain WHERE userid = '$empvalue'");
+	mysqli_query($db, "UPDATE buildings SET home=$evb[home], barrack=$evb[barrack], farm=$evb[farm], wp=$evb[wp], lmill=$evb[lmill], dhome=$evb[dhome], dbarrack=$evb[dbarrack], dfarm=$evb[dfarm], dwp=$evb[dwp], dlmill=$evb[dlmill], aland=$evb[aland] WHERE userid = '$empvalue'");
 	 		
-	if($landgain >= 10 AND $evu[land] - $landgain >= 1)	{
+	if($landgain >= 10 AND $evu['land'] - $landgain >= 1)	{
 		$sid + $msid + 1;
-		mysql_query("INSERT INTO setnews (date, news, setid, sid)	VALUES	('$clock', '<font class=yellow>$ename ($setid) successfully attacked $evu[ename] ($evu[setid]) and gained $landgain land</font>', '$setid', '$sid') ");
+		mysqli_query($db, "INSERT INTO setnews (date, news, setid, sid)	VALUES	('$clock', '<font class=yellow>$ename ($setid) successfully attacked $evu[ename] ($evu[setid]) and gained $landgain land</font>', '$setid', '$sid') ");
 									
 		if($gid[0] != "")	{
 			$gnid = $mgnid + 1;
-			mysql_query("INSERT INTO guildnews (date, news, gid, gnid)	VALUES	('$clock', '<font class=yellow>$ename ($setid) successfully attacked $evu[ename] ($evu[setid]) and gained $landgain land</font>', '$gid[0]', '$gnid') ");
+			mysqli_query($db, "INSERT INTO guildnews (date, news, gid, gnid)	VALUES	('$clock', '<font class=yellow>$ename ($setid) successfully attacked $evu[ename] ($evu[setid]) and gained $landgain land</font>', '$gid[0]', '$gnid') ");
 		}
 		
 		$sid = $msid + 2;
-		mysql_query("INSERT INTO setnews (date, news, setid, sid)	VALUES	('$clock', '<font class=lg>$evu[ename] ($evu[setid]) lost $landgain land to $ename ($setid)</font>', '$evu[setid]', '$sid') ");
+		mysqli_query($db, "INSERT INTO setnews (date, news, setid, sid)	VALUES	('$clock', '<font class=lg>$evu[ename] ($evu[setid]) lost $landgain land to $ename ($setid)</font>', '$evu[setid]', '$sid') ");
 												
 		if($tgid[0] != "")	{
 			$gnid = $mgnid + 2;
-			mysql_query("INSERT INTO guildnews (date, news, gid, gnid)	VALUES	('$clock', '<font class=lg>$evu[ename] ($evu[setid]) lost $landgain land to $ename ($setid)</font>', '$tgid[0]', '$gnid') ");
+			mysqli_query($db, "INSERT INTO guildnews (date, news, gid, gnid)	VALUES	('$clock', '<font class=lg>$evu[ename] ($evu[setid]) lost $landgain land to $ename ($setid)</font>', '$tgid[0]', '$gnid') ");
 		}
 	}
-	if($evu[land] - $landgain <= 0)	{
+	if($evu['land'] - $landgain <= 0)	{
 		$sid = $msid + 1;
-		mysql_query("INSERT INTO setnews (date, news, setid, sid)	VALUES	('$clock', '<font class=yellow>$ename ($setid) gained $landgain land and destroyed $evu[ename] ($evu[setid]) <i>Medieval style</i></font>', '$setid', '$sid') ");
+		mysqli_query($db, "INSERT INTO setnews (date, news, setid, sid)	VALUES	('$clock', '<font class=yellow>$ename ($setid) gained $landgain land and destroyed $evu[ename] ($evu[setid]) <i>Medieval style</i></font>', '$setid', '$sid') ");
 												
 		if($gid[0] != "")	{
 			$gnid = $mgnid + 1;
-			mysql_query("INSERT INTO guildnews (date, news, gid, gnid)	VALUES	('$clock', '<font class=yellow>$ename ($setid) gained $landgain land and destroyed $evu[ename] ($evu[setid]) <i>Medieval style</i></font>', '$gid[0]', '$gnid') ");
+			mysqli_query($db, "INSERT INTO guildnews (date, news, gid, gnid)	VALUES	('$clock', '<font class=yellow>$ename ($setid) gained $landgain land and destroyed $evu[ename] ($evu[setid]) <i>Medieval style</i></font>', '$gid[0]', '$gnid') ");
 		}
 		$sid = $msid + 2;
-		mysql_query("INSERT INTO setnews (date, news, setid, sid)	VALUES	('$clock', '<font class=lg>$evu[ename] ($evu[setid]) was destroyed by $ename ($setid) <i>Medieval style</i></font>', '$evu[setid]', '$sid') ");
+		mysqli_query($db, "INSERT INTO setnews (date, news, setid, sid)	VALUES	('$clock', '<font class=lg>$evu[ename] ($evu[setid]) was destroyed by $ename ($setid) <i>Medieval style</i></font>', '$evu[setid]', '$sid') ");
 												
 		if($tgid[0] != "")	{
 			$gnid = $mgnid + 2;
-			mysql_query("INSERT INTO guildnews (date, news, gid, gnid)	VALUES	('$clock', '<font class=lg>$evu[ename] ($evu[setid]) was destroyed by $ename ($setid) <i>Medieval style</i></font>', '$tgid[0]', '$gnid') ");
+			mysqli_query($db, "INSERT INTO guildnews (date, news, gid, gnid)	VALUES	('$clock', '<font class=lg>$evu[ename] ($evu[setid]) was destroyed by $ename ($setid) <i>Medieval style</i></font>', '$tgid[0]', '$gnid') ");
 		}
 	}
-	if($landgain >= 10 AND $evu[land] - $landgain >= 1)	{
+	if($landgain >= 10 AND $evu['land'] - $landgain >= 1)	{
 		echo"<div align=center><font class=yellow>You have conquered $landgain land from $evu[ename]($evu[setid])!</font><br><br><font class=orange>$your_losses<br><br></font>";
 					
-		mysql_query("UPDATE user SET nno = nno + 1 WHERE userid='$empvalue'");				
-		mysql_query("INSERT INTO empnews (date, news, yourid)	VALUES	('$clock', '<font class=yellow>We have unsuccessfully defended our empire against $ename ($setid) and lost $landgain land</font>' , '$empvalue') ");
+		mysqli_query($db, "UPDATE user SET nno = nno + 1 WHERE userid='$empvalue'");				
+		mysqli_query($db, "INSERT INTO empnews (date, news, yourid)	VALUES	('$clock', '<font class=yellow>We have unsuccessfully defended our empire against $ename ($setid) and lost $landgain land</font>' , '$empvalue') ");
 		include("include/attack/ldrop.php");
 		include("include/attack/table.php");
 	}
-	if($evu[land] - $landgain <= 0)	{
+	if($evu['land'] - $landgain <= 0)	{
 		echo"<div align=center><font class=yellow>You have gained $landgain land and destroyed $evu[ename]($evu[setid]) Medieval Style!</font><br><br><font class=orange>$your_losses<br><br></font>";
 		include("include/attack/ldrop.php");
 		include("include/attack/table.php");
 	}
-	if($evu[land] - $landgain == 0)	{	
+	if($evu['land'] - $landgain == 0)	{	
 		include("include/connect.php");
 		
-		$no_members = mysql_db_query($dbnam, "SELECT members FROM settlement WHERE setid ='$evu[setid]'");
-			$mem_no = mysql_result($no_members,"mem_no");
+		$no_members = mysqli_query($db, "SELECT members FROM settlement WHERE setid ='$evu[setid]'");
+			$mem_no = mb_db_result($no_members,"mem_no");
 
-		mysql_query("UPDATE settlement SET members = members - 1 WHERE setid='$evu[setid]'");
+		mysqli_query($db, "UPDATE settlement SET members = members - 1 WHERE setid='$evu[setid]'");
 
 		$subject = "Account destroyed";
 		$body = "You have been destroyed by $ename.  If there is any spots open, you are welcome to signup again.";
@@ -281,29 +281,29 @@ else	{
 		$mailsend = mail("$evu[email]","$subject","$body","$from");
 		
 		// check votefor
-		$V_result = mysql_db_query($dbnam, "SELECT votefor FROM user WHERE userid='$empvalue'");
-		$V_check = mysql_fetch_array($V_result);
+		$V_result = mysqli_query($db, "SELECT votefor FROM user WHERE userid='$empvalue'");
+		$V_check = mysqli_fetch_array($V_result);
 		
-		if($V_check[0] != None)	{	mysql_query("UPDATE user SET vote=vote-1 WHERE ename='$V_check'");	}
+		if($V_check[0] != 'None')	{	mysqli_query($db, "UPDATE user SET vote=vote-1 WHERE ename='$V_check'");	}
 
-		$gresult = mysql_query("SELECT * FROM guild WHERE owner='$evu[userid]'");
-		$guild = mysql_fetch_array($gresult);
+		$gresult = mysqli_query($db, "SELECT * FROM guild WHERE owner='$evu[userid]'");
+		$guild = mysqli_fetch_array($gresult);
 
-		if($guild[owner] == $evu[userid])	{
-				$gresult1 = mysql_db_query($dbnam, "SELECT * FROM guild WHERE owner='$evu[userid]'");
-				$setno = mysql_fetch_array($gresult1);
+		if($guild['owner'] == $evu['userid'])	{
+				$gresult1 = mysqli_query($db, "SELECT * FROM guild WHERE owner='$evu[userid]'");
+				$setno = mysqli_fetch_array($gresult1);
 
-				mysql_query("UPDATE user SET guild='None' WHERE guild='$guild[gname]'");
-				mysql_query("DELETE FROM guild WHERE owner='$evu[userid]'");
+				mysqli_query($db, "UPDATE user SET guild='None' WHERE guild='$guild[gname]'");
+				mysqli_query($db, "DELETE FROM guild WHERE owner='$evu[userid]'");
 		}
 		
-		mysql_query("DELETE FROM user WHERE userid='$empvalue'");
-		mysql_query("DELETE FROM militaryWHERE userid='$empvalue'");
-		mysql_query("DELETE FROM buildings WHERE userid='$empvalue'");
-		mysql_query("DELETE FROM research WHERE userid='$empvalue'");
-		mysql_query("DELETE FROM returntbl WHERE userid='$empvalue'");
-		mysql_query("DELETE FROM explore WHERE userid='$empvalue'"); 
-		mysql_query("UPDATE user SET votefor='None' WHERE votefor='$evu[ename]'");
+		mysqli_query($db, "DELETE FROM user WHERE userid='$empvalue'");
+		mysqli_query($db, "DELETE FROM militaryWHERE userid='$empvalue'");
+		mysqli_query($db, "DELETE FROM buildings WHERE userid='$empvalue'");
+		mysqli_query($db, "DELETE FROM research WHERE userid='$empvalue'");
+		mysqli_query($db, "DELETE FROM returntbl WHERE userid='$empvalue'");
+		mysqli_query($db, "DELETE FROM explore WHERE userid='$empvalue'"); 
+		mysqli_query($db, "UPDATE user SET votefor='None' WHERE votefor='$evu[ename]'");
 	}
 }
 }

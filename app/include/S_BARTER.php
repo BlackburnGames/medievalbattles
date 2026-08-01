@@ -15,18 +15,18 @@ echo "
 			<td class=main2 width=20%><b class=reg>Barter</b></td>";
 
 $query_string = "SELECT seller, type, amount, method, cost, barterid, userid FROM barter WHERE page != 'guild' ORDER BY type ASC";
-$result_id = mysql_query($query_string, $var);
-while ($row = mysql_fetch_row($result_id))	{
+$result_id = mysqli_query($db, $query_string);
+while ($row = mysqli_fetch_row($result_id))	{
 
-	$result = mysql_db_query($dbnam, "SELECT setid FROM user WHERE userid='$row[6]'");
-	$s_sel = mysql_fetch_array($result);
+	$result = mysqli_query($db, "SELECT setid FROM user WHERE userid='$row[6]'");
+	$s_sel = mysqli_fetch_array($result);
 		$s_sel = $s_sel[0];
-		if($s_sel == "")	 {	mysql_query("DELETE FROM barter WHERE userid='$row[6]'");	}
+		if($s_sel == "")	 {	mysqli_query($db, "DELETE FROM barter WHERE userid='$row[6]'");	}
 
 	if($row[0] == $ename)	{	$endnow = "<br><a href=barter.php?end=true&bid=$row[5]>End</a>";	}
 	else	{	$endnow = "";	}
 
-	if($row[3] == gp)	 {	$row[3] = "Gold";	}
+	if($row[3] == 'gp')	 {	$row[3] = "Gold";	}
 	else	{	$row[3] = "Iron";	}
 	
 	$row[2] = number_format($row[2]);

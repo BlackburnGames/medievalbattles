@@ -20,14 +20,14 @@ echo "
 		<td class='main2'><b class='reg' width='15%'>Strength</b></td>";
 
 	$query_string = "SELECT gname, mem, strength FROM guild ORDER BY strength DESC LIMIT 0,10";
-	$result_id = mysql_query($query_string, $var);
-	while ($row = mysql_fetch_row($result_id))	{
+	$result_id = mysqli_query($db, $query_string);
+	while ($row = mysqli_fetch_row($result_id))	{
 
 		$placeno = $placeno + 1;
 		$row[2] = number_format($row[2]);
 		
-		$guild_mem_query = mysql_db_query($dbnam, "SELECT count(ename) FROM user WHERE guild='$row[0]'");
-			$guildmem = mysql_result($guild_mem_query, "guildmem");
+		$guild_mem_query = mysqli_query($db, "SELECT count(ename) FROM user WHERE guild='$row[0]'");
+			$guildmem = mb_db_result($guild_mem_query, "guildmem");
 
 echo "
 	<tr align='center' valign='top' colspan='7'>

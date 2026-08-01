@@ -5,7 +5,7 @@ include("include/connect.php");
 $email = $_SESSION['email'];
 $pw = $_SESSION['pw'];
 
-mysql_query("UPDATE user SET online='0' WHERE email='$email' AND pw='$pw'");
+mysqli_query($db, "UPDATE user SET online='0' WHERE email='$email' AND pw='$pw'");
 
 unset($_SESSION['email']);
 unset($_SESSION['pw']);

@@ -15,9 +15,9 @@ $color1 = "#303030";
 $color2 = "#460101";
 $color3 = "#303030";
 $tablewidth= "80%";
-	$guild_id_query = mysql_db_query($dbnam, "SELECT gid FROM guild WHERE gname='$empireguild'");	
-		$gid = mysql_result($guild_id_query, "gid");
-$empireguild = ereg_replace(" ", "", "$empireguild");
+	$guild_id_query = mysqli_query($db, "SELECT gid FROM guild WHERE gname='$empireguild'");	
+		$gid = mb_db_result($guild_id_query, "gid");
+$empireguild = str_replace(" ", "", $empireguild);
 $topicdb = "$empireguild" . "main" . "$gid";
 $msgsdb = "$empireguild" . "msgs" . "$gid";
 ?>

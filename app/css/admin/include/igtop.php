@@ -5,7 +5,7 @@ session_register('email');
 session_register('pw');
 
 function callback($buffer) {
-	return (ereg_replace("nothing", "nothing", $buffer));
+	return ($buffer);
 }
 
 ob_start("callback");

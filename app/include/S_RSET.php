@@ -125,8 +125,8 @@
     <td class=inner align=center><?php echo"$max_war"; ?></td>
       <td class=inner2><center><input type="number" name="uwarrior" size=8></center></td>
 <?php
-if($race != Giant)  {
-  if(($class != Ranger) AND ($class != Insurrectionist))  {
+if($race != 'Giant')  {
+  if(($class != 'Ranger') AND ($class != 'Insurrectionist'))  {
     echo"
   <tr>
       <td class=inner2><b class=reg>Wizard</b></td>
@@ -137,7 +137,7 @@ if($race != Giant)  {
       <td class=inner align=center>$max_wiz</td>
       <td class=inner2><center><input type=number name=uwizard size=8></center></td>";
   }
-  if($race != Demon)  {
+  if($race != 'Demon')  {
   echo"
   <tr>
       <td class=inner2><b class=reg>Priest</b></td>
@@ -150,7 +150,7 @@ if($race != Giant)  {
   }
 }
 
-if($res[r13pts] >= 125000)   {
+if($res['r13pts'] >= 125000)   {
   echo"
   <tr>
       <td class=inner2><b class=reg>Archer</b></td>
@@ -163,7 +163,7 @@ if($res[r13pts] >= 125000)   {
 </table>";
 }
 
-if(($res[r13pts] >= 125000) OR ($res[r14pts] >= 125000))   {
+if(($res['r13pts'] >= 125000) OR ($res['r14pts'] >= 125000))   {
   echo "
 <table border=0 bordercolor=#808080 align=center width=85%>
   <tr>
@@ -178,7 +178,7 @@ if(($res[r13pts] >= 125000) OR ($res[r14pts] >= 125000))   {
       <td class=main2><b class=reg>Amount</b></td>";
 }
 
-if($res[r13pts] >= 125000)   {
+if($res['r13pts'] >= 125000)   {
   echo "
   <tr>
       <td class=inner2><b class=reg>Catapult</b></td>
@@ -191,7 +191,7 @@ if($res[r13pts] >= 125000)   {
     <td class=inner align=center>$max_catapult</td>
     <td class=inner2><center><input type=number name=ucatapult size=8></center></td>";
 }
-if($res[r14pts] >= 125000)   {
+if($res['r14pts'] >= 125000)   {
     echo "
   <tr>
       <td class=inner align=center><b class=reg>Suicide Civilian</b></td>

@@ -7,7 +7,7 @@ if(!IsSet($empnews))	{
 else	{	
 	
 	echo "<div align=center><font class=yellow>Your Empire News has been deleted</a><br>";
-	mysql_query("DELETE FROM empnews WHERE yourid='$userid'");
+	mysqli_query($db, "DELETE FROM empnews WHERE yourid='$userid'");
 	include("include/chngpw_table.php");
 	include("include/S_PREF.php");
 	include("include/S_PD.php");
@@ -39,12 +39,12 @@ else	{
 	// change their password
 	$newpw = htmlspecialchars($newpw);
 	$newpw = md5($newpw);
-	mysql_query("UPDATE user SET pw='$newpw' WHERE email='$email' AND pw='$pw'") or die(mysql_error('Error'));
-	mysql_query("UPDATE buildings SET pw='$newpw' WHERE email='$email' AND pw='$pw'") or die(mysql_error('Error'));
- 	mysql_query("UPDATE military SET pw='$newpw' WHERE email='$email' AND pw='$pw'") or die(mysql_error('Error'));
- 	mysql_query("UPDATE research SET pw='$newpw' WHERE email='$email' AND pw='$pw'") or die(mysql_error('Error'));
- 	mysql_query("UPDATE returntbl SET pw='$newpw' WHERE email='$email' AND pw='$pw'") or die(mysql_error('Error'));
- 	mysql_query("UPDATE explore SET pw='$newpw' WHERE email='$email' AND pw='$pw'") or die(mysql_error('Error'));
+	mysqli_query($db, "UPDATE user SET pw='$newpw' WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
+	mysqli_query($db, "UPDATE buildings SET pw='$newpw' WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
+ 	mysqli_query($db, "UPDATE military SET pw='$newpw' WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
+ 	mysqli_query($db, "UPDATE research SET pw='$newpw' WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
+ 	mysqli_query($db, "UPDATE returntbl SET pw='$newpw' WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
+ 	mysqli_query($db, "UPDATE explore SET pw='$newpw' WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
 	session_unregister('pw');
 	$pw = $newpw;
 	session_register('pw');
@@ -63,8 +63,8 @@ else	{
 			
 	$cnewemail = strtolower($newemail);
 		
-	$E_Result = mysql_query("SELECT email FROM user WHERE email='$cnewemail'");
-	$New_Email = mysql_fetch_array($E_Result);
+	$E_Result = mysqli_query($db, "SELECT email FROM user WHERE email='$cnewemail'");
+	$New_Email = mysqli_fetch_array($E_Result);
 
 	$New_Email[0] = strtolower($New_Email[0]);
 
@@ -78,19 +78,19 @@ else	{
 	
 	// update email
 	$newemail = htmlspecialchars($newemail);
-	mysql_query("UPDATE user SET email='$newemail' WHERE email='$email' AND pw='$pw'") or die(mysql_error('Error'));
-	mysql_query("UPDATE buildings SET email='$newemail' WHERE email='$email' AND pw='$pw'") or die(mysql_error('Error'));
- 	mysql_query("UPDATE military SET email='$newemail' WHERE email='$email' AND pw='$pw'") or die(mysql_error('Error'));
- 	mysql_query("UPDATE research SET email='$newemail' WHERE email='$email' AND pw='$pw'") or die(mysql_error('Error'));
- 	mysql_query("UPDATE returntbl SET email='$newemail' WHERE email='$email' AND pw='$pw'") or die(mysql_error('Error'));
- 	mysql_query("UPDATE explore SET email='$newemail' WHERE email='$email' AND pw='$pw'") or die(mysql_error('Error'));
+	mysqli_query($db, "UPDATE user SET email='$newemail' WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
+	mysqli_query($db, "UPDATE buildings SET email='$newemail' WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
+ 	mysqli_query($db, "UPDATE military SET email='$newemail' WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
+ 	mysqli_query($db, "UPDATE research SET email='$newemail' WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
+ 	mysqli_query($db, "UPDATE returntbl SET email='$newemail' WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
+ 	mysqli_query($db, "UPDATE explore SET email='$newemail' WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
 	session_unregister('email');
 	$email = $newemail;
 	session_register('email');
 			
 	// update aim and msn
-	mysql_query("UPDATE user SET aim='$newaim' WHERE email='$email' AND pw='$pw'");
-	mysql_query("UPDATE user SET msn='$newmsn' WHERE email='$email' AND pw='$pw'");
+	mysqli_query($db, "UPDATE user SET aim='$newaim' WHERE email='$email' AND pw='$pw'");
+	mysqli_query($db, "UPDATE user SET msn='$newmsn' WHERE email='$email' AND pw='$pw'");
 		
 	$email = $newemail;
 	$msn = $newmsn;
@@ -124,18 +124,18 @@ else	{
 	}
 	else	{
 		
-		mysql_query("INSERT INTO setnews (date, news, setid)	 VALUES	('$clock', '<font class=red>$ename has deleted their account</font>', '$setid') ");
+		mysqli_query($db, "INSERT INTO setnews (date, news, setid)	 VALUES	('$clock', '<font class=red>$ename has deleted their account</font>', '$setid') ");
 	  
 		// check who they are voting for
-		$V_result = mysql_query("SELECT votefor FROM user WHERE userid='$empvalue'");
-		$V_check = mysql_fetch_array($V_result);
+		$V_result = mysqli_query($db, "SELECT votefor FROM user WHERE userid='$empvalue'");
+		$V_check = mysqli_fetch_array($V_result);
 		
-		if($V_check[0] != None AND $V_check[0] != $empireattacked)	 {
-			$Votedfor_emp = mysql_db_query($dbnam, "SELECT vote FROM user WHERE ename='$VF_emp'");
-			$VF_emp = mysql_result($Votedfor_emp,"VF_emp");
+		if($V_check[0] != 'None' AND $V_check[0] != $empireattacked)	 {
+			$Votedfor_emp = mysqli_query($db, "SELECT vote FROM user WHERE ename='$VF_emp'");
+			$VF_emp = mb_db_result($Votedfor_emp,"VF_emp");
 				
 			$newvote = $VF_emp - 1;
-			mysql_query("UPDATE user SET vote='$newvote' WHERE ename='$empireattacked'");
+			mysqli_query($db, "UPDATE user SET vote='$newvote' WHERE ename='$empireattacked'");
 			}
 
 	  	echo "<div align=center><font class=yellow>Your account has been deleted.</font></div>";
@@ -149,32 +149,32 @@ else	{
 
 
 		// check user
-		$gresult = mysql_db_query($dbnam, "SELECT owner FROM guild WHERE owner=$userid");
-		$guildcheck = mysql_fetch_array($gresult);
+		$gresult = mysqli_query($db, "SELECT owner FROM guild WHERE owner=$userid");
+		$guildcheck = mysqli_fetch_array($gresult);
 		
 		if($guildcheck[0] == $userid)	{
 			//	select guild name
-				$guild_info_query = mysql_db_query($dbnam, "SELECT * FROM guild WHERE owner='$ename'");
-				$guild_info = mysql_fetch_array($guild_info_query);
+				$guild_info_query = mysqli_query($db, "SELECT * FROM guild WHERE owner='$ename'");
+				$guild_info = mysqli_fetch_array($guild_info_query);
 		
-			mysql_query("UPDATE user SET guild='None' WHERE guild='$guild_info[gname]'");
-			mysql_query("DELETE FROM guildrequest WHERE gl_userid='$userid'");
+			mysqli_query($db, "UPDATE user SET guild='None' WHERE guild='$guild_info[gname]'");
+			mysqli_query($db, "DELETE FROM guildrequest WHERE gl_userid='$userid'");
 				
 			$tblname = "$GN" . "main" ."$GIDD";
 			$tblname2 = "$GN" . "msgs" . "$GIDD";	
 
-			mysql_query("DELETE FROM guild WHERE owner='$userid'");
-			mysql_query("DROP TABLE $tblname");
-			mysql_query("DROP TABLE $tblname2");
+			mysqli_query($db, "DELETE FROM guild WHERE owner='$userid'");
+			mysqli_query($db, "DROP TABLE $tblname");
+			mysqli_query($db, "DROP TABLE $tblname2");
 		}
 	
-		mysql_query("DELETE FROM user WHERE email='$email' AND pw='$pw'"); 
-		mysql_query("DELETE FROM military WHERE email='$email' AND pw='$pw'");
-		mysql_query("DELETE FROM buildings WHERE email='$email' AND pw='$pw'");
-		mysql_query("DELETE FROM research WHERE email='$email' AND pw='$pw'");
-		mysql_query("DELETE FROM returntbl WHERE email='$email' AND pw='$pw'");
-		mysql_query("DELETE FROM explore WHERE email='$email' AND pw='$pw'");
-		mysql_query("UPDATE user SET votefor='None' WHERE votefor='$ename'");
+		mysqli_query($db, "DELETE FROM user WHERE email='$email' AND pw='$pw'"); 
+		mysqli_query($db, "DELETE FROM military WHERE email='$email' AND pw='$pw'");
+		mysqli_query($db, "DELETE FROM buildings WHERE email='$email' AND pw='$pw'");
+		mysqli_query($db, "DELETE FROM research WHERE email='$email' AND pw='$pw'");
+		mysqli_query($db, "DELETE FROM returntbl WHERE email='$email' AND pw='$pw'");
+		mysqli_query($db, "DELETE FROM explore WHERE email='$email' AND pw='$pw'");
+		mysqli_query($db, "UPDATE user SET votefor='None' WHERE votefor='$ename'");
 		
 		session_unregister('login');
 		session_unregister('email');

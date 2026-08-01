@@ -6,15 +6,15 @@ session_register('pw');
 
 function callback($buffer) 
 {
-	return (ereg_replace("nothing", "nothing", $buffer));
+	return ($buffer);
 }
 
 ob_start("callback");
 
 include("functions.php");
 
-$version_query = mysql_db_query($dbnam, "SELECT version FROM game_info");
-	$version = mysql_result($version_query, "version");
+$version_query = mysqli_query($db, "SELECT version FROM game_info");
+	$version = mb_db_result($version_query, "version");
 ?>
 <html>
 <head> 
@@ -57,9 +57,9 @@ if($safemode > 0)	{
 } 
 
 // are ticks running?
-	$tickk = mysql_db_query($dbnam, "SELECT tick FROM game_info");
-		$tick = mysql_result($tickk, "tick");
-if($tick == yes)		{	
+	$tickk = mysqli_query($db, "SELECT tick FROM game_info");
+		$tick = mb_db_result($tickk, "tick");
+if($tick == 'yes')		{	
 	echo"<font class=yellow size=4px><center><br>Tick in progress.</center>";	 
 	die();	
 }
