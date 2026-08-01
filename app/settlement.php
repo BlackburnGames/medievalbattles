@@ -36,7 +36,7 @@ if (!IsSet($change))	{
 else	{
 
 	if($snum < 1 || $snum > $maxset)	 {
-		echo"<center>Settlement $snum does not exist.</center>";
+		echo"<center>Settlement " . mb_h($snum) . " does not exist.</center>";
 		die();
 	}
 

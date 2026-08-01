@@ -10,13 +10,13 @@ $snum   = mb_input('snum');
 if($setchg == 1)	{
 
 	if($snum > 30 OR $snum <= 0)	{
-		echo "<font class=yellow><div align=center>Settlement $snum does not exist.</font></div><br><br>";
+		echo "<font class=yellow><div align=center>Settlement " . mb_h($snum) . " does not exist.</font></div><br><br>";
 		die();
 	}
 
 	mysqli_query($db, "UPDATE user SET csnum=" . mb_sql_int($snum) . " WHERE email='$email' AND pw='$pw'");
 	echo "
-		<font class='inner2'>You are viewing Settlement $snum</font><br><br>
+		<font class='inner2'>You are viewing Settlement " . mb_h($snum) . "</font><br><br>
 		<select name='empvalue'>
 			<option selected value='ns'>-Select an Empire-</option>";
 

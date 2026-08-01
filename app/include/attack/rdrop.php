@@ -14,14 +14,14 @@ if($setchg == 1)	{
 		$maxset = mb_db_result($maxset0,"maxset");
 
 	if($snum > $maxset OR $snum <= 0)	{
-		echo"<font class=yellow><div align=center>Settlement $snum does not exist.</font></div><br><br>";
+		echo"<font class=yellow><div align=center>Settlement " . mb_h($snum) . " does not exist.</font></div><br><br>";
 		die();
 	}
 
 	mysqli_query($db, "UPDATE user SET csnum =" . mb_sql_int($snum) . " WHERE email='$email' AND pw='$pw'");
 
 	echo "
-		<font class=inner2>You are viewing Settlement $snum</font><br><br>
+		<font class=inner2>You are viewing Settlement " . mb_h($snum) . "</font><br><br>
 		<select name=empvalue>
 			<option selected value=ns>-Resource Attack-</option>";
 

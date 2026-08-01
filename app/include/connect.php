@@ -22,6 +22,15 @@
 require_once __DIR__ . '/db.php';
 
 /**
+ * And html.php rides along for the same reason, at the other end of the request.
+ *
+ * It has nothing to do with the connection. It is here because this is the one
+ * file every rendering path already reaches, and a page that echoes a value it
+ * read out of the database is a page that ran a query.
+ */
+require_once __DIR__ . '/html.php';
+
+/**
  * Query errors are reported again, as of Phase 3.
  *
  * PHP 8.1 made mysqli throw on error instead of returning false. Phase 2 turned

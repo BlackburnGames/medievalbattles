@@ -17,7 +17,7 @@ echo "
 <div align=center>
 <table border=0 width=300 align=center>
   <tr>
-    <td width=20% align=center colspan=2><b><font class=red>Name:</font></b> $settlename <font class=red>[</font>$N_NUM<font class=red>]</font></td>";
+    <td width=20% align=center colspan=2><b><font class=red>Name:</font></b> $settlename <font class=red>[</font>" . mb_h($N_NUM) . "<font class=red>]</font></td>";
 if($settlepic != "")  {
   echo "<tr>
     <td colspan=2><img src=$settlepic width=300 height=200></td>";
@@ -33,7 +33,7 @@ echo "
 
 <table border=1 bordercolor=#000000 align=center width=80% cellpadding = 0 cellspacing = 0>
   <tr>
-    <td class=main colspan=8><b class=reg>Settlement: $N_NUM</b></td>
+    <td class=main colspan=8><b class=reg>Settlement: " . mb_h($N_NUM) . "</b></td>
   <tr>
     <td class=main2 width=><b class=reg>Empire Name</b></td>
     <td class=main2 width=><b class=reg>Race</b></td>
@@ -78,7 +78,7 @@ while ($row = mysqli_fetch_row($result_id))  {
 
   echo "
   <tr align=center valign=top colspan=7>
-    <td bgcolor=$color><a href=messaging.php?send_to=$row[0]&snum=$N_NUM&setchg=1><font class=$yclass>$row[1]</a>$O_line</td>
+    <td bgcolor=$color><a href=" . mb_attr("messaging.php?send_to=$row[0]&snum=$N_NUM&setchg=1") . "><font class=$yclass>$row[1]</a>$O_line</td>
     <td bgcolor=$color><font class=$yclass>$row[2]</td>
     <td bgcolor=$color><font class=$yclass>$row[3]</td>
     <td bgcolor=$color><font class=$yclass>$row[4]</td>
