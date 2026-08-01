@@ -43,6 +43,37 @@ $MAX_PAGES        = 600;
 $MAX_MEMBER_PAGES = 120;
 
 /*
+ * The admin area, whose URL space is small and closed -- unlike the game's, a
+ * modest cap here is a real ceiling rather than a budget that always trips.
+ *
+ * The credential matches app/admin/include/auth.php's defaults, which
+ * docker-compose.yml passes through unchanged unless MB_ADMIN_USER and
+ * MB_ADMIN_PASSWORD are set in the environment.
+ */
+$MAX_ADMIN_PAGES = 40;
+$ADMIN_USER = getenv('MB_ADMIN_USER') ? getenv('MB_ADMIN_USER') : 'mako';
+$ADMIN_PASS = getenv('MB_ADMIN_PASSWORD') ? getenv('MB_ADMIN_PASSWORD') : 'quickshot';
+
+// Every entry point, including the two that nothing links to. A page added to
+// app/admin/ and left off this list is a page whose gate is never checked, so
+// the coverage report at the end of the run flags one that is missing.
+$ADMIN_PAGES = array(
+    'admin/main.php',
+    'admin/gameconfig.php',
+    'admin/newgame.php',
+    'admin/dempire.php',
+    'admin/get_user_info.php',
+    'admin/dusers.php',
+    'admin/dusers_email.php',
+    'admin/dusers_ip.php',
+    'admin/dusers_suid.php',
+    'admin/dusers_curid.php',
+);
+
+// gameconfig.php's bulk actions, by the key its form submits.
+$MB_ADMIN_ACTIONS = array('messages', 'news', 'forums', 'guilds', 'settlements', 'accounts');
+
+/*
  * Baseline of warnings that already existed before the port began.
  *
  * The app cannot be made warning-clean in one step, but a permanently red
@@ -76,6 +107,14 @@ $SKIP = array(
     'gmembers.php?leave',
     'guildconfig.php?accept',
     'guildconfig.php?reject',
+    // Buying and cancelling are plain GET links off the barter listings, and
+    // both consume the fixture rows. Driven explicitly below instead, so which
+    // of them runs does not depend on where the crawler happened to run out of
+    // budget.
+    'barter.php?barter',
+    'barter.php?end',
+    'guildbarter.php?barter',
+    'guildbarter.php?end',
 );
 
 /*
@@ -145,7 +184,6 @@ $UNREACHABLE = array(
     'logout.php'           => 'skipped: ends the session the crawl depends on',
 
     // Dead in the shipped game, not merely uncovered.
-    'guildbarter.php'      => 'dead: barter.php dies at line 17, the barter system was switched off in 2003',
     'scoreboard.php'       => 'dead: orphaned, nothing links to it and index.php has its Scores link commented out',
     // Auth flow outside both crawl roots.
     'activate_account.php' => 'auth flow: needs a live activation code emailed by activate_code.php',
@@ -228,6 +266,45 @@ foreach (array(
     inspect($path, $body, $tester->lastStatus);
 }
 
+/*
+ * The two barter boards, which were switched off in 2003 and are back.
+ *
+ * Every path is driven by hand rather than followed: listing is a form, and
+ * buying and cancelling are GET links that consume the row they point at, so
+ * leaving them to the crawler would make the coverage depend on queue order.
+ * $SKIP keeps it off them.
+ *
+ * Before the crawl for the same reason the moderation handlers are -- buying
+ * needs gold and iron, and the crawl spends both on buildings and troops.
+ *
+ * Both arms of both boards: the seeded rows 1 and 2 are the buy path (you
+ * cannot buy your own, so they belong to other empires, and row 2's seller is
+ * a guild-mate because guildbarter.php refuses anyone else), row 3 is the
+ * tester's own and is the cancel path.
+ */
+// Sage on the guild board specifically: it is the type whose name the game
+// changed, and the only way to know the handler now writes military.sages
+// rather than the abandoned military.scientists is to sell one.
+foreach (array('barter.php' => 'Warrior', 'guildbarter.php' => 'Sage') as $board => $unit) {
+    postForm($tester, $board, array(
+        'add'    => '1',
+        'amount' => 1,
+        'type'   => $unit,
+        'cost'   => 100,
+        'method' => 'gp',
+    ));
+}
+foreach (array(
+    'barter.php?barter=1&bid=1',
+    'guildbarter.php?barter=1&bid=2',
+    'barter.php?end=true&bid=3',
+) as $path) {
+    $body = $tester->get('/' . $path);
+    $visited++;
+    $scriptsHit[strtok($path, '?')] = true;
+    inspect($path, $body, $tester->lastStatus);
+}
+
 crawl($tester, array('main.php?pageid=news'), $MAX_PAGES);
 
 /*
@@ -258,6 +335,171 @@ postForm($member, 'inputpostsg.php', array(
 ));
 crawl($member, array('main.php?pageid=news'), $MAX_MEMBER_PAGES);
 
+/*
+ * Changing the account's email address, on the member rather than the primary
+ * tester -- it rewrites six tables and the session, and every fixture the
+ * primary pass depends on is keyed on that address.
+ *
+ * This is the last entry that was on tests/sql-injection.txt. A player-chosen
+ * address is written here and then interpolated into every "WHERE
+ * email='$email'" in the game, so include/credentials.php now says what an
+ * address may be and signup, this page and include/session.php all enforce it.
+ * The refusal is the assertion that matters; the accepted case is here so the
+ * six UPDATEs and the session rewrite are still known to work.
+ */
+prefsEmailChange($member);
+
+/**
+ * Both arms of preferences.php's email change.
+ */
+function prefsEmailChange(MbClient $client)
+{
+    global $failures;
+
+    $hostile = "a'b@example.com";
+    $body = postForm($client, 'preferences.php', array(
+        'update'   => 'Update',
+        'newemail' => $hostile,
+        'newaim'   => 'aim',
+        'newmsn'   => 'msn',
+    ));
+    if (stripos($body, 'not a valid email address') === false) {
+        $failures['preferences.php | accepted an address containing a quote'] =
+            'app/include/credentials.php: mb_valid_email() is not being applied before the six UPDATEs';
+    }
+
+    $body = postForm($client, 'preferences.php', array(
+        'update'   => 'Update',
+        'newemail' => 'idle2@example.com',
+        'newaim'   => 'aim',
+        'newmsn'   => 'msn',
+    ));
+    if (stripos($body, 'settings have been updated') === false) {
+        $failures['preferences.php | rejected a valid address'] =
+            'the email change no longer completes';
+    }
+
+    // The session was rewritten to the new address by the handler. If
+    // include/session.php's validation disagreed with what preferences.php
+    // just wrote, the very next request would come back logged out -- which is
+    // the failure mode of putting a rule at a boundary and not at the writes.
+    $body = $client->get('/preferences.php');
+    if (stripos($body, 'idle2@example.com') === false) {
+        $failures['preferences.php | logged out after its own email change'] =
+            'include/session.php rejects what preferences.php stores';
+    }
+}
+
+/*
+ * The admin area, which no test has ever touched.
+ *
+ * It sat under app/css/admin/ with no authentication of any kind: adminlogin.php
+ * compared against a hardcoded pair and, on a match, printed a link. No session
+ * was written and nothing checked for one, so every page in it -- including the
+ * one that deletes every account -- served to anyone who typed the URL. It has
+ * a session gate now, and this is what says so.
+ *
+ * Two passes. The first asserts that a client with no admin session is refused
+ * by every entry point; without that arm the second pass would pass just as
+ * happily against no gate at all. The second logs in and crawls.
+ *
+ * DESTRUCTIVE, and last in the file for that reason: adminCrawl() drives
+ * gameconfig.php's bulk actions, which is the only way to find out whether
+ * statements naming thirty tables that do not exist actually run. The fixture
+ * is spent afterwards. Nothing below this point may depend on game state.
+ */
+adminGate($BASE, $ADMIN_PAGES);
+$admin = adminLogin($BASE, $ADMIN_USER, $ADMIN_PASS);
+// Confined to admin/. The navbar's links are relative -- href="main.php" from
+// a page served out of /admin/ -- and extractLinks() normalises every href to
+// a path from the docroot, so without this the admin pass walks straight out
+// into the game as a client with no player session.
+crawl($admin, array('admin/main.php'), $MAX_ADMIN_PAGES, 'admin/');
+adminActions($admin, $MB_ADMIN_ACTIONS);
+
+/**
+ * Every admin entry point must refuse a client that has not logged in.
+ *
+ * Checked before the login pass, and on a client that HAS a game session --
+ * being a logged-in player must not be enough to reach the admin area, and a
+ * gate keyed on the wrong session slot would look fine without this.
+ */
+function adminGate($base, array $pages)
+{
+    global $failures, $visited;
+
+    $stranger = new MbClient($base);
+    $player   = login($base, 'tester@example.com', 'test1234');
+
+    foreach (array('anonymous' => $stranger, 'logged-in player' => $player) as $who => $client) {
+        foreach ($pages as $path) {
+            $body = $client->get('/' . $path);
+            $visited++;
+
+            // 403 from the gate, or 302 from the two pages that redirect
+            // (index.php sends an authenticated caller on to main.php, and
+            // adminlogin.php redirects either way). Anything that renders is
+            // a page that served itself to someone who is not an admin.
+            if ($client->lastStatus !== 403 && $client->lastStatus !== 302) {
+                $failures["$path | reachable by $who (HTTP {$client->lastStatus})"] =
+                    'app/admin/include/auth.php: mb_admin_require() is not gating this page';
+                continue;
+            }
+            if (stripos($body, 'MB Administration') !== false) {
+                $failures["$path | rendered the admin header for $who"] =
+                    'the gate ran too late -- call mb_admin_require() before any output';
+            }
+        }
+    }
+}
+
+/**
+ * Log into the admin area, or fail the run.
+ */
+function adminLogin($base, $user, $pass)
+{
+    global $visited;
+
+    $client = new MbClient($base);
+    $client->post('/admin/adminlogin.php', array('username' => $user, 'pw' => $pass));
+    $visited++;
+
+    if ($client->lastStatus !== 302) {
+        fwrite(STDERR, "FATAL: admin login did not redirect (got HTTP {$client->lastStatus}).\n");
+        fwrite(STDERR, "MB_ADMIN_USER/MB_ADMIN_PASSWORD must match app/admin/include/auth.php's defaults.\n");
+        exit(2);
+    }
+
+    return $client;
+}
+
+/**
+ * Drive gameconfig.php's bulk actions, each of which empties a table.
+ *
+ * The point is the queries, not the buttons. Thirty of this page's statements
+ * named tables no other part of the schema has -- `setnews1`..`setnews10`,
+ * `setmain*`, `setmsgs*`, `return` -- so "delete all news" and "delete all
+ * forums" had never once done anything. mysqli reports a bad table as a
+ * warning now and inspect() fails on warnings, so running them is what says
+ * the spellings are right.
+ *
+ * Ordered so the account wipe is last: deleting one empire by name needs an
+ * empire to still be there.
+ */
+function adminActions(MbClient $admin, array $actions)
+{
+    postForm($admin, 'admin/gameconfig.php', array('daccount' => 'Delete', 'empre' => 'PoorSerf'));
+    postForm($admin, 'admin/gameconfig.php', array('daccount' => 'Delete', 'empre' => "No O'Brien here"));
+
+    foreach ($actions as $action) {
+        postForm($admin, 'admin/gameconfig.php', array('action' => $action));
+    }
+
+    // newgame.php takes no parameters and wipes the world on a bare GET, so it
+    // is left until everything else has run.
+    postForm($admin, 'admin/newgame.php', array());
+}
+
 /**
  * Authenticate a fresh client, or abort the run.
  */
@@ -285,7 +527,7 @@ function login($base, $email, $pass)
  * scripts-hit map and the failure list are global state on purpose, so the
  * report describes the whole run rather than one half of it.
  */
-function crawl(MbClient $client, array $seeds, $maxPages)
+function crawl(MbClient $client, array $seeds, $maxPages, $confineTo = '')
 {
     global $SKIP, $FAIL_PATTERN, $NOTICE_PATTERN, $SEVERITY_DEMOTED;
     global $QUERY_AUDIT, $QUERY_ERROR_PATTERN, $queryErrors;
@@ -316,6 +558,9 @@ function crawl(MbClient $client, array $seeds, $maxPages)
         inspect($path, $body, $client->lastStatus);
 
         foreach (extractLinks($body) as $link) {
+            if ($confineTo !== '' && strpos($link, $confineTo) !== 0) {
+                continue;
+            }
             if (isSkipped($link, $SKIP)) {
                 $skipped[$link] = true;
                 continue;
@@ -346,7 +591,11 @@ function inspect($path, $body, $status)
     global $baseline, $failures, $observed, $noticeCount;
 
     if ($status !== 200 && $status !== 302) {
-        $failures[] = array($path, "HTTP $status");
+        // Keyed like every other failure. It used to append array($path,
+        // "HTTP $status"), which the report at the bottom then tried to print
+        // as "$signature ... first seen at: $path" -- so the first time this
+        // ever fired it printed a row of "0 / first seen at: Array".
+        $failures["$path | HTTP $status"] = $path;
     }
 
     // Diagnostics must be matched against the stripped text, not the raw
@@ -538,7 +787,9 @@ foreach (glob(__DIR__ . '/../app/*.php') as $file) {
 }
 $unreached = array_diff_key($allScripts, $scriptsHit);
 
-echo "Scripts reached: " . count($scriptsHit) . " of " . count($allScripts) . " in app/\n";
+// Intersected, not counted raw: $scriptsHit also holds the admin/ paths, which
+// are not in app/*.php and were making this report "70 of 69".
+echo "Scripts reached: " . count(array_intersect_key($scriptsHit, $allScripts)) . " of " . count($allScripts) . " in app/\n";
 
 // Split the gap into "known and explained" and "new", because only the second
 // kind is actionable. An unreached script with no entry in $UNREACHABLE means
@@ -568,6 +819,28 @@ if ($stalePlea) {
 foreach (array_keys($newGaps) as $script) {
     $failures["$script | unreached with no entry in \$UNREACHABLE"] =
         'add it to the crawl, or record why it cannot be reached';
+}
+
+/*
+ * The admin area is counted separately, against $ADMIN_PAGES rather than
+ * against what the crawl happened to reach.
+ *
+ * $ADMIN_PAGES is the list adminGate() proves is refused to a stranger, so a
+ * page missing from it is a page whose gate nothing checks. index.php and
+ * adminlogin.php are the login pair and are deliberately outside it -- they
+ * are the two that must serve to someone who is not signed in yet.
+ */
+$adminScripts = array();
+foreach (glob(__DIR__ . '/../app/admin/*.php') as $file) {
+    $adminScripts['admin/' . basename($file)] = true;
+}
+unset($adminScripts['admin/index.php'], $adminScripts['admin/adminlogin.php']);
+
+$adminUngated = array_diff_key($adminScripts, array_flip($ADMIN_PAGES));
+echo "Admin pages behind a checked gate: " . count($ADMIN_PAGES) . " of " . count($adminScripts) . "\n";
+foreach (array_keys($adminUngated) as $script) {
+    $failures["$script | not in \$ADMIN_PAGES"] =
+        'nothing checks that this page refuses a caller without an admin session';
 }
 
 echo "Notices/deprecations (not failing): $noticeCount\n";

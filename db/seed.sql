@@ -18,6 +18,7 @@
 --
 -- Re-runnable: each load clears its own rows first.
 
+DELETE FROM `barter`        WHERE barterid IN (1, 2, 3);
 DELETE FROM `user`          WHERE userid IN (1, 2, 3);
 DELETE FROM `buildings`     WHERE userid IN (1, 2, 3);
 DELETE FROM `military`      WHERE userid IN (1, 2, 3);
@@ -50,11 +51,15 @@ INSERT INTO `military`
   (email, pw, civ, recruits, warriors, wizards, priests, maxciv, userid, warpower,
    warspeedw, cweapon, wizpower, wizspeeds, cspell, pripower, prispeedw, cstaff,
    cbow, archspeedw, archpower, wararmor, wizarmor, priarmor, wardef, wizdef,
-   pridef, warspeeda, wizspeeda, prispeeda, archers, suicide)
+-- `sages` on the primary tester, so the barter board can trade one. The unit
+-- is called a Sage everywhere current -- functions.php reads military.sages
+-- into $sages -- while `military.scientists` is what it was called before the
+-- rename and is now written by nothing.
+   pridef, warspeeda, wizspeeda, prispeeda, archers, suicide, sages)
 VALUES
-  ('tester@example.com', '16d7a4fca7442dda3ad93c9a726597e4', 1200, 200, 3, 3, 3, 200, 1, 2, 6, 'Dagger', 3, 4, 'Magic Missile', 2, 4, 'Quarterstaff', 'Bow', 4, 2, 'Studded Leather', 'Robe', 'Leather', 1, 1, 2, 0, 0, 1, 0, 0),
-  ('idle@example.com',   'c1572d05424d0ecb2a65ec6a82aeacbf', 1300, 250, 5, 0, 5, 300, 2, 2, 6, 'Dagger', 3, 4, 'Magic Missile', 2, 4, 'Quarterstaff', 'Bow', 4, 2, 'Studded Leather', 'Robe', 'Leather', 1, 1, 2, 0, 0, 1, 0, 0),
-  ('poor@example.com',   '3afc79b597f88a72528e864cf81856d2',    0,   0, 0, 0, 0, 100, 3, 2, 6, 'Dagger', 3, 4, 'Magic Missile', 2, 4, 'Quarterstaff', 'Bow', 4, 2, 'Studded Leather', 'Robe', 'Leather', 1, 1, 2, 0, 0, 1, 5, 0);
+  ('tester@example.com', '16d7a4fca7442dda3ad93c9a726597e4', 1200, 200, 3, 3, 3, 200, 1, 2, 6, 'Dagger', 3, 4, 'Magic Missile', 2, 4, 'Quarterstaff', 'Bow', 4, 2, 'Studded Leather', 'Robe', 'Leather', 1, 1, 2, 0, 0, 1, 0, 0, 8),
+  ('idle@example.com',   'c1572d05424d0ecb2a65ec6a82aeacbf', 1300, 250, 5, 0, 5, 300, 2, 2, 6, 'Dagger', 3, 4, 'Magic Missile', 2, 4, 'Quarterstaff', 'Bow', 4, 2, 'Studded Leather', 'Robe', 'Leather', 1, 1, 2, 0, 0, 1, 0, 0, 0),
+  ('poor@example.com',   '3afc79b597f88a72528e864cf81856d2',    0,   0, 0, 0, 0, 100, 3, 2, 6, 'Dagger', 3, 4, 'Magic Missile', 2, 4, 'Quarterstaff', 'Bow', 4, 2, 'Studded Leather', 'Robe', 'Leather', 1, 1, 2, 0, 0, 1, 5, 0, 0);
 
 -- r1/r15 are sages ASSIGNED to a project; r1pts/r15pts are the points they have
 -- accumulated. The primary tester has both kinds so the tick's research step is
@@ -142,6 +147,31 @@ INSERT INTO `guildmsgs` (messageid, name, host, topic, topicid, message, datesta
 DELETE FROM `messages` WHERE yourid = 1;
 INSERT INTO `messages` (origin, datesent, message, yourid, mid, age) VALUES
   ('IdleBaron', '1/1/03, 12:00am', 'Care to trade iron for gold?', 1, 1, 0);
+
+-- The barter boards.
+--
+-- `user.barterclock` counts down from 336 ticks -- a week -- and barter.php
+-- refuses to open until it is at or below 1. Left at the schema default the
+-- fixture could never reach either board, so the primary tester and the guild
+-- member start with it spent. PoorSerf keeps the default so the "your empire
+-- is too young" branch is still represented in the fixture.
+UPDATE `user` SET barterclock = 0   WHERE userid IN (1, 2);
+UPDATE `user` SET barterclock = 336 WHERE userid = 3;
+
+-- Three listings, one per path the crawl drives.
+--
+-- The tester buys 1 and 2, and cancels 3. Two sellers are needed because you
+-- cannot buy your own listing, and the guild row has to come from a guild-mate
+-- or guildbarter.php refuses it -- which is the check that was never reachable
+-- before, since include/guild_barter.php sent every Barter link to the open
+-- board instead.
+--
+-- barterid 1-3 are fixed so the crawl visits stable URLs; the add form derives
+-- the next id from max(barterid), so anything it posts lands at 4 and up.
+INSERT INTO `barter` (seller, cost, type, amount, barterid, userid, method, page, guild) VALUES
+  ('PoorSerf',  2000, 'Land',    10, 1, 3, 'gp',   '',      ''),
+  ('IdleBaron',  150, 'Recruit', 25, 2, 2, 'iron', 'guild', 'Testguild'),
+  ('TestLord',   500, 'Warrior',  1, 3, 1, 'gp',   '',      '');
 
 -- Settlements 1 and 2 now hold the seeded users.
 UPDATE `settlement` SET members = 2, setname = 'Testhold'  WHERE setid = 1;

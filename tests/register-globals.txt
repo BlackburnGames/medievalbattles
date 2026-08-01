@@ -24,16 +24,9 @@ app/attackr.php	evu
 app/attackr.php	tgid
 app/attackr.php	tsetid
 app/attackr.php	your_losses
-app/barter.php	b_method
-app/barter.php	scientists
 app/buildings.php	adv_const
 app/checklogin.php	computer_id
 app/checksignup.php	computer_id
-app/css/admin/functions.php	bcost
-app/css/admin/functions.php	bmcost
-app/css/admin/functions.php	dbdogs
-app/css/admin/functions.php	maxtrain
-app/css/admin/get_user_info.php	userinfo
 app/emland.php	placeno
 app/emmountains.php	placeno
 app/esscores.php	placeno
@@ -62,9 +55,6 @@ app/functions.php	wiz3
 app/functions.php	wiz4
 app/gmembers.php	num
 app/gnews.php	num
-app/guildbarter.php	archer
-app/guildbarter.php	b_method
-app/guildbarter.php	scientists
 app/include/S_BARTER.php	row_num
 app/include/S_CRES.php	adv_animation
 app/include/S_CRES.php	adv_build

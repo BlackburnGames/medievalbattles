@@ -2,39 +2,4 @@
 # Request input that reaches a mysqli_query() unescaped, as file, variable
 # and the quoting context it lands in. This list may only ever SHRINK.
 # Regenerate with: php tests/sql-injection-audit.php --accept
-app/barter.php	amount	quoted
-app/barter.php	b_amount	quoted
-app/barter.php	b_cost	quoted
-app/barter.php	b_meth	quoted
-app/barter.php	b_seller	quoted
-app/barter.php	b_type	quoted
-app/barter.php	b_userid	quoted
-app/barter.php	bid	quoted
-app/barter.php	cost	quoted
-app/barter.php	method	quoted
-app/barter.php	query	unquoted
-app/barter.php	tsetid	quoted
-app/barter.php	type	quoted
-app/css/admin/dempire.php	empre	quoted
-app/css/admin/dempire.php	esetid	quoted
-app/css/admin/dempire.php	tmail	quoted
-app/css/admin/gameconfig.php	empre	quoted
-app/css/admin/gameconfig.php	settable	unquoted
-app/css/admin/gameconfig.php	tmail	quoted
-app/css/admin/get_user_info.php	empre	quoted
-app/css/admin/get_user_info.php	evu	quoted
-app/css/admin/get_user_info.php	query_string	unquoted
-app/guildbarter.php	amount	quoted
-app/guildbarter.php	b_amount	quoted
-app/guildbarter.php	b_cost	quoted
-app/guildbarter.php	b_meth	quoted
-app/guildbarter.php	b_seller	quoted
-app/guildbarter.php	b_type	quoted
-app/guildbarter.php	b_userid	quoted
-app/guildbarter.php	bid	quoted
-app/guildbarter.php	cost	quoted
-app/guildbarter.php	method	quoted
-app/guildbarter.php	query	unquoted
-app/guildbarter.php	tsetid	quoted
-app/guildbarter.php	type	quoted
-app/preferences.php	email	quoted
+
