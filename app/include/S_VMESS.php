@@ -2,10 +2,6 @@
 
 <?php
 
-// Request input, formerly supplied by register_globals.
-include("include/request.php");
-$message = mb_input('message');
-
 echo "  <br><br>
 	<table border='1' bordercolor='#000000' align='center' width='90%' cellpadding='3' cellspacing='0'>
 		<tr>
@@ -17,15 +13,15 @@ echo "  <br><br>
 $query_string = "SELECT origin, datesent, message, mid FROM messages WHERE yourid='$userid' ORDER BY datesent DESC";
 $result_id = mysqli_query($db, $query_string);
 while ($row = mysqli_fetch_array($result_id))	{
-	extract ($row);
+	$origin = $row['origin']; $message = $row['message']; $datesent = $row['datesent'];
 	$link = $origin;
-	
+
 	// check to see if he/shes allready a GL
-	$sresult = mysqli_query($db, "SELECT setid FROM user WHERE ename='$origin'");
+	$sresult = mysqli_query($db, "SELECT setid FROM user WHERE ename=" . mb_sql_str($db, $origin));
 	$setcheck = mysqli_fetch_array($sresult);
-	
+
 	if($setcheck[0] != "")	{
-		$their_set = mysqli_query($db, "SELECT setid FROM user WHERE ename='$origin'");	
+		$their_set = mysqli_query($db, "SELECT setid FROM user WHERE ename=" . mb_sql_str($db, $origin));
 			$snum = mb_db_result($their_set,"snum");
 		$sender = urlencode($origin);
 		$link = "<a href=messaging.php?value=$sender&snum=$snum&setchg=1>$origin($snum)</a>";

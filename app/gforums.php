@@ -1,11 +1,5 @@
 <?php
 
-// Request input, formerly supplied by register_globals.
-include("include/request.php");
-$topic   = mb_input('topic');
-$topicid = mb_input('topicid');
-
-
 include("include/igtop.php");
 
 
@@ -46,20 +40,19 @@ echo "
 						<td align=center><b class=forum>LAST POST</strong></td>
 					</tr>";									
 	while ($r = mysqli_fetch_array($result)) {
-	extract ($r);
-	
-	$topic_replies_query = mysqli_query($db, "SELECT count(topicid) FROM guildmsgs WHERE topicid=$topicid");
+
+	$topic_replies_query = mysqli_query($db, "SELECT count(topicid) FROM guildmsgs WHERE topicid=" . mb_sql_int($r['topicid']));
 		$topic_replies = mb_db_result($topic_replies_query, "topic_replies");
-	
+
 echo "
 					<tr bgcolor=$color2>
-						<td valign=top><strong class=black-small>&nbsp;&nbsp; <a href=topicg.php?topicid=$topicid>$topic</a></strong></td>			
-						<td valign=top><strong class=black-small>&nbsp; $name</strong></td>
-						<td valign=top><strong class=black-small>&nbsp; $lastposter</strong></td>
+						<td valign=top><strong class=black-small>&nbsp;&nbsp; <a href=topicg.php?topicid={$r['topicid']}>{$r['topic']}</a></strong></td>
+						<td valign=top><strong class=black-small>&nbsp; {$r['name']}</strong></td>
+						<td valign=top><strong class=black-small>&nbsp; {$r['lastposter']}</strong></td>
 						<td valign=top width=61 align=center><strong class=black-small>&nbsp; $topic_replies</strong></td>
-						<td valign=top width=125>&nbsp;<nobr><small class=black-small>$lastpost</small></nobr></td>
-					</tr>";			
-	} 
+						<td valign=top width=125>&nbsp;<nobr><small class=black-small>{$r['lastpost']}</small></nobr></td>
+					</tr>";
+	}
 }
 echo "
 				</table>

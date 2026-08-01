@@ -1,10 +1,5 @@
 <?php
 
-// Request input, formerly supplied by register_globals.
-include("include/request.php");
-$topic   = mb_input('topic');
-$topicid = mb_input('topicid');
-
 include("include/igtop.php");
 echo "<br><br>";
 
@@ -42,21 +37,20 @@ echo "
 						<td align=center><b class=forum>Delete</strong></td>
 					</tr>";									
 	while ($r = mysqli_fetch_array($result)) {
-	extract ($r);
-	
-	$topic_replies_query = mysqli_query($db, "SELECT count(topicid) FROM guildmsgs WHERE topicid=$topicid") or die(mysqli_error($db));
+
+	$topic_replies_query = mysqli_query($db, "SELECT count(topicid) FROM guildmsgs WHERE topicid=" . mb_sql_int($r['topicid'])) or die(mysqli_error($db));
 		$topic_replies = mb_db_result($topic_replies_query, "topic_replies");
-	
+
 echo "
 					<tr bgcolor=$color2>
-						<td valign=top><strong class=black-small><a href=topicg.php?topicid=$topicid>$topic</a></strong></td>	
-						<td valign=top align=center>$topic_replies</td>		
-						<td valign=top align=center><strong class=black-small>$name</strong></td>
-						<td valign=top align=center><strong class=black-small>$lastposter</strong></td>
-						<td valign=top align=center>$lastpost</td>
-						<td valign=top align=center><strong class=black-small><a href=gl-delposts.php?delete=true&tid=$topicid><font size=-2>Delete</a></strong></td>
-					</tr>";			
-	} 
+						<td valign=top><strong class=black-small><a href=topicg.php?topicid={$r['topicid']}>{$r['topic']}</a></strong></td>
+						<td valign=top align=center>$topic_replies</td>
+						<td valign=top align=center><strong class=black-small>{$r['name']}</strong></td>
+						<td valign=top align=center><strong class=black-small>{$r['lastposter']}</strong></td>
+						<td valign=top align=center>{$r['lastpost']}</td>
+						<td valign=top align=center><strong class=black-small><a href=gl-delposts.php?delete=true&tid={$r['topicid']}><font size=-2>Delete</a></strong></td>
+					</tr>";
+	}
 }
 echo "
 				</table>

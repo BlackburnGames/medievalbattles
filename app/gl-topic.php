@@ -4,7 +4,7 @@
 include("include/request.php");
 $message = mb_input('message');
 $topic   = mb_input('topic');
-$topicid = mb_input('topicid');
+$topicid = (int) mb_input('topicid');
 
 
 include("include/igtop.php");
@@ -35,7 +35,7 @@ if ($result1) {
 		</tr>";
 										
 	while ($r1 = mysqli_fetch_array($result1)) {
-	extract ($r1);
+	$name = $r1['name']; $topic = $r1['topic']; $message = $r1['message']; $lastpost = $r1['lastpost'];
 	echo "
 		<tr>
 			<td bgcolor=$color3 width=15% align=left><b class=forum>$name</b></td>
@@ -58,8 +58,8 @@ echo "
 	<table border=0 class=f width=95% align=center cellspacing=1 cellpadding=1>";
 	
 	while ($r2 = mysqli_fetch_array($result2)) {
-	extract ($r2);
-		
+	$name = $r2['name']; $topic = $r2['topic']; $message = $r2['message']; $datestamp = $r2['datestamp'];
+
 echo "
 		<tr>
 			<td bgcolor=$color3 width=15% align=left><b class=forum>$name</b></td>

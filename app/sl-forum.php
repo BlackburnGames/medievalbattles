@@ -1,11 +1,5 @@
 <?php
 
-// Request input, formerly supplied by register_globals.
-include("include/request.php");
-$topic   = mb_input('topic');
-$topicid = mb_input('topicid');
-
-
 include("include/igtop.php");
 
 echo "<br><br>";
@@ -41,21 +35,20 @@ echo "
 						<td align=center><b class=forum>Delete</b></td>
 					</tr>";										
 	while ($r = mysqli_fetch_array($result)) {
-	extract ($r);
 
-		$topicreplies = mysqli_query($db, "SELECT count(topicid) FROM setforumsmsgs WHERE topicid=$topicid");
+		$topicreplies = mysqli_query($db, "SELECT count(topicid) FROM setforumsmsgs WHERE topicid=" . mb_sql_int($r['topicid']));
 		$treplies = mb_db_result($topicreplies, "treplies");
 
 echo "
 					<tr bgcolor=$color2>
-						<td valign=top><strong class=black-small><a href=sl-topic.php?topicid=$topicid>$topic</a></strong></td>	
-						<td valign=top align=center>$treplies</td>		
-						<td valign=top align=center><strong class=black-small>$name$S_L</strong></td>
-						<td valign=top align=center><strong class=black-small>$lastposter</strong></td>
-						<td valign=top align=center>$lastpost</td>
-						<td valign=top align=center><strong class=black-small><a href=sl-delposts.php?delete=true&tid=$topicid><font size=-2>Delete</a></strong></td>
-					</tr>";	
-	} 
+						<td valign=top><strong class=black-small><a href=sl-topic.php?topicid={$r['topicid']}>{$r['topic']}</a></strong></td>
+						<td valign=top align=center>$treplies</td>
+						<td valign=top align=center><strong class=black-small>{$r['name']}$S_L</strong></td>
+						<td valign=top align=center><strong class=black-small>{$r['lastposter']}</strong></td>
+						<td valign=top align=center>{$r['lastpost']}</td>
+						<td valign=top align=center><strong class=black-small><a href=sl-delposts.php?delete=true&tid={$r['topicid']}><font size=-2>Delete</a></strong></td>
+					</tr>";
+	}
 }
 echo"
 				</table>

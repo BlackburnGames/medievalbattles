@@ -135,6 +135,14 @@ INSERT INTO `guildthreads` (topicid, name, host, topic, lastpost, lastposter, re
 INSERT INTO `guildmsgs` (messageid, name, host, topic, topicid, message, datestamp) VALUES
   (1, 'IdleBaron', 'localhost', 'Guild orders', 1, 'Understood.', '1/1/03, 12:00am');
 
+-- A message in the primary tester's inbox. vmessages.php was reachable before
+-- this but rendered an empty table: `messages` starts empty, so the loop that
+-- draws each message -- and runs two more queries per row on the sender's name
+-- -- never executed once in the whole crawl.
+DELETE FROM `messages` WHERE yourid = 1;
+INSERT INTO `messages` (origin, datesent, message, yourid, mid, age) VALUES
+  ('IdleBaron', '1/1/03, 12:00am', 'Care to trade iron for gold?', 1, 1, 0);
+
 -- Settlements 1 and 2 now hold the seeded users.
 UPDATE `settlement` SET members = 2, setname = 'Testhold'  WHERE setid = 1;
 UPDATE `settlement` SET members = 1, setname = 'Poorhaven' WHERE setid = 2;
