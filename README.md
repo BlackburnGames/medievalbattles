@@ -85,3 +85,9 @@ docker compose build --build-arg PHP_VERSION=5.6-apache web
 
 See [CLAUDE.md](CLAUDE.md) for the architecture notes and the traps worth
 knowing before changing anything.
+
+---
+
+## Credits
+
+Originally created by Jon "Mako" Ursenbach and the Medieval Battles community.
