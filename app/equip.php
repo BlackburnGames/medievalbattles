@@ -178,7 +178,7 @@ else	{
 			$warspeedw = $wspeed;
 			$warpower = $wpower;
 			$cweapon = $uwarrior;
-			mysqli_query($db, "UPDATE military SET cweapon='$cweapon' WHERE email='$email' AND pw='$pw'");
+			mysqli_query($db, "UPDATE military SET cweapon=" . mb_sql_str($db, $cweapon) . " WHERE email='$email' AND pw='$pw'");
 			mysqli_query($db, "UPDATE military SET warspeedw='$warspeedw' WHERE email='$email' AND pw='$pw'");
 			mysqli_query($db, "UPDATE military SET warpower='$warpower' WHERE email='$email' AND pw='$pw'");
 		}
@@ -200,7 +200,7 @@ else	{
 			$wizpower = $wpower;
 			$wizspeeds = $wspeed;
 			$cspell = $uwizard;
-			mysqli_query($db, "UPDATE military SET cspell='$cspell' WHERE email='$email' AND pw='$pw'");
+			mysqli_query($db, "UPDATE military SET cspell=" . mb_sql_str($db, $cspell) . " WHERE email='$email' AND pw='$pw'");
 			mysqli_query($db, "UPDATE military SET wizspeeds='$wizspeeds' WHERE email='$email' AND pw='$pw'");
 			mysqli_query($db, "UPDATE military SET wizpower='$wizpower' WHERE email='$email' AND pw='$pw'");
 		}
@@ -227,7 +227,7 @@ else	{
 			$pripower = $wpower;
 			$prispeedw = $wspeed;
 			$cstaff = $upriest;
-			mysqli_query($db, "UPDATE military SET cstaff='$cstaff' WHERE email='$email' AND pw='$pw'");
+			mysqli_query($db, "UPDATE military SET cstaff=" . mb_sql_str($db, $cstaff) . " WHERE email='$email' AND pw='$pw'");
 			mysqli_query($db, "UPDATE military SET prispeedw='$prispeedw' WHERE email='$email' AND pw='$pw'");
 			mysqli_query($db, "UPDATE military SET pripower='$pripower' WHERE email='$email' AND pw='$pw'");
 		}
@@ -254,7 +254,7 @@ else	{
 			$archpower = $wpowera;
 			$archspeedw = $wspeeda;
 			$cbow = $uarcher;
-			mysqli_query($db, "UPDATE military SET cbow='$cbow' WHERE email='$email' AND pw='$pw'");
+			mysqli_query($db, "UPDATE military SET cbow=" . mb_sql_str($db, $cbow) . " WHERE email='$email' AND pw='$pw'");
 			mysqli_query($db, "UPDATE military SET archspeedw='$archspeedw' WHERE email='$email' AND pw='$pw'");
 			mysqli_query($db, "UPDATE military SET archpower='$archpower' WHERE email='$email' AND pw='$pw'");
 		}
@@ -323,7 +323,7 @@ else	{
 			$wardef = $mod;
 			$warspeeda = $aspeed;
 			$wararmor = $uwararmor;
-			mysqli_query($db, "UPDATE military SET wararmor='$wararmor' WHERE email='$email' AND pw='$pw'");
+			mysqli_query($db, "UPDATE military SET wararmor=" . mb_sql_str($db, $wararmor) . " WHERE email='$email' AND pw='$pw'");
 	 		mysqli_query($db, "UPDATE military SET wardef='$wardef' WHERE email='$email' AND pw='$pw'");
 			mysqli_query($db, "UPDATE military SET warspeeda='$warspeeda' WHERE email='$email' AND pw='$pw'");
 		}
@@ -344,7 +344,7 @@ else	{
 			$wizdef = $mod;
 			$wizspeeda = $aspeed;
 			$wizarmor = $uwizarmor;
- 			mysqli_query($db, "UPDATE military SET wizarmor='$wizarmor' WHERE email='$email' AND pw='$pw'");
+ 			mysqli_query($db, "UPDATE military SET wizarmor=" . mb_sql_str($db, $wizarmor) . " WHERE email='$email' AND pw='$pw'");
  			mysqli_query($db, "UPDATE military SET wizdef='$wizdef' WHERE email='$email' AND pw='$pw'");
  			mysqli_query($db, "UPDATE military SET wizspeeda='$wizspeeda' WHERE email='$email' AND pw='$pw'");
 		}
@@ -364,7 +364,7 @@ else	{
 			$pridef = $mod;
 			$prispeeda = $aspeed;
 			$priarmor = $upriarmor;
-			mysqli_query($db, "UPDATE military SET priarmor='$priarmor' WHERE email='$email' AND pw='$pw'");
+			mysqli_query($db, "UPDATE military SET priarmor=" . mb_sql_str($db, $priarmor) . " WHERE email='$email' AND pw='$pw'");
 			mysqli_query($db, "UPDATE military SET pridef='$pridef' WHERE email='$email' AND pw='$pw'");
 		   mysqli_query($db, "UPDATE military SET prispeeda='$prispeeda' WHERE email='$email' AND pw='$pw'");
 		}
@@ -386,7 +386,7 @@ else	{
 			$archdef = $mod;
 			$archspeeda = $aspeed;
 			$archarmor = $uarcharmor;
-			mysqli_query($db, "UPDATE military SET archarmor='$archarmor' WHERE email='$email' AND pw='$pw'");
+			mysqli_query($db, "UPDATE military SET archarmor=" . mb_sql_str($db, $archarmor) . " WHERE email='$email' AND pw='$pw'");
  			mysqli_query($db, "UPDATE military SET archdef='$archdef' WHERE email='$email' AND pw='$pw'");
  			mysqli_query($db, "UPDATE military SET archspeeda='$aspeed' WHERE email='$email' AND pw='$pw'");
 		}

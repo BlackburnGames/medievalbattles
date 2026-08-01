@@ -53,15 +53,18 @@ else	{
 	}
 
 	// change their password
-	$newpw = htmlspecialchars($newpw);
-	$newpw = md5($newpw);
-	mysqli_query($db, "UPDATE user SET pw='$newpw' WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
-	mysqli_query($db, "UPDATE buildings SET pw='$newpw' WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
- 	mysqli_query($db, "UPDATE military SET pw='$newpw' WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
- 	mysqli_query($db, "UPDATE research SET pw='$newpw' WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
- 	mysqli_query($db, "UPDATE returntbl SET pw='$newpw' WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
- 	mysqli_query($db, "UPDATE explore SET pw='$newpw' WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
-	$pw = $newpw;
+	//
+	// The digest gets its own name. What the six UPDATEs interpolate is 32 hex
+	// characters and always was, but with the request value and the hash of it
+	// sharing one name, that is only true if you read all three lines in order.
+	$newpw_hash = md5(htmlspecialchars($newpw));
+	mysqli_query($db, "UPDATE user SET pw='$newpw_hash' WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
+	mysqli_query($db, "UPDATE buildings SET pw='$newpw_hash' WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
+ 	mysqli_query($db, "UPDATE military SET pw='$newpw_hash' WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
+ 	mysqli_query($db, "UPDATE research SET pw='$newpw_hash' WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
+ 	mysqli_query($db, "UPDATE returntbl SET pw='$newpw_hash' WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
+ 	mysqli_query($db, "UPDATE explore SET pw='$newpw_hash' WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
+	$pw = $newpw_hash;
 	$_SESSION['pw'] = $pw;
 
 	echo"<div align=center><font class=yellow>Your password has been changed.</font></div>";
@@ -78,7 +81,7 @@ else	{
 			
 	$cnewemail = strtolower($newemail);
 		
-	$E_Result = mysqli_query($db, "SELECT email FROM user WHERE email='$cnewemail'");
+	$E_Result = mysqli_query($db, "SELECT email FROM user WHERE email=" . mb_sql_str($db, $cnewemail));
 	$New_Email = mysqli_fetch_array($E_Result);
 
 	$New_Email[0] = strtolower($New_Email[0]);
@@ -92,19 +95,26 @@ else	{
 	}
 	
 	// update email
+	//
+	// htmlspecialchars() was doing double duty here and only half of it worked.
+	// It is an output escape, and whether it also happens to stop a quote
+	// reaching MySQL depends on the PHP version: ENT_QUOTES became the default
+	// in 8.1, so single quotes survive it on the 5.6 image this suite also runs
+	// against. The escaping is explicit now and does not depend on that.
 	$newemail = htmlspecialchars($newemail);
-	mysqli_query($db, "UPDATE user SET email='$newemail' WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
-	mysqli_query($db, "UPDATE buildings SET email='$newemail' WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
- 	mysqli_query($db, "UPDATE military SET email='$newemail' WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
- 	mysqli_query($db, "UPDATE research SET email='$newemail' WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
- 	mysqli_query($db, "UPDATE returntbl SET email='$newemail' WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
- 	mysqli_query($db, "UPDATE explore SET email='$newemail' WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
+	$q_newemail = mb_sql_str($db, $newemail);
+	mysqli_query($db, "UPDATE user SET email=$q_newemail WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
+	mysqli_query($db, "UPDATE buildings SET email=$q_newemail WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
+ 	mysqli_query($db, "UPDATE military SET email=$q_newemail WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
+ 	mysqli_query($db, "UPDATE research SET email=$q_newemail WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
+ 	mysqli_query($db, "UPDATE returntbl SET email=$q_newemail WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
+ 	mysqli_query($db, "UPDATE explore SET email=$q_newemail WHERE email='$email' AND pw='$pw'") or die(mysqli_error($db));
 	$email = $newemail;
 	$_SESSION['email'] = $email;
-			
+
 	// update aim and msn
-	mysqli_query($db, "UPDATE user SET aim='$newaim' WHERE email='$email' AND pw='$pw'");
-	mysqli_query($db, "UPDATE user SET msn='$newmsn' WHERE email='$email' AND pw='$pw'");
+	mysqli_query($db, "UPDATE user SET aim=" . mb_sql_str($db, $newaim) . " WHERE email='$email' AND pw='$pw'");
+	mysqli_query($db, "UPDATE user SET msn=" . mb_sql_str($db, $newmsn) . " WHERE email='$email' AND pw='$pw'");
 		
 	$email = $newemail;
 	$msn = $newmsn;
@@ -141,7 +151,7 @@ else	{
 		mysqli_query($db, "INSERT INTO setnews (date, news, setid)	 VALUES	('$clock', '<font class=red>$ename has deleted their account</font>', '$setid') ");
 	  
 		// check who they are voting for
-		$V_result = mysqli_query($db, "SELECT votefor FROM user WHERE userid='$empvalue'");
+		$V_result = mysqli_query($db, "SELECT votefor FROM user WHERE userid=" . mb_sql_int($empvalue));
 		$V_check = mysqli_fetch_array($V_result);
 		
 		if($V_check[0] != 'None' AND $V_check[0] != $empireattacked)	 {
