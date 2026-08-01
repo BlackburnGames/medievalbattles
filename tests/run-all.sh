@@ -44,6 +44,15 @@ if ! docker compose exec -T web php /repo/tests/xss-audit.php; then
   status=1
 fi
 
+# The stored half, with a row read back out of the database counting as a
+# source. Separate baseline so the first-order list keeps meaning what
+# docs/testing.md says it means.
+echo
+echo "=== unescaped output audit (stored) ==="
+if ! docker compose exec -T web php /repo/tests/xss-audit.php --stored; then
+  status=1
+fi
+
 echo
 if [ "$status" = "0" ]; then
   echo "ALL TESTS PASSED"

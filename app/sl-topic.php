@@ -66,7 +66,7 @@ echo	"
 		<tr>
 			<td bgcolor=$color3 width=15% align=left><b class=forum>" . mb_h($r_name) . "</b></td>
 			<td bgcolor=$color3 width=80% align=left><b class=forum>" . mb_h($r_topic) . "</b></td>
-			<td bgcolor=$color3><strong class=white><a href=sl-delposts.php?delpost=true&mid=$messageid&tid=$topicid><font size=-2> &nbsp; Delete</a></strong></td>
+			<td bgcolor=$color3><strong class=white><a href=" . mb_attr("sl-delposts.php?delpost=true&mid=$messageid&tid=$topicid") . "><font size=-2> &nbsp; Delete</a></strong></td>
 		</tr>
 		<tr>
 			<td bgcolor=$color2 valign=top colspan=4><pre>" . mb_h($r_datestamp) . "</pre>$r_message<br><br></td>

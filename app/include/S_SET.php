@@ -20,7 +20,7 @@ echo "
     <td width=20% align=center colspan=2><b><font class=red>Name:</font></b> $settlename <font class=red>[</font>" . mb_h($N_NUM) . "<font class=red>]</font></td>";
 if($settlepic != "")  {
   echo "<tr>
-    <td colspan=2><img src=$settlepic width=300 height=200></td>";
+    <td colspan=2><img src=" . mb_attr($settlepic) . " width=300 height=200></td>";
 }
 echo "
 </table>

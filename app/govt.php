@@ -40,7 +40,7 @@ if (!IsSet($change)) {
   $query_string = "SELECT userid, ename FROM user WHERE setid='$setid' ORDER BY userid ASC";
   $result_id = mysqli_query($db, $query_string);
   while ($row = mysqli_fetch_row($result_id))  {
-    echo "<option value=$row[0]>$row[1]\n</option>";
+    echo "<option value=" . mb_attr($row[0]) . ">" . mb_h($row[1]) . "\n</option>";
   }
 
 

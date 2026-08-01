@@ -69,7 +69,7 @@ while ($row = mysqli_fetch_row($result_id))	{
     echo "
 	<tr align='center' valign='top' colspan='6'>
 		<td bgcolor=000000>$num</td>
-		<td class='inner2'><a href=messaging.php?value=$their_name&snum=$t_setid&setchg=1>$row[0]($t_setid)</a>$O_line</td>
+		<td class='inner2'><a href=" . mb_attr("messaging.php?value=$their_name&snum=$t_setid&setchg=1") . ">$row[0]($t_setid)</a>$O_line</td>
 		<td class='inner2'>$row[1]</td>
 		<td class='inner2'>$row[2]</td>
 		<td class='inner2'>$row[3]</td>

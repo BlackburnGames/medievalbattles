@@ -132,11 +132,11 @@ while ($row = mysqli_fetch_array($result_id))	{
 	echo "
 	<tr align=center valign=top colspan=6>
 		<td bgcolor=#404040><a href=\"$flag\" target=newwindow><img src=\"$flag\" width=50 height=50 border=0></a></td>
-		<td bgcolor=#404040><a href=gc.php?pageid=mgl&gid=$row[3]>$row[0]</a></td>
+		<td bgcolor=#404040><a href=" . mb_attr("gc.php?pageid=mgl&gid=$row[3]") . ">$row[0]</a></td>
 		<td bgcolor=#404040>$row[1]</td>
 		<td bgcolor=#404040>$row[5]</td>
 		<td bgcolor=#404040>$row[2]</td>
-		<td bgcolor=#404040><a href=gc.php?request=yes&req_guild=$urlencode_guild>Request<br>Mbrshp.</a></td>";
+		<td bgcolor=#404040><a href=" . mb_attr("gc.php?request=yes&req_guild=$urlencode_guild") . ">Request<br>Mbrshp.</a></td>";
 }
 echo "</table><br><br>";
 

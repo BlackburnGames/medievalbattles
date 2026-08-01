@@ -47,10 +47,23 @@
 
 $repoRoot = dirname(__DIR__);
 $appRoot  = $repoRoot . '/app';
-$baseline = __DIR__ . '/xss.txt';
 $accept   = in_array('--accept', $argv, true);
+$stored   = in_array('--stored', $argv, true);
+$baseline = __DIR__ . ($stored ? '/xss-stored.txt' : '/xss.txt');
 
 require_once __DIR__ . '/taint-lib.php';
+
+/**
+ * --stored takes a row read back out of the database as a source too.
+ *
+ * Everything in this database was typed by a player at some point, so a value
+ * fetched and echoed is request input that has been round-tripped -- and that
+ * is the larger half of the problem, because the default list cannot see any
+ * of it. The two are separate baselines rather than one, so that the
+ * first-order list keeps meaning what docs/testing.md says it means: request
+ * input, at zero, and staying there.
+ */
+$MB_XSS_CALLS = $stored ? $MB_STORED_CALLS : $MB_SOURCE_CALLS;
 
 /**
  * Everything that is safe to interpolate into a query is safe in HTML too --
@@ -172,7 +185,7 @@ $current = array();
 foreach (mb_app_files($appRoot) as $path) {
     $rel = ltrim(str_replace(str_replace('\\', '/', $repoRoot), '', $path), '/');
     $src = file_get_contents($path);
-    $tainted = mb_tainted_names($src, $MB_SOURCE_GLOBALS, $MB_HTML_SANITIZERS);
+    $tainted = mb_tainted_names($src, $MB_SOURCE_GLOBALS, $MB_HTML_SANITIZERS, $MB_XSS_CALLS);
     $found   = mb_scan_output($src, $tainted, $MB_SOURCE_GLOBALS, $MB_HTML_SANITIZERS, $MB_HTML_CONTEXTS);
     ksort($found);
     foreach ($found as $name => $context) {
@@ -185,11 +198,13 @@ exit(mb_ratchet(array(
     'current'  => $current,
     'accept'   => $accept,
     'header'   => "# Unescaped output audit baseline -- see tests/xss-audit.php\n"
-                . "# Request input that reaches an echo unescaped, as file, variable and the\n"
-                . "# worst HTML context it lands in. This list may only ever SHRINK.\n"
-                . "# Regenerate with: php tests/xss-audit.php --accept\n",
-    'label'    => 'unescaped request input in output',
-    'pass'     => 'no new unescaped request input in output.',
+                . "# " . ($stored ? 'Player data, request or stored,' : 'Request input')
+                . " that reaches an echo unescaped, as\n"
+                . "# file, variable and the worst HTML context it lands in. This list may only\n"
+                . "# ever SHRINK. Regenerate with: php tests/xss-audit.php"
+                . ($stored ? ' --stored' : '') . " --accept\n",
+    'label'    => 'unescaped ' . ($stored ? 'player data' : 'request input') . ' in output',
+    'pass'     => 'no new unescaped ' . ($stored ? 'player data' : 'request input') . ' in output.',
     'fail'     => 'new unescaped echo(es)',
     'advice'   => "Wrap it with mb_h(). If the context is attr-bare, quote the attribute\n"
                 . "first -- escaping a bare attribute value does not close it. See\n"

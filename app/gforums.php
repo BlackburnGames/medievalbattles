@@ -46,7 +46,7 @@ echo "
 
 echo "
 					<tr bgcolor=$color2>
-						<td valign=top><strong class=black-small>&nbsp;&nbsp; <a href=topicg.php?topicid={$r['topicid']}>{$r['topic']}</a></strong></td>
+						<td valign=top><strong class=black-small>&nbsp;&nbsp; <a href=" . mb_attr("topicg.php?topicid={$r['topicid']}") . ">{$r['topic']}</a></strong></td>
 						<td valign=top><strong class=black-small>&nbsp; {$r['name']}</strong></td>
 						<td valign=top><strong class=black-small>&nbsp; {$r['lastposter']}</strong></td>
 						<td valign=top width=61 align=center><strong class=black-small>&nbsp; $topic_replies</strong></td>

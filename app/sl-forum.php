@@ -41,12 +41,12 @@ echo "
 
 echo "
 					<tr bgcolor=$color2>
-						<td valign=top><strong class=black-small><a href=sl-topic.php?topicid={$r['topicid']}>{$r['topic']}</a></strong></td>
+						<td valign=top><strong class=black-small><a href=" . mb_attr("sl-topic.php?topicid={$r['topicid']}") . ">{$r['topic']}</a></strong></td>
 						<td valign=top align=center>$treplies</td>
 						<td valign=top align=center><strong class=black-small>{$r['name']}$S_L</strong></td>
 						<td valign=top align=center><strong class=black-small>{$r['lastposter']}</strong></td>
 						<td valign=top align=center>{$r['lastpost']}</td>
-						<td valign=top align=center><strong class=black-small><a href=sl-delposts.php?delete=true&tid={$r['topicid']}><font size=-2>Delete</a></strong></td>
+						<td valign=top align=center><strong class=black-small><a href=" . mb_attr("sl-delposts.php?delete=true&tid={$r['topicid']}") . "><font size=-2>Delete</a></strong></td>
 					</tr>";
 	}
 }

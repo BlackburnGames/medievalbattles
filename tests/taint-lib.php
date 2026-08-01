@@ -16,6 +16,20 @@
 $MB_SOURCE_GLOBALS = array('_GET', '_POST', '_COOKIE', '_REQUEST', '_SERVER', '_FILES');
 
 /**
+ * Functions whose return value is player-controlled.
+ *
+ * mb_input() is the request. The fetch calls are the second order: everything
+ * in this database was typed by a player at some point, so a row read back is
+ * request input that has been round-tripped. The SQL audit uses only the first
+ * -- see its header for why -- and the XSS audit takes both in --stored mode.
+ */
+$MB_SOURCE_CALLS = array('mb_input');
+$MB_STORED_CALLS = array(
+    'mb_input', 'mysqli_fetch_array', 'mysqli_fetch_row', 'mysqli_fetch_assoc',
+    'mysqli_fetch_object', 'mysqli_fetch_all', 'mb_db_result',
+);
+
+/**
  * Calls and casts that make a value safe to interpolate into a query.
  *
  * The first three are the intended fix. The rest are there because they return
@@ -134,8 +148,11 @@ function mb_is_sanitized(array $t, $i, $start, array $names)
  *
  * @return array<string,true>
  */
-function mb_tainted_names($src, array $sourceGlobals, array $sanitizers)
+function mb_tainted_names($src, array $sourceGlobals, array $sanitizers, array $sourceCalls = null)
 {
+    if ($sourceCalls === null) {
+        $sourceCalls = array('mb_input');
+    }
     $t = token_get_all($src);
     $n = count($t);
     $tainted = array();
@@ -175,7 +192,8 @@ function mb_tainted_names($src, array $sourceGlobals, array $sanitizers)
             for ($k = $j + 1; $k <= $end; $k++) {
                 $x = $t[$k];
                 $hit = false;
-                if (is_array($x) && $x[0] === T_STRING && strtolower($x[1]) === 'mb_input') {
+                if (is_array($x) && $x[0] === T_STRING
+                    && in_array(strtolower($x[1]), $sourceCalls, true)) {
                     $hit = true;
                 } elseif (is_array($x) && $x[0] === T_VARIABLE) {
                     $v = substr($x[1], 1);

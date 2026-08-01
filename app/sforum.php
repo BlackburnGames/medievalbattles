@@ -34,7 +34,7 @@ echo "
 
 echo "
 					<tr bgcolor=$color2>
-						<td valign=top><strong class=black-small><a href=topic.php?topicid={$r['topicid']}>{$r['topic']}</a></strong></td>
+						<td valign=top><strong class=black-small><a href=" . mb_attr("topic.php?topicid={$r['topicid']}") . ">{$r['topic']}</a></strong></td>
 						<td valign=top align=center>$treplies</td>
 						<td valign=top align=center><strong class=black-small>{$r['name']}$S_L</strong></td>
 						<td valign=top align=center><strong class=black-small>{$r['lastposter']}</strong></td>

@@ -159,7 +159,19 @@ flow-insensitivity and the first-order/per-file limits applies here unchanged.
 same as clean.** The first-order limit bites harder here than it does for SQL:
 the stored XSS — an empire name, a guild name, a forum post, a message — is
 read back out of the database and is invisible to this. That is the larger half
-of the problem and the more dangerous one.
+of the problem and the more dangerous one, so it has its own list:
+
+```bash
+php tests/xss-audit.php --stored             # check tests/xss-stored.txt
+php tests/xss-audit.php --stored --accept    # re-accept it
+```
+
+`--stored` counts a `mysqli_fetch_*` or `mb_db_result()` as a source as well as
+`mb_input()`, on the reasoning that everything in this database was typed by a
+player at some point. Two baselines rather than one, so the default list keeps
+meaning exactly what this section says it means. `xss-stored.txt` opened at 116
+and is the superset — a fix that clears an entry there usually clears one here
+too.
 
 Each entry records the HTML context, because it decides the fix:
 

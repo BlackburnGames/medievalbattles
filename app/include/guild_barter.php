@@ -31,7 +31,7 @@ while ($row = mysqli_fetch_row($result_id))	{
 	// every guild listing's Barter link went to the handler that refuses to
 	// sell it -- and before that handler was scoped to its own board, it sold
 	// it anyway, without ever checking that the buyer was in the guild.
-	if($row[0] == $ename)	{	$endnow = "<br><a href=guildbarter.php?end=true&bid=$row[5]>End</a>";	}
+	if($row[0] == $ename)	{	$endnow = "<br><a href=" . mb_attr("guildbarter.php?end=true&bid=$row[5]") . ">End</a>";	}
 	else	{	$endnow = "";	}
 
 	if($row[3] == 'gp')	 {	$row[3] = "Gold";	}
@@ -43,12 +43,12 @@ while ($row = mysqli_fetch_row($result_id))	{
 echo "
 		<tr align=center valign=top colspan=5>
 			<td bgcolor=#404040>$row_num</td>
-			<td bgcolor=#404040><a href=\"messaging.php?value=$row[0]&snum=$s_sel&setchg=1\">$row[0]($s_sel)</a></td>
+			<td bgcolor=#404040><a href=" . mb_attr("messaging.php?value=$row[0]&snum=$s_sel&setchg=1") . ">" . mb_h($row[0]) . "(" . mb_h($s_sel) . ")</a></td>
 			<td bgcolor=#404040>$row[1]</td>
 			<td bgcolor=#404040>$row[2]</td>
 			<td bgcolor=#404040>$row[3]</td>
 			<td bgcolor=#404040>$row[4]</td>
-			<td bgcolor=#404040><a href=guildbarter.php?barter=1&bid=$row[5]>Barter</a>$endnow</td>\n";
+			<td bgcolor=#404040><a href=" . mb_attr("guildbarter.php?barter=1&bid=$row[5]") . ">Barter</a>$endnow</td>\n";
 }
 
 echo "

@@ -29,7 +29,7 @@ while ($row = mysqli_fetch_row($result_id))	{
 		// A listing whose seller no longer exists is swept up here.
 		if($s_sel == "")	 {	mysqli_query($db, "DELETE FROM barter WHERE userid=$q_seller");	}
 
-	if($row[0] == $ename)	{	$endnow = "<br><a href=barter.php?end=true&bid=$row[5]>End</a>";	}
+	if($row[0] == $ename)	{	$endnow = "<br><a href=" . mb_attr("barter.php?end=true&bid=$row[5]") . ">End</a>";	}
 	else	{	$endnow = "";	}
 
 	if($row[3] == 'gp')	 {	$row[3] = "Gold";	}
@@ -41,12 +41,12 @@ while ($row = mysqli_fetch_row($result_id))	{
 echo "
 		<tr align=center valign=top colspan=5>
 			<td bgcolor=#404040>$row_num</td>
-			<td bgcolor=#404040><a href=\"messaging.php?value=$row[0]&snum=$s_sel&setchg=1\">$row[0]($s_sel)</a></td>
+			<td bgcolor=#404040><a href=" . mb_attr("messaging.php?value=$row[0]&snum=$s_sel&setchg=1") . ">" . mb_h($row[0]) . "(" . mb_h($s_sel) . ")</a></td>
 			<td bgcolor=#404040>$row[1]</td>
 			<td bgcolor=#404040>$row[2]</td>
 			<td bgcolor=#404040>$row[3]</td>
 			<td bgcolor=#404040>$row[4]</td>
-			<td bgcolor=#404040><a href=barter.php?barter=1&bid=$row[5]>Barter</a>$endnow</td>\n";
+			<td bgcolor=#404040><a href=" . mb_attr("barter.php?barter=1&bid=$row[5]") . ">Barter</a>$endnow</td>\n";
 }
 
 echo "

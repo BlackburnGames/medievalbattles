@@ -24,7 +24,7 @@ if($setchg == 1)	{
 	$query_string = "SELECT userid, ename FROM user WHERE setid=" . mb_sql_int($snum);
 	$result_id = mysqli_query($db, $query_string);
 	while ($row = mysqli_fetch_row($result_id))	{
-		echo "<option value='$row[0]' ";
+		echo "<option value='" . mb_h($row[0]) . "' ";
 		if($row[0] == $send_to)	{	echo "selected";	}
 		echo " >$row[1]</option>";
 	}
@@ -43,7 +43,7 @@ if($setchg == 1)	{
 		$query_string = "SELECT userid, ename FROM user WHERE setid='$csnum'";
 		$result_id = mysqli_query($db, $query_string);
 		while ($row = mysqli_fetch_row($result_id))	{
-			echo "<option value='$row[0]' ";
+			echo "<option value='" . mb_h($row[0]) . "' ";
 			if($row[0] == $send_to)	{	echo "selected";	}
 			echo " >$row[1]</option>";
 		}

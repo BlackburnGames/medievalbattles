@@ -154,7 +154,35 @@ In progress. The known work, in no committed order:
   Same two limits the SQL audit carries, and they matter more here. It is
   **first-order and per-file**, so the stored XSS — an empire name, a guild
   name, a message — is invisible to it. That is the larger half and the more
-  dangerous one. **A zero here does not mean output is safe.**
+  dangerous one, so it has its own list rather than being left implied.
+
+  `--stored` takes a row read back out of the database as a source too, and
+  baselines separately in `tests/xss-stored.txt` so the first-order list keeps
+  meaning what it says. It opened at **116 entries across 50 files**, which is
+  the whole of it — every echo in the app that renders something a player
+  typed.
+
+  **All 24 attribute-context entries are closed; the 92 in element text are
+  not.** The attributes came first because that is the half escaping alone
+  cannot fix, and because they concentrate the genuinely dangerous shapes:
+
+  - `S_SET.php` rendered `<img src=$settlepic>` bare, from a URL a settlement
+    leader types in — the same shape as `gc.php`'s guild flag, which had
+    already been closed. `S_SINFO.php` echoed the same URL, the settlement name
+    and the leader's notice back into three single-quoted form fields, where
+    one apostrophe closes the attribute.
+  - Seven copies of `<option value=$row[0]>$row[1]` — the empire pickers on the
+    attack, intel, message, kick and government pages.
+  - Every listing's action link: the forum thread links, the barter Barter/End
+    pair, the guild accept/reject pair, the settlement and guild member links.
+
+  What is left is 92 element-text entries, and they are not simply 92 `mb_h()`
+  calls. Some of those values are stored as markup on purpose and would
+  double-escape: the forum post body, and the guild name and info, which
+  `gc.php` runs through `htmlspecialchars()` on the way in. Closing them means
+  deciding per column whether the stored value is text or markup and unwinding
+  the 2003 escape-on-input where it is the latter. That is the next piece of
+  work, and it is a data decision rather than a mechanical one.
 
   One pre-existing mismatch found and left alone: `gc.php` stores the
   HTML-escaped guild name in `guild.gname` and the raw one in `user.guild` on
