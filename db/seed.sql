@@ -37,7 +37,7 @@ INSERT INTO `user`
   (email, pw, ename, race, class, gp, iron, lumber, exp, food, land, mts,
    setid, csnum, userid, online, safemode, countdown, guild, lastlogin, signup_comp_id)
 VALUES
-  ('tester@example.com', '16d7a4fca7442dda3ad93c9a726597e4', 'TestLord',  'Human', 'Warrior', 300000, 5000, 4000, 1000, 1500, 250, 200, 1, 1, 1, 0, 0,  336, 'None', '1/1/03, 12:00am', 'seed'),
+  ('tester@example.com', '16d7a4fca7442dda3ad93c9a726597e4', 'TestLord',  'Human', 'Warrior', 300000, 5000, 4000, 1000, 1500, 250, 200, 1, 1, 1, 0, 0,  336, 'None', '1/1/03, 12:00am', 'seed'),  -- fleets set below
   ('idle@example.com',   'c1572d05424d0ecb2a65ec6a82aeacbf', 'IdleBaron', 'Demon', 'Cleric',  120000, 6200, 3100,  400, 1500, 250, 200, 1, 1, 2, 0, 0,    2, 'None', '1/1/03, 12:00am', 'seed'),
   ('poor@example.com',   '3afc79b597f88a72528e864cf81856d2', 'PoorSerf',  'Giant', 'Ranger',       0,    0,    0,    0,    0, 250, 200, 2, 2, 3, 0, 0,  336, 'None', '1/1/03, 12:00am', 'seed');
 
@@ -56,10 +56,32 @@ VALUES
   ('idle@example.com',   'c1572d05424d0ecb2a65ec6a82aeacbf', 1300, 250, 5, 0, 5, 300, 2, 2, 6, 'Dagger', 3, 4, 'Magic Missile', 2, 4, 'Quarterstaff', 'Bow', 4, 2, 'Studded Leather', 'Robe', 'Leather', 1, 1, 2, 0, 0, 1, 0, 0),
   ('poor@example.com',   '3afc79b597f88a72528e864cf81856d2',    0,   0, 0, 0, 0, 100, 3, 2, 6, 'Dagger', 3, 4, 'Magic Missile', 2, 4, 'Quarterstaff', 'Bow', 4, 2, 'Studded Leather', 'Robe', 'Leather', 1, 1, 2, 0, 0, 1, 5, 0);
 
-INSERT INTO `research` (email, pw, userid, r1pts, r13pts, r14pts) VALUES
-  ('tester@example.com', '16d7a4fca7442dda3ad93c9a726597e4', 1, 0, 0, 0),
-  ('idle@example.com',   'c1572d05424d0ecb2a65ec6a82aeacbf', 2, 0, 0, 0),
-  ('poor@example.com',   '3afc79b597f88a72528e864cf81856d2', 3, 0, 125000, 0);
+-- r1/r15 are sages ASSIGNED to a project; r1pts/r15pts are the points they have
+-- accumulated. The primary tester has both kinds so the tick's research step is
+-- covered: without an assigned sage the UPDATE writes nothing observable, which
+-- is how the schema being four columns short went unnoticed for the whole port.
+INSERT INTO `research` (email, pw, userid, r1, r15, r1pts, r13pts, r14pts) VALUES
+  ('tester@example.com', '16d7a4fca7442dda3ad93c9a726597e4', 1, 5, 2, 0, 0, 0),
+  ('idle@example.com',   'c1572d05424d0ecb2a65ec6a82aeacbf', 2, 0, 0, 0, 0, 0),
+  ('poor@example.com',   '3afc79b597f88a72528e864cf81856d2', 3, 0, 0, 0, 125000, 0);
+
+-- An army in the field, so the tick's return path is exercised.
+--
+-- Slot 1 lands this tick (time1 = 1): the units should move into `military` and
+-- the slot should clear. Slot 2 is still travelling (time2 = 3) and should only
+-- have its timer decremented. Golems are included deliberately -- they are the
+-- reason both of those statements used to fail.
+DELETE FROM `returntbl` WHERE userid IN (1, 2, 3);
+INSERT INTO `returntbl` (email, pw, userid, war1, wiz1, pri1, arch1, golem1, irongolem1, time1, war2, golem2, time2) VALUES
+  ('tester@example.com', '16d7a4fca7442dda3ad93c9a726597e4', 1, 40, 2, 1, 3, 2, 1, 1, 25, 1, 3),
+  ('idle@example.com',   'c1572d05424d0ecb2a65ec6a82aeacbf', 2,  0, 0, 0, 0, 0, 0, 0,  0, 0, 0),
+  ('poor@example.com',   '3afc79b597f88a72528e864cf81856d2', 3,  0, 0, 0, 0, 0, 0, 0,  0, 0, 0);
+
+-- user.fleets counts generals still AVAILABLE, not armies in the field: sending
+-- an army decrements it and update.php:180 gives one back per army that lands.
+-- The two armies above therefore have to be paid for here, or the tick hands
+-- the tester a fifth general on a roster of four.
+UPDATE `user` SET fleets = 2 WHERE userid = 1;
 
 INSERT INTO `explore` (email, pw, userid) VALUES
   ('tester@example.com', '16d7a4fca7442dda3ad93c9a726597e4', 1),

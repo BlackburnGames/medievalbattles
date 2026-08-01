@@ -471,6 +471,17 @@ CREATE TABLE `research` (
   `r12` bigint(255) NOT NULL default '0',
   `r13` bigint(255) NOT NULL default '0',
   `r14` bigint(255) NOT NULL default '0',
+  -- The game has eighteen research projects, not fourteen: r15 Advanced
+  -- Farming, r16 Advanced Construction, r17 Animation, r18 Advanced Animation.
+  -- cresearch.php assigns sages to all eighteen and functions.php, buildings.php,
+  -- animate.php and attack.php all read their point totals; only this file
+  -- stopped at fourteen. Because the tick adds points to r1pts-r18pts in a
+  -- single atomic UPDATE, the four missing columns meant NO research point ever
+  -- accrued. See docs/modernization.md.
+  `r15` bigint(255) NOT NULL default '0',
+  `r16` bigint(255) NOT NULL default '0',
+  `r17` bigint(255) NOT NULL default '0',
+  `r18` bigint(255) NOT NULL default '0',
   `r1pts` bigint(255) NOT NULL default '0',
   `r2pts` bigint(255) NOT NULL default '0',
   `r3pts` bigint(255) NOT NULL default '0',
@@ -484,7 +495,11 @@ CREATE TABLE `research` (
   `r11pts` bigint(255) NOT NULL default '0',
   `r12pts` bigint(255) NOT NULL default '0',
   `r13pts` bigint(255) NOT NULL default '0',
-  `r14pts` bigint(255) NOT NULL default '0'
+  `r14pts` bigint(255) NOT NULL default '0',
+  `r15pts` bigint(255) NOT NULL default '0',
+  `r16pts` bigint(255) NOT NULL default '0',
+  `r17pts` bigint(255) NOT NULL default '0',
+  `r18pts` bigint(255) NOT NULL default '0'
 ) ENGINE=MyISAM;
 
 #
@@ -521,6 +536,21 @@ CREATE TABLE `returntbl` (
   `arch2` bigint(255) NOT NULL default '0',
   `arch3` bigint(255) NOT NULL default '0',
   `arch4` bigint(255) NOT NULL default '0',
+  -- Golems march with every army the engine sends: attack/calculations.php
+  -- writes golem<n>/irongolem<n> here, update.php:179-191 reads them back into
+  -- military, and functions.php renders them on the status screen. They were
+  -- simply missing from this file, which made both of those UPDATEs fail --
+  -- and a MySQL UPDATE is atomic, so the warriors, wizards, priests and
+  -- archers named alongside them were not written either. Every army sent out
+  -- was lost. See docs/modernization.md.
+  `golem1` bigint(255) NOT NULL default '0',
+  `golem2` bigint(255) NOT NULL default '0',
+  `golem3` bigint(255) NOT NULL default '0',
+  `golem4` bigint(255) NOT NULL default '0',
+  `irongolem1` bigint(255) NOT NULL default '0',
+  `irongolem2` bigint(255) NOT NULL default '0',
+  `irongolem3` bigint(255) NOT NULL default '0',
+  `irongolem4` bigint(255) NOT NULL default '0',
   `time1` bigint(255) NOT NULL default '0',
   `time2` bigint(255) NOT NULL default '0',
   `time3` bigint(255) NOT NULL default '0',
