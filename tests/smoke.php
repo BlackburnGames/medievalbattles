@@ -31,6 +31,11 @@ $PASS  = 'test1234';
 // A rank-and-file guild member, for the other arm of every role check.
 $MEMBER_EMAIL = 'idle@example.com';
 $MEMBER_PASS  = 'pass2';
+// The third fixture empire, who leads nothing, is in no guild and -- the reason
+// they are logged in at all -- is the only member of settlement 2. A raid files
+// two rows against the defender's settlement, and nobody else can read them.
+$TARGET_EMAIL = 'poor@example.com';
+$TARGET_PASS  = 'pass3';
 // Per-phase page caps. The logged-in URL space never closes -- paginated
 // listings keep generating fresh query strings -- so its cap always trips and
 // which scripts get reached depends on queue order. That makes the budget
@@ -305,6 +310,92 @@ foreach (array(
     inspect($path, $body, $tester->lastStatus);
 }
 
+/*
+ * Combat, which is the only thing in the game that files a news row.
+ *
+ * Thirty-two of the fifty-one news sites are in the three attack pages, and
+ * none of them had ever run: the crawler reaches attack.php but only its
+ * landing form, because launching an attack means naming a target and a number
+ * of units. So the whole conversion of the news column from stored markup to
+ * stored text -- see app/include/news.php -- was covered by nothing that ran
+ * here. What the sentences say is checked below; that they can be rendered
+ * safely from hostile input is tests/news-render.php.
+ *
+ * Target is PoorSerf (userid 3), who is in no guild, is not in safe mode and
+ * holds a settlement of their own, so neither the guild check nor the
+ * own-empire check refuses. The unit counts are chosen to clear their defence:
+ * they field five archers at power 2, so the attacker's offence has to beat 10
+ * and three warriors alone (power 2) would not.
+ *
+ * Before the crawl, like the barter calls above, because an attack needs a
+ * general and troops in the barracks, and the crawl spends both.
+ *
+ * Two attacks and no more: user.fleets is 2 in the fixture -- four generals
+ * less the two armies already in the field -- and each attack consumes one.
+ * That is also why attackm.php is not driven. It is the same file shape as
+ * attackr.php, and a third attack would find no general; giving the fixture
+ * one more would hand calculations.php a fifth army for four return slots,
+ * which is a fixture change with an engine bug attached rather than coverage.
+ */
+foreach (array(
+    // The land attack, won: three warriors at power 2 and three wizards at
+    // power 3 make 15 against their 10. This is the branch with the most news
+    // sites in it, and the one whose neighbour writes the [i]Medieval style[/i]
+    // line.
+    'attack.php?attack=1&empvalue=3&uwarrior=3&uwizard=3',
+    // The resource attack, lost, which is the other half of the shape: a raid
+    // files four rows either way and the two outcomes use different categories.
+    // Priests, because the warriors and wizards above are in the field now and
+    // attackr.php refuses to send what you do not have -- and three of them at
+    // power 2 make 6, which is what makes this the losing branch.
+    'attackr.php?attack=1&empvalue=3&upriest=3',
+) as $path) {
+    $body = $tester->get('/' . $path);
+    $visited++;
+    $scriptsHit[strtok($path, '?')] = true;
+    inspect($path, $body, $tester->lastStatus);
+}
+
+/*
+ * The rendered result, asserted rather than merely fetched.
+ *
+ * inspect() only knows about PHP diagnostics, and every one of these writers
+ * runs unchecked -- a news INSERT that fails leaves no trace in the response
+ * at all, which is exactly how the guildnews column named `guildid` went
+ * unnoticed for twenty years. So the two pages that read the rows back are
+ * asserted on directly.
+ *
+ * The class matters as much as the sentence. It is a category with a legend on
+ * snews.php, and it lives in its own column now, so a row rendering with the
+ * fallback colour would mean the writer never passed one.
+ */
+newsShows($tester, 'snews.php',
+    'TestLord (1) successfully attacked PoorSerf (2) and gained 25 land', '<font class=yellow>');
+newsShows($tester, 'snews.php',
+    'TestLord (1) failed to attack PoorSerf (2) for resources', '<font class=yellow>');
+// Empire news reaches the tester through the barter buys above; an attack files
+// its empire line against the defender, not the attacker.
+newsShows($tester, 'main.php?pageid=news', 'You have bought', '<font class=yellow>');
+
+/*
+ * The defender's half, which needs the defender's own eyes: snews.php shows the
+ * settlement you are in and nothing else, and the two empires are in different
+ * ones.
+ *
+ * Worth a third login for one page, because the two rows this asserts were the
+ * bug this phase found. attackr.php and attackm.php filed the defender's
+ * settlement news against $tsetid -- a name nothing assigns in either file, and
+ * on tests/register-globals.txt as a dead read since the audit was written -- so
+ * both rows went to setid 0 and no settlement has ever been told one of its
+ * members was raided. attack.php, which does the same thing correctly, is what
+ * says what the value should have been.
+ */
+$target = login($BASE, $TARGET_EMAIL, $TARGET_PASS);
+newsShows($target, 'snews.php',
+    'PoorSerf (2) lost 25 land to TestLord (1)', '<font class=lg>');
+newsShows($target, 'snews.php',
+    'PoorSerf (2) successfully defended their resources against TestLord (1)', '<font class=orange>');
+
 crawl($tester, array('main.php?pageid=news'), $MAX_PAGES);
 
 /*
@@ -574,6 +665,38 @@ function crawl(MbClient $client, array $seeds, $maxPages, $confineTo = '')
     // Reported rather than silent: a phase that ran out of budget with work
     // left did not prove the pages it never opened were fine.
     $unfinished += count($queue);
+}
+
+/**
+ * Fetch a news page and assert that a line is on it, in its category's colour.
+ *
+ * The rest of this file asserts absence -- no fatal, no warning, no unexpected
+ * status -- which is the right shape for a crawl and the wrong shape for a
+ * write that produces no diagnostic when it fails. Every news INSERT in the
+ * game is fired unchecked, so "the page rendered" and "the row was written"
+ * are independent facts and only the first one is otherwise tested.
+ *
+ * $class is asserted separately from the sentence rather than as one string,
+ * because the two now come from different columns: matching the whole
+ * "<font class=yellow>TestLord ..." would pass a row that stored the colour
+ * back inside the sentence, which is the thing being kept out.
+ */
+function newsShows(MbClient $client, $path, $needle, $class)
+{
+    global $scriptsHit, $visited, $failures;
+
+    $body = $client->get('/' . $path);
+    $visited++;
+    $scriptsHit[strtok($path, '?')] = true;
+    inspect($path, $body, $client->lastStatus);
+
+    if (strpos($body, $needle) === false) {
+        $failures["$path | news line missing: $needle"] = $path;
+    } elseif (strpos($body, $class) === false) {
+        $failures["$path | news line not in category $class"] = $path;
+    }
+
+    return $body;
 }
 
 /**

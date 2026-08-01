@@ -53,6 +53,7 @@ Individual tests:
 bash tests/tick-golden.sh                 # tick regression test
 bash tests/tick-golden.sh --accept        # re-accept after an intended change
 docker compose exec -T web php /repo/tests/smoke.php        # page crawl only
+docker compose exec -T web php /repo/tests/news-render.php  # news writers + renderer
 docker compose exec -T web php /repo/tests/dump-state.php   # dump DB as text
 MB_WRITE_BASELINE=1 docker compose exec -T web php /repo/tests/smoke.php  # regen baseline
 ```

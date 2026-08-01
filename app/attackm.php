@@ -137,7 +137,11 @@ else	{
 			mb_news_guild($db, "$clock", 'yellow', "$ename ($setid) failed to attack $evu[ename] ($evu[setid]) for mountains", $gid['0'], 0);
 		}
 
-		mb_news_set($db, "$clock", 'orange', "$evu[ename] ($evu[setid]) successfully defended their mountains against $ename ($setid)", $tsetid, 0);
+//	The defender's own settlement, which used to be $tsetid -- a name nothing in
+//	this file or anything it includes has ever assigned. Both of these rows were
+//	filed against setid 0, so no settlement has ever heard about a raid on one of
+//	its members. attack.php files the same sentence against $evu['setid'].
+		mb_news_set($db, "$clock", 'orange', "$evu[ename] ($evu[setid]) successfully defended their mountains against $ename ($setid)", $evu['setid'], 0);
 			
 		if($tgid[0] != "")	{
 			mb_news_guild($db, "$clock", 'orange', "$evu[ename] ($evu[setid]) successfully defended their mountains against $ename ($setid)", $tgid['0'], 0);
@@ -185,7 +189,7 @@ else	{
 			mb_news_guild($db, "$clock", 'yellow', "$ename ($setid) successfully attacked $evu[ename] ($evu[setid]) and gained $mtgain mountains", $gid['0'], 0);
 		}
 
-		mb_news_set($db, "$clock", 'lg', "$evu[ename] ($evu[setid]) lost $mtgain mountains to $ename ($setid)", $tsetid, 0);
+		mb_news_set($db, "$clock", 'lg', "$evu[ename] ($evu[setid]) lost $mtgain mountains to $ename ($setid)", $evu['setid'], 0);
 											
 		if($tgid[0] != "")	{
 			mb_news_guild($db, "$clock", 'lg', "$evu[ename] ($evu[setid]) lost $mtgain mountains to $ename ($setid)", $tgid['0'], 0);

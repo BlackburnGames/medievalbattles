@@ -240,12 +240,35 @@ schema has never had, so "X has been removed from the guild" never appeared.
 column and there is no other corpus, which is the fact that made doing it now
 rather than later obviously right.
 
-**The suite reaches none of the 51 news writers.** The crawl produces no news
-rows at all, so this conversion was verified by driving all three writers and
-the renderer directly — including an empire name that is an XSS payload, the
-`[i]Medieval style[/i]` line, and a `class` column holding something unknown,
-which falls back to `yellow` rather than landing raw in the attribute. Closing
-that coverage gap is the obvious next job.
+~~**The suite reaches none of the 51 news writers.**~~ **It does now**, in the
+two halves the gap actually had.
+
+The crawl files real rows: thirty-two of the fifty-one sites are in the three
+attack pages, and none had ever run, because launching an attack means naming a
+target and a number of units and the crawler only follows links. Two attacks are
+driven by hand — a land raid that wins and a resource raid that loses, which is
+both outcome branches — and the rendered lines are then asserted on `snews.php`
+and `main.php?pageid=news`, sentence and category colour separately. Asserting
+matters more here than anywhere else in the crawl: every news `INSERT` in the
+game is fired unchecked, so a row that is never written produces no diagnostic
+at all.
+
+It found one immediately. `attackr.php` and `attackm.php` filed the defender's
+settlement news against `$tsetid`, a name nothing in either file assigns — both
+were on `tests/register-globals.txt` as dead reads — so all four rows went to
+setid 0 and no settlement has ever been told that one of its members was raided.
+`attack.php` writes the same sentence against `$evu['setid']`, which is what
+says what the value should have been. The ratchet is down to 159.
+
+What the crawl still cannot do is choose an empire name, and an empire name that
+is an XSS payload is the case this conversion exists for — the fixture's names
+are what the tick golden master is computed from. So the round trip is driven
+directly in `tests/news-render.php`: the three writers, then the renderer, on
+the rows read back out of the database. It asserts that text survives unchanged,
+that the category is in its own column, that the payload renders inert, that
+`[i]Medieval style[/i]` italicises while a typed `<i>` does not, and that an
+unknown category falls back to `yellow` rather than landing raw in the unquoted
+attribute.
 - **Passwords.** Unsalted MD5, denormalized into four tables alongside the
   email that identifies the row.
 - ~~**Error handling.**~~ **Done.** `mysqli_report()` is back on as

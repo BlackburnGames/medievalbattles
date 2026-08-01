@@ -98,6 +98,10 @@ looks unassigned. Both readings have to be checked before acting:
   **not** — all 24 are assigned in `include/buttons.php`, which `S_WEP.php`
   includes on its first line. The weapon buy buttons render fine; this entry
   and its siblings are an artefact of the per-file analysis.
+- `app/attackr.php` and `app/attackm.php` reading `$tsetid` were **real**, and
+  took driving an attack to prove: both filed the defender's settlement news
+  against it, so four news rows went to setid 0 rather than to the settlement
+  being raided. Fixed, which is what took the list from 161 to 159.
 
 ### `tests/sql-injection-audit.php`
 
@@ -201,6 +205,27 @@ used to be, and both are stored as plain text now — `mb_rich()` and
 `empnews`, `setnews` or `guildnews` at all, so a broken news INSERT would not
 fail this suite — which is how `guildconfig.php` came to be writing into a
 `guildid` column the schema has never had.
+
+### `tests/news-render.php`
+
+The only test in the suite that drives app functions directly rather than
+through a page, and the reason is a limit of the crawl rather than a preference.
+The three news writers and `mb_news_html()` (see
+[`app/include/news.php`](../app/include/news.php)) turn a stored sentence and a
+category back into markup, and the value that reaches every one of those
+sentences is an empire name — which a player chooses. The crawl files real news
+rows now, but it cannot make one of those names an XSS payload: the fixture's
+names are what the tick golden master is computed from.
+
+So the round trip runs here, with the hostile values a real player could pick.
+It asserts that what goes in comes back byte for byte (escaping on the way in
+was the defect being removed), that the category is in its own column rather
+than wrapped around the sentence, that the payload renders inert, that `[i]`
+works while a typed `<i>` does not, and that an unknown category falls back
+rather than landing in the unquoted `class=` attribute.
+
+It writes to the three news tables on ids far outside the fixture's and deletes
+what it wrote, so it is order-independent and safe against a live world.
 
 ### `tests/query-audit.sh`
 
@@ -317,6 +342,36 @@ seeded listings are numbered 1–3 so the URLs are stable: 1 and 2 belong to
 other empires and are the buy path (2's seller is a guild-mate, because
 `guildbarter.php` refuses anyone else), 3 is the tester's own and is the cancel
 path.
+
+**Combat is driven by hand too, and it is the only thing that files news.**
+Thirty-two of the fifty-one news sites are in the three attack pages, and none
+had ever run: the crawler reaches `attack.php` but only its landing form,
+because launching an attack means naming a target and a number of units. Two
+attacks on `poor@` — a land raid that wins and a resource raid that loses, so
+both outcome branches are covered — and then the rendered lines are asserted on
+`snews.php` and `main.php?pageid=news`.
+
+The assertion is the point. Every news `INSERT` in the game is fired unchecked,
+so a row that is never written produces no diagnostic and the crawl's usual
+"no warning in the body" test cannot see it. `newsShows()` fetches the page,
+runs the same `inspect()` as everything else, and then requires the sentence
+*and* its category colour — separately, because they come from different
+columns now and matching them as one string would pass a row that stored the
+`<font>` tag back inside the text.
+
+It found one on its first run. `attackr.php` and `attackm.php` filed the
+defender's settlement news against `$tsetid`, which nothing in either file
+assigns — both were on `register-globals.txt` as dead reads — so the rows went
+to setid 0 and no settlement has ever been told that one of its members was
+raided. `attack.php` does the same thing correctly and is what says what the
+value should be. Checking that half needs a third login: `snews.php` shows the
+settlement you are in, and attacker and defender are in different ones.
+
+Two attacks and no more, because `user.fleets` is 2 in the fixture — four
+generals less the two armies already in the field — and each attack consumes
+one. That is also why `attackm.php` is not driven: it is the same file shape as
+`attackr.php`, and giving the fixture a third general would hand
+`calculations.php` a fifth army for four return slots.
 
 The email change in `preferences.php` is driven on the *member*, not the
 primary tester: it rewrites six tables and the session, and every fixture the

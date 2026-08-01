@@ -17,7 +17,6 @@ app/attackm.php	gid
 app/attackm.php	mgain
 app/attackm.php	mtally
 app/attackm.php	tgid
-app/attackm.php	tsetid
 app/attackm.php	your_losses
 app/attackr.php	cdefense
 app/attackr.php	evm
@@ -25,7 +24,6 @@ app/attackr.php	evpower
 app/attackr.php	evu
 app/attackr.php	gid
 app/attackr.php	tgid
-app/attackr.php	tsetid
 app/attackr.php	your_losses
 app/buildings.php	adv_const
 app/checklogin.php	computer_id

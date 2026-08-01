@@ -24,6 +24,16 @@ if ! docker compose exec -T web php /repo/tests/smoke.php; then
   status=1
 fi
 
+# The news pipeline, driven directly rather than through a page. The crawl now
+# files news rows (see its combat phase) but it cannot choose an empire name,
+# and an empire name that is an XSS payload is the case this conversion exists
+# for. Order-independent: it writes and deletes its own rows on scratch ids.
+echo
+echo "=== news pipeline ==="
+if ! docker compose exec -T web php /repo/tests/news-render.php; then
+  status=1
+fi
+
 # Static, so order does not matter; last because it is the port checklist
 # rather than a behavioural test.
 echo
