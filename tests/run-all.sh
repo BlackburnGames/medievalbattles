@@ -24,6 +24,14 @@ if ! docker compose exec -T web php /repo/tests/smoke.php; then
   status=1
 fi
 
+# Static, so order does not matter; last because it is the port checklist
+# rather than a behavioural test.
+echo
+echo "=== register_globals audit ==="
+if ! docker compose exec -T web php /repo/tests/register-globals-audit.php; then
+  status=1
+fi
+
 echo
 if [ "$status" = "0" ]; then
   echo "ALL TESTS PASSED"
