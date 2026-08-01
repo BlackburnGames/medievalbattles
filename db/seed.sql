@@ -69,11 +69,49 @@ INSERT INTO `explore` (email, pw, userid) VALUES
 -- A guild exists so the guild and guild-forum pages are reachable. Without
 -- membership the crawler cannot enter roughly ten scripts at all, and they
 -- would silently sit outside the regression net.
+--
+-- `owner` holds the owner's USERID, not their empire name. It looks like a
+-- name column and every screen renders it next to one, but gc.php:210 inserts
+-- '$userid' and every reader compares it to '$userid' -- so seeding the ename
+-- here (as this fixture did until now) leaves the guild with no recognised
+-- leader, and silently hid gl-forum, gl-topic, gl-inputposts, gl-delposts and
+-- guildconfig from the crawl.
 DELETE FROM `guild` WHERE gid = 1;
 INSERT INTO `guild` (gname, cpw, strength, gid, datemade, info, owner, mem, notice) VALUES
-  ('Testguild', '', 0, 1, '1/1/03, 12:00am', 'A guild used by the test fixtures.', 'TestLord', 2, 'None');
+  ('Testguild', '', 0, 1, '1/1/03, 12:00am', 'A guild used by the test fixtures.', '1', 2, 'None');
 
 UPDATE `user` SET guild = 'Testguild' WHERE userid IN (1, 2);
+
+-- The primary tester leads settlement 1, which is what gates sl.php and the
+-- sl-* settlement forum moderation pages. govt.php elects a leader by setting
+-- this column; there is no separate leader column on `settlement`.
+UPDATE `user` SET sl = 'yes' WHERE userid = 1;
+UPDATE `user` SET sl = 'no'  WHERE userid IN (2, 3);
+
+-- Seeded forum threads. Both forums are empty until someone posts, and an
+-- empty forum renders no topic links at all -- so topic.php, topicg.php and
+-- the moderation pages that hang off them were unreachable from the crawl no
+-- matter which user it logged in as.
+--
+-- topicid/messageid are given explicitly so the crawl visits stable URLs.
+DELETE FROM `setforums`      WHERE setid = 1;
+DELETE FROM `setforumsmsgs`  WHERE setid = 1;
+DELETE FROM `guildthreads`   WHERE guildname = 'Testguild';
+DELETE FROM `guildmsgs`      WHERE topicid IN (1, 2);
+
+INSERT INTO `setforums` (setid, topicid, name, topic, lastpost, lastposter, replies, message, datestamp) VALUES
+  (1, 1, 'TestLord',  'Settlement muster',  '1/1/03, 12:00am', 'IdleBaron', 1, 'Who is holding the north wall?', '1/1/03, 12:00am'),
+  (1, 2, 'IdleBaron', 'Grain prices again', '1/1/03, 12:00am', 'IdleBaron', 0, 'The mill is charging double.',   '1/1/03, 12:00am');
+
+INSERT INTO `setforumsmsgs` (setid, messageid, name, topic, topicid, message, datestamp) VALUES
+  (1, 1, 'IdleBaron', 'Settlement muster', 1, 'I will take the watch.', '1/1/03, 12:00am');
+
+INSERT INTO `guildthreads` (topicid, name, host, topic, lastpost, lastposter, replies, message, datestamp, guildname) VALUES
+  (1, 'TestLord',  'localhost', 'Guild orders',   '1/1/03, 12:00am', 'IdleBaron', 1, 'Muster at dawn.',        '1/1/03, 12:00am', 'Testguild'),
+  (2, 'IdleBaron', 'localhost', 'Recruiting', '1/1/03, 12:00am', 'IdleBaron', 0, 'We have two open slots.', '1/1/03, 12:00am', 'Testguild');
+
+INSERT INTO `guildmsgs` (messageid, name, host, topic, topicid, message, datestamp) VALUES
+  (1, 'IdleBaron', 'localhost', 'Guild orders', 1, 'Understood.', '1/1/03, 12:00am');
 
 -- Settlements 1 and 2 now hold the seeded users.
 UPDATE `settlement` SET members = 2, setname = 'Testhold'  WHERE setid = 1;
