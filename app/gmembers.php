@@ -32,7 +32,7 @@ else	{
 
 	echo "<div align=center><font class=yellow>You have left $empireguild</a><br>";
 	
-	mysqli_query($db, "INSERT INTO guildnews (date, news, gid, gnid)	VALUES	('$clock', '<font class=blue>$ename has left $empireguild</font>', '$guild_id[gid]' , '$gnid') ");
+	mb_news_guild($db, "$clock", 'blue', "$ename has left $empireguild", $guild_id['gid'], $gnid);
 	mysqli_query($db, "UPDATE user SET guild='None' WHERE email='$email' AND pw='$pw'");
 }
 

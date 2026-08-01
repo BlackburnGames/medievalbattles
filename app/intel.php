@@ -79,7 +79,7 @@ else	{
 			// nothing -- the parameter is still a piece of the statement text.
 			mysqli_query($db, "UPDATE military SET thieves = round($thieves - (" . mb_sql_int($send) . " * .1)) WHERE email='$email' AND pw='$pw'");
 			mysqli_query($db, "UPDATE user SET nno = nno + 1 WHERE userid=" . mb_sql_int($empvalue));
-			mysqli_query($db, "INSERT INTO empnews (date, news, yourid)	VALUES	('$clock', '<font class=yellow>$ename ($setid) has failed to gather information on you</font>' , " . mb_sql_int($empvalue) . ") ");
+			mb_news_emp($db, "$clock", 'yellow', "$ename ($setid) has failed to gather information on you", $empvalue);
 			
 			include("include/S_INTEL.php");
 			die();
@@ -88,7 +88,7 @@ else	{
 	
 			mysqli_query($db, "UPDATE military SET thieves = round($thieves - (" . mb_sql_int($send) . " * .03)) WHERE email='$email' AND pw='$pw'");
 			mysqli_query($db, "UPDATE user SET nno = nno + 1 WHERE userid=" . mb_sql_int($empvalue));
-			mysqli_query($db, "INSERT INTO empnews (date, news, yourid)	VALUES	('$clock', '<font class=yellow>Thieves have gathered intelligence on your empire</font>' , " . mb_sql_int($empvalue) . ") ");
+			mb_news_emp($db, "$clock", 'yellow', "Thieves have gathered intelligence on your empire", $empvalue);
 
 			$tempmodifier = 1.00;
 

@@ -138,10 +138,10 @@ if (IsSet($daccount)) {
 	// inserted into it. That is the per-settlement schema this game has not
 	// used since before db.sql, and it also meant a settlement id from the
 	// database was interpolated outside quotes as an identifier.
-	$news    = "<font class=red><b>$empre</b> has been deleted by an administrator</font>";
+	$news    = "[b]{$empre}[/b] has been deleted by an administrator";
 	$q_tmail = mb_sql_str($db, $tmail);
 
-	mysqli_query($db, "INSERT INTO setnews (date, news, setid)	VALUES	('$clock', " . mb_sql_str($db, $news) . ", " . mb_sql_int($esetid) . ") ");
+	mb_news_set($db, "$clock", 'red', $news, $esetid, 0);
 
 	mysqli_query($db, "DELETE FROM buildings WHERE email=$q_tmail");
 	mysqli_query($db, "DELETE FROM military WHERE email=$q_tmail");

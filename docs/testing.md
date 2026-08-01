@@ -192,10 +192,15 @@ the tag a value lands in is routinely opened somewhere else: `topic.php` emits
 an `<input ... value="` as inline HTML and the short-tag echo that follows
 carries no literal text of its own.
 
-One value is deliberately still echoed as markup. The forum post body is stored
-as markup, because the forum has always allowed `<i>` and `<b>`; it is closed
-by `mb_post_html()` at the point it is stored instead. See
+Nothing is echoed as stored markup any more. The forum body and the news lines
+used to be, and both are stored as plain text now — `mb_rich()` and
+`mb_news_html()` in `app/include/` do the markup at render time. See
 [modernization.md](modernization.md).
+
+**The 51 news writers are not covered.** The crawl produces no rows in
+`empnews`, `setnews` or `guildnews` at all, so a broken news INSERT would not
+fail this suite — which is how `guildconfig.php` came to be writing into a
+`guildid` column the schema has never had.
 
 ### `tests/query-audit.sh`
 

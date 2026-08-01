@@ -36,7 +36,6 @@ app/gl-forum.php	topic_replies	text
 app/gmembers.php	guild_strength_total	text
 app/gmembers.php	row	text
 app/gmembers.php	t_setid	text
-app/gnews.php	row	text
 app/govt.php	fename	text
 app/guildconfig.php	applicant_ename	text
 app/guildconfig.php	empire_info	text
@@ -79,7 +78,6 @@ app/intel.php	evb	text
 app/intel.php	evdef	text
 app/intel.php	evm	text
 app/intel.php	evu	text
-app/main.php	row	text
 app/messaging.php	empireattacked	text
 app/scattack.php	evu	text
 app/setstrength.php	row	text

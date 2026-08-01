@@ -165,7 +165,7 @@ if ($signup) {
 
     include("include/clock.php");
 
-    $db->query("INSERT INTO setnews (date, news, setid)   VALUES ('$clock', '<font class=red>$ename has joined the settlement</font>', '$snum') ");
+    mb_news_set($db, "$clock", 'red', "$ename has joined the settlement", $snum, 0);
     $db->query("INSERT INTO returntbl (email, pw, userid)   VALUES ('$email', '$pw', '$newbuserid') ");
 
     echo "Thank you for signing up for Medieval Battles. You are in settlement $snum.<br>Your login information and activation code has been emailed to you.<br><br><a href=index.php>You can login now here</a>";

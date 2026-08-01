@@ -234,7 +234,7 @@ while($INC_ID < $max_UID + 1) {
   mysqli_query($db, "UPDATE emailvalidate SET clock= clock - 1 WHERE clock > 0 AND userid ='$INC_ID'");
 
   if($validate['clock'] == 1 AND $validate['check'] == 1)  {
-    mysqli_query($db, "INSERT INTO setnews (date, news, setid)  VALUES  ('$clock', '<font class=red>$user[ename] has been deleted for inactivity.</font>', '$user[setid]') ");
+    mb_news_set($db, "$clock", 'red', "$user[ename] has been deleted for inactivity.", $user['setid'], 0);
 
     $email = $user['email'];
     $subject = "Your Medieval Battles Account Deleted";
@@ -264,7 +264,7 @@ This email is automated. Your reply will not be recieved.";
   mysqli_query($db, "UPDATE user SET countdown= countdown - 1 WHERE userid ='$INC_ID'");
 
   if($user['countdown'] == 1)  {
-    mysqli_query($db, "INSERT INTO setnews (date, news, setid)  VALUES  ('$clock', '<font class=red>$user[ename] has been deleted for inactivity.</font>', '$user[setid]') ");
+    mb_news_set($db, "$clock", 'red', "$user[ename] has been deleted for inactivity.", $user['setid'], 0);
 
     $email = $user['email'];
     $subject = "Your Medieval Battles Account Deleted";

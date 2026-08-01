@@ -149,24 +149,24 @@ else	{
 			$mgnid = mb_db_result($Guild_MaxID,"mgnid");
 					
 		$sid = $msid + 1;
-		mysqli_query($db, "INSERT INTO setnews (date, news, setid, sid)	VALUES	('$clock', '<font class=yellow>$ename ($setid) failed to attack $evu[ename] ($evu[setid]) for land</font>', '$setid', '$sid') ");
+		mb_news_set($db, "$clock", 'yellow', "$ename ($setid) failed to attack $evu[ename] ($evu[setid]) for land", $setid, $sid);
 					
 		if($gid[0] != "")	{
 			$gnid = $mgnid + 1;
-			mysqli_query($db, "INSERT INTO guildnews (date, news, gid, gnid)	VALUES	('$clock', '<font class=yellow>$ename ($setid) failed to attack $evu[ename] ($evu[setid]) for land</font>', '$gid[0]', '$gnid') ");
+			mb_news_guild($db, "$clock", 'yellow', "$ename ($setid) failed to attack $evu[ename] ($evu[setid]) for land", $gid['0'], $gnid);
 		}
 		
 		$sid = $msid + 1;
-		mysqli_query($db, "INSERT INTO setnews (date, news, setid, sid)	VALUES	('$clock', '<font class=orange>$evu[ename] ($evu[setid]) successfully defended their land against $ename ($setid)</font>', '$evu[setid]', '$sid') ");
+		mb_news_set($db, "$clock", 'orange', "$evu[ename] ($evu[setid]) successfully defended their land against $ename ($setid)", $evu['setid'], $sid);
 					
 		if($tgid[0] != "")	{
 			$gnid = $mgnid + 2;
-			mysqli_query($db, "INSERT INTO guildnews (date, news, gid, gnid)	VALUES	('$clock', '<font class=orange>$evu[ename] ($evu[setid]) successfully defended their land against $ename ($setid)</font>', '$tgid[0]', '$gnid') ");
+			mb_news_guild($db, "$clock", 'orange', "$evu[ename] ($evu[setid]) successfully defended their land against $ename ($setid)", $tgid['0'], $gnid);
 		}
 						
 		mysqli_query($db, "UPDATE user SET nno = nno + 1 WHERE userid=" . mb_sql_int($empvalue));
 
-		mysqli_query($db, "INSERT INTO empnews (date, news, yourid)	VALUES	('$clock', '<font class=yellow>We have successfully defended our empire against $ename ($setid)</font>' , " . mb_sql_int($empvalue) . ") ");
+		mb_news_emp($db, "$clock", 'yellow', "We have successfully defended our empire against $ename ($setid)", $empvalue);
 					
 		echo"<div align=center><font class=yellow>We have failed to attack $evu[ename]($evu[setid])!</font><br><br><font class=orange>$your_losses<br><br></font></div>";
 		include("include/attack/ldrop.php");
@@ -235,42 +235,42 @@ else	{
 	 		
 	if($landgain >= 10 AND $evu['land'] - $landgain >= 1)	{
 		$sid + $msid + 1;
-		mysqli_query($db, "INSERT INTO setnews (date, news, setid, sid)	VALUES	('$clock', '<font class=yellow>$ename ($setid) successfully attacked $evu[ename] ($evu[setid]) and gained $landgain land</font>', '$setid', '$sid') ");
+		mb_news_set($db, "$clock", 'yellow', "$ename ($setid) successfully attacked $evu[ename] ($evu[setid]) and gained $landgain land", $setid, $sid);
 									
 		if($gid[0] != "")	{
 			$gnid = $mgnid + 1;
-			mysqli_query($db, "INSERT INTO guildnews (date, news, gid, gnid)	VALUES	('$clock', '<font class=yellow>$ename ($setid) successfully attacked $evu[ename] ($evu[setid]) and gained $landgain land</font>', '$gid[0]', '$gnid') ");
+			mb_news_guild($db, "$clock", 'yellow', "$ename ($setid) successfully attacked $evu[ename] ($evu[setid]) and gained $landgain land", $gid['0'], $gnid);
 		}
 		
 		$sid = $msid + 2;
-		mysqli_query($db, "INSERT INTO setnews (date, news, setid, sid)	VALUES	('$clock', '<font class=lg>$evu[ename] ($evu[setid]) lost $landgain land to $ename ($setid)</font>', '$evu[setid]', '$sid') ");
+		mb_news_set($db, "$clock", 'lg', "$evu[ename] ($evu[setid]) lost $landgain land to $ename ($setid)", $evu['setid'], $sid);
 												
 		if($tgid[0] != "")	{
 			$gnid = $mgnid + 2;
-			mysqli_query($db, "INSERT INTO guildnews (date, news, gid, gnid)	VALUES	('$clock', '<font class=lg>$evu[ename] ($evu[setid]) lost $landgain land to $ename ($setid)</font>', '$tgid[0]', '$gnid') ");
+			mb_news_guild($db, "$clock", 'lg', "$evu[ename] ($evu[setid]) lost $landgain land to $ename ($setid)", $tgid['0'], $gnid);
 		}
 	}
 	if($evu['land'] - $landgain <= 0)	{
 		$sid = $msid + 1;
-		mysqli_query($db, "INSERT INTO setnews (date, news, setid, sid)	VALUES	('$clock', '<font class=yellow>$ename ($setid) gained $landgain land and destroyed $evu[ename] ($evu[setid]) <i>Medieval style</i></font>', '$setid', '$sid') ");
+		mb_news_set($db, "$clock", 'yellow', "$ename ($setid) gained $landgain land and destroyed $evu[ename] ($evu[setid]) [i]Medieval style[/i]", $setid, $sid);
 												
 		if($gid[0] != "")	{
 			$gnid = $mgnid + 1;
-			mysqli_query($db, "INSERT INTO guildnews (date, news, gid, gnid)	VALUES	('$clock', '<font class=yellow>$ename ($setid) gained $landgain land and destroyed $evu[ename] ($evu[setid]) <i>Medieval style</i></font>', '$gid[0]', '$gnid') ");
+			mb_news_guild($db, "$clock", 'yellow', "$ename ($setid) gained $landgain land and destroyed $evu[ename] ($evu[setid]) [i]Medieval style[/i]", $gid['0'], $gnid);
 		}
 		$sid = $msid + 2;
-		mysqli_query($db, "INSERT INTO setnews (date, news, setid, sid)	VALUES	('$clock', '<font class=lg>$evu[ename] ($evu[setid]) was destroyed by $ename ($setid) <i>Medieval style</i></font>', '$evu[setid]', '$sid') ");
+		mb_news_set($db, "$clock", 'lg', "$evu[ename] ($evu[setid]) was destroyed by $ename ($setid) [i]Medieval style[/i]", $evu['setid'], $sid);
 												
 		if($tgid[0] != "")	{
 			$gnid = $mgnid + 2;
-			mysqli_query($db, "INSERT INTO guildnews (date, news, gid, gnid)	VALUES	('$clock', '<font class=lg>$evu[ename] ($evu[setid]) was destroyed by $ename ($setid) <i>Medieval style</i></font>', '$tgid[0]', '$gnid') ");
+			mb_news_guild($db, "$clock", 'lg', "$evu[ename] ($evu[setid]) was destroyed by $ename ($setid) [i]Medieval style[/i]", $tgid['0'], $gnid);
 		}
 	}
 	if($landgain >= 10 AND $evu['land'] - $landgain >= 1)	{
 		echo"<div align=center><font class=yellow>You have conquered $landgain land from $evu[ename]($evu[setid])!</font><br><br><font class=orange>$your_losses<br><br></font>";
 					
 		mysqli_query($db, "UPDATE user SET nno = nno + 1 WHERE userid=" . mb_sql_int($empvalue));				
-		mysqli_query($db, "INSERT INTO empnews (date, news, yourid)	VALUES	('$clock', '<font class=yellow>We have unsuccessfully defended our empire against $ename ($setid) and lost $landgain land</font>' , " . mb_sql_int($empvalue) . ") ");
+		mb_news_emp($db, "$clock", 'yellow', "We have unsuccessfully defended our empire against $ename ($setid) and lost $landgain land", $empvalue);
 		include("include/attack/ldrop.php");
 		include("include/attack/table.php");
 	}

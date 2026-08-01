@@ -29,14 +29,14 @@ echo "
 		<td class=main2 width=20% align=left><b class=reg>Date/Time</b></td>
 		<td class=main2 align=left><b class=reg width=80%>News</b></td>";
 
-$query_string = "SELECT date, news, gnid FROM guildnews WHERE gid='$guild_id[gid]' ORDER BY date DESC LIMIT 0, 60";
+$query_string = "SELECT date, news, gnid, class FROM guildnews WHERE gid='$guild_id[gid]' ORDER BY date DESC LIMIT 0, 60";
 $result_id = mysqli_query($db, $query_string);
 while ($row = mysqli_fetch_row($result_id))	{
 	$num = $num + 1;
 echo "
 	<tr align=center valign=top colspan=6>
-		<td bgcolor=404040 align=left>$row[0]</td>
-		<td bgcolor=404040 align=left>$row[1]</td>\n";
+		<td bgcolor=404040 align=left>" . mb_h($row[0]) . "</td>
+		<td bgcolor=404040 align=left>" . mb_news_html($row[3], $row[1]) . "</td>\n";
 }
 ?>
 

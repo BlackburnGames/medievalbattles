@@ -143,13 +143,9 @@ In progress. The known work, in no committed order:
     guild name, `S_PREF.php`'s MSN field, `barter_handler.php`'s unit type, and
     one boolean.
 
-  The forum post body is the one value still echoed as markup, because it is
-  stored as markup on purpose: the forum has always allowed `<i>` and `<b>`.
-  That is closed at the boundary instead. `strip_tags($message, "<i>,<b>")` is
-  the wrong tool for an allow-list — an allowed tag keeps its attributes, so
-  `<i onmouseover=alert(1)>` passed through whole. `mb_post_html()` escapes
-  everything and restores exactly the two bare tags, which an attribute makes
-  not match.
+  The forum post body was the one value still echoed as markup, because it was
+  stored as markup. That is fixed by not storing markup at all — see
+  "Rich text, stored as text" below.
 
   Same two limits the SQL audit carries, and they matter more here. It is
   **first-order and per-file**, so the stored XSS — an empire name, a guild
@@ -162,9 +158,9 @@ In progress. The known work, in no committed order:
   the whole of it — every echo in the app that renders something a player
   typed.
 
-  **All 24 attribute-context entries are closed; the 92 in element text are
-  not.** The attributes came first because that is the half escaping alone
-  cannot fix, and because they concentrate the genuinely dangerous shapes:
+  **All 24 attribute-context entries are closed**, and the element-text ones
+  are down to 88. The attributes came first because that is the half escaping
+  alone cannot fix, and because they concentrate the genuinely dangerous shapes:
 
   - `S_SET.php` rendered `<img src=$settlepic>` bare, from a URL a settlement
     leader types in — the same shape as `gc.php`'s guild flag, which had
@@ -176,18 +172,80 @@ In progress. The known work, in no committed order:
   - Every listing's action link: the forum thread links, the barter Barter/End
     pair, the guild accept/reject pair, the settlement and guild member links.
 
-  What is left is 92 element-text entries, and they are not simply 92 `mb_h()`
-  calls. Some of those values are stored as markup on purpose and would
-  double-escape: the forum post body, and the guild name and info, which
-  `gc.php` runs through `htmlspecialchars()` on the way in. Closing them means
-  deciding per column whether the stored value is text or markup and unwinding
-  the 2003 escape-on-input where it is the latter. That is the next piece of
-  work, and it is a data decision rather than a mechanical one.
+  What is left is 88 element-text entries. They are not blocked on anything any
+  more — the values that used to be markup are text now — but a good many are
+  numbers and dates rather than anything a player types, so the list is longer
+  than the risk in it.
 
-  One pre-existing mismatch found and left alone: `gc.php` stores the
-  HTML-escaped guild name in `guild.gname` and the raw one in `user.guild` on
-  the two adjacent statements that create a guild, so a name containing `&` or
-  `<` never matches itself again.
+### Rich text, stored as text
+
+The escaping above made the stored HTML *safe*. It was still stored HTML, which
+is the actual defect: the database held presentation, and every reader had to
+know which columns were markup and which were not. Three things were tangled
+together under that heading, and only one of them was rich text.
+
+**Most of it was not rich text at all.** `htmlspecialchars()` on the way in was
+2003's stand-in for output escaping. With `mb_h()` at the other end it is pure
+downside, and it was breaking two things outright:
+
+- **Passwords.** `preferences.php` stored `md5(htmlspecialchars($newpw))` while
+  `checksignup.php` and `checklogin.php` hash the raw string.
+  `credentials.php` constrains the *hash*, not the password, so nothing stopped
+  it: changing your password to anything containing `& < > " '` stored the
+  digest of a value login could never reproduce, and locked the account.
+- **Guild identity.** `gc.php` wrote the escaped name to `guild.gname` and the
+  raw one to `user.guild` on adjacent statements, so a guild called `Ale & Axe`
+  never matched itself and its members belonged to a guild that did not exist.
+
+`S_SINFOS.php` was the worst of it — seven `strip_tags()`, six
+`htmlspecialchars()` and **ninety `str_replace()`** calls over six fields. The
+`str_replace()` list could not have worked: it looked for `<script>` and
+`onmouseover` in a string `htmlspecialchars()` had already turned into
+`&lt;script&gt;`. What it *did* do was corrupt legitimate input, stripping its
+needles out of the middle of the value — a settlement named `Wheightsville` was
+stored as `Wsville`, because `height` was on the list. All 103 lines are gone,
+replaced for the two URL fields by `mb_safe_url()`, which checks the scheme.
+That is the thing the list was reaching for and never achieved:
+`href="javascript:alert(1)"` runs however well the value is escaped.
+
+**The forum and message bodies are the real rich text**, and they are stored as
+exactly what the player typed. `mb_rich()` does everything at render: escape,
+then break, then translate `[b]` and `[i]`. Brackets rather than angle brackets,
+and the ordering is the reason — `mb_h()` runs first, so a player who types
+`<b>` sees it as text, while `[` and `]` are not HTML metacharacters and come
+through escaping untouched. The markup cannot be forged, because forging it
+would mean emitting a character the escaper has already dealt with.
+
+**The news lines were not rich text either — they were events.** All 51 sites
+built a finished string like
+
+```
+"<font class=yellow>$ename ($setid) successfully attacked
+ $evu[ename] ($evu[setid]) and gained $landgain land</font>"
+```
+
+and stored it, with two player-chosen empire names interpolated and nothing
+escaping them. That was the last stored-XSS vector in the game and the one no
+amount of output escaping could have closed, because the column genuinely did
+contain HTML.
+
+The colour was never decoration — `snews.php` prints a legend for it, so it is
+a category. It has its own `class` column now, the `news` column holds plain
+text, and `mb_news_html()` puts them back together at render time. The three
+writers live in `app/include/news.php`; `mb_news_guild()` fixed a call site in
+`guildconfig.php` that was inserting into a column named `guildid`, which the
+schema has never had, so "X has been removed from the guild" never appeared.
+
+**None of this needed a migration.** `db/seed.sql` contains no markup in any
+column and there is no other corpus, which is the fact that made doing it now
+rather than later obviously right.
+
+**The suite reaches none of the 51 news writers.** The crawl produces no news
+rows at all, so this conversion was verified by driving all three writers and
+the renderer directly — including an empire name that is an XSS payload, the
+`[i]Medieval style[/i]` line, and a `class` column holding something unknown,
+which falls back to `yellow` rather than landing raw in the attribute. Closing
+that coverage gap is the obvious next job.
 - **Passwords.** Unsalted MD5, denormalized into four tables alongside the
   email that identifies the row.
 - ~~**Error handling.**~~ **Done.** `mysqli_report()` is back on as

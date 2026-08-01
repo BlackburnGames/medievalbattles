@@ -71,13 +71,13 @@ else	{
 	}
 	elseif($current_guild['guild'] == 'None')	{
 		mysqli_query($db, "UPDATE user SET guild='$guild_info[gname]' WHERE userid=$q_auserid");
-		mysqli_query($db, "INSERT INTO empnews (date, news, yourid) VALUES	('$clock', '<font class=blue>You were accepted into $guild_info[gname].</font>', $q_auserid) ");
+		mb_news_emp($db, "$clock", 'blue', "You were accepted into $guild_info[gname].", $q_auserid);
 
 		$Guild_MaxID = mysqli_query($db, "SELECT max(gnid) FROM guildnews");
 			$mgnid = mb_db_result($Guild_MaxID, "mgnid");
 			$gnid = $mgnid + 1;
 	
-		mysqli_query($db, "INSERT INTO guildnews (date, news, gid, gnid)	VALUES	('$clock', '<font class=blue>$applicant_ename[ename] has joined $empireguild</font>', '$guild_info[gid]' , '$gnid') ");
+		mb_news_guild($db, "$clock", 'blue', "$applicant_ename[ename] has joined $empireguild", $guild_info['gid'], $gnid);
 		mysqli_query($db, "DELETE FROM guildrequests WHERE applicant=$q_auserid");
 
 		echo "<div align=center><font class=yellow><b>$applicant_ename[ename] has been accepted into the guild!</b></font></div>";
@@ -102,7 +102,7 @@ else	{
 		$current_guild = mysqli_fetch_array($current_guild_query);
 
 	if(($current_guild['guild'] == 'None') OR ($current_guild['guild'] != 'None'))	 {
-		mysqli_query($db, "INSERT INTO empnews (date, news, yourid) VALUES	('$clock', '<font class=blue>You were rejected from $guild_info[gname].</font>', $q_auserid) ");
+		mb_news_emp($db, "$clock", 'blue', "You were rejected from $guild_info[gname].", $q_auserid);
 		mysqli_query($db, "DELETE FROM guildrequests WHERE applicant=$q_auserid AND gl_userid='$userid'");
 
 		echo "<div align=center><font class=yellow><b>$applicant_ename[ename] has been rejected from the guild!</b></font></div>";
@@ -168,8 +168,8 @@ else	{
 		mysqli_query($db, "UPDATE user SET guild='None' WHERE userid=$q_remp");
 		mysqli_query($db, "UPDATE guild SET mem='$new_mem' WHERE owner='$userid'");	
 		mysqli_query($db, "DELETE FROM barter WHERE seller='$empire_info[0]' AND guild='$empireguild'");
-		mysqli_query($db, "INSERT INTO empnews (date, news, yourid) VALUES	('$clock', '<font class=blue>You were removed from $guild_info[gname].</font>', $q_remp) ");
-		mysqli_query($db, "INSERT INTO guildnews (date, news, guildid) VALUES	('$clock', '<font class=blue>$empire_info[0] has been removed from the guild.</font>', '$guild_info[gid]') ");
+		mb_news_emp($db, "$clock", 'blue', "You were removed from $guild_info[gname].", $q_remp);
+		mb_news_guild($db, "$clock", 'blue', "$empire_info[0] has been removed from the guild.", $guild_info['gid'], 0);
 
 		echo"<div align=center><font class=yellow>$empire_info[0] has been removed from your guild.</font></div>";
 		include("include/S_GKICK.php");

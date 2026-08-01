@@ -31,6 +31,13 @@ require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/html.php';
 
 /**
+ * And the news writers, which need both -- mb_sql_str() to file a row and
+ * mb_rich() to render one. Every page that files news runs a query, so every
+ * one of them is here already.
+ */
+require_once __DIR__ . '/news.php';
+
+/**
  * Query errors are reported again, as of Phase 3.
  *
  * PHP 8.1 made mysqli throw on error instead of returning false. Phase 2 turned

@@ -192,7 +192,7 @@ else	{
 	}
 	else	{
 		
-		mysqli_query($db, "INSERT INTO setnews (date, news, setid)	 VALUES	('$clock', '<font class=red>$ename has deleted their account</font>', '$setid') ");
+		mb_news_set($db, "$clock", 'red', "$ename has deleted their account", $setid, 0);
 	  
 		// check who they are voting for
 		$V_result = mysqli_query($db, "SELECT votefor FROM user WHERE userid=" . mb_sql_int($empvalue));

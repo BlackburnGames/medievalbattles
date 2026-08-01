@@ -28,20 +28,21 @@
 	{
 			Global $setid, $db;
 
-			$query_string = "SELECT date, news FROM setnews  WHERE setid='$setid' ORDER BY date DESC";
+			$query_string = "SELECT date, news, class FROM setnews  WHERE setid='$setid' ORDER BY date DESC";
 			$result_id = mysqli_query($db, $query_string);
-			$column_count = mysqli_num_fields($result_id);
 
 			 
 			while ($row = mysqli_fetch_row($result_id))
 		
 			{
+				// Was a generic loop over mysqli_num_fields(), printing every
+				// selected column raw. The columns are named now because they
+				// render differently: the date is text, and the news is text
+				// plus its category. See include/news.php.
 				print("<TR ALIGN=center VALIGN=TOP>");
-				for ($column_num = 0;
-				$column_num < $column_count;
-				$column_num++)
+				print("<TD bgcolor=#404040 align=left>" . mb_h($row[0]) . "</TD>\n");
+				print("<TD bgcolor=#404040 align=left>" . mb_news_html($row[2], $row[1]) . "</TD>\n");
 		
-					print("<TD bgcolor=#404040 align=left>$row[$column_num]</TD>\n");
 				print("</TR>\n");
 			}
 		

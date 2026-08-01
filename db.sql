@@ -98,6 +98,7 @@ CREATE TABLE `emailvalidate` (
 CREATE TABLE `empnews` (
   `date` varchar(255) NOT NULL default '',
   `news` blob NOT NULL,
+  `class` varchar(16) NOT NULL default 'yellow',
   `yourid` bigint(255) NOT NULL default '0'
 ) ENGINE=MyISAM;
 
@@ -234,6 +235,7 @@ CREATE TABLE `guildmsgs` (
 CREATE TABLE `guildnews` (
   `date` varchar(255) NOT NULL default '',
   `news` varchar(255) NOT NULL default '',
+  `class` varchar(16) NOT NULL default 'yellow',
   `gnid` bigint(255) NOT NULL default '0',
   `age` bigint(255) NOT NULL default '0',
   `gid` varchar(225) NOT NULL default ''
@@ -633,6 +635,7 @@ CREATE TABLE `setforumsmsgs` (
 CREATE TABLE `setnews` (
   `date` varchar(255) NOT NULL default '',
   `news` blob NOT NULL,
+  `class` varchar(16) NOT NULL default 'yellow',
   `setid` bigint(255) NOT NULL default '0',
   `sid` bigint(255) NOT NULL default '0',
   `age` bigint(255) NOT NULL default '0'

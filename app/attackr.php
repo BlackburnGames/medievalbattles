@@ -124,22 +124,22 @@ else	{
 	
 		include("include/attack/calculations.php");
 			
-		mysqli_query($db, "INSERT INTO setnews (date, news, setid)	 VALUES	('$clock', '<font class=yellow>$ename ($setid) failed to attack $evu[ename] ($evu[setid]) for resources</font>', '$setid') ");
+		mb_news_set($db, "$clock", 'yellow', "$ename ($setid) failed to attack $evu[ename] ($evu[setid]) for resources", $setid, 0);
 			
 		if($gid[0] !="")	 {
-			mysqli_query($db, "INSERT INTO guildnews (date, news, gid)	VALUES	('$clock', '<font class=yellow>$ename ($setid) failed to attack $evu[ename] ($evu[setid]) for resources</font>', '$gid[0]') ");
+			mb_news_guild($db, "$clock", 'yellow', "$ename ($setid) failed to attack $evu[ename] ($evu[setid]) for resources", $gid['0'], 0);
 			}
 
-		mysqli_query($db, "INSERT INTO setnews (date, news, setid)	 VALUES	('$clock', '<font class=orange>$evu[ename] ($evu[setid]) successfully defended their resources against $ename ($setid)</font>', '$tsetid') ");
+		mb_news_set($db, "$clock", 'orange', "$evu[ename] ($evu[setid]) successfully defended their resources against $ename ($setid)", $tsetid, 0);
 			
 		if($tgid[0] != "")	{
-			mysqli_query($db, "INSERT INTO guildnews (date, news, gid)	VALUES	('$clock', '<font class=orange>$evu[ename] ($evu[setid]) successfully defended their resources against $ename ($setid)</font>', '$tgid[0]') ");
+			mb_news_guild($db, "$clock", 'orange', "$evu[ename] ($evu[setid]) successfully defended their resources against $ename ($setid)", $tgid['0'], 0);
 		}			
 								
 
 		mysqli_query($db, "UPDATE user SET nno = nno+1 WHERE userid=" . mb_sql_int($empvalue));
 
-		mysqli_query($db, "INSERT INTO empnews (date, news, yourid) VALUES	('$clock', '<font class=yellow>We have successfully defended our empire against $ename ($setid)</font>' , " . mb_sql_int($empvalue) . ") ");
+		mb_news_emp($db, "$clock", 'yellow', "We have successfully defended our empire against $ename ($setid)", $empvalue);
 		echo"<div align=center><font class=yellow>You have failed to attack $evu[ename]!</font><br><br><font class=orange>$your_losses<br><br></font></div>";
 		include("include/attack/rdrop.php");
 		include("include/attack/table.php");
@@ -172,16 +172,16 @@ else	{
 		mysqli_query($db, "UPDATE user SET lumber = lumber - $lumbergaim WHERE userid = " . mb_sql_int($empvalue));
 		mysqli_query($db, "UPDATE military SET civ  = civ - $civgain WHERE userid = " . mb_sql_int($empvalue));
 
-		mysqli_query($db, "INSERT INTO setnews (date, news, setid) VALUES ('$clock', '<font class=yellow>$ename ($setid) successfully attacked $evu[ename] ($evu[setid]) for resources</font>', '$setid') ");
+		mb_news_set($db, "$clock", 'yellow', "$ename ($setid) successfully attacked $evu[ename] ($evu[setid]) for resources", $setid, 0);
 				
 		if($gid[0] != "")	{
-			mysqli_query($db, "INSERT INTO guildnews (date, news, gid) VALUES ('$clock', '<font class=yellow>$ename ($setid) successfully attacked $evu[ename] ($evu[setid]) for resources</font>', '$gid[0]') ");
+			mb_news_guild($db, "$clock", 'yellow', "$ename ($setid) successfully attacked $evu[ename] ($evu[setid]) for resources", $gid['0'], 0);
 		}
 				
-		mysqli_query($db, "INSERT INTO setnews (date, news, setid) VALUES ('$clock', '<font class=lg>$evu[ename] ($evu[setid]) lost resources to $ename ($setid)</font>', '$tsetid') ");
+		mb_news_set($db, "$clock", 'lg', "$evu[ename] ($evu[setid]) lost resources to $ename ($setid)", $tsetid, 0);
 				
 		if($tgid[0] != "")	{
-			mysqli_query($db, "INSERT INTO guildnews (date, news, gid)	 VALUES ('$clock', '<font class=lg>$evu[ename] ($evu[setid]) lost resources to $ename ($setid)</font>', '$tgid[0]') ");
+			mb_news_guild($db, "$clock", 'lg', "$evu[ename] ($evu[setid]) lost resources to $ename ($setid)", $tgid['0'], 0);
 		}
  
 		echo"<div align=center><font class=yellow>Success! You have managed to gain $gpgain gold pieces, $irongain iron, $lumbergain lumber, and $civgain civilians from $evu[ename]($evu[setid])!</font><br><br><font class=orange>$your_losses<br><br></font></div>";
@@ -190,7 +190,7 @@ else	{
 
 		mysqli_query($db, "UPDATE user SET nno = nno + 1 WHERE userid=" . mb_sql_int($empvalue));
 
-		mysqli_query($db, "INSERT INTO empnews (date, news, yourid)	VALUES	('$clock', '<font class=yellow>We have unsuccessfully defended our empire against $ename ($setid) and lost $gpgain gold pieces, $irongain iron, $lumbergain lumber, and $civgain civilians.</font>' , " . mb_sql_int($empvalue) . ") ");
+		mb_news_emp($db, "$clock", 'yellow', "We have unsuccessfully defended our empire against $ename ($setid) and lost $gpgain gold pieces, $irongain iron, $lumbergain lumber, and $civgain civilians.", $empvalue);
 		die();
 	}
 }

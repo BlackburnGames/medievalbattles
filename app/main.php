@@ -88,14 +88,14 @@ echo "
         <td class=main2 width=20%><b class=reg>Date</b></td>
         <td class=main2><b class=reg>News</b></td>";
 
-  $query_string = "SELECT `date`, news FROM empnews WHERE yourid='$userid' ORDER BY `date` DESC";
+  $query_string = "SELECT `date`, news, class FROM empnews WHERE yourid='$userid' ORDER BY `date` DESC";
   $result_id = $db->query($query_string);
 
   while ($row = mysqli_fetch_row($result_id))  {
     echo "
       <tr align=left valign=top>
-        <td bgcolor=404040>$row[0]</td>
-        <td bgcolor=404040>$row[1]</td>\n";
+        <td bgcolor=404040>" . mb_h($row[0]) . "</td>
+        <td bgcolor=404040>" . mb_news_html($row[2], $row[1]) . "</td>\n";
   }
 ?>
 

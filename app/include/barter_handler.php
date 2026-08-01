@@ -241,11 +241,11 @@ else	{
 	// $b_method never existed: the seller's line read "for $b_cost $b_meth
 	// $b_method" and ended in a stray space, and it quoted a different number
 	// from the buyer's copy because $c_cost was computed here and never used.
-	$their_news = "<font class=yellow>$ename ($setid) has bought $b_amount $b_type(s) for $c_cost $b_meth</font>";
-	$your_news  = "<font class=yellow>You have bought $b_amount $b_type(s) for $c_cost $b_meth from $b_seller ($tsetid)</font>";
+	$their_news = "$ename ($setid) has bought $b_amount $b_type(s) for $c_cost $b_meth";
+	$your_news  = "You have bought $b_amount $b_type(s) for $c_cost $b_meth from $b_seller ($tsetid)";
 
-	mysqli_query($db, "INSERT INTO empnews (date, news, yourid)	VALUES	('$clock', " . mb_sql_str($db, $their_news) . ", $q_b_userid) ");
-	mysqli_query($db, "INSERT INTO empnews (date, news, yourid)	VALUES	('$clock', " . mb_sql_str($db, $your_news)  . ", '$userid') ");
+	mb_news_emp($db, "$clock", 'yellow', $their_news, $q_b_userid);
+	mb_news_emp($db, "$clock", 'yellow', $your_news, $userid);
 
 	$your_new_nno = $nno + 1;
 	$their_new    = $b_nno + 1;
