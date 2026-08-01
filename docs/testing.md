@@ -26,13 +26,19 @@ in the response body. Notices are counted but not failed — this is PHP 4 code
 that reads uninitialised variables everywhere, and failing on them would mean a
 permanently red suite.
 
-Two phases, each with its own cookie jar and its own page budget:
+Three phases, each with its own cookie jar and its own page budget:
 
 1. **Logged out**, from `index.php`. This is the login page plus the four
    fragments it `include`s and echoes as `$data` (`main-site`, `about_us`,
    `game_scores`, `signup`). They are credited to their own filenames rather
    than to `index.php`, because a parse error in one still breaks the request.
-2. **Logged in**, from `main.php?pageid=news`.
+2. **Logged in as `tester@`**, from `main.php?pageid=news`. This user leads
+   both Testguild and settlement 1.
+3. **Logged in as `idle@`**, a rank-and-file guild member, on a fraction of the
+   budget. Every role check in this app has two arms and the primary tester
+   only ever takes one; this pass is here for the other arm, not for breadth.
+   It runs last because crawling mutates game state through plain GET links,
+   and the primary pass should see the fixture world rather than its leavings.
 
 The budgets are separate on purpose. The logged-in URL space never closes —
 paginated listings keep generating fresh query strings — so its cap always
@@ -126,14 +132,14 @@ restarts the container twice; run it by hand after touching request handling.
 
 ## Coverage
 
-The crawl reaches **50 of the 69 scripts in `app/`**, and the other 19 are
+The crawl reaches **51 of the 69 scripts in `app/`**, and the other 18 are
 listed in `$UNREACHABLE` in `smoke.php` with a reason each. That list is the
 third ratchet: an `app/` script that is neither reached nor explained **fails
 the run**, so a page falling out of the net is a regression rather than a
 silently smaller number. Entries that become reachable are reported so they can
 be deleted.
 
-The 19 fall into five groups:
+The 18 fall into five groups:
 
 - **Includes** (3) — `common.php`, `commong.php`, `functions.php`. Not pages;
   this group is structural and will not shrink.
@@ -142,12 +148,11 @@ The 19 fall into five groups:
 - **Destructive, deliberately skipped** (4) — see `$SKIP`. The fixture is reset
   per run so the mutation is harmless, but letting the crawler delete forum
   posts makes every later page depend on crawl order.
-- **Dead in the shipped game** (3) — `guildbarter.php` (`barter.php` dies at
-  line 17; the barter system was switched off in 2003), `scoreboard.php`
+- **Dead in the shipped game** (2) — `guildbarter.php` (`barter.php` dies at
+  line 17; the barter system was switched off in 2003) and `scoreboard.php`
   (orphaned — nothing links to it and `index.php` has its Scores link
-  commented out), and `gforums.php` (the non-leader alternate to `gl-forum.php`,
-  which the crawl user no longer sees because they lead the test guild).
+  commented out).
 - **Auth flow** (2) — the activation pages, which need a live emailed code.
 
-`gforums.php` is the only one of the 19 that a second crawl identity would
-close.
+Nothing left in the list is closable by seeding data or adding an identity;
+the remainder needs the crawler to submit forms, or needs the pages fixed.

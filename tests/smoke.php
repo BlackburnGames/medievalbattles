@@ -27,13 +27,20 @@ require __DIR__ . '/lib/client.php';
 $BASE  = getenv('MB_BASE_URL') ? getenv('MB_BASE_URL') : 'http://localhost';
 $EMAIL = 'tester@example.com';
 $PASS  = 'test1234';
+
+// A rank-and-file guild member, for the other arm of every role check.
+$MEMBER_EMAIL = 'idle@example.com';
+$MEMBER_PASS  = 'pass2';
 // Per-phase page caps. The logged-in URL space never closes -- paginated
 // listings keep generating fresh query strings -- so its cap always trips and
 // which scripts get reached depends on queue order. That makes the budget
 // load-bearing: sharing one pool between the phases let the handful of
 // logged-out pages starve the settlement-leader pages off the end of the run.
-$MAX_ANON_PAGES = 25;
-$MAX_PAGES      = 600;
+$MAX_ANON_PAGES   = 25;
+$MAX_PAGES        = 600;
+// The member pass re-treads most of the same pages; it is here for the branches
+// the leader never takes, not for breadth, so it gets a fraction of the budget.
+$MAX_MEMBER_PAGES = 120;
 
 /*
  * Baseline of warnings that already existed before the port began.
@@ -146,8 +153,6 @@ $UNREACHABLE = array(
     // Dead in the shipped game, not merely uncovered.
     'guildbarter.php'      => 'dead: barter.php dies at line 17, the barter system was switched off in 2003',
     'scoreboard.php'       => 'dead: orphaned, nothing links to it and index.php has its Scores link commented out',
-    'gforums.php'          => 'alternate: the navbar offers it only to non-guild-leaders, and the crawl user leads Testguild',
-
     // Auth flow outside both crawl roots.
     'activate_account.php' => 'auth flow: needs a live activation code emailed by activate_code.php',
     'activate_code.php'    => 'auth flow: sends the activation mail, requires an unactivated session',
@@ -175,18 +180,41 @@ $unfinished  = 0;
 $anon = new MbClient($BASE);
 crawl($anon, array('index.php', 'index.php?page=about_us'), $MAX_ANON_PAGES);
 
-// Prime the computer_id cookie the login flow expects, then authenticate.
-$client = new MbClient($BASE);
-$client->get('/index.php');
-$client->post('/checklogin.php', array('email' => $EMAIL, 'pw' => $PASS, 'login' => 'Login'));
+crawl(login($BASE, $EMAIL, $PASS), array('main.php?pageid=news'), $MAX_PAGES);
 
-if ($client->lastStatus !== 302) {
-    fwrite(STDERR, "FATAL: login did not redirect (got HTTP {$client->lastStatus}).\n");
-    fwrite(STDERR, "Is the database seeded? Try: docker compose exec -T db mysql -umb -pmb mbv6 < db/seed.sql\n");
-    exit(2);
+/*
+ * A second identity, run last and on a smaller budget.
+ *
+ * Every role check in this app has two arms, and the primary tester only ever
+ * exercises one: they lead Testguild and settlement 1, so the crawl never sees
+ * the branch an ordinary member gets. idle@ is in the guild and leads nothing,
+ * which is what makes gforums.php -- the non-leader alternate the navbar offers
+ * in place of gl-forum.php -- reachable at all.
+ *
+ * Last because the crawl mutates game state through plain GET links, and the
+ * primary pass should see the fixture world rather than whatever this one left.
+ */
+crawl(login($BASE, $MEMBER_EMAIL, $MEMBER_PASS), array('main.php?pageid=news'), $MAX_MEMBER_PAGES);
+
+/**
+ * Authenticate a fresh client, or abort the run.
+ */
+function login($base, $email, $pass)
+{
+    // The GET primes the computer_id cookie the login flow expects; without it
+    // checklogin.php renders its "new computer" challenge instead of redirecting.
+    $client = new MbClient($base);
+    $client->get('/index.php');
+    $client->post('/checklogin.php', array('email' => $email, 'pw' => $pass, 'login' => 'Login'));
+
+    if ($client->lastStatus !== 302) {
+        fwrite(STDERR, "FATAL: login as $email did not redirect (got HTTP {$client->lastStatus}).\n");
+        fwrite(STDERR, "Is the database seeded? Try: bash tests/reset-db.sh\n");
+        exit(2);
+    }
+
+    return $client;
 }
-
-crawl($client, array('main.php?pageid=news'), $MAX_PAGES);
 
 /**
  * Walk every page reachable from $seeds, asserting on the diagnostics in each.
