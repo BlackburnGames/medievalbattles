@@ -4,6 +4,22 @@
 include("app/include/connect.php");
 include("app/include/clock.php");
 
+/*
+ * The manual's numbers, read by the engine rather than transcribed from it.
+ *
+ * include/gamedata.php has been a one-way copy since it was written: every
+ * value carries a file:line citation back to the engine, and keeping the two in
+ * step was a review rule. A rule is not a mechanism, so this inverts the
+ * dependency one block at a time -- the economy rates first, because the tick
+ * golden master computes every one of them and will not let a transcription
+ * error through.
+ *
+ * An inverted value's citation changes direction with it: gamedata.php is the
+ * definition now and the comment says who reads it.
+ */
+include("app/include/gamedata.php");
+$ECON = $GAMEDATA['economy'];
+
 echo "<p>Starting update process</p>";
 
   mysqli_query($db, "UPDATE game_info SET tick='yes'");
@@ -66,11 +82,13 @@ while($INC_ID < $max_UID + 1) {
         $land_gain = 0;
         $mt_gain = 0;
         $exp_num = .9;
-        $foodmod = .5;
-        $gpmod = 1;
-        $ironmod = 1.945;
-        $lumbmod = 2;
-        $civmod  = .26;
+        // The per-tick base rates. The switches below adjust these copies for
+        // race, class and research; the values themselves are gamedata's.
+        $foodmod = $ECON['food_per_farm'];
+        $gpmod   = $ECON['gpmod'];
+        $ironmod = $ECON['iron_per_mine'];
+        $lumbmod = $ECON['lumber_per_mill'];
+        $civmod  = $ECON['civ_growth_mod'];
         $base = $build['home'];
         $civ = $mil['civ'];
         $food = $user['food'];
@@ -153,24 +171,33 @@ while($INC_ID < $max_UID + 1) {
         break;
       }
 
-      if($mil['civ'] > $build['home'] * 20) {
+      // Overcrowded: more civilians than the homes hold.
+      if($mil['civ'] > $build['home'] * $ECON['civ_per_home']) {
         $base = $mil['civ'];
-        $civmod = .97;
+        $civmod = $ECON['decay_factor'];
       }
 
+      // Starving: more civilians than the food supply feeds.
       if($mil['civ'] > $user['food']) {
         $base = $mil['civ'];
-        $civmod = .97;
+        $civmod = $ECON['decay_factor'];
       }
 
-      if($user['food'] > $build['farm'] * 50) {
+      // Overflowing: more food than the farms can store.
+      if($user['food'] > $build['farm'] * $ECON['food_cap_per_farm']) {
         $fbase = $user['food'];
-        $foodmod = .97;
+        $foodmod = $ECON['decay_factor'];
         $food = 0;
       }
 
-      mysqli_query($db, "UPDATE military SET maxciv = round($mil[maxciv] + (.007 * $mil[civ])), civ=round($base * $civmod) WHERE userid='$INC_ID'");
-      mysqli_query($db, "UPDATE user SET gp = round(($build[gm] * 300) * $gpmod + $user[gp]), iron = round($build[im] * $ironmod + $user[iron]), food = round($foodmod * $fbase + $food), lumber = round($build[lmill] * $lumbmod + $user[lumber]) WHERE userid='$INC_ID'");
+      // Pulled into locals because these two are interpolated into SQL, where
+      // $ECON['x'] would need braces and $ECON[x] is the bare-key form the
+      // port removed.
+      $recruit_rate  = $ECON['recruit_pool_rate'];
+      $gold_per_mine = $ECON['gold_per_mine'];
+
+      mysqli_query($db, "UPDATE military SET maxciv = round($mil[maxciv] + ($recruit_rate * $mil[civ])), civ=round($base * $civmod) WHERE userid='$INC_ID'");
+      mysqli_query($db, "UPDATE user SET gp = round(($build[gm] * $gold_per_mine) * $gpmod + $user[gp]), iron = round($build[im] * $ironmod + $user[iron]), food = round($foodmod * $fbase + $food), lumber = round($build[lmill] * $lumbmod + $user[lumber]) WHERE userid='$INC_ID'");
 
 ##################
 ### Update Land & Mountains

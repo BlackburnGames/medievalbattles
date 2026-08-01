@@ -524,7 +524,24 @@ attribute.
     satisfied to the audit in the first place. The posted password is
     `$admin_pw` now, and the collision is gone rather than sequenced around.
 - **Invert the manual dependency** so the engine reads `$GAMEDATA` rather than
-  its inline literals.
+  its inline literals. **Started: the economy block is inverted.**
+
+  `include/gamedata.php` was a one-way copy. Every value carries a `file:line`
+  citation back to the engine and keeping the two in step was a review rule —
+  and a rule is not a mechanism, so the manual could go stale between the change
+  and the review that was supposed to catch it.
+
+  The ten per-tick economy rates are the first block to go the other way:
+  `update.php` reads them and carries no copies. The tick golden master is why
+  this block came first — it computes every one of them, so a transcription
+  error cannot pass, and the inversion is checkable rather than merely claimed.
+  Setting `iron_per_mine` to 1.5 moves the tester's iron by 22 and fails the
+  run, which is the proof that the engine is reading the file rather than
+  including it and ignoring it.
+
+  An inverted value's citation turns around with it: gamedata is the definition
+  now, and the comment names the reader. Uninverted entries keep their `file:line`
+  and the block says which is which.
 
 ### The barter system, switched back on
 

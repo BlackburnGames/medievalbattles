@@ -21,19 +21,26 @@ $GAMEDATA = array();
 
 /* ------------------------------------------------------------------ *
  * Economy base rates -- the per-tick modifiers before race, class or
- * research adjustments. update.php:44-49, :148-149.
+ * research adjustments.
+ *
+ * THE FIRST BLOCK THE ENGINE READS. update.php takes the ten values below
+ * rather than carrying its own copies, so there is nothing here to keep in
+ * step: change one and the tick changes with it, which the golden master will
+ * report. The entries still name their reader, but the arrow points the other
+ * way from the rest of this file -- these are definitions, not transcriptions.
  * ------------------------------------------------------------------ */
 $GAMEDATA['economy'] = array(
-    'gold_per_mine'     => 300,     // update.php:149  gp += (gm * 300) * gpmod
-    'gpmod'             => 1.0,     // update.php:46
-    'iron_per_mine'     => 1.945,   // update.php:47
-    'food_per_farm'     => 0.5,     // update.php:45
-    'lumber_per_mill'   => 2.0,     // update.php:48
-    'civ_growth_mod'    => 0.26,    // update.php:49  civ = round(homes * civmod)
-    'civ_per_home'      => 20,      // update.php:132 overcrowding threshold
-    'food_cap_per_farm' => 50,      // update.php:142 food above this decays
-    'decay_factor'      => 0.97,    // update.php:132-146 overcrowd/starve/overflow
-    'recruit_pool_rate' => 0.007,   // update.php:148 maxciv += .007 * civ
+    'gold_per_mine'     => 300,     // read by update.php: gp += (gm * 300) * gpmod
+    'gpmod'             => 1.0,     // read by update.php: base gold modifier
+    'iron_per_mine'     => 1.945,   // read by update.php
+    'food_per_farm'     => 0.5,     // read by update.php
+    'lumber_per_mill'   => 2.0,     // read by update.php
+    'civ_growth_mod'    => 0.26,    // read by update.php: civ = round(homes * civmod)
+    'civ_per_home'      => 20,      // read by update.php: overcrowding threshold
+    'food_cap_per_farm' => 50,      // read by update.php: food above this decays
+    'decay_factor'      => 0.97,    // read by update.php: overcrowd/starve/overflow
+    'recruit_pool_rate' => 0.007,   // read by update.php: maxciv += .007 * civ
+    // Not yet inverted -- still transcribed, still cited.
     'recruit_cost_gp'   => 150,     // military.php:41,48
     'troops_per_barrack' => 50,     // military.php:72, status.php:23
     'wp_defense'        => 15,      // functions.php:317, attack/defANDoff.php:44
