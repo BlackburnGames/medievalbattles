@@ -1,13 +1,14 @@
 <?php
 
-// The admin area has its own include root, so it cannot reach the app's
-// include/session.php; this is the same bootstrap inlined.
-if (session_status() !== PHP_SESSION_ACTIVE && !headers_sent()) {
-	session_start();
-}
-$login = isset($_SESSION['login']) ? $_SESSION['login'] : '';
-$email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
-$pw    = isset($_SESSION['pw'])    ? $_SESSION['pw']    : '';
+// The gate, before any output and before connect.php. Every page that includes
+// this file is behind it; gameconfig.php and newgame.php do not include it and
+// call mb_admin_require() for themselves.
+//
+// auth.php pulls in the app's include/session.php, which is what the bootstrap
+// inlined here used to duplicate -- the admin area has its own include root but
+// a __DIR__-relative require reaches the real one fine.
+include("auth.php");
+mb_admin_require();
 
 function callback($buffer) {
 	return ($buffer);
@@ -19,7 +20,7 @@ include("connect.php");
 
 echo "
 <html>
-<head> 
+<head>
 <title>MB Administration</title>
 </head>
 
@@ -28,4 +29,4 @@ echo "
 
 ob_end_flush();
 
-?>	
+?>

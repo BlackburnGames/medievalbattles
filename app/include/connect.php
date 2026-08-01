@@ -17,7 +17,7 @@
  * which is why the helper is required here rather than included at each site.
  * __DIR__ because includes in this codebase are otherwise CWD-relative and the
  * CWD differs between pages (app/), update.php (repo root) and the admin area
- * (app/css/admin/).
+ * (app/admin/).
  */
 require_once __DIR__ . '/db.php';
 

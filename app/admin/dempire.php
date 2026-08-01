@@ -24,22 +24,39 @@ else	{
 
 	$clock = date("m/d/y, H:ia");
 
+	// The empire name is typed into the form, and the address and settlement id
+	// are read back out of the row it names -- so all three reach the DELETEs
+	// below, and the last of them removes an account.
+	$q_empre = mb_sql_str($db, $empre);
+
 	//SELECTING SETID
-		$empreset = mysqli_query($db, "SELECT setid FROM user WHERE ename='$empre'");
+		$empreset = mysqli_query($db, "SELECT setid FROM user WHERE ename=$q_empre");
 		$esetid = mb_db_result($empreset,"esetid");
 	//SELECTING EMAIL
-		$theiremail = mysqli_query($db, "SELECT email FROM user WHERE ename='$empre'");
+		$theiremail = mysqli_query($db, "SELECT email FROM user WHERE ename=$q_empre");
 		$tmail = mb_db_result($theiremail,"tmail");
-	mysqli_query($db, "INSERT INTO setnews (date, news, setid) 	VALUES	('$clock', '<font class=red><b>$empre</b> has been deleted by an administrator</font>', '$esetid') ");			
 
-	mysqli_query($db, "DELETE FROM buildings WHERE email='$tmail'"); 
-	mysqli_query($db, "DELETE FROM military WHERE email='$tmail'");
-	mysqli_query($db, "DELETE FROM returntbl WHERE email='$tmail'"); 
-	mysqli_query($db, "DELETE FROM research WHERE email='$tmail'");
-	mysqli_query($db, "DELETE FROM explore WHERE email='$tmail'"); 
-	mysqli_query($db, "DELETE FROM user WHERE email='$tmail'");
+	// No such empire: say so rather than running six unfiltered DELETEs. With
+	// $tmail unset every WHERE below read `email=''`, which matches any row
+	// whose address is blank.
+	if ($tmail === null) {
+		echo "<center>No empire called " . htmlspecialchars($empre) . ".<br>";
+		die();
+	}
 
-	echo "<center>$empre has been deleted.<br>";
+	$q_tmail = mb_sql_str($db, $tmail);
+	$news    = "<font class=red><b>$empre</b> has been deleted by an administrator</font>";
+
+	mysqli_query($db, "INSERT INTO setnews (date, news, setid) 	VALUES	('$clock', " . mb_sql_str($db, $news) . ", " . mb_sql_int($esetid) . ") ");
+
+	mysqli_query($db, "DELETE FROM buildings WHERE email=$q_tmail");
+	mysqli_query($db, "DELETE FROM military WHERE email=$q_tmail");
+	mysqli_query($db, "DELETE FROM returntbl WHERE email=$q_tmail");
+	mysqli_query($db, "DELETE FROM research WHERE email=$q_tmail");
+	mysqli_query($db, "DELETE FROM explore WHERE email=$q_tmail");
+	mysqli_query($db, "DELETE FROM user WHERE email=$q_tmail");
+
+	echo "<center>" . htmlspecialchars($empre) . " has been deleted.<br>";
 	die();
 }
 

@@ -51,6 +51,12 @@ services:
       # Set to "0" to silence them again as a bisection aid.
       # See app/include/connect.php.
       MB_REPORT_QUERIES: "${MB_REPORT_QUERIES:-1}"
+      # The admin area's one credential. The defaults are the pair that was
+      # hardcoded in adminlogin.php in 2003 and are therefore public; override
+      # both for anything that is not a throwaway container.
+      # See app/admin/include/auth.php.
+      MB_ADMIN_USER: "${MB_ADMIN_USER:-mako}"
+      MB_ADMIN_PASSWORD: "${MB_ADMIN_PASSWORD:-quickshot}"
     volumes:
       # app/ is the docroot; the repo root is also mounted because update.php
       # includes "app/include/..." and must run with the root as CWD.

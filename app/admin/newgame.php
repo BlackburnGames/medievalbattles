@@ -1,8 +1,13 @@
-<?
+<?php
 // Was mysql_connect() with placeholder credentials, so this script has never
-// run as shipped. It now uses the shared connection like every other admin
-// page -- note it still wipes the world with no authentication of any kind,
-// which is a Phase 3 problem.
+// run as shipped. It uses the shared connection like every other admin page.
+//
+// Nothing links here and it takes no parameters: a bare GET wipes the entire
+// world. It is behind the gate now -- it does not include include/igtop.php,
+// so it asks for itself.
+include("include/auth.php");
+mb_admin_require();
+
 include("include/connect.php");
 
 mysqli_query($db, "DELETE FROM emailvalidate");

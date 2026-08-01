@@ -1,558 +1,201 @@
 <?php
+/**
+ * Bulk game administration: wipe a table, reset the settlements, drop one
+ * account.
+ *
+ * This page had two problems beyond the missing gate, and the second is why it
+ * is rewritten rather than patched.
+ *
+ * The gate first. Its only authentication sat at the top and had been
+ * commented out since 2003 -- it restored $pw from the session and compared it
+ * to a hardcoded "melvin". With that gone, anyone who could reach the file
+ * could drop every account in the game. gameconfig.php is not linked from the
+ * navbar, and it used not to include include/igtop.php either, so it was the
+ * one page in the area with nothing above it to inherit a check from -- which
+ * is how it came to have none. It calls the gate itself, before igtop.php, so
+ * that a refused request gets a clean 403 rather than half a rendered page.
+ *
+ * Then the queries. Thirty of its forty statements named tables that have
+ * never existed in this schema: `setnews1`..`setnews10`, `setmain1`..`10` and
+ * `setmsgs1`..`10` are the per-settlement tables of a much older schema -- the
+ * game has kept settlement news in one `setnews` table with a `setid` column,
+ * and its forums in `setforums`/`setforumsmsgs`, for as long as db.sql goes
+ * back -- and `DELETE FROM return` wants `returntbl`. So "delete all news",
+ * "delete all forums" and "delete all accounts" have never done anything, on
+ * any version of PHP. app/admin/newgame.php names the same tables correctly
+ * and is where the working spellings came from.
+ *
+ * Its "reset all accounts" section is gone rather than repaired. It wrote
+ * about twenty columns -- `military.ssword`, `axe`, `club`, `icesword`,
+ * `priout`, `buildings.lab` -- that this schema does not have either, and
+ * deciding what a reset should now write to the columns that replaced them is
+ * a game-design question, not a port. db/seed.sql and newgame.php are the two
+ * things that build a world, and both are current.
+ *
+ * The four hundred lines of copy-pasted table markup are one loop now, over
+ * the action list below.
+ */
+
+include("include/auth.php");
+mb_admin_require();
 
 // Request input, formerly supplied by register_globals.
 include("include/request.php");
-$daccount = mb_input('daccount');
-$deletea  = mb_input('deletea');
-$deletef  = mb_input('deletef');
-$deleteg  = mb_input('deleteg');
-$deletem  = mb_input('deletem');
-$deleten  = mb_input('deleten');
-$deletes  = mb_input('deletes');
+$action   = mb_input('action');
 $empre    = mb_input('empre');
-$reseta   = mb_input('reseta');
+$daccount = mb_input('daccount');
 
-function callback($buffer) {
+include("include/igtop.php");
 
-  return ($buffer);
-
-}
-
-ob_start("callback");
-
-/*
- * The page's only authentication was here and was already commented out in
- * 2003: it restored $pw from the session and compared it to a hardcoded
- * password, redirecting to index.php on a mismatch. As it stands anyone who
- * can reach this file can drop every account, message and news table in the
- * game. Restoring a real check on the admin pages is Phase 3.
+/**
+ * The bulk actions, as label => list of statements.
  *
- * if ($pw == "melvin") { } else { header("Location: index.php"); exit; }
+ * Deliberately not parameterised: every one of these is a fixed statement with
+ * nothing interpolated into it, which is the property that makes a page that
+ * can empty the database reviewable at a glance. The one action that does take
+ * input -- deleting a named account -- is handled separately below.
  */
-?>
+$MB_ADMIN_ACTIONS = array(
+	'messages' => array(
+		'label'      => 'Delete every private message',
+		'statements' => array('DELETE FROM messages'),
+	),
+	'news' => array(
+		'label'      => 'Delete every settlement news entry',
+		'statements' => array('DELETE FROM setnews'),
+	),
+	'forums' => array(
+		'label'      => 'Delete every settlement forum thread and reply',
+		'statements' => array('DELETE FROM setforums', 'DELETE FROM setforumsmsgs'),
+	),
+	'guilds' => array(
+		'label'      => 'Delete every guild, and its threads, news and requests',
+		'statements' => array(
+			'DELETE FROM guild', 'DELETE FROM guildthreads', 'DELETE FROM guildmsgs',
+			'DELETE FROM guildnews', 'DELETE FROM guildrequests',
+		),
+	),
+	'settlements' => array(
+		'label'      => 'Return every settlement to its starting state',
+		'statements' => array(
+			"UPDATE settlement SET setname='None'",
+			"UPDATE settlement SET setpic=''",
+			"UPDATE settlement SET members='0'",
+			"UPDATE settlement SET setnotice='Welcome to Medieval Battles'",
+			"UPDATE settlement SET setstrength='0'",
+		),
+	),
+	'accounts' => array(
+		'label'      => 'Delete EVERY account',
+		'statements' => array(
+			'DELETE FROM user', 'DELETE FROM buildings', 'DELETE FROM military',
+			'DELETE FROM research', 'DELETE FROM explore', 'DELETE FROM returntbl',
+			'DELETE FROM barter', 'DELETE FROM empnews', 'DELETE FROM emailvalidate',
+		),
+	),
+);
 
-<?php
-if($deletem)	{
+echo "<center><br><b>Game configuration</b><br><br>";
 
-	include("include/connect.php");
+// --- a bulk action -----------------------------------------------------------
 
-	mysqli_query($db, "DELETE FROM messages"); 
-	echo "<center>All of the messages have been deleted.<br><a href=gameconfig.php>Return</a></center>";
+if (IsSet($action)) {
+	// $action indexes the list above and is never interpolated into a query --
+	// an unrecognised one selects nothing rather than reaching MySQL.
+	if (!isset($MB_ADMIN_ACTIONS[$action])) {
+		echo "<b>No such action.</b><br><br>";
+	} else {
+		foreach ($MB_ADMIN_ACTIONS[$action]['statements'] as $sql) {
+			mysqli_query($db, $sql) or die(mysqli_error($db));
+		}
+		echo "<b>" . htmlspecialchars($MB_ADMIN_ACTIONS[$action]['label']) . "</b>: done.<br><br>";
+	}
+	echo "<a href=gameconfig.php>Return</a></center>";
+	die();
 }
-else	{	
-?>
 
-<form type="post" action="gameconfig.php">
-<table border=1 bordercolor=#ffffff align=center bgcolor=#630000 cellpadding=0 cellspacing=0> 
-	<tr>
-		<td bgcolor=#404040 colspan=3><font color=#ffffff><b>You can delete all of the messages on the message table</b></font></td>
-	<tr>
-		<td><font color="#ffffff">DELETE all messages</font></td>
-		<td><center><input type="submit" name="deletem" value="DELETE"></center></td>
-</table>
-</form>
+// --- delete one account ------------------------------------------------------
 
-<?php
+if (IsSet($daccount)) {
+	$clock   = date("m/d/y, H:ia");
+	$q_empre = mb_sql_str($db, $empre);
+
+	$theiremail = mysqli_query($db, "SELECT email FROM user WHERE ename=$q_empre");
+	$tmail      = mb_db_result($theiremail, "tmail");
+
+	// No such empire: stop. With $tmail unset every DELETE below read
+	// `email=''`, which matches any row whose address happens to be blank.
+	if ($tmail === null) {
+		echo "<b>No empire called " . htmlspecialchars($empre) . ".</b><br><br>";
+		echo "<a href=gameconfig.php>Return</a></center>";
+		die();
+	}
+
+	$empreset = mysqli_query($db, "SELECT setid FROM user WHERE ename=$q_empre");
+	$esetid   = mb_db_result($empreset, "esetid");
+
+	// The old spelling built a table name -- "setnews" . $esetid -- and
+	// inserted into it. That is the per-settlement schema this game has not
+	// used since before db.sql, and it also meant a settlement id from the
+	// database was interpolated outside quotes as an identifier.
+	$news    = "<font class=red><b>$empre</b> has been deleted by an administrator</font>";
+	$q_tmail = mb_sql_str($db, $tmail);
+
+	mysqli_query($db, "INSERT INTO setnews (date, news, setid)	VALUES	('$clock', " . mb_sql_str($db, $news) . ", " . mb_sql_int($esetid) . ") ");
+
+	mysqli_query($db, "DELETE FROM buildings WHERE email=$q_tmail");
+	mysqli_query($db, "DELETE FROM military WHERE email=$q_tmail");
+	mysqli_query($db, "DELETE FROM returntbl WHERE email=$q_tmail");
+	mysqli_query($db, "DELETE FROM research WHERE email=$q_tmail");
+	mysqli_query($db, "DELETE FROM explore WHERE email=$q_tmail");
+	mysqli_query($db, "DELETE FROM user WHERE email=$q_tmail");
+
+	echo "<b>" . htmlspecialchars($empre) . " has been deleted.</b><br><br>";
+	echo "<a href=gameconfig.php>Return</a></center>";
+	die();
 }
-if(!IsSet($deleten))
-	{
-?>
-	
-<br>
 
-<form type="post" action="gameconfig.php">
-	<table border=1 bordercolor=#ffffff align=center bgcolor=#630000 cellpadding=0 cellspacing=0>
-		<tr>
-		  <td bgcolor=#404040 colspan=2><font color=#ffffff><b>You can delete all of the news on the setnews tables</b></font></td>
-		<tr>
-			<td><font color="#ffffff">DELETE all news</font></td>
-			<td><center><input type="submit" name="deleten" value="DELETE"></center></td>
-				<input type="hidden" name="deleten" value="2"></td>
-			
-	
-
-</table>
-</form>
-	<?php
-		}
-		else
-		{	
-
-
-	include("include/connect.php");
-
-
-			mysqli_query($db, "DELETE FROM setnews1"); 
-			mysqli_query($db, "DELETE FROM setnews2");
-			mysqli_query($db, "DELETE FROM setnews3"); 
-			mysqli_query($db, "DELETE FROM setnews4");
-			mysqli_query($db, "DELETE FROM setnews5"); 
-			mysqli_query($db, "DELETE FROM setnews6");
-			mysqli_query($db, "DELETE FROM setnews7"); 
-			mysqli_query($db, "DELETE FROM setnews8");
-			mysqli_query($db, "DELETE FROM setnews9"); 
-			mysqli_query($db, "DELETE FROM setnews10");
-			echo"<center>All settlement news have been deleted.<br>
-				<a href=http://www.medievalbattles.com/gameconfig.php>Return</a></center>";
-		}
-?>
-<br>
-
-
-
-<?php
-if(!IsSet($deletea))
-	{
-?>
-	
-<br>
-
-<form type="post" action="gameconfig.php">
-	<table border=1 bordercolor=#ffffff align=center bgcolor=#630000 cellpadding=0 cellspacing=0>
-		<tr>
-		  <td bgcolor=#404040 colspan=2><font color=#ffffff><b>You can delete all accounts</b></font></td>
-		<tr>
-			<td><font color="#ffffff">DELETE all accounts</font></td>
-			<td><center><input type="submit" name="deletea" value="DELETE"></center></td>
-				<input type="hidden" name="deletea" value="3"></td>
-			
-	
-
-</table>
-</form>
-	<?php
-		}
-		else
-		{	
-
-
-	include("include/connect.php");
-
-
-			mysqli_query($db, "DELETE FROM buildings"); 
-			mysqli_query($db, "DELETE FROM military");
-			mysqli_query($db, "DELETE FROM return"); 
-			mysqli_query($db, "DELETE FROM research");
-			mysqli_query($db, "DELETE FROM explore"); 
-			mysqli_query($db, "DELETE FROM user");
-		
-			echo"<center>All accounts have been deleted.<br>
-				<a href=http://www.medievalbattles.com/gameconfig.php>Return</a></center>";
-		}
-?>
-
-
-<br><br>
-
-
-
-<?php
-if(!IsSet($deleteg))
-	{
-?>
-	
-<br><br>
-
-<form type="post" action="gameconfig.php">
-	<table border=1 bordercolor=#ffffff align=center bgcolor=#630000 cellpadding=0 cellspacing=0>
-		<tr>
-		  <td bgcolor=#404040 colspan=2><font color=#ffffff><b>You can delete all of the guilds from the guild table</b></font></td>
-		<tr>
-			<td><font color="#ffffff">DELETE all guilds</font></td>
-			<td><center><input type="submit" name="deleteg" value="DELETE"></center></td>
-				<input type="hidden" name="deleteg" value="4"></td>
-			
-	
-
-</table>
-</form>
-	<?php
-		}
-		else
-		{	
-
-
-		include("include/connect.php");
-
-			mysqli_query($db, "DELETE FROM guild"); 
-			echo"<center>All guilds have been deleted.<br>
-				<a href=http://www.medievalbattles.com/gameconfig.php>Return</a></center>";
-		}
-?>
-
-<br>
-
-
-<?php
-if(!IsSet($deletef))
-	{
-?>
-	
-<br><br>
-
-<form type="post" action="gameconfig.php">
-	<table border=1 bordercolor=#ffffff align=center bgcolor=#630000 cellpadding=0 cellspacing=0>
-		<tr>
-		  <td bgcolor=#404040 colspan=2><font color=#ffffff><b>You can delete all fields from the forums</b></font></td>
-		<tr>
-			<td><font color="#ffffff">DELETE all forums</font></td>
-			<td><center><input type="submit" name="deletef" value="DELETE"></center></td>
-				<input type="hidden" name="deletef" value="5"></td>
-			
-	
-
-</table>
-</form>
-	<?php
-		}
-		else
-		{	
-
-
-include("include/connect.php");
-
-
-			mysqli_query($db, "DELETE FROM setmain1"); 
-			mysqli_query($db, "DELETE FROM setmsgs1");
-			mysqli_query($db, "DELETE FROM setmain2"); 
-			mysqli_query($db, "DELETE FROM setmsgs2");
-			mysqli_query($db, "DELETE FROM setmain3"); 
-			mysqli_query($db, "DELETE FROM setmsgs3");
-			mysqli_query($db, "DELETE FROM setmain4"); 
-			mysqli_query($db, "DELETE FROM setmsgs4");
-			mysqli_query($db, "DELETE FROM setmain5"); 
-			mysqli_query($db, "DELETE FROM setmsgs5");
-			mysqli_query($db, "DELETE FROM setmain6"); 
-			mysqli_query($db, "DELETE FROM setmsgs6");
-			mysqli_query($db, "DELETE FROM setmain7"); 
-			mysqli_query($db, "DELETE FROM setmsgs7");
-			mysqli_query($db, "DELETE FROM setmain8"); 
-			mysqli_query($db, "DELETE FROM setmsgs8");
-			mysqli_query($db, "DELETE FROM setmain9"); 
-			mysqli_query($db, "DELETE FROM setmsgs9");
-			mysqli_query($db, "DELETE FROM setmain10"); 
-			mysqli_query($db, "DELETE FROM setmsgs10");
-			echo"<center>All forums have been deleted.<br>
-				<a href=http://www.medievalbattles.com/gameconfig.php>Return</a></center>";
-		}
-?>
-
-<br><br>
-
-
-<?php
-if(!IsSet($deletes))
-	{
-?>
-	
-<br>
-
-<form type="post" action="gameconfig.php">
-	<table border=1 bordercolor=#ffffff align=center bgcolor=#630000 cellpadding=0 cellspacing=0>
-		<tr>
-		  <td bgcolor=#404040 colspan=2><font color=#ffffff><b>You can change settlement table back to normal</b></font></td>
-		<tr>
-			<td><font color="#ffffff">RETURN all fields to normal</font></td>
-			<td><center><input type="submit" name="deletes" value="RETURN"></center></td>
-				<input type="hidden" name="deletes" value="5"></td>
-			
-	
-
-</table>
-</form>
-	<?php
-		}
-		else
-		{	
-
-
-		include("include/connect.php");
-
-
-			mysqli_query($db, "UPDATE settlement SET setname = \"None\"") or die(mysqli_error($db));
-			mysqli_query($db, "UPDATE settlement SET setpic = \"http://www.medievalbattles.com/setpic.gif\"") or die(mysqli_error($db));
-			mysqli_query($db, "UPDATE settlement SET setguild = \"None\"") or die(mysqli_error($db));
-
-			mysqli_query($db, "UPDATE settlement SET setstrength = \"0\"") or die(mysqli_error($db));
-			mysqli_query($db, "UPDATE settlement SET userid = \"0\"") or die(mysqli_error($db));
-			mysqli_query($db, "UPDATE settlement SET fgold = \"0\"") or die(mysqli_error($db));
-			mysqli_query($db, "UPDATE settlement SET firon = \"0\"") or die(mysqli_error($db));
-			mysqli_query($db, "UPDATE settlement SET nap = \"None\"") or die(mysqli_error($db));
-echo"<center>Settlement table has been restored to normal.<br>
-				<a href=http://www.medievalbattles.com/gameconfig.php>Return</a></center>";
-		}
-?>
-
-
-
-
-<?php
-if(!IsSet($daccount))
-	{
-?>
-	
-<br>
-
-<form type="post" action="gameconfig.php">
-	<table border=1 bordercolor=#ffffff align=center bgcolor=#630000 cellpadding=0 cellspacing=0>
-		<tr>
-		  <td bgcolor=#404040 colspan=2><font color=#ffffff><b>Delete Account</b></font></td>
-		<tr>
-			<td><input type="text" name="empre" maxlength="50"></td>
-			<td><center><input type="submit" name="daccount" value="DELETE ACCOUNT"></center></td>
-				<input type="hidden" name="daccount" value="6"></td>
-			
-	
-
-</table>
-</form>
-	<?php
-		}
-		else
-		{	
-
-
-							$hourdiff = "0"; 
-
-							$timeadjust = ($hourdiff * 60 * 60);
-
-							$clock = date(" d F h:i:s a",time() + $timeadjust);
-		$dbnam= "medievalbattles_com";
-
-include("include/connect.php");
-
-		//SELECTING SETID
-			$empreset = mysqli_query($db, "SELECT setid FROM user WHERE ename='$empre'");
-			$esetid = mb_db_result($empreset,"esetid");
-		//SELECTING EMAIL
-			$theiremail = mysqli_query($db, "SELECT email FROM user WHERE ename='$empre'");
-			$tmail = mb_db_result($theiremail,"tmail");
-		//UPDATE NEWS
-			$settable = "setnews" . "$esetid";
-		mysqli_query($db, "INSERT INTO $settable (date, news) 
-			VALUES	('$clock', '<font class=red><b>$empre</b> has been deleted by an administrator</font>') ");			
-
-
-			mysqli_query($db, "DELETE FROM buildings WHERE email='$tmail'"); 
-			mysqli_query($db, "DELETE FROM military WHERE email='$tmail'");
-			mysqli_query($db, "DELETE FROM returntbl WHERE email='$tmail'"); 
-			mysqli_query($db, "DELETE FROM research WHERE email='$tmail'");
-			mysqli_query($db, "DELETE FROM explore WHERE email='$tmail'"); 
-			mysqli_query($db, "DELETE FROM user WHERE email='$tmail'");
-
-echo"<center>$empre has been deleted.<br>
-				<a href=http://www.medievalbattles.com/gameconfig.php>Return</a></center>";die();
-		}
-?>
-
-
-<?php
-if(!IsSet($reseta))
-	{
-?>
-	
-<br>
-
-<form type="post" action="gameconfig.php">
-	<table border=1 bordercolor=#ffffff align=center bgcolor=#630000 cellpadding=0 cellspacing=0>
-		<tr>
-		  <td bgcolor=#404040 colspan=2><font color=#ffffff><b>You can reset all accounts</b></font></td>
-		<tr>
-			<td><font color="#ffffff">RESET all accounts</font></td>
-			<td><center><input type="submit" name="reseta" value="RESET"></center></td>
-				<input type="hidden" name="reseta" value="7"></td>
-			
-	
-
-</table>
-</form>
-	<?php
-		}
-		else
-		{	
-
-include("include/connect.php");
-
-// Reset User Table
-mysqli_query($db, "UPDATE user SET gp = \"500000\"");
-mysqli_query($db, "UPDATE user SET iron = \"10000\"");
-mysqli_query($db, "UPDATE user SET exp = \"10000\"");
-mysqli_query($db, "UPDATE user SET food = \"500\"");
-mysqli_query($db, "UPDATE user SET land = \"300\"");
-mysqli_query($db, "UPDATE user SET mts = \"200\"");
-mysqli_query($db, "UPDATE user SET vote = \"0\"");
-mysqli_query($db, "UPDATE user SET votefor = \"None\"");
-mysqli_query($db, "UPDATE user SET sl = \"no\"");
-mysqli_query($db, "UPDATE user SET exp2 = \"0\"");
-mysqli_query($db, "UPDATE user SET fleets = \"4\"");
-mysqli_query($db, "UPDATE user SET rectime = \"0\"");
-mysqli_query($db, "UPDATE user SET mno = \"0\"");
-
-// Reset Buildings Table
-mysqli_query($db, "UPDATE buildings SET home = \"50\"");
-mysqli_query($db, "UPDATE buildings SET barrack = \"75\"");
-mysqli_query($db, "UPDATE buildings SET farm = \"50\"");
-mysqli_query($db, "UPDATE buildings SET lab = \"75\"");
-mysqli_query($db, "UPDATE buildings SET gm = \"50\"");
-mysqli_query($db, "UPDATE buildings SET im = \"50\"");
-mysqli_query($db, "UPDATE buildings SET aland = \"50\"");
-mysqli_query($db, "UPDATE buildings SET amts = \"100\"");
-mysqli_query($db, "UPDATE buildings SET dhome = \"0\"");
-mysqli_query($db, "UPDATE buildings SET dbarrack = \"0\"");
-mysqli_query($db, "UPDATE buildings SET dfarm = \"0\"");
-mysqli_query($db, "UPDATE buildings SET dlab = \"0\"");
-mysqli_query($db, "UPDATE buildings SET dgm = \"0\"");
-mysqli_query($db, "UPDATE buildings SET dim = \"0\"");
-mysqli_query($db, "UPDATE buildings SET Hhrs = \"0\"");
-mysqli_query($db, "UPDATE buildings SET Bhrs = \"0\"");
-mysqli_query($db, "UPDATE buildings SET Lhrs = \"0\"");
-mysqli_query($db, "UPDATE buildings SET Fhrs = \"0\"");
-mysqli_query($db, "UPDATE buildings SET Ghrs = \"0\"");
-mysqli_query($db, "UPDATE buildings SET Ihrs = \"0\"");
-
-// Reset Military Table
-mysqli_query($db, "UPDATE military SET civ = \"5000\"");
-mysqli_query($db, "UPDATE military SET recruits = \"250\"");
-mysqli_query($db, "UPDATE military SET wizards = \"10\"");
-mysqli_query($db, "UPDATE military SET warriors = \"10\"");
-mysqli_query($db, "UPDATE military SET priests = \"10\"");
-mysqli_query($db, "UPDATE military SET scientists = \"0\"");
-mysqli_query($db, "UPDATE military SET thieves = \"0\"");
-mysqli_query($db, "UPDATE military SET explorers = \"0\"");
-mysqli_query($db, "UPDATE military SET maxciv = \"350\"");
-mysqli_query($db, "UPDATE military SET ssword = \"0\"");
-mysqli_query($db, "UPDATE military SET lsword = \"0\"");
-mysqli_query($db, "UPDATE military SET axe = \"0\"");
-mysqli_query($db, "UPDATE military SET gaxe = \"0\"");
-mysqli_query($db, "UPDATE military SET club = \"0\"");
-mysqli_query($db, "UPDATE military SET cweapon = \"Dagger\"");
-mysqli_query($db, "UPDATE military SET cspell = \"Magic Missile\"");
-mysqli_query($db, "UPDATE military SET cstaff = \"Quarter Staff\"");
-mysqli_query($db, "UPDATE military SET icesword = \"0\"");
-mysqli_query($db, "UPDATE military SET wararmor = \"Studded Leather\"");
-mysqli_query($db, "UPDATE military SET wizarmor = \"Robe\"");
-mysqli_query($db, "UPDATE military SET priarmor = \"Leather\"");
-mysqli_query($db, "UPDATE military SET cs = \"0\"");
-mysqli_query($db, "UPDATE military SET cm = \"0\"");
-mysqli_query($db, "UPDATE military SET bp = \"0\"");
-mysqli_query($db, "UPDATE military SET fp = \"0\"");
-mysqli_query($db, "UPDATE military SET fullp = \"0\"");
-mysqli_query($db, "UPDATE military SET sm = \"0\"");
-mysqli_query($db, "UPDATE military SET warspeedw = \"0\"");
-mysqli_query($db, "UPDATE military SET wizspeeds = \"0\"");
-mysqli_query($db, "UPDATE military SET prispeedw = \"0\"");
-mysqli_query($db, "UPDATE military SET warpower = \"3\"");
-mysqli_query($db, "UPDATE military SET wizpower = \"2\"");
-mysqli_query($db, "UPDATE military SET pripower = \"2\"");
-mysqli_query($db, "UPDATE military SET priout = \"0\"");
-mysqli_query($db, "UPDATE military SET warspeeda = \"0\"");
-mysqli_query($db, "UPDATE military SET wizspeeda = \"0\"");
-mysqli_query($db, "UPDATE military SET prispeeda = \"0\"");
-mysqli_query($db, "UPDATE military SET wardef = \"6\"");
-mysqli_query($db, "UPDATE military SET wizdef = \"10\"");
-mysqli_query($db, "UPDATE military SET prideef = \"8\"");
-mysqli_query($db, "UPDATE military SET dbwar = \"0\"");
-mysqli_query($db, "UPDATE military SET dbwiz = \"0\"");
-mysqli_query($db, "UPDATE military SET dbpri = \"0\"");
-mysqli_query($db, "UPDATE military SET dbwar2 = \"0\"");
-mysqli_query($db, "UPDATE military SET dbwiz2 = \"0\"");
-mysqli_query($db, "UPDATE military SET dbpri2 = \"0\"");
-mysqli_query($db, "UPDATE military SET dbscientist = \"0\"");
-mysqli_query($db, "UPDATE military SET dbexplorer = \"0\"");
-mysqli_query($db, "UPDATE military SET dbthief = \"0\"");
-
-// Reset Return Table
-mysqli_query($db, "UPDATE returntbl SET war1 = \"0\"");
-mysqli_query($db, "UPDATE returntbl SET war2 = \"0\"");
-mysqli_query($db, "UPDATE returntbl SET war3 = \"0\"");
-mysqli_query($db, "UPDATE returntbl SET war4 = \"0\"");
-mysqli_query($db, "UPDATE returntbl SET wiz1 = \"0\"");
-mysqli_query($db, "UPDATE returntbl SET wiz2 = \"0\"");
-mysqli_query($db, "UPDATE returntbl SET wiz3 = \"0\"");
-mysqli_query($db, "UPDATE returntbl SET wiz4 = \"0\"");
-mysqli_query($db, "UPDATE returntbl SET pri1 = \"0\"");
-mysqli_query($db, "UPDATE returntbl SET pri2 = \"0\"");
-mysqli_query($db, "UPDATE returntbl SET pri3 = \"0\"");
-mysqli_query($db, "UPDATE returntbl SET pri4 = \"0\"");
-mysqli_query($db, "UPDATE returntbl SET time1 = \"0\"");
-mysqli_query($db, "UPDATE returntbl SET time2 = \"0\"");
-mysqli_query($db, "UPDATE returntbl SET time3 = \"0\"");
-mysqli_query($db, "UPDATE returntbl SET time4 = \"0\"");
-
-// Reset Research Table
-mysqli_query($db, "UPDATE research SET r1 = \"0\"");
-mysqli_query($db, "UPDATE research SET r2 = \"0\"");
-mysqli_query($db, "UPDATE research SET r3 = \"0\"");
-mysqli_query($db, "UPDATE research SET r4 = \"0\"");
-mysqli_query($db, "UPDATE research SET r5 = \"0\"");
-mysqli_query($db, "UPDATE research SET r1pts = \"0\"");
-mysqli_query($db, "UPDATE research SET r2pts = \"0\"");
-mysqli_query($db, "UPDATE research SET r3pts = \"0\"");
-mysqli_query($db, "UPDATE research SET r4pts = \"0\"");
-mysqli_query($db, "UPDATE research SET r5pts = \"0\"");
-
-// Reset Explore Table
-mysqli_query($db, "UPDATE explore SET expland = \"0\"");
-mysqli_query($db, "UPDATE explore SET expmt = \"0\"");
-mysqli_query($db, "UPDATE explore SET landhrs = \"0\"");
-mysqli_query($db, "UPDATE explore SET mthrs= \"0\"");
-
-
-			echo"<center>All accounts have been reset.<br>
-				<a href=http://www.medievalbattles.com/gameconfig.php>Return</a></center>";
-		}
-?>
-
-<br>
-<br>
-<br>
-<?php
-
-include("include/connect.php");
-	$tablename = "user";
-
-echo "
-	<table border=1 align=center width=\"100%\">
-	 <tr>
-	  <td>Empire Name</td>
-	  <td>Password</td>
-	  <td>Email</td>
-	  <td>AIM</td>
-	  <td>MSN</td>
-	  <td>Host Name</td>
-";
-
-
-
-
-		$query_string = "SELECT ename, pw, email, aim, msn, ip FROM user ORDER BY ip";
-		$result_id = mysqli_query($db, $query_string);
-		while ($row = mysqli_fetch_row($result_id))
-		    {
-
-			$ONLINE_NO = mysqli_query($db, "SELECT online FROM user WHERE ename='$row[0]'");	
-				$OLINE = mb_db_result($ONLINE_NO,"OLINE");
-	
-			if($OLINE == 1)
-				{$O_line = "<font color=red>*</font>";}
-			else{$O_line = "";}
-
-
-		    print("<TR ALIGN=center VALIGN=TOP colspan=7>
-				<td>$row[0] $O_line</td>
-				<td>$row[1]</td>
-				<td>$row[2]</td>
-				<td>$row[3]</td>
-				<td>$row[4]</td>
-				<td>$row[5]</td>\n");
-		    }
-
-		echo "</table>"; 
-
-?>
-
-<?php
-
-ob_end_flush();
-
-?>	
+// --- the menu ----------------------------------------------------------------
+
+echo "<table border=1 bordercolor=#000000 cellpadding=4 cellspacing=0>";
+foreach ($MB_ADMIN_ACTIONS as $key => $spec) {
+	echo "<tr><td>" . htmlspecialchars($spec['label']) . "</td>"
+		. "<td><form method=post action=gameconfig.php>"
+		. "<input type=hidden name=action value=\"" . htmlspecialchars($key) . "\">"
+		. "<input type=submit value=\"Do it\"></form></td></tr>";
+}
+echo "<tr><td>Delete one account, by empire name</td>"
+	. "<td><form method=post action=gameconfig.php>"
+	. "<input type=text name=empre maxlength=50>"
+	. "<input type=submit name=daccount value=\"Delete\"></form></td></tr>";
+echo "</table><br>";
+
+// --- every account, as the credential dump this page has always been ---------
+
+echo "<table border=1 width=\"100%\">
+	<tr>
+		<td><b>Empire Name</b></td>
+		<td><b>Password (MD5)</b></td>
+		<td><b>Email</b></td>
+		<td><b>AIM</b></td>
+		<td><b>MSN</b></td>
+		<td><b>Host Name</b></td>
+	</tr>";
+
+// One query, not one per row. The online marker used to be a second SELECT
+// inside the loop, filtered on the empire name it had just fetched.
+$result_id = mysqli_query($db, "SELECT ename, pw, email, aim, msn, ip, online FROM user ORDER BY ip");
+while ($row = mysqli_fetch_row($result_id)) {
+	$online = $row[6] == 1 ? "<font color=red>*</font>" : "";
+	echo "<tr align=center valign=top>"
+		. "<td>" . htmlspecialchars($row[0]) . " $online</td>"
+		. "<td>" . htmlspecialchars($row[1]) . "</td>"
+		. "<td>" . htmlspecialchars($row[2]) . "</td>"
+		. "<td>" . htmlspecialchars($row[3]) . "</td>"
+		. "<td>" . htmlspecialchars($row[4]) . "</td>"
+		. "<td>" . htmlspecialchars($row[5]) . "</td></tr>\n";
+}
+
+echo "</table></center>
+</body>
+</html>";

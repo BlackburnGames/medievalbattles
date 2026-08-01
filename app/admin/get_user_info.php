@@ -3,7 +3,13 @@
 // Request input, formerly supplied by register_globals.
 include("include/request.php");
 $empre = mb_input('empre');
- 
+// The page branches on $userinfo, which the form submits and nothing read: the
+// port missed it the same way it missed adminlogin.php's $pw. Left unset, the
+// IsSet() below was always false and the results half of this page had been
+// unreachable since register_globals went away -- typing a name and pressing
+// the button simply redrew the form.
+$userinfo = mb_input('userinfo');
+
 
 include("include/igtop.php");
 
@@ -23,24 +29,34 @@ else	{
 
 	$clock = date("m/d/y, H:ia");
 
-	$result = mysqli_query($db, "SELECT * FROM user WHERE ename='$empre'");
+	$result = mysqli_query($db, "SELECT * FROM user WHERE ename=" . mb_sql_str($db, $empre));
 		$evu = mysqli_fetch_array($result);
 
-	$result1 = mysqli_query($db, "SELECT * FROM military WHERE userid='$evu[userid]'");
+	// The five queries below all filter on $evu[userid]. With no such empire
+	// $evu is false, every one of them read `userid=''`, and the page rendered
+	// a full report made of whichever rows happened to have a blank id.
+	if (!$evu) {
+		echo "<div align=center>No empire called " . htmlspecialchars($empre) . ".</div>";
+		die();
+	}
+
+	$q_evuid = mb_sql_int($evu['userid']);
+
+	$result1 = mysqli_query($db, "SELECT * FROM military WHERE userid=$q_evuid");
 		$evm = mysqli_fetch_array($result1);
-	
-	$result2 = mysqli_query($db, "SELECT * FROM buildings WHERE userid='$evu[userid]'");
+
+	$result2 = mysqli_query($db, "SELECT * FROM buildings WHERE userid=$q_evuid");
 		$evb = mysqli_fetch_array($result2);
 
-	$result3 = mysqli_query($db, "SELECT * FROM returntbl WHERE userid='$evu[userid]'");
+	$result3 = mysqli_query($db, "SELECT * FROM returntbl WHERE userid=$q_evuid");
 		$evr = mysqli_fetch_array($result3);
 
-	$result4 = mysqli_query($db, "SELECT * FROM research WHERE userid='$evu[userid]'");
+	$result4 = mysqli_query($db, "SELECT * FROM research WHERE userid=$q_evuid");
 		$evres = mysqli_fetch_array($result4);
 
-	$result5 = mysqli_query($db, "SELECT * FROM explore WHERE userid='$evu[userid]'");
+	$result5 = mysqli_query($db, "SELECT * FROM explore WHERE userid=$q_evuid");
 		$eve = mysqli_fetch_array($result5);
-	
+
 echo"
 		<table border=1 bordercolor=#000000 align=center cellpadding=0 cellspacing=0 width=80%>
 			<tr>
@@ -156,7 +172,11 @@ echo"
 			</tr>
 			</table><br>";
 
-	$empnews_sel = mysqli_query($db, "SELECT count(yourid) FROM empnews WHERE yourid='$userid'");	
+	// $userid is the LOGGED-IN player's id and is not set in the admin area at
+	// all, so this counted the news belonging to userid '' -- i.e. none, for
+	// everybody. The empire news table below it therefore never rendered for
+	// any user, whatever news they had. It wants the empire being looked at.
+	$empnews_sel = mysqli_query($db, "SELECT count(yourid) FROM empnews WHERE yourid=$q_evuid");
 	$emp_sel = mb_db_result($empnews_sel,"emp_sel");
 	
 	if($emp_sel == 0 OR $emp_sel == "")	{
@@ -172,7 +192,7 @@ echo "
 				<td class=inner2 width=20%><b>Date</b></td>
 				<td class=inner22><b>News</b></td>";
 
-	$query_string = "SELECT date, news FROM empnews WHERE yourid='$evu[userid]' ORDER BY date DESC";
+	$query_string = "SELECT date, news FROM empnews WHERE yourid=$q_evuid ORDER BY date DESC";
 	$result_id = mysqli_query($db, $query_string);
 	while ($row = mysqli_fetch_row($result_id))	{
 		echo "
