@@ -25,10 +25,24 @@ ACCEPT=0
 bash tests/reset-db.sh > /dev/null
 
 echo "Running tick (update.php)..."
-# Output is discarded: it is a wall of deprecation notices, and the database
-# state is what this test actually asserts on. The smoke test covers page-level
-# diagnostics separately.
-docker compose exec -T -w /repo web php update.php > /dev/null 2>&1
+# Captured rather than discarded. Most of it is a wall of deprecation notices
+# and the database state is what this test really asserts on, but the tick is
+# outside the smoke crawl, so a failing query here would be reported by nothing
+# at all -- which is exactly how the dead research and lost-army bugs survived.
+TICK_LOG="$(mktemp)"
+trap 'rm -f "$ACTUAL" "$TICK_LOG"' EXIT
+docker compose exec -T -w /repo web php update.php > "$TICK_LOG" 2>&1
+
+# Matched against stripped text: with html_errors on PHP emits "<b>Warning</b>:"
+# and a pattern expecting "Warning:" silently matches nothing.
+if grep -q 'mysqli_' "$TICK_LOG"; then
+  echo "FAIL: the tick reported query errors."
+  echo
+  grep -oE 'mysqli_[a-z_]+\(\): .* on line [0-9]+' "$TICK_LOG" | sort -u | sed 's/^/  /'
+  echo
+  echo "Regenerate the full inventory with: bash tests/query-audit.sh"
+  exit 1
+fi
 
 docker compose exec -T web php /repo/tests/dump-state.php > "$ACTUAL"
 

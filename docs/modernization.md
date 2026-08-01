@@ -44,23 +44,31 @@ Not started. The known work, in no committed order:
 - **Unescaped output.** Every template echoes user data raw.
 - **Passwords.** Unsalted MD5, denormalized into four tables alongside the
   email that identifies the row.
-- **Error handling.** Turn `mysqli_report()` back on and handle what it
-  surfaces. `tests/query-audit.sh` now enumerates this: see
-  `tests/broken-queries.txt`. Three of its entries are not cosmetic —
+- ~~**Error handling.**~~ **Done.** `mysqli_report()` is back on as
+  `MYSQLI_REPORT_ERROR` (warnings, not exceptions), the smoke crawl and the tick
+  both fail on a query error, and `tests/broken-queries.txt` is empty. Going
+  further, to `STRICT` and exceptions, needs the ~1300 call sites to check their
+  return values first. Getting there meant fixing what it surfaced —
 
-  - **Research has never worked.** The tick adds points to `r1pts`–`r18pts` in
-    one `UPDATE`, but the schema stops at `r14pts`. A MySQL `UPDATE` is atomic,
-    so the statement is rejected whole and the fourteen columns that do exist
-    are not written either. Assigning researchers does nothing, and never has.
-  - **Troops sent out are lost permanently.** The returning-army slot and its
-    timer are cleared by separate statements. The first also names
-    `golem1`–`golem4`, which `returntbl` does not have, so it fails while the
-    timer keeps counting down — and once the timer passes 1 the
-    `WHERE time1 = 1` release condition can never match again.
-  - `guildconfig.php` selects a `flag` column that is not in `db.sql`.
+  - **Research had never worked.** The tick adds points to `r1pts`–`r18pts` in
+    one `UPDATE`, but the schema stopped at `r14pts`. A MySQL `UPDATE` is
+    atomic, so the statement was rejected whole and the fourteen columns that
+    did exist were not written either — assigning sages did nothing, for
+    anyone, ever.
+  - **Troops sent out were lost permanently.** The returning-army slot and its
+    timer are cleared by separate statements, and the restore that moves the
+    army back into `military` is a third. Two of the three name
+    `golem1`–`golem4`, which `returntbl` did not have, so they failed while the
+    timer beside them kept counting down — and once it passed 1 the
+    `WHERE time1 = 1` release could never match again.
+  - **The guild flag was not a cut feature, just an unsaveable one.** Only the
+    column was missing. It is also escaped now, which it never was.
+  - The tick ran a phantom first pass for userid 0, whose empty interpolations
+    MySQL rejected as syntax errors.
 
-  All three share a cause: an `UPDATE` naming a column that does not exist,
-  against code that checks no return value.
+  The first three shared a cause: an `UPDATE` naming a column that `db.sql` did
+  not have, against code that checks no return value. The engine was right and
+  the schema was short — so the fix was almost entirely `db.sql`.
 - **The bug list.** `tests/register-globals.txt` and `$GAMEDATA['quirks']` are
   both inventories of real defects, kept in a form that shrinks as they are
   fixed.

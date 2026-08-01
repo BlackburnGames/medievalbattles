@@ -16,6 +16,11 @@ database-in/database-out, no HTML, session or auth, and the densest game logic.
 It resets the database, runs a tick, dumps all tables via
 `tests/dump-state.php`, and diffs against `tests/golden/tick.txt`.
 
+It also **fails if the tick reports any query error**. The tick is outside the
+smoke crawl, so a failing query there would otherwise be reported by nothing at
+all — which is exactly how the dead-research and lost-army bugs survived the
+whole port.
+
 Treat re-accepting a golden as a review step: read the diff and confirm every
 changed number was intended. Re-accept with `--accept`.
 
@@ -80,26 +85,23 @@ Re-accept with `--accept`.
 Not a test — an inventory generator, and the only thing that runs the stack
 with `MB_REPORT_QUERIES=1`.
 
-`connect.php` normally sets `MYSQLI_REPORT_OFF`, which is correct (see
-[porting-notes.md](porting-notes.md)) and is also a blindfold: the app fires
-~1300 unchecked queries and swallows every failure, so nobody knows which have
-been broken or since when. This script selects `MYSQLI_REPORT_ERROR` *without*
-`MYSQLI_REPORT_STRICT` for one run — failures become warnings rather than
-exceptions, so each names itself and its line and the request still completes —
-and writes what it finds to `tests/broken-queries.txt`.
+Query reporting is on by default now (see
+[porting-notes.md](porting-notes.md)), and both the crawl and the tick fail on a
+query error, so this is no longer the only way to see one. What it still does
+that they cannot is produce the **combined inventory** in one pass, across both
+surfaces at once, without stopping at the first failure — which is what you want
+when you are working through a batch rather than guarding against a regression.
 
-Two passes, because neither covers the other: the smoke crawl in audit mode
-(`MB_QUERY_AUDIT=1`, which collects the mysqli warnings instead of failing on
-them), and `update.php`, which the crawl never touches and which is the densest
-query surface in the codebase.
+Two passes: the smoke crawl in audit mode (`MB_QUERY_AUDIT=1`, which collects
+the mysqli warnings instead of failing on them), and `update.php`. It is not in
+`run-all.sh` because it restarts the container twice.
 
-It is not in `run-all.sh` — it restarts the container twice, and with reporting
-on the crawl is red by construction. The output is a floor on the number of
-broken queries, not a total, and **should only ever shrink**.
+`tests/broken-queries.txt` is **currently empty**, and its output is a floor on
+the number of broken queries rather than a total — it covers only what the two
+passes reach.
 
-The first run of it found that research has never worked and that troops sent
-out are lost permanently; see `$GAMEDATA['quirks']` and
-[modernization.md](modernization.md).
+Its first run found that research had never worked and that troops sent out were
+lost permanently. Both are fixed; see [modernization.md](modernization.md).
 
 ### `tests/register-globals-diff.sh`
 

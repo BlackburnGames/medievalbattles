@@ -46,11 +46,11 @@ services:
       # input through mb_input() now. Set to "1" only to check whether a bug on
       # one of the pages the smoke crawl cannot reach is a porting regression.
       MB_REGISTER_GLOBALS: "0"
-      # Makes mysqli report failing queries as warnings instead of swallowing
-      # them. Off in the normal stack -- those warnings would fail the smoke
-      # crawl. tests/query-audit.sh flips it on for one run to inventory the
-      # queries that have never worked. See app/include/connect.php.
-      MB_REPORT_QUERIES: "${MB_REPORT_QUERIES:-0}"
+      # mysqli reports failing queries as warnings (not exceptions) by default
+      # as of Phase 3, so the smoke crawl fails on one instead of swallowing it.
+      # Set to "0" to silence them again as a bisection aid.
+      # See app/include/connect.php.
+      MB_REPORT_QUERIES: "${MB_REPORT_QUERIES:-1}"
     volumes:
       # app/ is the docroot; the repo root is also mounted because update.php
       # includes "app/include/..." and must run with the root as CWD.

@@ -22,24 +22,29 @@
 require_once __DIR__ . '/db.php';
 
 /**
- * PHP 8.1 made mysqli throw on error instead of returning false. That is the
- * better default, but it is not what this code was written against: it fires
- * ~1300 unchecked queries, several of which have never succeeded (the guild
- * listing selects a column that is not in db.sql, and update.php's first loop
- * iteration interpolates empty values into arithmetic). Under exceptions each
- * one becomes a fatal, which is a behaviour change, not a port.
+ * Query errors are reported again, as of Phase 3.
  *
- * Restoring the silent-false contract keeps Phase 2 mechanical. Turning this
- * back on -- and handling the errors it surfaces -- is Phase 3 work.
+ * PHP 8.1 made mysqli throw on error instead of returning false. Phase 2 turned
+ * that off wholesale with MYSQLI_REPORT_OFF, because this code fires ~1300
+ * unchecked queries and several had never succeeded -- under exceptions each
+ * one becomes a fatal, which is a behaviour change rather than a port.
  *
- * MB_REPORT_QUERIES=1 is the first half of that work: MYSQLI_REPORT_ERROR
- * without MYSQLI_REPORT_STRICT reports failures as warnings rather than
- * exceptions, so a failing query names itself and its line without aborting
- * the request. That makes the set of queries that have never worked
- * enumerable -- see tests/query-audit.sh -- without yet having to fix them.
- * It is off in the normal stack because those warnings would fail the crawl.
+ * Those failures are now fixed (research and returning armies were both dead
+ * because db.sql was missing columns; see docs/modernization.md), and
+ * tests/query-audit.sh reports none left on the surface the tests reach. So
+ * reporting goes back on -- but as MYSQLI_REPORT_ERROR *without*
+ * MYSQLI_REPORT_STRICT. Failures are raised as warnings, not exceptions:
+ *
+ *   - The smoke crawl fails on any warning, so a query that breaks on a covered
+ *     page now fails the suite instead of being swallowed. That is the point.
+ *   - A query that breaks on a page the crawl cannot reach still only warns, so
+ *     restoring reporting cannot turn a live page into a blank one. Going
+ *     further, to STRICT and exceptions, needs the remaining ~1300 call sites to
+ *     actually check their return values first.
+ *
+ * MB_REPORT_QUERIES=0 turns it back off, as a bisection aid.
  */
-mysqli_report(getenv('MB_REPORT_QUERIES') === '1' ? MYSQLI_REPORT_ERROR : MYSQLI_REPORT_OFF);
+mysqli_report(getenv('MB_REPORT_QUERIES') === '0' ? MYSQLI_REPORT_OFF : MYSQLI_REPORT_ERROR);
 
 $dbnam      = getenv('MB_DB_NAME') ? getenv('MB_DB_NAME') : 'mbv6';
 $mb_db_host = getenv('MB_DB_HOST') ? getenv('MB_DB_HOST') : '127.0.0.1';

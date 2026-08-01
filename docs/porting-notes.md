@@ -81,11 +81,18 @@ after that the prepend is nothing but the `display_errors` switch, which stays.
   buildable as the behavioural reference. The 5.6 images are archived and their
   Debian jessie apt repos are dead, so the Dockerfile installs nothing via apt —
   **do not add an `apt-get` line**, it breaks that build only.
-- **`mysqli_report(MYSQLI_REPORT_OFF)` in `connect.php` is deliberate.** PHP 8.1
-  made mysqli throw on error instead of returning false. This code fires ~1300
-  unchecked queries and several have never succeeded, so exceptions turn each one
-  into a fatal. Turning reporting back on, and handling what it surfaces, is
-  Phase 3 — expect real breakage when you do.
+- **`connect.php` reports query errors as warnings, not exceptions, and the
+  distinction is deliberate.** PHP 8.1 made mysqli throw on error; Phase 2
+  turned that off wholesale with `MYSQLI_REPORT_OFF`, because this code fires
+  ~1300 unchecked queries and several had never succeeded — under exceptions
+  each becomes a fatal. Those failures are fixed now, so Phase 3 restored
+  `MYSQLI_REPORT_ERROR` *without* `MYSQLI_REPORT_STRICT`. The smoke crawl fails
+  on any warning, so a query that breaks on a covered page now fails the suite;
+  a query that breaks on a page the crawl cannot reach still only warns, so
+  restoring reporting cannot turn a live page into a blank one. Going further —
+  to `STRICT` and exceptions — needs those ~1300 call sites to actually check
+  their return values first. `MB_REPORT_QUERIES=0` silences it as a bisection
+  aid.
 - The smoke test demotes PHP 8's `Undefined variable` / `Undefined array key` /
   `Trying to access array offset on null` warnings back to notice class. PHP 8
   raised these from E_NOTICE, and they are precisely the uninitialised reads this
