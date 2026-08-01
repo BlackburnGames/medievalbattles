@@ -21,7 +21,8 @@ while ($row = mysqli_fetch_row($result_id))	{
 				$AIM_SELECT = mysqli_query($db, "SELECT aim FROM user WHERE ename='$row[0]'");	
 	   			$AIM_S = mb_db_result($AIM_SELECT, "AIM_S");
 				$row[1] = urlencode($row[1]);
-				$AIM_VAR = "<a href=\"aim:goim?screenname=$row[1]&message=Hey+its+$ename\"><img src=\"images/aim.gif\" border=\"0\"></a>";
+				$AIM_VAR = "<a href=" . mb_attr("aim:goim?screenname=$row[1]&message=Hey+its+$ename")
+				         . "><img src=\"images/aim.gif\" border=\"0\"></a>";
 			}
 	//	Check to see if SL is there
 		$SL_result = mysqli_query($db, "SELECT sl FROM user WHERE ename='$row[0]'");

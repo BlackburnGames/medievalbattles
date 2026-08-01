@@ -11,6 +11,11 @@ if (empty($offset))  {  $offset=0;  }
 $numresults=mysqli_query($db, "SELECT topicid FROM setforums WHERE setid=$setid");
 $numrows=mysqli_num_rows($numresults);
 
+// Who leads this settlement, for the (SL) badge. One lookup, before the
+// loop -- the badge is rendered now rather than stored; see mb_sl_badge().
+$mb_sl_q = mysqli_query($db, "SELECT ename FROM user WHERE sl='yes' AND setid=" . mb_sql_int($setid));
+$mb_leader = mb_db_result($mb_sl_q, "ename");
+
 $query = "SELECT topicid, name, topic, replies, lastpost, lastposter FROM setforums WHERE setid='$setid' ORDER by topicid DESC";
 $result= mysqli_query($db, $query) or die("Could not run the database query!");
 
@@ -36,8 +41,8 @@ echo "
 					<tr bgcolor=$color2>
 						<td valign=top><strong class=black-small><a href=" . mb_attr("topic.php?topicid={$r['topicid']}") . ">{$r['topic']}</a></strong></td>
 						<td valign=top align=center>$treplies</td>
-						<td valign=top align=center><strong class=black-small>{$r['name']}$S_L</strong></td>
-						<td valign=top align=center><strong class=black-small>{$r['lastposter']}</strong></td>
+						<td valign=top align=center><strong class=black-small>" . mb_h($r['name']) . mb_sl_badge($r['name'], $mb_leader) . "</strong></td>
+						<td valign=top align=center><strong class=black-small>" . mb_h($r['lastposter']) . mb_sl_badge($r['lastposter'], $mb_leader) . "</strong></td>
 						<td valign=top align=center>{$r['lastpost']}</td>
 					</tr>";
 	}

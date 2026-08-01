@@ -98,7 +98,6 @@ app/include/S_RES.php	lightning_bolt
 app/include/S_RES.php	meteor_swarm
 app/include/S_RES.php	wall_of_fire
 app/include/S_RES.php	wall_of_ice
-app/include/S_SINFOS.php	thenap
 app/include/S_WEP.php	bastardsword_button
 app/include/S_WEP.php	bowoftion_button
 app/include/S_WEP.php	dynefian_button
@@ -158,10 +157,8 @@ app/preferences.php	VF_emp
 app/preferences.php	empireattacked
 app/research.php	assages
 app/setstrength.php	placeno
-app/sforum.php	S_L
 app/sforum.php	offset
 app/sguild.php	placeno
-app/sl-forum.php	S_L
 app/sl-forum.php	offset
 app/sl-input.posts.php	replies
 app/vmessages.php	check

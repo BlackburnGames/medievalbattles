@@ -41,12 +41,10 @@ app/govt.php	fename	text
 app/guildconfig.php	applicant_ename	text
 app/guildconfig.php	empire_info	text
 app/include/S_BARTER.php	row	text
-app/include/S_GOVT.php	AIM_VAR	text
 app/include/S_GOVT.php	row	text
 app/include/S_MESS.php	row	text
 app/include/S_SET.php	S_STRENGTH	text
 app/include/S_SET.php	row	text
-app/include/S_SET.php	settlename	text
 app/include/S_VMESS.php	datesent	text
 app/include/S_VMESS.php	link	text
 app/include/S_WEP.php	bastardtime	text
@@ -81,9 +79,7 @@ app/intel.php	evb	text
 app/intel.php	evdef	text
 app/intel.php	evm	text
 app/intel.php	evu	text
-app/main.php	guildnotice	text
 app/main.php	row	text
-app/main.php	setnotice	text
 app/messaging.php	empireattacked	text
 app/scattack.php	evu	text
 app/setstrength.php	row	text

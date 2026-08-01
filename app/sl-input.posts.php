@@ -27,10 +27,9 @@ $usetid = mysqli_query($db, "SELECT setid FROM user WHERE email='$email' AND pw=
 include("common.php");	
 include("include/clock.php");
 
-if($sl == 'yes')	{
-	$ename = "$ename". "<font class=red>(SL)</font>";
-}
-
+// A settlement leader's name used to get "<font class=red>(SL)</font>" bolted
+// on here, before the INSERT, so the badge was stored in `name` and in
+// `lastposter` beside it. It is rendered now -- see mb_sl_badge().
 
 $q_topic   = mb_sql_str($db, $topic);
 $q_message = mb_sql_str($db, $message);

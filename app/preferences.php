@@ -53,7 +53,6 @@ if(!IsSet($changepw))	{
 }
 else	{
 	include("include/S_SINFOS.php");
-	$md5currentpw = htmlspecialchars($currentpw);
 	$md5currentpw = md5($currentpw);
 			
 	if($md5currentpw != $pw)	{
@@ -76,7 +75,16 @@ else	{
 	// The digest gets its own name. What the six UPDATEs interpolate is 32 hex
 	// characters and always was, but with the request value and the hash of it
 	// sharing one name, that is only true if you read all three lines in order.
-	$newpw_hash = md5(htmlspecialchars($newpw));
+	//
+	// md5($newpw), not md5(htmlspecialchars($newpw)). Escaping the password
+	// before hashing it was the same 2003 reflex as escaping everything else on
+	// the way in, and here it locked people out: checksignup.php and
+	// checklogin.php both hash the raw string, so a password containing & < > "
+	// or ' was stored as the digest of a value login could never reproduce.
+	// credentials.php constrains the hash, not the password, so nothing stopped
+	// it. The line above it did the same thing to the *current* password check
+	// and was harmless only because the next line immediately overwrote it.
+	$newpw_hash = md5($newpw);
 	mysqli_query($db, "UPDATE user SET pw='$newpw_hash' WHERE $q_cred") or die(mysqli_error($db));
 	mysqli_query($db, "UPDATE buildings SET pw='$newpw_hash' WHERE $q_cred") or die(mysqli_error($db));
  	mysqli_query($db, "UPDATE military SET pw='$newpw_hash' WHERE $q_cred") or die(mysqli_error($db));

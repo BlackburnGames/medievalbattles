@@ -126,12 +126,14 @@ while ($row = mysqli_fetch_array($result_id))	{
 	// The flag is a URL the guild leader types in, echoed into an href and an
 	// img src. It is the only field here that was never escaped, and it only
 	// stopped being a stored-XSS vector by accident, because the column it
-	// comes from did not exist.
-	$flag = htmlspecialchars($row['flag'], ENT_QUOTES);
+	// comes from did not exist. Escaping is not enough on its own either:
+	// href="javascript:alert(1)" needs no metacharacter at all, so the scheme
+	// is checked first.
+	$flag = mb_safe_url($row['flag']);
 
 	echo "
 	<tr align=center valign=top colspan=6>
-		<td bgcolor=#404040><a href=\"$flag\" target=newwindow><img src=\"$flag\" width=50 height=50 border=0></a></td>
+		<td bgcolor=#404040><a href=" . mb_attr($flag) . " target=newwindow><img src=" . mb_attr($flag) . " width=50 height=50 border=0></a></td>
 		<td bgcolor=#404040><a href=" . mb_attr("gc.php?pageid=mgl&gid=$row[3]") . ">$row[0]</a></td>
 		<td bgcolor=#404040>$row[1]</td>
 		<td bgcolor=#404040>$row[5]</td>
@@ -206,12 +208,14 @@ else	{
 		$M_gid = mysqli_query($db, "SELECT max(gid) FROM guild");	
 			$mgid = mb_db_result($M_gid, "mgid");	
 		
-		// The escaped forms get their own names. $creating_guild_name meant the
-		// raw name above this line and the escaped one below it, so nothing
-		// reading the file -- the audit included -- could tell whether the echo
-		// at the bottom was safe. It always was; now it says so.
-		$info = htmlspecialchars($info);
-		$guild_name_html = htmlspecialchars($creating_guild_name);
+		// The name and the info are stored as typed. They used to be
+		// htmlspecialchars()'d here, which put entities in the database and
+		// broke the guild's identity: this INSERT wrote the escaped name to
+		// guild.gname while the UPDATE two lines down wrote the raw one to
+		// user.guild, so a guild called "Ale & Axe" stopped matching itself
+		// and its members were in a guild that did not exist. Every page that
+		// renders either field escapes it now.
+		//
 		// Its own name. $gid up at the top of this file is the guild the player
 		// is messaging, read from the request; this one is the id of the guild
 		// about to be created. Sharing a name made the second look like the
@@ -219,11 +223,11 @@ else	{
 		$new_gid = $mgid + 1;
 
 		include("include/connect.php");
-		mysqli_query($db, "INSERT INTO guild (gname, info, gid, datemade, cpw, owner)	 VALUES	(" . mb_sql_str($db, $guild_name_html) . ", " . mb_sql_str($db, $info) . ", '$new_gid', '$clock', " . mb_sql_str($db, $cpw) . ", '$userid') ");
+		mysqli_query($db, "INSERT INTO guild (gname, info, gid, datemade, cpw, owner)	 VALUES	(" . mb_sql_str($db, $creating_guild_name) . ", " . mb_sql_str($db, $info) . ", '$new_gid', '$clock', " . mb_sql_str($db, $cpw) . ", '$userid') ");
 		mysqli_query($db, "UPDATE user SET guild=" . mb_sql_str($db, $gname) . " WHERE email='$email' AND pw='$pw'");
 		mysqli_query($db, "DELETE FROM guildrequests WHERE applicant='$userid'");
 						
-		echo"<div align=center><font class=yellow><b><u>$guild_name_html</u> has been successfully created!</b></font></div>";
+		echo"<div align=center><font class=yellow><b><u>" . mb_h($creating_guild_name) . "</u> has been successfully created!</b></font></div>";
 		include("include/S_GM.php");
 		die();
 	}

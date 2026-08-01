@@ -71,6 +71,68 @@ if (!function_exists('mb_rich')) {
     }
 }
 
+if (!function_exists('mb_safe_url')) {
+    /**
+     * A player-supplied URL, or '' if it is not one we will link to.
+     *
+     * Two of these exist -- the settlement picture and the guild flag -- and
+     * both are echoed into an href as well as an img src. mb_attr() stops the
+     * value breaking out of the attribute, but it does not stop the attribute
+     * meaning something dangerous: href="javascript:alert(1)" is a perfectly
+     * well-formed attribute and it runs.
+     *
+     * So the scheme is checked, which is the part that decides. An empty value
+     * is legal -- both fields are optional and the pages test for "" already.
+     *
+     * S_SINFOS.php used to guard these with ninety str_replace() calls
+     * stripping ".exe", ".php", "onmouseover" and so on out of the middle of
+     * the string. It could not have worked: the XSS clauses ran *after*
+     * htmlspecialchars(), so they were looking for "<script>" in a string where
+     * it had already become "&lt;script&gt;". What they did do was mangle
+     * legitimate input -- a settlement named "Wheightsville" came out
+     * "Wsville", because "height" is on the list.
+     *
+     * @param mixed $value
+     * @return string the URL, or ''
+     */
+    function mb_safe_url($value)
+    {
+        $value = trim((string) $value);
+        return preg_match('~^https?://~i', $value) === 1 ? $value : '';
+    }
+}
+
+if (!function_exists('mb_sl_badge')) {
+    /**
+     * The "(SL)" a settlement leader's name carries on the forums.
+     *
+     * It used to be stored. input.posts.php and sl-input.posts.php appended
+     * "<font class=red>(SL)</font>" to the poster's name before the INSERT, so
+     * the decoration lived in the `name` column and in `lastposter` beside it.
+     *
+     * That is markup in the database, and it froze the badge at post time -- a
+     * leader who was voted out kept it on every old post forever. The forum
+     * index was reaching for the render-time version already: sforum.php and
+     * sl-forum.php both echo "{$r['name']}$S_L", and $S_L is assigned nowhere
+     * in the codebase, so the badge never appeared there at all. Both entries
+     * are on tests/register-globals.txt as dead reads.
+     *
+     * So this is $S_L, finally written. The caller looks up who leads the
+     * settlement once, before its loop, and asks per row.
+     *
+     * @param mixed $name    the poster's name, as stored
+     * @param mixed $leader  ename of the settlement's current leader, or ''
+     * @return string markup, or '' -- already safe, it is a constant
+     */
+    function mb_sl_badge($name, $leader)
+    {
+        if ((string) $leader === '' || (string) $name !== (string) $leader) {
+            return '';
+        }
+        return '<font class=red>(SL)</font>';
+    }
+}
+
 if (!function_exists('mb_attr')) {
     /**
      * An attribute value, escaped AND quoted, ready to interpolate.

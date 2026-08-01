@@ -28,14 +28,12 @@ $usetid = mysqli_query($db, "SELECT setid FROM user WHERE email='$email' AND pw=
 include("common.php");	
 include("include/clock.php");
 
-if($sl == 'yes')	{
-	$ename = "$ename". "<font class=red>(SL)</font>";
-}
-
+// A settlement leader's name used to get "<font class=red>(SL)</font>" bolted
+// on here, before the INSERT, so the badge was stored in `name` and in
+// `lastposter` beside it. It is rendered now -- see mb_sl_badge().
 
 // $ename is escaped alongside the request values. It is read back out of the
-// `user` row rather than off the request, but the player chose it at signup,
-// and the (SL) suffix bolted on above does not make it safe.
+// `user` row rather than off the request, but the player chose it at signup.
 $q_topic   = mb_sql_str($db, $topic);
 $q_message = mb_sql_str($db, $message);
 $q_ename   = mb_sql_str($db, $ename);

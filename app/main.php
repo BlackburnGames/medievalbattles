@@ -47,9 +47,9 @@ echo "        </tr>
   <tr align=center>
     <td>
       <table border=0 bordercolor=#808080 width=70%>
-        <tr><td class=slglnotice><b><font class=red>SL Notice:</font></b></td><td class=slglnotice width=80%>$setnotice[0]</td>";
+        <tr><td class=slglnotice><b><font class=red>SL Notice:</font></b></td><td class=slglnotice width=80%>" . mb_h($setnotice[0]) . "</td>";
   if($empireguild != 'None')  {
-    echo "<tr><td class=slglnotice><b><font class=red>GL Notice:</font></b></td><td class=slglnotice width=80%>$guildnotice[0]</td>";
+    echo "<tr><td class=slglnotice><b><font class=red>GL Notice:</font></b></td><td class=slglnotice width=80%>" . mb_h($guildnotice[0]) . "</td>";
   }
 ?>
     </td>

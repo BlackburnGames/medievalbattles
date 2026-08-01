@@ -26,6 +26,11 @@ if($setid != $settlement_check['setid'])	{
 // is decidable and the audit can see it.
 $r_topic = $topic;
 
+// Who leads this settlement, for the (SL) badge. One lookup, before the
+// loop -- the badge is rendered now rather than stored; see mb_sl_badge().
+$mb_sl_q = mysqli_query($db, "SELECT ename FROM user WHERE sl='yes' AND setid=" . mb_sql_int($setid));
+$mb_leader = mb_db_result($mb_sl_q, "ename");
+
 $result1 = mysqli_query($db, "SELECT name, topic, message, lastpost FROM setforums WHERE topicid='$topicid' AND setid='$setid'") or die("Error!". mysqli_error($db));
 
 if ($result1) { 
@@ -37,7 +42,7 @@ echo"
 
 echo "
 		<tr>
-			<td bgcolor=$color3 width=15% align=left><b class=forum>" . mb_h($r_name) . "</b></td>
+			<td bgcolor=$color3 width=15% align=left><b class=forum>" . mb_h($r_name) . mb_sl_badge($r_name, $mb_leader) . "</b></td>
 			<td bgcolor=$color3 width=80% align=left><b class=forum>" . mb_h($r_topic) . "</b></td>
 			<td bgcolor=$color3></td>
 		</tr>
@@ -64,7 +69,7 @@ echo	"
 
 	echo "
 		<tr>
-			<td bgcolor=$color3 width=15% align=left><b class=forum>" . mb_h($r_name) . "</b></td>
+			<td bgcolor=$color3 width=15% align=left><b class=forum>" . mb_h($r_name) . mb_sl_badge($r_name, $mb_leader) . "</b></td>
 			<td bgcolor=$color3 width=80% align=left><b class=forum>" . mb_h($r_topic) . "</b></td>
 			<td bgcolor=$color3><strong class=white><a href=" . mb_attr("sl-delposts.php?delpost=true&mid=$messageid&tid=$topicid") . "><font size=-2> &nbsp; Delete</a></strong></td>
 		</tr>

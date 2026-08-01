@@ -28,7 +28,7 @@ echo "
 echo "
 	<tr align='center' valign='top' colspan='7'>
 		<td bgcolor='#404040'>$placeno</td>
-		<td bgcolor='#404040' align='left'>$row[0]</td>
+		<td bgcolor='#404040' align='left'>" . mb_h($row[0]) . "</td>
 		<td bgcolor='#404040'>$row[1]</td>
 		<td bgcolor='#404040'>$row[2]</td>";
 	
