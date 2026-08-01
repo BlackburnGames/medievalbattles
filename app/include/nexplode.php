@@ -1,4 +1,41 @@
 <?php
+
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$cexploreland = mb_input('cexploreland');
+$cexploremt   = mb_input('cexploremt');
+$exploreland  = mb_input('exploreland');
+$exploremt    = mb_input('exploremt');
+$send         = mb_input('send');
+$uarcher      = mb_input('uarcher');
+$ubarrack     = mb_input('ubarrack');
+$uexplorer    = mb_input('uexplorer');
+$ufarm        = mb_input('ufarm');
+$ugm          = mb_input('ugm');
+$uhome        = mb_input('uhome');
+$uim          = mb_input('uim');
+$ulmill       = mb_input('ulmill');
+$upriest      = mb_input('upriest');
+$ur1          = mb_input('ur1');
+$ur10         = mb_input('ur10');
+$ur11         = mb_input('ur11');
+$ur12         = mb_input('ur12');
+$ur13         = mb_input('ur13');
+$ur2          = mb_input('ur2');
+$ur3          = mb_input('ur3');
+$ur4          = mb_input('ur4');
+$ur5          = mb_input('ur5');
+$ur6          = mb_input('ur6');
+$ur7          = mb_input('ur7');
+$ur8          = mb_input('ur8');
+$ur9          = mb_input('ur9');
+$urecruit     = mb_input('urecruit');
+$usage        = mb_input('usage');
+$uthief       = mb_input('uthief');
+$uwarrior     = mb_input('uwarrior');
+$uwizard      = mb_input('uwizard');
+$uwp          = mb_input('uwp');
+
 //donate
 $donateg = implode("", explode(",", $donateg));
 $donatei = implode("", explode(",", $donatei));

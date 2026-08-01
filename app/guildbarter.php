@@ -1,4 +1,16 @@
-<? 
+<?
+
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$add    = mb_input('add');
+$amount = mb_input('amount');
+$barter = mb_input('barter');
+$bid    = mb_input('bid');
+$cost   = mb_input('cost');
+$end    = mb_input('end');
+$method = mb_input('method');
+$type   = mb_input('type');
+ 
 include("include/igtop.php");
 
 echo "<font class=yellow><div align=center><b>Barter will be down for the remainder of the game. The barter will return in Version 6 as the Auction Barter. <br>There will not be a guild barter in Version 6.</b></div></font>";

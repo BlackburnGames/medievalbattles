@@ -1,4 +1,9 @@
-<?php 
+<?php
+
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$leave = mb_input('leave');
+ 
 
 include("include/igtop.php");
 

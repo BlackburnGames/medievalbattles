@@ -1,4 +1,9 @@
-<?php 
+<?php
+
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$empre = mb_input('empre');
+ 
 
 include("include/igtop.php");
 

@@ -1,4 +1,13 @@
 <?php
+
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$addreply = mb_input('addreply');
+$addtopic = mb_input('addtopic');
+$message  = mb_input('message');
+$topic    = mb_input('topic');
+$topicid  = mb_input('topicid');
+
 function callback($buffer) {
   // replace all the apples with oranges
   return ($buffer);

@@ -1,4 +1,18 @@
 <?
+
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$ccpw        = mb_input('ccpw');
+$cpw         = mb_input('cpw');
+$create      = mb_input('create');
+$gname       = mb_input('gname');
+$info        = mb_input('info');
+$pageid      = mb_input('pageid');
+$req_guild   = mb_input('req_guild');
+$request     = mb_input('request');
+$sendmessage = mb_input('sendmessage');
+$umessage    = mb_input('umessage');
+
 include("include/igtop.php");
 
 if(!IsSet($sendmessage))	{
@@ -47,6 +61,7 @@ if ($pageid == 'mgl')	{
 	// stale session value -- session_register() preferred the session, which
 	// meant a second mgl link opened while one was pending messaged the first
 	// guild's leader.
+	$gid = mb_input('gid');
 	$_SESSION['gid'] = $gid;
 		$guild_name = mysqli_query($db, "SELECT gname FROM guild WHERE gid='$gid'");	
 			$g_name = mb_db_result($guild_name,"g_name");

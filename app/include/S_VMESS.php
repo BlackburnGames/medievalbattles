@@ -1,6 +1,11 @@
 <font class='orange'><div align='center'><b>All messages get deleted after 4 days</b></div></font><br>
 
 <?php
+
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$message = mb_input('message');
+
 echo "  <br><br>
 	<table border='1' bordercolor='#000000' align='center' width='90%' cellpadding='3' cellspacing='0'>
 		<tr>

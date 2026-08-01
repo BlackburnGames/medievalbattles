@@ -1,5 +1,12 @@
 <?php
 
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$message = mb_input('message');
+$topic   = mb_input('topic');
+$topicid = mb_input('topicid');
+
+
 include("include/igtop.php");
 include("commong.php");
 

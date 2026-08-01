@@ -1,4 +1,16 @@
 <?
+
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$attack     = mb_input('attack');
+$empvalue   = mb_input('empvalue');
+$uarcher    = mb_input('uarcher');
+$ugolem     = mb_input('ugolem');
+$uirongolem = mb_input('uirongolem');
+$upriest    = mb_input('upriest');
+$uwarrior   = mb_input('uwarrior');
+$uwizard    = mb_input('uwizard');
+
 include("include/igtop.php");
 
 echo "

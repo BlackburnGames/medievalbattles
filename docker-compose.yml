@@ -42,9 +42,10 @@ services:
       MB_DB_NAME: mbv6
       MB_DB_USER: mb
       MB_DB_PASS: mb
-      # Emulates PHP 4 register_globals. Required: every form handler in this
-      # app reads bare $pageid / $gid / $umessage and is inert without it.
-      MB_REGISTER_GLOBALS: "1"
+      # Emulates PHP 4 register_globals. Off: the form handlers read their
+      # input through mb_input() now. Set to "1" only to check whether a bug on
+      # one of the pages the smoke crawl cannot reach is a porting regression.
+      MB_REGISTER_GLOBALS: "0"
     volumes:
       # app/ is the docroot; the repo root is also mounted because update.php
       # includes "app/include/..." and must run with the root as CWD.

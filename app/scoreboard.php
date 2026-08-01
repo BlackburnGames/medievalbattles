@@ -1,4 +1,9 @@
-<? include ("include/top.php"); ?>
+<?
+
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$pageid = mb_input('pageid');
+ include ("include/top.php"); ?>
 		
 		    <center><b>Score Board</b></center>
 			<hr class=main>

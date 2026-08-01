@@ -1,4 +1,12 @@
-<?	 
+<?
+
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$empvalue   = mb_input('empvalue');
+$send       = mb_input('send');
+$suicideatk = mb_input('suicideatk');
+$toatk      = mb_input('toatk');
+	 
 include("include/igtop.php");	
 
 echo "

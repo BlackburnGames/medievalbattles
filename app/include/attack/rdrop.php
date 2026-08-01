@@ -1,4 +1,10 @@
 <?
+
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$setchg = mb_input('setchg');
+$snum   = mb_input('snum');
+
 echo "
 <form type=post action=attackr.php>
 <div align=center>";

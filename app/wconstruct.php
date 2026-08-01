@@ -1,5 +1,32 @@
 <?php
 
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$bastardsword = mb_input('bastardsword');
+$bowoftion    = mb_input('bowoftion');
+$broadsword   = mb_input('broadsword');
+$dynefian     = mb_input('dynefian');
+$eldamarstar  = mb_input('eldamarstar');
+$ferricbow    = mb_input('ferricbow');
+$flail        = mb_input('flail');
+$footmanflail = mb_input('footmanflail');
+$gandalara    = mb_input('gandalara');
+$heartsong    = mb_input('heartsong');
+$isidole      = mb_input('isidole');
+$keldarsarms  = mb_input('keldarsarms');
+$longsword    = mb_input('longsword');
+$morningstar  = mb_input('morningstar');
+$romsfury     = mb_input('romsfury');
+$scimitar     = mb_input('scimitar');
+$scourge      = mb_input('scourge');
+$shortbow     = mb_input('shortbow');
+$shortsword   = mb_input('shortsword');
+$shyrscream   = mb_input('shyrscream');
+$splensight   = mb_input('splensight');
+$thyorastear  = mb_input('thyorastear');
+$zakarum      = mb_input('zakarum');
+
+
 include("include/igtop.php");
 
 echo "

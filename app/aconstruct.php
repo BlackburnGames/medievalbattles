@@ -1,4 +1,17 @@
-<?	 
+<?
+
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$update10 = mb_input('update10');
+$update11 = mb_input('update11');
+$update2  = mb_input('update2');
+$update3  = mb_input('update3');
+$update4  = mb_input('update4');
+$update6  = mb_input('update6');
+$update7  = mb_input('update7');
+$update8  = mb_input('update8');
+$update9  = mb_input('update9');
+	 
 
 include("include/igtop.php");
 

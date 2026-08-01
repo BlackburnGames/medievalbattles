@@ -1,4 +1,9 @@
 <?php
+
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$empvalue = mb_input('empvalue');
+
 include("include/igtop.php");
 
 $change = $_POST['change'];

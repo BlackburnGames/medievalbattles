@@ -1,6 +1,12 @@
 <form type=post action="scattack.php">
 <?php
 
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$setchg = mb_input('setchg');
+$snum   = mb_input('snum');
+
+
 if($setchg == 1)	{
 
 	if($snum > 30 OR $snum <= 0)	{

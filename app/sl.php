@@ -1,4 +1,12 @@
 <?
+
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$thesetname   = mb_input('thesetname');
+$thesetnotice = mb_input('thesetnotice');
+$theseturl    = mb_input('theseturl');
+$update       = mb_input('update');
+
 include("include/igtop.php");
 
 if($sl == 'no')	{

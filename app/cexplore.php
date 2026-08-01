@@ -1,4 +1,11 @@
-<?php include("include/igtop.php");
+<?php
+
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$cancel       = mb_input('cancel');
+$cexploreland = mb_input('cexploreland');
+$cexploremt   = mb_input('cexploremt');
+ include("include/igtop.php");
 
 echo "<center> <b class=reg> | <a href=explore.php> -Send Explorers- </a> | </b></center><br>";
 

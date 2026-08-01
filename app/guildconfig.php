@@ -1,5 +1,20 @@
 <?
 
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$accept  = mb_input('accept');
+$auserid = mb_input('auserid');
+$change  = mb_input('change');
+$cpw     = mb_input('cpw');
+$deleteg = mb_input('deleteg');
+$flag    = mb_input('flag');
+$info    = mb_input('info');
+$kick    = mb_input('kick');
+$notice  = mb_input('notice');
+$reject  = mb_input('reject');
+$remp    = mb_input('remp');
+
+
 include("include/igtop.php");
 
 // are they a guild leader?

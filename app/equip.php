@@ -1,4 +1,18 @@
 <?
+
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$uarcharmor = mb_input('uarcharmor');
+$uarcher    = mb_input('uarcher');
+$update     = mb_input('update');
+$update2    = mb_input('update2');
+$upriarmor  = mb_input('upriarmor');
+$upriest    = mb_input('upriest');
+$uwararmor  = mb_input('uwararmor');
+$uwarrior   = mb_input('uwarrior');
+$uwizard    = mb_input('uwizard');
+$uwizarmor  = mb_input('uwizarmor');
+
 include("include/igtop.php");
 
 echo "

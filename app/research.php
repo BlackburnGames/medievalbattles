@@ -1,4 +1,27 @@
-<?php 
+<?php
+
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$first = mb_input('first');
+$ur1   = mb_input('ur1');
+$ur10  = mb_input('ur10');
+$ur11  = mb_input('ur11');
+$ur12  = mb_input('ur12');
+$ur13  = mb_input('ur13');
+$ur14  = mb_input('ur14');
+$ur15  = mb_input('ur15');
+$ur16  = mb_input('ur16');
+$ur17  = mb_input('ur17');
+$ur18  = mb_input('ur18');
+$ur2   = mb_input('ur2');
+$ur3   = mb_input('ur3');
+$ur4   = mb_input('ur4');
+$ur5   = mb_input('ur5');
+$ur6   = mb_input('ur6');
+$ur7   = mb_input('ur7');
+$ur8   = mb_input('ur8');
+$ur9   = mb_input('ur9');
+ 
 
 include("include/igtop.php");
 echo "<div align=center><b class=reg>[ <a href=cresearch.php>Cancel Sages</a> ]</b></center><br>";

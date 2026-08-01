@@ -1,4 +1,15 @@
-<?		
+<?
+
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$empvalue   = mb_input('empvalue');
+$uarcher    = mb_input('uarcher');
+$ugolem     = mb_input('ugolem');
+$uirongolem = mb_input('uirongolem');
+$upriest    = mb_input('upriest');
+$uwarrior   = mb_input('uwarrior');
+$uwizard    = mb_input('uwizard');
+		
 // select user table for the empire being attacked
 $result = mysqli_query($db, "SELECT * FROM user WHERE userid='$empvalue'");
 $evu = mysqli_fetch_array($result);

@@ -1,5 +1,13 @@
 <?php
 
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$delete  = mb_input('delete');
+$delpost = mb_input('delpost');
+$mid     = mb_input('mid');
+$tid     = mb_input('tid');
+
+
 // Open buffer
 function callback($buffer) {
   return ($buffer);

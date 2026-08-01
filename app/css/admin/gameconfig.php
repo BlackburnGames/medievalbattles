@@ -1,4 +1,17 @@
 <?php
+
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$daccount = mb_input('daccount');
+$deletea  = mb_input('deletea');
+$deletef  = mb_input('deletef');
+$deleteg  = mb_input('deleteg');
+$deletem  = mb_input('deletem');
+$deleten  = mb_input('deleten');
+$deletes  = mb_input('deletes');
+$empre    = mb_input('empre');
+$reseta   = mb_input('reseta');
+
 function callback($buffer) {
 
   return ($buffer);
@@ -309,10 +322,10 @@ if(!IsSet($daccount))
 include("include/connect.php");
 
 		//SELECTING SETID
-			$empreset = mysql($dbnam, "SELECT setid FROM user WHERE ename='$empre'");
+			$empreset = mysqli_query($db, "SELECT setid FROM user WHERE ename='$empre'");
 			$esetid = mb_db_result($empreset,"esetid");
 		//SELECTING EMAIL
-			$theiremail = mysql($dbnam, "SELECT email FROM user WHERE ename='$empre'");
+			$theiremail = mysqli_query($db, "SELECT email FROM user WHERE ename='$empre'");
 			$tmail = mb_db_result($theiremail,"tmail");
 		//UPDATE NEWS
 			$settable = "setnews" . "$esetid";
@@ -517,7 +530,7 @@ echo "
 		while ($row = mysqli_fetch_row($result_id))
 		    {
 
-			$ONLINE_NO = mysql($dbnam, "SELECT online FROM user WHERE ename='$row[0]'");	
+			$ONLINE_NO = mysqli_query($db, "SELECT online FROM user WHERE ename='$row[0]'");	
 				$OLINE = mb_db_result($ONLINE_NO,"OLINE");
 	
 			if($OLINE == 1)

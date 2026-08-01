@@ -1,4 +1,16 @@
-<? 
+<?
+
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$trains    = mb_input('trains');
+$uarcher   = mb_input('uarcher');
+$uexplorer = mb_input('uexplorer');
+$upriest   = mb_input('upriest');
+$usage     = mb_input('usage');
+$uthief    = mb_input('uthief');
+$uwarrior  = mb_input('uwarrior');
+$uwizard   = mb_input('uwizard');
+ 
 include("include/igtop.php");
 
 echo "

@@ -90,17 +90,21 @@ if (!function_exists('mb_client_hostname')) {
 }
 
 // ---------------------------------------------------------------------------
-// 3. register_globals -- switched off in PHP 5.4.
+// 3. register_globals -- switched off in PHP 5.4, and now OFF here too.
 //
-//    This is the single most invasive shim and the reason the stack is bound
-//    to localhost. Injecting request data into the global scope IS the
-//    vulnerability register_globals was removed for; it is enabled here only
-//    because ~35 files read bare $pageid / $gid / $umessage and every form in
-//    the game is inert without it.
+//    This was the single most invasive shim and the reason the stack is bound
+//    to localhost: injecting request data into the global scope IS the
+//    vulnerability register_globals was removed for. All 315 reads that
+//    depended on it now call mb_input() (app/include/request.php) instead, so
+//    MB_REGISTER_GLOBALS is "0" in docker-compose.yml and this block does
+//    nothing. tests/register-globals-audit.php holds the line.
 //
-//    Gated on an explicit env var so it can never switch itself on outside the
-//    dev container. Exit condition: handlers read $_GET/$_POST explicitly, at
-//    which point MB_REGISTER_GLOBALS is removed from docker-compose.yml.
+//    Kept, disabled, for one reason: the smoke crawl reaches 39 of 69 scripts
+//    and only issues GETs, so the forum, signup and guild-admin handlers were
+//    verified statically rather than by exercise. If one of them misbehaves,
+//    flipping the flag back to "1" answers "is this a register_globals
+//    regression?" in one request. Delete the block, the env var and this
+//    comment once those paths are crawled.
 // ---------------------------------------------------------------------------
 if (getenv('MB_REGISTER_GLOBALS') === '1') {
     $mb_protected = array(

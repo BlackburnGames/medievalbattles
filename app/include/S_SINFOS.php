@@ -1,4 +1,14 @@
 <?
+
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$flag       = mb_input('flag');
+$info       = mb_input('info');
+$newaim     = mb_input('newaim');
+$newmsn     = mb_input('newmsn');
+$thesetname = mb_input('thesetname');
+$theseturl  = mb_input('theseturl');
+
 $thenap = strip_tags($thenap);
 $newaim = strip_tags($newaim);
 $newmsn = strip_tags($newmsn);

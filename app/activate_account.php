@@ -15,6 +15,12 @@
 				<tr>
 					<td colspan=2 align=center>
 						<?php
+
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$act_code   = mb_input('act_code');
+$act_userid = mb_input('act_userid');
+
 							include("include/clock.php");
 							echo $clock;
 						?>

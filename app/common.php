@@ -1,4 +1,9 @@
 <?
+
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$message = mb_input('message');
+
 include("include/connect.php");
 
 include("include/session.php");

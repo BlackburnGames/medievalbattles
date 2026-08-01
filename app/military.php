@@ -1,4 +1,10 @@
 <?php
+
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$ucatapult = mb_input('ucatapult');
+$usuicide  = mb_input('usuicide');
+
 include("include/igtop.php");
 
 $recruited = $_POST['recruited'];

@@ -1,5 +1,10 @@
 <?php
 
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$snum = mb_input('snum');
+
+
 if($snum != "")  {  $N_NUM = $snum; }
 if($snum == "") { $N_NUM = $csnum;  }
 

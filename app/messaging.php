@@ -1,4 +1,11 @@
-<?php	include("include/igtop.php");	?>
+<?php
+
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$empvalue    = mb_input('empvalue');
+$sendmessage = mb_input('sendmessage');
+$umessage    = mb_input('umessage');
+	include("include/igtop.php");	?>
 
 <br><br>
 <center>

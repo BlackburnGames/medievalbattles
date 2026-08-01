@@ -1,5 +1,13 @@
 <?php
 
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$cexploreland = mb_input('cexploreland');
+$cexploremt   = mb_input('cexploremt');
+$exploreland  = mb_input('exploreland');
+$exploremt    = mb_input('exploremt');
+
+
 echo "
 <form method='POST' action='explore.php'>
 <table border='0' bordercolor='#808080' align='center' width='40%'>

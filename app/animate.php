@@ -1,4 +1,11 @@
-<? 
+<?
+
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$trains     = mb_input('trains');
+$ugolem     = mb_input('ugolem');
+$uirongolem = mb_input('uirongolem');
+ 
 include("include/igtop.php");
 
 if(($race != 'Giant') AND ($race != 'Angel') AND ($class != 'Ranger') AND ($class != 'Insurrectionist'))	{

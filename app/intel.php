@@ -1,5 +1,12 @@
 <?
 
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$empvalue = mb_input('empvalue');
+$gather   = mb_input('gather');
+$send     = mb_input('send');
+
+
 include("include/igtop.php");
 
 echo "

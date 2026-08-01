@@ -1,5 +1,10 @@
 <?php
 
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$username = mb_input('username');
+
+
 function callback($buffer) {
   return ($buffer);
 }

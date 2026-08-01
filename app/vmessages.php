@@ -1,4 +1,10 @@
-<?php 
+<?php
+
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$delete  = mb_input('delete');
+$deletem = mb_input('deletem');
+ 
 
 include("include/igtop.php");
 

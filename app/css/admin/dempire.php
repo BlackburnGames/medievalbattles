@@ -1,4 +1,10 @@
-<?php 
+<?php
+
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$daccount = mb_input('daccount');
+$empre    = mb_input('empre');
+ 
 
 include("include/igtop.php");
 

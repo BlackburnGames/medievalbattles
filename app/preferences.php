@@ -1,4 +1,20 @@
-<? 
+<?
+
+// Request input, formerly supplied by register_globals.
+include("include/request.php");
+$changepw  = mb_input('changepw');
+$cnewpw    = mb_input('cnewpw');
+$currentpw = mb_input('currentpw');
+$delete    = mb_input('delete');
+$dpw       = mb_input('dpw');
+$empnews   = mb_input('empnews');
+$empvalue  = mb_input('empvalue');
+$newaim    = mb_input('newaim');
+$newemail  = mb_input('newemail');
+$newmsn    = mb_input('newmsn');
+$newpw     = mb_input('newpw');
+$update    = mb_input('update');
+ 
 include("include/igtop.php"); 
 
 if(!IsSet($empnews))	{
