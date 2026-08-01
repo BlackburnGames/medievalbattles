@@ -14,20 +14,17 @@ function callback($buffer) {
 }
 ob_start("callback");
 
-/**
+/*
  * May the caller moderate this settlement's forum?
  *
  * sl-forum.php and sl-topic.php both open by refusing anyone whose $sl is not
  * 'yes'. This page, which is the one that deletes things, never asked -- so any
  * logged-in player could call it directly.
+ *
+ * The check itself lives in include/forum_guard.php now: sl-input.posts.php
+ * needs the same rule, and a rule written twice is a rule that gets fixed once.
  */
-function mb_sl_guard($sl)
-{
-	if ($sl != 'yes') {
-		echo "<center><b class=yellow>You are not Settlement Leader.</b>";
-		die();
-	}
-}
+include("include/forum_guard.php");
 
 //	delete topic
 if(!IsSet($delete))	{
@@ -36,7 +33,7 @@ if(!IsSet($delete))	{
 else	{
 	include("common.php");
 	include("include/connect.php");
-	mb_sl_guard($sl);
+	mb_forum_require_sl($sl);
 
 	mysqli_query($db, "DELETE FROM setforums WHERE topicid=" . mb_sql_int($tid) . " AND setid='$setid'");
 	mysqli_query($db, "DELETE FROM setforumsmsgs WHERE topicid=" . mb_sql_int($tid) . " AND setid='$setid'");
@@ -53,7 +50,7 @@ if(!IsSet($delpost))	{
 else	{	
 	include("common.php");
 	include("include/connect.php");
-	mb_sl_guard($sl);
+	mb_forum_require_sl($sl);
 
 	// setforumsmsgs carries its own setid, so the caller's settlement scopes
 	// the delete directly -- no join needed, unlike the guild equivalent.

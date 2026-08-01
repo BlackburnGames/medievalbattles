@@ -22,13 +22,16 @@ include("include/session.php");
 $uename = mysqli_query($db, "SELECT ename FROM user WHERE email='$email' AND pw='$pw'");
 	$ename = mb_db_result($uename,"ename");
 
-include("commong.php");	
+include("commong.php");
 include("include/clock.php");
+include("include/forum_guard.php");
 
-// are they a gl?
-$gresult = mysqli_query($db, "SELECT owner FROM guild WHERE owner='$userid'");
-$gnamecheck = mysqli_fetch_array($gresult);
-			
+// The "are they a gl?" query stood here and its result was never looked at.
+// gl-forum.php runs the same two lines and then compares them; this file, which
+// is where the writing happens, fetched the row and fell through to the INSERT
+// regardless. So the leader-only board took posts from any guild member.
+mb_forum_require_gl($db, $userid, $empireguild);
+
 $q_topic   = mb_sql_str($db, $topic);
 $q_message = mb_sql_str($db, $message);
 $q_ename   = mb_sql_str($db, $ename);
@@ -57,6 +60,11 @@ elseif ($addreply) {
 	// leader has ever managed to reply to a thread. Then its return value was
 	// passed straight back to mysqli_query() as a second query, which is the
 	// same double-execute the other three post handlers carry.
+	// Whose thread is $topicid? Nothing asked, and guildmsgs carries no guild of
+	// its own, so the reply below is bound to a guild only by the thread it
+	// names. Every statement in this branch matched on the id alone.
+	mb_forum_require_guild_thread($db, $topicid, $empireguild);
+
 	$result1 = mysqli_query($db, "INSERT INTO guildmsgs (name, topic, topicid, message, datestamp) VALUES ($q_ename, $q_topic, $q_topicid, $q_message, '$clock')");
 	$lastid = mysqli_insert_id($db);
 

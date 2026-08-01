@@ -19,8 +19,14 @@ ob_start("callback");
 
 include("include/session.php");
 
-include("commong.php");	
+include("commong.php");
 include("include/clock.php");
+include("include/forum_guard.php");
+
+// gforums.php, whose form posts here, refuses a player with no guild before it
+// renders anything. This file asked nothing, so the same POST sent directly
+// filed a thread under the guildname 'None'.
+mb_forum_require_guild($empireguild);
 
 $q_topic   = mb_sql_str($db, $topic);
 $q_message = mb_sql_str($db, $message);
@@ -39,6 +45,12 @@ if ($addtopic) {
 }
 
 elseif ($addreply) {
+
+	// The thread has to be on this guild's board. Both statements below matched
+	// on the topicid alone, so a reply could be posted into another guild's
+	// private thread -- and topicg.php renders guildmsgs by topicid unscoped,
+	// which is where it appeared.
+	mb_forum_require_guild_thread($db, $topicid, $empireguild);
 
 	// See input.posts.php: the INSERT was being run twice, the second time with
 	// its own return value as the query string.

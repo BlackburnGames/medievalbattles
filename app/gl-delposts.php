@@ -35,28 +35,18 @@ ob_start("callback");
  * sl-delposts.php, the working equivalent, never had the block at all.
  */
 
-/**
+/*
  * May the caller moderate this guild's forum at all?
  *
  * Nothing on this page asked. Every other gl-* page opens by checking that the
- * caller owns a guild -- gl-forum.php:17 is the pattern -- and this one, the
+ * caller owns a guild -- gl-forum.php:15 is the pattern -- and this one, the
  * only page that destroys anything, did not. Any logged-in player could reach
  * it, and the deletes below scoped by nothing but the id in the URL.
+ *
+ * Both that check and the thread-ownership one below live in
+ * include/forum_guard.php now, because gl-inputposts.php needs the same pair.
  */
-function mb_gl_guard($db, $userid, $empireguild)
-{
-	$gresult = mysqli_query($db, "SELECT owner FROM guild WHERE owner=" . mb_sql_int($userid));
-	$gnamecheck = mysqli_fetch_array($gresult);
-
-	if (!$gnamecheck || $gnamecheck[0] != $userid) {
-		echo "<div align=center><font class=yellow>You are not a Guild Leader.</font></div>";
-		die();
-	}
-	if ($empireguild == 'None' || $empireguild == '') {
-		echo "<div align=center><font class=yellow>You have to be in a guild to view this page!</font></div>";
-		die();
-	}
-}
+include("include/forum_guard.php");
 
 //	delete topic
 if(!IsSet($delete))	{
@@ -65,7 +55,7 @@ if(!IsSet($delete))	{
 else	{
 	include("commong.php");
 	include("include/connect.php");
-	mb_gl_guard($db, $userid, $empireguild);
+	mb_forum_require_gl($db, $userid, $empireguild);
 
 	// Scoped to the caller's own guild. Deleting on the id alone let anyone who
 	// reached this page remove any guild's thread by guessing a topicid; the
@@ -73,12 +63,7 @@ else	{
 	// guildmsgs carries no guildname of its own, so the thread is confirmed
 	// first and both deletes hang off that.
 	$q_tid = mb_sql_int($tid);
-	$owned = mysqli_query($db, "SELECT topicid FROM guildthreads WHERE topicid=$q_tid AND guildname=" . mb_sql_str($db, $empireguild));
-
-	if (!$owned || !mysqli_num_rows($owned)) {
-		echo "<div align=center><font class=yellow>That thread is not in your guild.</font></div>";
-		die();
-	}
+	mb_forum_require_guild_thread($db, $tid, $empireguild);
 
 	mysqli_query($db, "DELETE FROM guildthreads WHERE topicid=$q_tid");
 	mysqli_query($db, "DELETE FROM guildmsgs WHERE topicid=$q_tid");
@@ -93,7 +78,7 @@ if(!IsSet($delpost))	{
 else	{
 	include("commong.php");
 	include("include/connect.php");
-	mb_gl_guard($db, $userid, $empireguild);
+	mb_forum_require_gl($db, $userid, $empireguild);
 
 	// Was topicid='$postid' on both, and $postid is assigned nowhere -- so this
 	// branch deleted on an empty id and did nothing. Deleting one reply should

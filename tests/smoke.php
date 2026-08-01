@@ -396,6 +396,30 @@ newsShows($target, 'snews.php',
 newsShows($target, 'snews.php',
     'PoorSerf (2) successfully defended their resources against TestLord (1)', '<font class=orange>');
 
+/*
+ * The cross-tenant arm, which needs an outsider and PoorSerf is the only one:
+ * settlement 2, no guild, and no relationship to any row the fixture seeds.
+ *
+ * Both forums are one shared table apiece, and a reply names its thread by an
+ * id off the request. topicid 1 is a Testguild thread and a settlement-1
+ * thread, so each of these is a write into a board this account cannot read.
+ * The guild half really landed -- guildmsgs has no guild column of its own, and
+ * topicg.php renders it by topicid unscoped, so the post appeared on the
+ * victim's thread.
+ */
+forumRefuses($target, 'inputpostsg.php', array(
+    'addreply' => 'Reply with this message',
+    'topicid'  => 1,
+    'topic'    => 'Not in this guild',
+    'message'  => 'Posted from outside the guild.',
+), 'have to be in a guild', 'app/inputpostsg.php: no membership check before the INSERT');
+forumRefuses($target, 'input.posts.php', array(
+    'addreply' => 'Reply with this message',
+    'topicid'  => 1,
+    'topic'    => 'Not in this settlement',
+    'message'  => 'Posted from outside the settlement.',
+), 'not in your settlement', 'app/input.posts.php: the reply is not scoped to the caller\'s own board');
+
 crawl($tester, array('main.php?pageid=news'), $MAX_PAGES);
 
 /*
@@ -424,6 +448,26 @@ postForm($member, 'inputpostsg.php', array(
     'topic'    => "A member's reply",
     'message'  => "O'Brien is at the ford.",
 ));
+/*
+ * The leader-only halves of both forums, posted to by a member of both.
+ *
+ * This is the arm the primary tester can never drive: they lead Testguild and
+ * settlement 1, so every gl-* and sl-* request they make is allowed. idle@ is
+ * inside the guild and inside the settlement and leads neither, which is the
+ * exact case each guard exists to refuse -- and gl-inputposts.php was running
+ * the leader query and discarding the answer.
+ */
+forumRefuses($member, 'gl-inputposts.php', array(
+    'addtopic' => 'Post this message',
+    'topic'    => 'Not a leader',
+    'message'  => 'Posted to the leader board by a member.',
+), 'not a Guild Leader', 'app/gl-inputposts.php: the guild-leader check is not gating the INSERT');
+forumRefuses($member, 'sl-input.posts.php', array(
+    'addtopic' => 'Post this message',
+    'topic'    => 'Not a leader',
+    'message'  => 'Posted to the leader board by a member.',
+), 'not Settlement Leader', 'app/sl-input.posts.php: no settlement-leader check before the INSERT');
+
 crawl($member, array('main.php?pageid=news'), $MAX_MEMBER_PAGES);
 
 /*
@@ -874,6 +918,24 @@ function postForm(MbClient $client, $path, array $fields)
  * should say they were exercised. Counting the URL alone would report them as
  * permanently unreached while they were in fact being rendered on every run.
  */
+/**
+ * Submit a form that must be refused, and say so if it was not.
+ *
+ * The other arm of every guard. A gate is only known to work if something drives
+ * the request it is supposed to stop -- gl-inputposts.php ran the guild-leader
+ * query and then never compared it, which passed every test in this suite,
+ * because the only account that had ever posted there was the leader.
+ */
+function forumRefuses(MbClient $client, $path, array $fields, $needle, $why)
+{
+    global $failures;
+
+    $body = postForm($client, $path, $fields);
+    if (stripos($body, $needle) === false) {
+        $failures[$path . ' | accepted a write it should have refused'] = $why;
+    }
+}
+
 function creditFragment($path, array &$scriptsHit)
 {
     if (strtok($path, '?') !== 'index.php') {

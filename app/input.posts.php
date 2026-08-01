@@ -25,8 +25,9 @@ $usetid = mysqli_query($db, "SELECT setid FROM user WHERE email='$email' AND pw=
 	$setid = mb_db_result($usetid,"setid");
 
 
-include("common.php");	
+include("common.php");
 include("include/clock.php");
+include("include/forum_guard.php");
 
 // A settlement leader's name used to get "<font class=red>(SL)</font>" bolted
 // on here, before the INSERT, so the badge was stored in `name` and in
@@ -53,6 +54,18 @@ if ($addtopic) {
 	header ("Location: sforum.php");
 }
 elseif ($addreply) {
+	/*
+	 * The thread named by $topicid has to be in this settlement.
+	 *
+	 * This was the half-scoped one. The two UPDATEs below have always said AND
+	 * setid, and the INSERT stamps the caller's own setid, so a topicid from
+	 * another settlement wrote a row with a setid that does not match its
+	 * thread -- and topic.php selects on both, so nothing displays it, ever. It
+	 * went nowhere rather than somewhere it should not, which is luck and not a
+	 * check. Refusing it says so.
+	 */
+	mb_forum_require_set_thread($db, $topicid, $setid);
+
 	// The reply INSERT used to be run twice: once here, and again on the next
 	// line with its own return value passed back as the query string. On a
 	// successful INSERT that is mysqli_query($db, "1") -- a syntax error; on a

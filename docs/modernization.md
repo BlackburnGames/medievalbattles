@@ -379,12 +379,12 @@ attribute.
   both inventories, kept in a form that shrinks as they are fixed. Treat the
   first as suspects rather than defects — it is per-file and flow-insensitive,
   so a variable assigned in one file and read in another looks unassigned.
-- **Authorization.** **The forum moderation pages are done; the rest is not.**
-  Nothing checks that you own what you are acting on beyond the queries' own
-  `WHERE` clauses.
+- **Authorization.** **The forums are done — both the moderation pages and the
+  four post handlers. The rest is not.** Nothing outside the forums checks that
+  you own what you are acting on beyond the queries' own `WHERE` clauses.
 
-  `gl-delposts.php` and `sl-delposts.php` were the clearest cases and are
-  fixed: neither checked that the caller led anything, and `gl-delposts.php`
+  `gl-delposts.php` and `sl-delposts.php` were the clearest cases and went
+  first: neither checked that the caller led anything, and `gl-delposts.php`
   deleted purely on the topicid in the URL, so any logged-in player could
   remove any guild's threads by guessing. Both now refuse a non-leader and
   scope every delete to the caller's own guild or settlement.
@@ -392,6 +392,45 @@ attribute.
   They were also the only two pages where a guard could be *verified*, because
   closing the coverage gap put them on the crawl. Anywhere the suite still does
   not reach, adding a check is a guess about what the check should permit.
+
+  **The four post handlers were the same two holes, on the pages that write.**
+  Both forums are one shared table apiece — `setforums` for every settlement,
+  `guildthreads` for every guild — and which board a row is on is a column on
+  it. So each handler had two questions to answer and answered neither:
+
+  - **May the caller act on this surface?** `gl-inputposts.php` ran the
+    guild-leader query and then never looked at the result, so the leader-only
+    board took posts from any member. `sl-input.posts.php` did not ask at all,
+    though `sl-forum.php` and `sl-delposts.php` both refuse a non-leader.
+    `inputpostsg.php` never checked membership, so a player in no guild filed
+    threads under the guildname `None`, on a board every other guildless player
+    reads.
+  - **Is the row they named on the caller's own board?** A reply takes its
+    topicid straight off the request. `guildmsgs` has no guildname of its own,
+    so a reply belongs to a guild only through the thread it hangs off — and
+    both guild handlers matched on the id alone. Any player in any guild could
+    post into any other guild's private thread by guessing, and `topicg.php`
+    renders `guildmsgs WHERE topicid` unscoped, so it appeared there. Exactly
+    the delete-on-the-id-alone shape `gl-delposts.php` carried.
+
+  The settlement half was half-scoped: its `UPDATE`s said `AND setid` and the
+  reply `INSERT` stamps the caller's own, so a foreign topicid wrote a row whose
+  setid does not match its thread — and `topic.php` selects on both, so nothing
+  can ever display it. It went nowhere rather than somewhere it should not,
+  which is luck and not a check. It is refused now.
+
+  All five rules live in `app/include/forum_guard.php`. Two of them were already
+  written inline in the two moderation pages, which is one copy too many for a
+  rule six pages share.
+
+  **Every guard is driven from the arm it refuses.** That is what this needed
+  and what the suite could not do before: the primary tester leads Testguild and
+  settlement 1, so every request they make is allowed, and a gate that answers
+  yes to everyone passes. `idle@` is inside both and leads neither — the case
+  the role guards exist to stop — and `poor@`, in settlement 2 and no guild, is
+  the outsider the scope guards exist to stop. `gl-inputposts.php`'s discarded
+  check is the reason to insist on it: it had been passing this suite for as
+  long as the suite had reached the page.
 
   ~~**The admin area has no gate at all.**~~ **Done.** It was under
   `app/css/admin/` — a stylesheet directory — and `adminlogin.php` compared

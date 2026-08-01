@@ -24,8 +24,14 @@ $uename = mysqli_query($db, "SELECT ename FROM user WHERE email='$email' AND pw=
 $usetid = mysqli_query($db, "SELECT setid FROM user WHERE email='$email' AND pw='$pw'");
 	$setid = mb_db_result($usetid,"setid");
 
-include("common.php");	
+include("common.php");
 include("include/clock.php");
+include("include/forum_guard.php");
+
+// The leader's half of the settlement forum. sl-forum.php refuses anyone whose
+// $sl is not 'yes' and sl-delposts.php does the same before it deletes; this
+// file, which is the one that writes, asked nothing.
+mb_forum_require_sl($sl);
 
 // A settlement leader's name used to get "<font class=red>(SL)</font>" bolted
 // on here, before the INSERT, so the badge was stored in `name` and in
@@ -45,6 +51,9 @@ if ($addtopic) {
 	header ("Location: sl-forum.php");
 }
 elseif ($addreply) {
+	// See input.posts.php on why a foreign topicid was not harmless here.
+	mb_forum_require_set_thread($db, $topicid, $setid);
+
 	// See input.posts.php: the INSERT was being run twice, the second time with
 	// its own return value as the query string.
 	$result1 = mysqli_query($db, "INSERT INTO setforumsmsgs (setid, name, topic, topicid, message, datestamp)	 VALUES ('$setid', $q_ename, $q_topic, $q_topicid, $q_message, '$clock')");
