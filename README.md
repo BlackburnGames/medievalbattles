@@ -70,11 +70,10 @@ rewrite the path and the command will fail.
 The revival is staged:
 
 - **Phase 1 — done.** Running, test-covered baseline on PHP 5.6 in Docker.
-- **Phase 2 — mostly done.** The game runs on PHP 8.3. All `mysql_*` calls are
+- **Phase 2 — done.** The game runs on PHP 8.3. All `mysql_*` calls are
   converted to `mysqli`, array keys and bare-word constants are quoted, and
-  `ereg_replace` is gone. The suite passes on both 8.3 and 5.6 against the same
-  golden master. Still outstanding: `session_register()` and the
-  `register_globals` emulation, which need call-site changes.
+  `ereg_replace`, `session_register()` and the `register_globals` emulation are
+  gone. The suite passes on both 8.3 and 5.6 against the same golden master.
 - **Phase 3 — not started.** Structural and security rewrite.
 
 The 5.6 image is kept buildable as the behavioural reference:
@@ -83,8 +82,11 @@ The 5.6 image is kept buildable as the behavioural reference:
 docker compose build --build-arg PHP_VERSION=5.6-apache web
 ```
 
-See [CLAUDE.md](CLAUDE.md) for the architecture notes and the traps worth
-knowing before changing anything.
+`docs/` holds the reference material — [architecture](docs/architecture.md),
+[testing strategy](docs/testing.md), [porting notes and traps](docs/porting-notes.md),
+[the generated manual](docs/game-manual.md) and the
+[staged plan](docs/modernization.md). [CLAUDE.md](CLAUDE.md) is the index and
+the command list.
 
 ---
 
