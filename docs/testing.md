@@ -87,6 +87,41 @@ unassigned. Both readings have to be checked before acting:
   includes on its first line. The weapon buy buttons render fine; this entry
   and its siblings are an artefact of the per-file analysis.
 
+### `tests/sql-injection-audit.php`
+
+Static, like the one above. It marks every variable derived from `mb_input()`
+or a request superglobal, spreads the taint through assignment to a fixpoint,
+and reports what survives into the second argument of `mysqli_query()` — the
+codebase's only query entry point. Baselined in `tests/sql-injection.txt`.
+
+**The list should only ever shrink**, and it is the Phase 3 SQL worklist.
+Re-accept with `--accept`. Entries carry no line numbers on purpose: a fix
+elsewhere in the file would otherwise read as one entry removed and one added.
+
+Each entry records the quoting context, because it decides the fix.
+`mb_sql_str()` for a value between quotes; `mb_sql_int()` for one interpolated
+bare, where escaping is useless because there is no quote to break out of.
+
+Three things worth knowing before acting on it:
+
+- **Arithmetic launders taint, and the audit knows.** Most of this game is
+  `$gp = $gp - $cost` chains seeded by a request parameter, and a subtraction
+  cannot carry an injection out of its operands. Teaching it that rule dropped
+  the initial list from 332 entries to 161. But the rule is about *PHP's*
+  arithmetic — `"SET thieves = round($thieves - ($send * .1))"` is MySQL's, so
+  `$send` is still statement text and is still reported. Correctly.
+- **It is flow-insensitive, so it over-reports one variable used two ways.**
+  `wconstruct.php` read `mb_input('longsword')` only to test `IsSet()` and then
+  assigned the same name the build time in ticks; what reached the query was
+  always a literal. Twenty-two entries, none of them real. Both cases found so
+  far were fixed by renaming rather than suppressed — if the audit cannot tell
+  the two meanings apart, neither can a reader.
+- **It is first-order and per-file.** A tainted value written to the database
+  and read back into a later query is a real stored injection this will not
+  see, and `extract()` on a row hides the flow entirely — which is how a
+  genuine one in `S_VMESS.php` stayed invisible. Every string reaching a query
+  still has to be escaped, not just the ones listed.
+
 ### `tests/query-audit.sh`
 
 Not a test — an inventory generator, and the only thing that runs the stack
@@ -141,27 +176,51 @@ restarts the container twice; run it by hand after touching request handling.
 
 ## Coverage
 
-The crawl reaches **51 of the 69 scripts in `app/`**, and the other 18 are
+The crawl reaches **57 of the 69 scripts in `app/`**, and the other 12 are
 listed in `$UNREACHABLE` in `smoke.php` with a reason each. That list is the
 third ratchet: an `app/` script that is neither reached nor explained **fails
 the run**, so a page falling out of the net is a regression rather than a
 silently smaller number. Entries that become reachable are reported so they can
 be deleted.
 
-The 18 fall into five groups:
+The 12 fall into five groups:
 
 - **Includes** (3) — `common.php`, `commong.php`, `functions.php`. Not pages;
   this group is structural and will not shrink.
-- **POST handlers** (7) — form targets. Covering them means driving the forms,
-  not seeding more data.
-- **Destructive, deliberately skipped** (4) — see `$SKIP`. The fixture is reset
-  per run so the mutation is harmless, but letting the crawler delete forum
-  posts makes every later page depend on crawl order.
+- **POST handlers** (3) — `checklogin.php` is exercised by the login that
+  starts each run, and is listed because the coverage map credits URLs rather
+  than requests. `checksignup.php` derives starting resources from `rand()` and
+  cannot be driven without breaking the cross-version golden (see above).
+  `gl-topic.php` has nothing linking to it.
+- **Destructive, deliberately skipped** (2) — `disband.php` destroys the
+  fixture army, `logout.php` ends the session the crawl depends on. See `$SKIP`.
 - **Dead in the shipped game** (2) — `guildbarter.php` (`barter.php` dies at
   line 17; the barter system was switched off in 2003) and `scoreboard.php`
   (orphaned — nothing links to it and `index.php` has its Scores link
   commented out).
 - **Auth flow** (2) — the activation pages, which need a live emailed code.
 
-Nothing left in the list is closable by seeding data or adding an identity;
-the remainder needs the crawler to submit forms, or needs the pages fixed.
+### Driving forms
+
+The crawler follows links, so every POST handler in the game sat outside the
+net. `postForm()` submits one and routes the response through `inspect()`, the
+same assertions a crawled page gets — a handler that emits a warning fails the
+run for the same reason a page does.
+
+Both arms of all four forum thread handlers are driven (`addtopic` and
+`addreply` are separate branches writing separate tables), and the two
+moderation handlers are called directly. Every field carries an apostrophe on
+purpose: an unescaped `INSERT` loses the row silently, and none of these
+handlers checks a return value.
+
+Deliberately not seeded through the database instead. An `INSERT` written by
+hand into the fixture proves nothing about the code that was supposed to write
+it — the first run of this found a double-executed query, a `VALUES` clause
+missing a quote since 2003, and a debug `echo` of raw SQL.
+
+**Destructive requests run before the crawl, not after.** `govt.php:20` clears
+`sl` for every member of a settlement on each visit and then re-elects whoever
+holds the most votes; nobody in the fixture votes, so the crawler merely
+opening that page deposes the tester. Anything afterwards that needs settlement
+leadership is refused, silently, because a refusal renders a message rather
+than a warning.

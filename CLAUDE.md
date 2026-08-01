@@ -26,7 +26,7 @@ The reference material lives in `docs/`. Read the relevant one before working in
 Four things load-bearing enough to repeat here:
 
 - **`mb_db_result()`'s column-0 fallback is deliberate**, not defensive. Resolving field names strictly returns null across signup, login and the guild code, and has already silently disabled the entire game tick once. Read the trap writeup in [docs/porting-notes.md](docs/porting-notes.md) before changing it.
-- **`tests/known-issues.txt`, `tests/register-globals.txt` and `tests/broken-queries.txt` may only ever shrink.** They are ratchets, and the last two double as Phase 3 bug lists.
+- **`tests/known-issues.txt`, `tests/register-globals.txt`, `tests/broken-queries.txt` and `tests/sql-injection.txt` may only ever shrink.** They are ratchets, and the last three double as Phase 3 bug lists. `sql-injection.txt` is regenerated with `php tests/sql-injection-audit.php --accept`.
 - **`connect.php` reports query errors as warnings, not exceptions**, and the crawl and the tick both fail on one. Going further to `MYSQLI_REPORT_STRICT` needs the ~1300 call sites to check their return values first. `bash tests/query-audit.sh` regenerates the combined inventory.
 - **`app/include/gamedata.php` is the only place a game value may be written**, and every value carries a `file:line` citation. Change a cited engine line and the citation must change with it.
 
