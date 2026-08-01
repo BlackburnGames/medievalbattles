@@ -31,8 +31,15 @@ require_once __DIR__ . '/db.php';
  *
  * Restoring the silent-false contract keeps Phase 2 mechanical. Turning this
  * back on -- and handling the errors it surfaces -- is Phase 3 work.
+ *
+ * MB_REPORT_QUERIES=1 is the first half of that work: MYSQLI_REPORT_ERROR
+ * without MYSQLI_REPORT_STRICT reports failures as warnings rather than
+ * exceptions, so a failing query names itself and its line without aborting
+ * the request. That makes the set of queries that have never worked
+ * enumerable -- see tests/query-audit.sh -- without yet having to fix them.
+ * It is off in the normal stack because those warnings would fail the crawl.
  */
-mysqli_report(MYSQLI_REPORT_OFF);
+mysqli_report(getenv('MB_REPORT_QUERIES') === '1' ? MYSQLI_REPORT_ERROR : MYSQLI_REPORT_OFF);
 
 $dbnam      = getenv('MB_DB_NAME') ? getenv('MB_DB_NAME') : 'mbv6';
 $mb_db_host = getenv('MB_DB_HOST') ? getenv('MB_DB_HOST') : '127.0.0.1';

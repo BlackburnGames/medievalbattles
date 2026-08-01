@@ -419,4 +419,15 @@ $GAMEDATA['quirks'] = array(
     'The explore page shows special rates for Angels (fewer explorers needed) and Demons (more needed), but the tick only implements the Human rate; everyone else gets the default. (include/S_EXPLORE.php:33-36 vs update.php:88)',
     'Night Elves are dealt 4-10 archers at signup, but the free Archery research is immediately overwritten unless they are also Rangers. (checksignup.php:130-134)',
     'The attacker\'s race/class combat modifier is applied to the defender\'s power as well as their own. (attack/defANDoff.php:42-44)',
+
+    /*
+     * The three below were found by tests/query-audit.sh rather than by
+     * reading the code, and they share a cause: the tick issues an UPDATE
+     * naming a column that is not in db.sql. A MySQL UPDATE is atomic, so the
+     * whole statement is rejected -- the columns that DO exist are not written
+     * either -- and the app checks no return value, so nothing is reported.
+     */
+    'Research never advances. The tick adds points to r1pts-r18pts in one UPDATE, but the schema stops at r14pts, so the statement is rejected whole and no research point has ever accrued -- assigning researchers does nothing. (update.php:203 vs db.sql research table)',
+    'Troops sent out never come home, and are lost permanently. The tick zeroes the returning-army slot and its timer in separate statements; the first also names golem1-golem4, which returntbl does not have, so it fails while the timer still counts down. Once the timer passes 1 the "WHERE time1 = 1" release condition can never match again. (update.php:375-378)',
+    'Advanced Farming and Advanced Construction have no point cap, because the statements that clamp them name r15pts/r16pts, which do not exist. Moot while research is dead, but it outlives the fix. (update.php:478-479)',
 );

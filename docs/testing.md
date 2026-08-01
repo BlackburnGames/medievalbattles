@@ -69,6 +69,32 @@ than request inputs, several of them real bugs:
 **The list should only ever shrink**, and it doubles as a Phase 3 bug list.
 Re-accept with `--accept`.
 
+### `tests/query-audit.sh`
+
+Not a test — an inventory generator, and the only thing that runs the stack
+with `MB_REPORT_QUERIES=1`.
+
+`connect.php` normally sets `MYSQLI_REPORT_OFF`, which is correct (see
+[porting-notes.md](porting-notes.md)) and is also a blindfold: the app fires
+~1300 unchecked queries and swallows every failure, so nobody knows which have
+been broken or since when. This script selects `MYSQLI_REPORT_ERROR` *without*
+`MYSQLI_REPORT_STRICT` for one run — failures become warnings rather than
+exceptions, so each names itself and its line and the request still completes —
+and writes what it finds to `tests/broken-queries.txt`.
+
+Two passes, because neither covers the other: the smoke crawl in audit mode
+(`MB_QUERY_AUDIT=1`, which collects the mysqli warnings instead of failing on
+them), and `update.php`, which the crawl never touches and which is the densest
+query surface in the codebase.
+
+It is not in `run-all.sh` — it restarts the container twice, and with reporting
+on the crawl is red by construction. The output is a floor on the number of
+broken queries, not a total, and **should only ever shrink**.
+
+The first run of it found that research has never worked and that troops sent
+out are lost permanently; see `$GAMEDATA['quirks']` and
+[modernization.md](modernization.md).
+
 ### `tests/register-globals-diff.sh`
 
 Being flow-insensitive, the audit has one blind spot worth knowing: a variable

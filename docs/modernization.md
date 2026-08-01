@@ -45,7 +45,22 @@ Not started. The known work, in no committed order:
 - **Passwords.** Unsalted MD5, denormalized into four tables alongside the
   email that identifies the row.
 - **Error handling.** Turn `mysqli_report()` back on and handle what it
-  surfaces — several queries have never succeeded.
+  surfaces. `tests/query-audit.sh` now enumerates this: see
+  `tests/broken-queries.txt`. Three of its entries are not cosmetic —
+
+  - **Research has never worked.** The tick adds points to `r1pts`–`r18pts` in
+    one `UPDATE`, but the schema stops at `r14pts`. A MySQL `UPDATE` is atomic,
+    so the statement is rejected whole and the fourteen columns that do exist
+    are not written either. Assigning researchers does nothing, and never has.
+  - **Troops sent out are lost permanently.** The returning-army slot and its
+    timer are cleared by separate statements. The first also names
+    `golem1`–`golem4`, which `returntbl` does not have, so it fails while the
+    timer keeps counting down — and once the timer passes 1 the
+    `WHERE time1 = 1` release condition can never match again.
+  - `guildconfig.php` selects a `flag` column that is not in `db.sql`.
+
+  All three share a cause: an `UPDATE` naming a column that does not exist,
+  against code that checks no return value.
 - **The bug list.** `tests/register-globals.txt` and `$GAMEDATA['quirks']` are
   both inventories of real defects, kept in a form that shrinks as they are
   fixed.

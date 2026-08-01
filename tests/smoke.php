@@ -93,6 +93,22 @@ $FAIL_PATTERN  = '/\b(Fatal error|Parse error|Catchable fatal error|Recoverable 
 $NOTICE_PATTERN = '/\b(Notice|Deprecated)\s*:\s*(.{0,200})/i';
 
 /*
+ * Query-audit mode: MB_QUERY_AUDIT=1, driven by tests/query-audit.sh.
+ *
+ * Collects the mysqli failures the crawl walks into and writes them to
+ * tests/broken-queries.txt instead of failing on them. They surface only when
+ * the stack runs with MB_REPORT_QUERIES=1 (see app/include/connect.php), which
+ * the normal one does not, so all of this is inert in an ordinary run.
+ *
+ * The point is an inventory, not a green light: roughly 1300 queries here are
+ * fired unchecked, and some have never succeeded in the game's life. Knowing
+ * which ones is the prerequisite for turning error reporting on for good.
+ */
+$QUERY_AUDIT = getenv('MB_QUERY_AUDIT') === '1';
+$QUERY_ERROR_PATTERN = '/^mysqli_(query|real_query|multi_query|prepare)\(\)/i';
+$queryErrors = array();
+
+/*
  * Scripts the crawl cannot reach, and why.
  *
  * Without this the unreached list is just a number that nobody can act on --
@@ -182,6 +198,7 @@ crawl($client, array('main.php?pageid=news'), $MAX_PAGES);
 function crawl(MbClient $client, array $seeds, $maxPages)
 {
     global $SKIP, $FAIL_PATTERN, $NOTICE_PATTERN, $SEVERITY_DEMOTED;
+    global $QUERY_AUDIT, $QUERY_ERROR_PATTERN, $queryErrors;
     global $baseline, $skipped, $failures, $observed, $scriptsHit, $noticeCount, $visited, $unfinished;
 
     // Seen is per-phase: the same URL renders differently logged in and out,
@@ -227,6 +244,16 @@ function crawl(MbClient $client, array $seeds, $maxPages)
                     continue;
                 }
                 $signature = signature($m[1], $m[2]);
+
+                // Query-audit mode: collect the mysqli failures instead of
+                // failing on them. They only appear at all when connect.php is
+                // running with MB_REPORT_QUERIES=1, which the normal stack is
+                // not, so this branch is inert in an ordinary run.
+                if ($QUERY_AUDIT && preg_match($QUERY_ERROR_PATTERN, $m[2])) {
+                    $queryErrors[$signature][$path] = true;
+                    continue;
+                }
+
                 $observed[$signature] = true;
                 if (!isset($baseline[$signature])) {
                     $failures[$signature] = $path;
@@ -427,6 +454,19 @@ if (getenv('MB_WRITE_BASELINE') === '1') {
         . implode("\n", array_keys($observed)) . "\n"
     );
     echo "Wrote " . count($observed) . " signature(s) to $BASELINE_FILE\n";
+}
+
+if ($QUERY_AUDIT) {
+    // Emitted as marker lines rather than written to the inventory directly:
+    // the crawl is only one of the two surfaces audited, and query-audit.sh
+    // merges these with the tick's failures so both go through one formatter.
+    ksort($queryErrors);
+    foreach ($queryErrors as $signature => $paths) {
+        $where = array_keys($paths);
+        echo "QUERYFAIL\t" . $signature . "\t" . $where[0] . "\n";
+    }
+    echo "\nQuery audit: " . count($queryErrors)
+        . " distinct failing quer(y/ies) from the crawl (see tests/query-audit.sh).\n";
 }
 
 $stale = array_diff_key($baseline, $observed);
