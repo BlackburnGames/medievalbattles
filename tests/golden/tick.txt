@@ -16,7 +16,7 @@
 == game_info (1 row) ==
   lastset=0 | tick=no | last_comp_id=998
 == guild (1 row) ==
-  gname=Testguild | cpw= | strength=10355 | gid=1 | datemade=<CLOCK> | info=A guild used by the test fixtures. | owner=1 | mem=2 | notice=None
+  gname=Testguild | cpw= | strength=10355 | gid=1 | datemade=<CLOCK> | info=A guild used by the test fixtures. | flag= | owner=1 | mem=2 | notice=None
 == guildmsgs (1 row) ==
   messageid=1 | name=IdleBaron | host=localhost | topic=Guild orders | topicid=1 | message=Understood. | datestamp=<VOLATILE>
 == guildnews (0 rows) ==

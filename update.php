@@ -10,6 +10,24 @@ echo "<p>Starting update process</p>";
   $max_userid = mysqli_query($db, "SELECT max(userid) FROM user");
   $max_UID = mb_db_result($max_userid, 0, 0);
 
+/*
+ * Walks userids rather than rows, so it visits every id from the first to the
+ * highest that exists -- including ids that never existed and ids whose owner
+ * was deleted. $INC_ID was not initialised, so the first pass was always for
+ * userid 0, which no player has ever had.
+ *
+ * Every write in this loop is scoped by userid and matched nothing on those
+ * passes, except the two resource UPDATEs below: with no row to read, they
+ * interpolated empty strings into their arithmetic and MySQL rejected them as
+ * syntax errors. Harmless, but the errors are noise in tests/broken-queries.txt
+ * and they hid the two real failures next to them for the whole port.
+ *
+ * Skipping an id with no user row is behaviour-preserving: the only writes not
+ * scoped by userid are inside the two deletion branches, and both are guarded
+ * on a column value that is null when there is no row.
+ */
+$INC_ID = 1;
+
 while($INC_ID < $max_UID + 1) {
       $query = "SELECT * FROM emailvalidate WHERE userid='$INC_ID'";
       $result = mysqli_query($db, $query) or die("Error in query! " . mysqli_error($db));
@@ -18,6 +36,12 @@ while($INC_ID < $max_UID + 1) {
       $query1 = "SELECT * FROM user WHERE userid='$INC_ID'";
       $result1 = mysqli_query($db, $query1) or die("Error in query! " . mysqli_error($db));
       $user = mysqli_fetch_array($result1);
+
+      // A gap in the id sequence -- a deleted player, or an id never issued.
+      if (!$user) {
+        $INC_ID = $INC_ID + 1;
+        continue;
+      }
 
       $query2 = "SELECT * FROM military WHERE userid='$INC_ID'";
       $result2 = mysqli_query($db, $query2) or die("Error in query! " . mysqli_error($db));

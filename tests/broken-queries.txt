@@ -13,6 +13,3 @@
 # on the number of broken queries, not a total.
 #
 # The list should only ever SHRINK. Regenerate with: bash tests/query-audit.sh
-guildconfig.php:31 | Warning: mysqli_query(): (42S22/1054): Unknown column 'flag' in 'field list'	(seen at: guildconfig.php)
-update.php:148 | Warning: mysqli_query(): (42000/1064): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ')), civ=round( * 0.26) WHERE userid=''' at line 1	(seen at: update.php)
-update.php:149 | Warning: mysqli_query(): (42000/1064): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '* 300) * 1 + ), iron = round( * 1.945 + ), food = round(0.5 *  + ), lumber = rou' at line 1	(seen at: update.php)

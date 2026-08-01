@@ -112,22 +112,26 @@ echo "  <br><br>
 		<td class=main2><b class=reg>Created</b></td>
 		<td class=main2></td>";
 
-// guild.flag has never existed in db.sql -- the guild-flag feature was cut
-// before release, but the markup below still renders it -- so this query has
-// always failed and the listing has always come back empty. On PHP 5 that was
-// a warning; on PHP 8 passing the resulting false to mysqli_fetch_array() is a
-// fatal TypeError. Selecting an empty placeholder keeps the column count and
-// the markup untouched while letting the query actually run.
-$query_string = "SELECT g.gname, g.info, g.datemade, g.gid, '' AS flag, count(u.ename) AS guildmem FROM guild g LEFT JOIN user u ON g.gname = u.guild GROUP BY u.guild ORDER BY guildmem DESC LIMIT 0, 60";
+// guild.flag was missing from db.sql, so this query always failed and the
+// listing always came back empty -- on PHP 8, passing the resulting false to
+// mysqli_fetch_array() was a fatal TypeError. Phase 1 selected an empty
+// placeholder to keep the query running; the column exists now, so this reads
+// the real one again.
+$query_string = "SELECT g.gname, g.info, g.datemade, g.gid, g.flag, count(u.ename) AS guildmem FROM guild g LEFT JOIN user u ON g.gname = u.guild GROUP BY u.guild ORDER BY guildmem DESC LIMIT 0, 60";
 $result_id = mysqli_query($db, $query_string);
 while ($row = mysqli_fetch_array($result_id))	{
 	$row[0] = htmlspecialchars($row[0]);
 	$row[1] = htmlspecialchars($row[1]);
 	$urlencode_guild = urlencode($row[0]);
+	// The flag is a URL the guild leader types in, echoed into an href and an
+	// img src. It is the only field here that was never escaped, and it only
+	// stopped being a stored-XSS vector by accident, because the column it
+	// comes from did not exist.
+	$flag = htmlspecialchars($row['flag'], ENT_QUOTES);
 
 	echo "
 	<tr align=center valign=top colspan=6>
-		<td bgcolor=#404040><a href=\"$row[flag]\" target=newwindow><img src=\"$row[flag]\" width=50 height=50 border=0></a></td>
+		<td bgcolor=#404040><a href=\"$flag\" target=newwindow><img src=\"$flag\" width=50 height=50 border=0></a></td>
 		<td bgcolor=#404040><a href=gc.php?pageid=mgl&gid=$row[3]>$row[0]</a></td>
 		<td bgcolor=#404040>$row[1]</td>
 		<td bgcolor=#404040>$row[5]</td>

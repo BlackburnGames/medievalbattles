@@ -184,6 +184,11 @@ CREATE TABLE `guild` (
   `gid` bigint(255) NOT NULL default '0',
   `datemade` varchar(255) NOT NULL default '',
   `info` blob NOT NULL,
+  -- A URL the guild leader sets, rendered as the guild's badge in the gc.php
+  -- listing. guildconfig.php has always read and written it and S_GCONFIG.php
+  -- has always offered the input; only this column was missing, so the feature
+  -- looked cut when it was merely unsaveable. See docs/modernization.md.
+  `flag` varchar(255) NOT NULL default '',
   `owner` varchar(255) NOT NULL default '',
   `mem` bigint(20) NOT NULL default '0',
   `notice` varchar(255) NOT NULL default 'None'
