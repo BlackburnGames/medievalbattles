@@ -169,7 +169,7 @@ else	{
 			if($uwarrior == "Sword of Gandalara")	{	$wspeed = 20;	 $wpower = 18;	$warwep_name = $warweapon['gandalara'];}
 
 			if($warwep_name != 1)	{
-				echo"<div align=center><font class=yellow>$uwarrior has not been created yet.</font></div>"; 
+				echo"<div align=center><font class=yellow>" . mb_h($uwarrior) . " has not been created yet.</font></div>"; 
 				include("include/S_EQUIPO.php");
 				include("include/S_EQUIPA.php");
 				die();
@@ -218,7 +218,7 @@ else	{
 			if($upriest == "Eldamar\'s Star")	{	$wspeed = 18;	 $wpower = 15;	$priwep_name = $priweapon['eldamarstar'];}
 
 			if($priwep_name != 1)	{
-				echo"<div align=center><font class=yellow>$upriest has not been created yet</font></div>"; 
+				echo"<div align=center><font class=yellow>" . mb_h($upriest) . " has not been created yet</font></div>"; 
 				include("include/S_EQUIPO.php");
 				include("include/S_EQUIPA.php");
 				die();
@@ -245,7 +245,7 @@ else	{
 			if($uarcher == "Shyrscream\'s Bow")	 {	$wspeeda = 16;	$wpowera = 16;	$archwep_name = $archweapon['shyrscreamsbow'];}
 
 			if($archwep_name != 1)	{
-				echo"<div align=center><font class=yellow>$uarcher has not been created yet</font></div>"; 
+				echo"<div align=center><font class=yellow>" . mb_h($uarcher) . " has not been created yet</font></div>"; 
 				include("include/S_EQUIPO.php");
 				include("include/S_EQUIPA.php");
 				die();
@@ -315,7 +315,7 @@ else	{
 			if($uwararmor == "Medieval Armor")	{	$aspeed = 5;	$mod = 9;	$A_NAME = $armor['fp'];	}
 		
 				if($A_NAME != 1)	{
-					echo"<div align=center><font class=yellow>$uwararmor has not been created yet</font></div>"; 
+					echo"<div align=center><font class=yellow>" . mb_h($uwararmor) . " has not been created yet</font></div>"; 
 					include("include/S_EQUIPA.php");
 					die();
 				}
@@ -336,7 +336,7 @@ else	{
 			if($uwizarmor == "Mythril Armor")	 {	$aspeed = 3;	$mod = 8;	$W_NAME = $armor['ma'];	 }
 			
 				if($W_NAME != 1)	 {
-					echo"<div align=center><font class=yellow>$uwizarmor has not been created yet</font></div>"; 
+					echo"<div align=center><font class=yellow>" . mb_h($uwizarmor) . " has not been created yet</font></div>"; 
 					include("include/S_EQUIPA.php");
 					die();
 				}
@@ -356,7 +356,7 @@ else	{
 			if($upriarmor == "Blessed Armor")	 {	$aspeed = 5;	$mod = 6;	$P_name = $armor['ba'];	}
 		
 				if($P_name != 1)	{
-					echo"<div align=center><font class=yellow>$upriarmor has not been created yet</font></div>"; 
+					echo"<div align=center><font class=yellow>" . mb_h($upriarmor) . " has not been created yet</font></div>"; 
 					include("include/S_EQUIPA.php");
 					die();
 				}
@@ -378,7 +378,7 @@ else	{
 			if($uarcharmor == "Medieval Armor")	{	$aspeed = 5;	$mod = 9;	$A_NAME = $armor['fp'];	}
 		
 				if($A_NAME != 1)	{
-					echo"<div align=center><font class=yellow>$uarcharmor has not been created yet</font></div>"; 
+					echo"<div align=center><font class=yellow>" . mb_h($uarcharmor) . " has not been created yet</font></div>"; 
 					include("include/S_EQUIPA.php");
 					die();
 				}

@@ -2,16 +2,4 @@
 # Request input that reaches an echo unescaped, as file, variable and the
 # worst HTML context it lands in. This list may only ever SHRINK.
 # Regenerate with: php tests/xss-audit.php --accept
-app/checksignup.php	email	text
-app/checksignup.php	ename	text
-app/equip.php	uarcharmor	text
-app/equip.php	uarcher	text
-app/equip.php	upriarmor	text
-app/equip.php	upriest	text
-app/equip.php	uwararmor	text
-app/equip.php	uwarrior	text
-app/equip.php	uwizarmor	text
-app/gc.php	creating_guild_name	text
-app/include/S_PREF.php	msn	attr-quoted
-app/include/barter_handler.php	type	text
-app/preferences.php	mailsend	text
+

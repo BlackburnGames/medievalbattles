@@ -15,7 +15,7 @@ $msn = mb_input('msn');
 		<td class=inner2><input type="text" name="newaim" maxlength=20 value="<? echo "$aim"; ?>"></td>
 	<tr>
 		<td class=main2><b>MSN:</b></td>
-		<td class=inner2><input type="text" name="newmsn" maxlength=50 value="<? echo "$msn"; ?>"></td>
+		<td class=inner2><input type="text" name="newmsn" maxlength=50 value="<? echo mb_h($msn); ?>"></td>
 </table>
 
 <br>

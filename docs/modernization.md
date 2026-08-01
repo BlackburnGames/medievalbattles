@@ -98,7 +98,68 @@ In progress. The known work, in no committed order:
   name, so four forum listings looked like they interpolated a request parameter
   when they did not — and it hid a genuine second-order injection in
   `S_VMESS.php` at the same time. All thirteen calls are gone.
-- **Unescaped output.** Every template echoes user data raw.
+- ~~**Unescaped output.**~~ **The audit is at zero: 29 entries down to none.**
+  Every template echoes user data raw — there is no escaping helper anywhere in
+  the 2003 sources, and the pages are one long `echo "<html> ... $var ..."` per
+  branch. `tests/xss-audit.php` finds the reachable half of it and baselines it
+  in `tests/xss.txt` as a fourth ratchet.
+
+  It shares the SQL audit's taint tracker, which moved to `tests/taint-lib.php`
+  rather than being copied: a source or a sanitizer that one audit knows about
+  and the other does not is a false clean bill of health.
+
+  The fix is `mb_h()` and `mb_attr()` in `app/include/html.php`, and as with
+  `mb_sql_str()` / `mb_sql_int()`, which one a site needs is the interesting
+  part. The audit records the HTML context because escaping only helps inside
+  quotes here too: `<font class=$x>` is a **bare** attribute, and a bare
+  attribute value ends at the first space, so `x onerror=alert(1)` breaks out
+  carrying no character `htmlspecialchars()` would touch. `mb_attr()` returns
+  the value escaped *and* quoted for exactly that reason. This codebase writes
+  almost every attribute bare.
+
+  Context is accumulated across the file rather than per statement, because the
+  tag a value lands in is routinely opened somewhere else: `topic.php` emits an
+  `<input ... value="` as inline HTML and the short-tag echo that follows
+  carries no literal text of its own. Per statement that scores as element
+  text — the mild answer, and the wrong one. It reclassified five entries.
+
+  What the 29 turned out to be:
+
+  - **Nine were `$snum`, the settlement number**, in six near-identical copies
+    of the settlement viewer plus `settlement.php` and `S_SET.php`. It is
+    range-checked and `mb_sql_int()`ed into every query, then echoed raw — and
+    in `S_SET.php` into a bare `href`. The range check is no protection:
+    `"<script>"` is not less than 1, so the "does not exist" branch echoes it.
+    The six copies are a merge candidate on the barter boards' precedent.
+  - **Eight were the four topic pages**, and all eight were one variable
+    meaning two things — the same shape the SQL work named. `$topic` and
+    `$message` are read from the request and then reused for the row being
+    rendered, and the reply form at the bottom prefills from whichever won.
+    The row values are `$r_*` now, seeded from the request so the empty-thread
+    case still prefills what it always did.
+  - **Seven were `equip.php`** telling you which weapon has not been created
+    yet, in the words you chose.
+  - The rest were `checksignup.php` reflecting a taken name back, `gc.php`'s
+    guild name, `S_PREF.php`'s MSN field, `barter_handler.php`'s unit type, and
+    one boolean.
+
+  The forum post body is the one value still echoed as markup, because it is
+  stored as markup on purpose: the forum has always allowed `<i>` and `<b>`.
+  That is closed at the boundary instead. `strip_tags($message, "<i>,<b>")` is
+  the wrong tool for an allow-list — an allowed tag keeps its attributes, so
+  `<i onmouseover=alert(1)>` passed through whole. `mb_post_html()` escapes
+  everything and restores exactly the two bare tags, which an attribute makes
+  not match.
+
+  Same two limits the SQL audit carries, and they matter more here. It is
+  **first-order and per-file**, so the stored XSS — an empire name, a guild
+  name, a message — is invisible to it. That is the larger half and the more
+  dangerous one. **A zero here does not mean output is safe.**
+
+  One pre-existing mismatch found and left alone: `gc.php` stores the
+  HTML-escaped guild name in `guild.gname` and the raw one in `user.guild` on
+  the two adjacent statements that create a guild, so a name containing `&` or
+  `<` never matches itself again.
 - **Passwords.** Unsalted MD5, denormalized into four tables alongside the
   email that identifies the row.
 - ~~**Error handling.**~~ **Done.** `mysqli_report()` is back on as

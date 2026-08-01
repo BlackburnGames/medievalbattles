@@ -206,8 +206,12 @@ else	{
 		$M_gid = mysqli_query($db, "SELECT max(gid) FROM guild");	
 			$mgid = mb_db_result($M_gid, "mgid");	
 		
+		// The escaped forms get their own names. $creating_guild_name meant the
+		// raw name above this line and the escaped one below it, so nothing
+		// reading the file -- the audit included -- could tell whether the echo
+		// at the bottom was safe. It always was; now it says so.
 		$info = htmlspecialchars($info);
-		$creating_guild_name = htmlspecialchars($creating_guild_name);
+		$guild_name_html = htmlspecialchars($creating_guild_name);
 		// Its own name. $gid up at the top of this file is the guild the player
 		// is messaging, read from the request; this one is the id of the guild
 		// about to be created. Sharing a name made the second look like the
@@ -215,11 +219,11 @@ else	{
 		$new_gid = $mgid + 1;
 
 		include("include/connect.php");
-		mysqli_query($db, "INSERT INTO guild (gname, info, gid, datemade, cpw, owner)	 VALUES	(" . mb_sql_str($db, $creating_guild_name) . ", " . mb_sql_str($db, $info) . ", '$new_gid', '$clock', " . mb_sql_str($db, $cpw) . ", '$userid') ");
+		mysqli_query($db, "INSERT INTO guild (gname, info, gid, datemade, cpw, owner)	 VALUES	(" . mb_sql_str($db, $guild_name_html) . ", " . mb_sql_str($db, $info) . ", '$new_gid', '$clock', " . mb_sql_str($db, $cpw) . ", '$userid') ");
 		mysqli_query($db, "UPDATE user SET guild=" . mb_sql_str($db, $gname) . " WHERE email='$email' AND pw='$pw'");
 		mysqli_query($db, "DELETE FROM guildrequests WHERE applicant='$userid'");
 						
-		echo"<div align=center><font class=yellow><b><u>$creating_guild_name</u> has been successfully created!</b></font></div>";
+		echo"<div align=center><font class=yellow><b><u>$guild_name_html</u> has been successfully created!</b></font></div>";
 		include("include/S_GM.php");
 		die();
 	}

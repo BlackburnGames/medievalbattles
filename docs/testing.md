@@ -67,17 +67,29 @@ entries at the end of Phase 1 — so any warning at all is now a regression.
 ### `tests/register-globals-audit.php`
 
 Static, not behavioural: it tokenizes every source and reports variables whose
-first appearance in global scope is a read. That was the checklist for removing
+first appearance in global scope is a read, and that none of the shared
+includes **that file pulls in** provide. That was the checklist for removing
 the `register_globals` shim, and entries remain in
 `tests/register-globals.txt` — all of them now plain uninitialised reads rather
 than request inputs.
 
 **The list should only ever shrink**, and it doubles as a Phase 3 bug list.
-Re-accept with `--accept`.
+Re-accept with `--accept`. It has grown exactly once, by three entries, on the
+commit that made the include resolution per file; the reason is in the script's
+header.
 
-**Read it as a list of suspects, not defects.** The audit is per-file as well as
-flow-insensitive, so a variable assigned in one file and read in another looks
-unassigned. Both readings have to be checked before acting:
+Include resolution is worth knowing about before you change the script. It is
+transitive, and a file that is only ever included sees its **includer's** scope
+— half this codebase is a panel template that renders `$race` and `$gp` while
+including nothing, and scoring those against their own closure reports 345
+entries of pure noise. Paths resolve the way PHP resolves them here: CWD first,
+where the CWD is the requested page's directory, then the including file's
+directory. `include($mb_panel)` is followed via the literal `.php` strings
+assigned to that name in the same file.
+
+**Read it as a list of suspects, not defects.** The audit is still
+flow-insensitive, so a variable assigned inside one branch and read in another
+looks unassigned. Both readings have to be checked before acting:
 
 - `app/gl-delposts.php` passing `$setgid` to `mb_db_result()` where it means
   `$guild_id` was **real** — `$setgid` appeared exactly once in the whole
@@ -132,6 +144,46 @@ Three things worth knowing before acting on it:
   see, and `extract()` on a row hides the flow entirely — which is how a
   genuine one in `S_VMESS.php` stayed invisible. Every string reaching a query
   still has to be escaped, not just the ones listed.
+
+### `tests/xss-audit.php`
+
+The same audit at the other end of the request: it reports tainted values that
+survive into an `echo` or a `print`. Baselined in `tests/xss.txt`.
+
+The taint tracker is not a second copy — both audits use `tests/taint-lib.php`,
+because a source or a sanitizer that one knows about and the other does not is
+a false clean bill of health. Everything above about arithmetic,
+flow-insensitivity and the first-order/per-file limits applies here unchanged.
+
+**The list should only ever shrink**, and **it is at zero, which is not the
+same as clean.** The first-order limit bites harder here than it does for SQL:
+the stored XSS — an empire name, a guild name, a forum post, a message — is
+read back out of the database and is invisible to this. That is the larger half
+of the problem and the more dangerous one.
+
+Each entry records the HTML context, because it decides the fix:
+
+| Context | Example | Fix |
+| --- | --- | --- |
+| `text` | `...>$x<...` | `mb_h()` |
+| `attr-quoted` | `<a href="$x">` | `mb_h()` — it uses `ENT_QUOTES`, the default does not |
+| `attr-bare` | `<font class=$x>` | `mb_attr()`, which quotes as well as escapes |
+
+The third is the one that matters, and it is how this codebase writes almost
+every attribute. A bare attribute value ends at the first space, so
+`x onerror=alert(1)` breaks out carrying no character `htmlspecialchars()`
+would touch — escaping alone does not close it, exactly as escaping alone does
+not close `WHERE topicid=$topicid`.
+
+Context is accumulated across the whole file rather than per statement, because
+the tag a value lands in is routinely opened somewhere else: `topic.php` emits
+an `<input ... value="` as inline HTML and the short-tag echo that follows
+carries no literal text of its own.
+
+One value is deliberately still echoed as markup. The forum post body is stored
+as markup, because the forum has always allowed `<i>` and `<b>`; it is closed
+by `mb_post_html()` at the point it is stored instead. See
+[modernization.md](modernization.md).
 
 ### `tests/query-audit.sh`
 

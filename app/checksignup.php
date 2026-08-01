@@ -50,8 +50,8 @@ if ($signup) {
     $ip_query = $db->query("SELECT count(userid) FROM user WHERE ip='$ipaddress'");
     $check_ip = mb_db_result($ip_query, "check_ip");
 
-  if($enamecheck1 == $ename1 AND $ename != "")  { echo "$ename is already being used!"; die();   }
-  elseif($emnamecheck1 == $email1 AND $email != "") { echo "$email is already being used!";  die(); }
+  if($enamecheck1 == $ename1 AND $ename != "")  { echo mb_h($ename) . " is already being used!"; die();   }
+  elseif($emnamecheck1 == $email1 AND $email != "") { echo mb_h($email) . " is already being used!";  die(); }
   // The address check was commented out in 2003, so anything at all could be
   // signed up with -- and the address is then written to six tables and
   // interpolated into every "WHERE email='$email'" the account ever loads.

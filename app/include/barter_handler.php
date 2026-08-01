@@ -332,7 +332,7 @@ else	{
 //	number of unit checks. guildbarter.php's copy of this read $archer, not
 //	$archers, so the guild board never checked that you owned the archers you
 //	were selling -- and its "invalid number" line had the same hole.
-	elseif($mb_have < $amount)	{	echo"<font class=yellow><div align=center>You don't have that many $type(s)!</font></div><br><br>";	die();	 }
+	elseif($mb_have < $amount)	{	echo"<font class=yellow><div align=center>You don't have that many " . mb_h($type) . "(s)!</font></div><br><br>";	die();	 }
 	elseif($mb_have <= 0)	{	echo"<font class=yellow><div align=center>Invaild number.</font></div><br><br>";	die();	 }
 
 	$themaxbarterid = mysqli_query($db, "SELECT max(barterid) FROM barter");
