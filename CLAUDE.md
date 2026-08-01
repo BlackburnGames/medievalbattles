@@ -60,7 +60,7 @@ Constraints worth knowing before changing the harness:
 - Fixture user ids are deliberately 1–3: the tick loops from 0 to `max(userid)` rather than over existing rows, so high ids make every run crawl.
 - Do not seed users by driving the signup form. Signup derives starting resources from `rand()`, and PHP 7.1 rewired `rand()` to `mt_rand` and fixed its modulo bias, so the same seed yields different numbers on 5.6 than on 8.x and cross-version goldens would never match.
 - Diagnostics must be matched against `strip_tags()`ed output. With `html_errors` on, PHP emits `<b>Notice</b>:`, and a pattern expecting `Notice:` silently matches nothing — that produced a false PASS during development.
-- Known coverage gap: the crawl reaches 38 of 68 top-level scripts. The forum pages (`gl-*`, `sl-*`, `topic*`) need seeded threads and the runtime per-settlement tables before they are reachable; the rest are includes or auth-flow pages. `smoke.php` prints the unreached list on every run.
+- Known coverage gap: the crawl reaches 39 of 69 top-level scripts. The forum pages (`gl-*`, `sl-*`, `topic*`) need seeded threads and the runtime per-settlement tables before they are reachable; the rest are includes or auth-flow pages. `smoke.php` prints the unreached list on every run.
 
 ## The `mysql_result` two-argument trap
 
@@ -91,6 +91,23 @@ When porting a call site: reproduce *column 0 of row 0*, not the name, unless yo
 - **Auth**: `$_SESSION['email']` plus `$_SESSION['pw']` (the MD5 hash) act as a bearer credential, and nearly every query filters `WHERE email='$email' AND pw='$pw'`. The email/hash pair is **denormalized into `buildings`, `military`, `research` and `explore`**, so changing the auth model means touching the schema and almost every query.
 - **Game tick**: `update.php` sets `game_info.tick='yes'` (every page then renders "Tick in progress" and dies), loops userids applying economy growth with hardcoded modifiers, mails inactive players, recomputes guild and settlement strength, and resets `tick='no'` at line 492. It is HTTP-invokable with no authentication.
 - **Schema** (`db.sql`): 22 MyISAM tables, almost no indexes, no charset declared, types nearly all `bigint(255)`/`varchar(255)`. It is not schema-only — it seeds the `game_info` row and ten empty settlements. `db/seed.sql` adds the deterministic test world on top.
+
+## The game manual
+
+`app/manual.php` renders the manual; `app/include/gamedata.php` holds every number in it. The old static `app/manual.html` is gone — it had drifted so far from the engine that a third of its claims were wrong (inverted race modifiers, an auction system that does not exist, a 10% resource steal that is actually 8%).
+
+**`gamedata.php` is the only place a game value may be written, and every value carries a `file:line` citation** to the engine code it was read from. `manual.php` computes its prose from those values rather than restating them — a race's "+10% civilian growth" is rendered as the resulting rate next to the base rate, because the engine's modifiers are *additive on small bases* and the percentage phrasing is what made the old manual wrong (Night Elf's advertised "−25% civilian growth" is `0.26 − 0.25`, a 96% cut).
+
+Two rules when touching game logic:
+
+- Change a cited line in the engine, and the matching entry in `gamedata.php` must change with it. The citations exist so this is a grep, not an audit.
+- Where the engine is plainly buggy, `gamedata.php` records **what it does, not what it meant**, and the discrepancy goes in `$GAMEDATA['quirks']` — which the manual publishes. That list doubles as a Phase 3 checklist; fixing an engine bug means deleting its quirk entry.
+
+Phase 3 should invert the dependency: have the engine read `$GAMEDATA` instead of its inline literals, after which the manual cannot go stale at all.
+
+`manual.php` is reachable logged out (the login page links it), so it must never include `igtop.php` or touch the session. It is crawled by `smoke.php`.
+
+`docs/v7-design-notes.md` records the design on the project's GitHub wiki, which describes a **different, unbuilt game** — different races and classes, a skill tree, mana, unit upkeep, typed magic resistances. None of it exists in `app/`. It is kept for reference only; never answer a question about game behaviour from it.
 
 ## The compatibility layer
 

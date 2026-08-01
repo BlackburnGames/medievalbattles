@@ -60,7 +60,7 @@ echo "
   <tr><td class=main><b class=other><font class=orange>Other</b></td></tr>
   <tr><td class=navbartxt><a href=preferences.php>Preferences</a></td></tr>
   <tr><td class=navbartxt><a href=scores.php>Scores</a> &nbsp;|&nbsp; <a href=http://forum.decoymedia.com target=newwindow>Forums</a></td></tr>
-  <tr><td class=navbartxt><a href=manual.html target=newwindow>Manual</a></td></tr>
+  <tr><td class=navbartxt><a href=manual.php target=newwindow>Manual</a></td></tr>
   <tr><td class=navbartxt><a href=logout.php>Logout</a></td></tr>
 </table>
 </td></table>

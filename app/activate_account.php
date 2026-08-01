@@ -49,7 +49,7 @@
 									<a href="index.php">Main</a><br>
 									<a href="index.php?page=signup">Sign Up</a><br>
 									<a href="http://forums.medievalbattles.com">Public Forums</a><br>
-									<a href="manual.html">Manual</a><br>
+									<a href="manual.php">Manual</a><br>
 									<a href="index.php?page=game_scores">Scores</a><br>
 									<a href="index.php?page=about_us">About Us</a><br>
 									<a href="index.php?page=agn">Announcements</a><br>

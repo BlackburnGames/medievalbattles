@@ -68,7 +68,7 @@ if ($computer_id === '') {
                   <a href="index.php">Main</a><br>
                   <a href="index.php?page=signup">Sign Up</a><br>
                   <!-- <a href="index.php?page=game_scores">Scores</a><br> -->
-                  <a href="manual.html" target="_blank">Manual</a><br>
+                  <a href="manual.php" target="_blank">Manual</a><br>
                 </td>
               </tr>
             </table>
