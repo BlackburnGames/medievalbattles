@@ -14,16 +14,32 @@ function callback($buffer) {
 }
 ob_start("callback");
 
+/**
+ * May the caller moderate this settlement's forum?
+ *
+ * sl-forum.php and sl-topic.php both open by refusing anyone whose $sl is not
+ * 'yes'. This page, which is the one that deletes things, never asked -- so any
+ * logged-in player could call it directly.
+ */
+function mb_sl_guard($sl)
+{
+	if ($sl != 'yes') {
+		echo "<center><b class=yellow>You are not Settlement Leader.</b>";
+		die();
+	}
+}
+
 //	delete topic
 if(!IsSet($delete))	{
 
 }
-else	{	
+else	{
 	include("common.php");
 	include("include/connect.php");
+	mb_sl_guard($sl);
 
-	mysqli_query($db, "DELETE FROM setforums WHERE topicid='$tid' AND setid='$setid'"); 
-	mysqli_query($db, "DELETE FROM setforumsmsgs WHERE topicid='$tid' AND setid='$setid'"); 
+	mysqli_query($db, "DELETE FROM setforums WHERE topicid=" . mb_sql_int($tid) . " AND setid='$setid'");
+	mysqli_query($db, "DELETE FROM setforumsmsgs WHERE topicid=" . mb_sql_int($tid) . " AND setid='$setid'");
 	echo "The post was successfully deleted<br>";
 	echo "Click <a href=index.php>here</a> to go back";
 
@@ -37,16 +53,32 @@ if(!IsSet($delpost))	{
 else	{	
 	include("common.php");
 	include("include/connect.php");
+	mb_sl_guard($sl);
 
-	mysqli_query($db, "DELETE FROM setforumsmsgs WHERE messageid='$mid'"); 
+	// setforumsmsgs carries its own setid, so the caller's settlement scopes
+	// the delete directly -- no join needed, unlike the guild equivalent.
+	mysqli_query($db, "DELETE FROM setforumsmsgs WHERE messageid=" . mb_sql_int($mid) . " AND setid='$setid'");
 
-	$mreplies = "SELECT replies FROM setforums WHERE topicid=$tid";
-	$replies = mysqli_query($db, $mreplies);
-	
-	$ureplies = "UPDATE setforums SET replies=$replies-1 WHERE topicid='$tid'";
+	/*
+	 * The reply count is decremented by MySQL now, which is what the rest of
+	 * the codebase does -- gl-inputposts.php:.. writes replies=replies+1 when a
+	 * reply is added.
+	 *
+	 * What stood here read the count back with mysqli_query() and then
+	 * interpolated the RESULT HANDLE into the UPDATE:
+	 *
+	 *     $replies  = mysqli_query($db, "SELECT replies FROM setforums ...");
+	 *     $ureplies = "UPDATE setforums SET replies=$replies-1 WHERE ...";
+	 *
+	 * so the statement was built from an object. On PHP 8 converting
+	 * mysqli_result to string is a fatal, and on 5.6 it was "Object id #7",
+	 * which MySQL rejected -- the count has never gone down on either version.
+	 * Doing the arithmetic in SQL removes the round trip along with the bug.
+	 */
+	$ureplies = "UPDATE setforums SET replies=replies-1 WHERE topicid=" . mb_sql_int($tid) . " AND setid='$setid'";
 	mysqli_query($db, $ureplies);
 
-	header ("Location: sl-topic.php?topicid=$tid"); 
+	header ("Location: sl-topic.php?topicid=" . (int) $tid);
 }
 
 // Close buffer

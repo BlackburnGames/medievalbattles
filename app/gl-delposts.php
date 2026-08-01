@@ -35,37 +35,84 @@ ob_start("callback");
  * sl-delposts.php, the working equivalent, never had the block at all.
  */
 
+/**
+ * May the caller moderate this guild's forum at all?
+ *
+ * Nothing on this page asked. Every other gl-* page opens by checking that the
+ * caller owns a guild -- gl-forum.php:17 is the pattern -- and this one, the
+ * only page that destroys anything, did not. Any logged-in player could reach
+ * it, and the deletes below scoped by nothing but the id in the URL.
+ */
+function mb_gl_guard($db, $userid, $empireguild)
+{
+	$gresult = mysqli_query($db, "SELECT owner FROM guild WHERE owner=" . mb_sql_int($userid));
+	$gnamecheck = mysqli_fetch_array($gresult);
+
+	if (!$gnamecheck || $gnamecheck[0] != $userid) {
+		echo "<div align=center><font class=yellow>You are not a Guild Leader.</font></div>";
+		die();
+	}
+	if ($empireguild == 'None' || $empireguild == '') {
+		echo "<div align=center><font class=yellow>You have to be in a guild to view this page!</font></div>";
+		die();
+	}
+}
+
 //	delete topic
 if(!IsSet($delete))	{
 
 }
-else	{	
+else	{
 	include("commong.php");
 	include("include/connect.php");
+	mb_gl_guard($db, $userid, $empireguild);
 
-	mysqli_query($db, "DELETE FROM guildthreads WHERE topicid='$tid'"); 
-	mysqli_query($db, "DELETE FROM guildmsgs WHERE topicid='$tid'"); 
+	// Scoped to the caller's own guild. Deleting on the id alone let anyone who
+	// reached this page remove any guild's thread by guessing a topicid; the
+	// settlement equivalent had at least been scoping by setid all along.
+	// guildmsgs carries no guildname of its own, so the thread is confirmed
+	// first and both deletes hang off that.
+	$q_tid = mb_sql_int($tid);
+	$owned = mysqli_query($db, "SELECT topicid FROM guildthreads WHERE topicid=$q_tid AND guildname=" . mb_sql_str($db, $empireguild));
 
-	header ("Location: gl-forum.php"); 
+	if (!$owned || !mysqli_num_rows($owned)) {
+		echo "<div align=center><font class=yellow>That thread is not in your guild.</font></div>";
+		die();
+	}
+
+	mysqli_query($db, "DELETE FROM guildthreads WHERE topicid=$q_tid");
+	mysqli_query($db, "DELETE FROM guildmsgs WHERE topicid=$q_tid");
+
+	header ("Location: gl-forum.php");
 }
 
 //	delete post
 if(!IsSet($delpost))	{
 
 }
-else	{	
+else	{
 	include("commong.php");
 	include("include/connect.php");
+	mb_gl_guard($db, $userid, $empireguild);
 
 	// Was topicid='$postid' on both, and $postid is assigned nowhere -- so this
 	// branch deleted on an empty id and did nothing. Deleting one reply should
 	// remove that message, not the whole thread, which is what the settlement
-	// equivalent does; sl-delposts.php:41 is the model. Nothing links here yet
-	// (gl-topic.php offers no per-post Delete the way sl-topic.php does), so
-	// this is repaired rather than verified end to end.
-	mysqli_query($db, "DELETE FROM guildmsgs WHERE messageid='$mid'");
+	// equivalent does; sl-delposts.php is the model.
+	//
+	// The message's thread has to be in the caller's guild, which takes a join:
+	// guildmsgs has a topicid but no guildname.
+	$q_mid = mb_sql_int($mid);
+	$owned = mysqli_query($db, "SELECT m.messageid FROM guildmsgs m JOIN guildthreads t ON t.topicid = m.topicid WHERE m.messageid=$q_mid AND t.guildname=" . mb_sql_str($db, $empireguild));
 
-	header ("Location: gl-topic.php?topicid=$tid");
+	if (!$owned || !mysqli_num_rows($owned)) {
+		echo "<div align=center><font class=yellow>That post is not in your guild.</font></div>";
+		die();
+	}
+
+	mysqli_query($db, "DELETE FROM guildmsgs WHERE messageid=$q_mid");
+
+	header ("Location: gl-topic.php?topicid=" . (int) $tid);
 }
 
 // Close buffer

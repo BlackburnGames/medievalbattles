@@ -24,9 +24,6 @@ app/css/admin/gameconfig.php	tmail	quoted
 app/css/admin/get_user_info.php	empre	quoted
 app/css/admin/get_user_info.php	evu	quoted
 app/css/admin/get_user_info.php	query_string	unquoted
-app/gc.php	gid	quoted
-app/gl-delposts.php	mid	quoted
-app/gl-delposts.php	tid	quoted
 app/guildbarter.php	amount	quoted
 app/guildbarter.php	b_amount	quoted
 app/guildbarter.php	b_cost	quoted
@@ -40,9 +37,4 @@ app/guildbarter.php	method	quoted
 app/guildbarter.php	query	unquoted
 app/guildbarter.php	tsetid	quoted
 app/guildbarter.php	type	quoted
-app/intel.php	send	unquoted
 app/preferences.php	email	quoted
-app/sl-delposts.php	mid	quoted
-app/sl-delposts.php	mreplies	unquoted
-app/sl-delposts.php	tid	quoted
-app/sl-delposts.php	ureplies	unquoted

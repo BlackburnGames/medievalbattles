@@ -75,7 +75,9 @@ else	{
 		if($send < $evm['thieves'])	{
 			echo"<div align=center><font class=yellow>You have failed to gather information on $empireattacked and lost 10% of your thieves.</div></align>";
 		
-			mysqli_query($db, "UPDATE military SET thieves = round($thieves - ($send * .1)) WHERE email='$email' AND pw='$pw'");
+			// The arithmetic around $send is MySQL's, not PHP's, so it launders
+			// nothing -- the parameter is still a piece of the statement text.
+			mysqli_query($db, "UPDATE military SET thieves = round($thieves - (" . mb_sql_int($send) . " * .1)) WHERE email='$email' AND pw='$pw'");
 			mysqli_query($db, "UPDATE user SET nno = nno + 1 WHERE userid=" . mb_sql_int($empvalue));
 			mysqli_query($db, "INSERT INTO empnews (date, news, yourid)	VALUES	('$clock', '<font class=yellow>$ename ($setid) has failed to gather information on you</font>' , " . mb_sql_int($empvalue) . ") ");
 			
@@ -84,7 +86,7 @@ else	{
 		}
 		else	{
 	
-			mysqli_query($db, "UPDATE military SET thieves = round($thieves - ($send * .03)) WHERE email='$email' AND pw='$pw'");
+			mysqli_query($db, "UPDATE military SET thieves = round($thieves - (" . mb_sql_int($send) . " * .03)) WHERE email='$email' AND pw='$pw'");
 			mysqli_query($db, "UPDATE user SET nno = nno + 1 WHERE userid=" . mb_sql_int($empvalue));
 			mysqli_query($db, "INSERT INTO empnews (date, news, yourid)	VALUES	('$clock', '<font class=yellow>Thieves have gathered intelligence on your empire</font>' , " . mb_sql_int($empvalue) . ") ");
 

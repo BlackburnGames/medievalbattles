@@ -208,10 +208,14 @@ else	{
 		
 		$info = htmlspecialchars($info);
 		$creating_guild_name = htmlspecialchars($creating_guild_name);
-		$gid = $mgid + 1;
-		
+		// Its own name. $gid up at the top of this file is the guild the player
+		// is messaging, read from the request; this one is the id of the guild
+		// about to be created. Sharing a name made the second look like the
+		// first to anything reading the file, the audit included.
+		$new_gid = $mgid + 1;
+
 		include("include/connect.php");
-		mysqli_query($db, "INSERT INTO guild (gname, info, gid, datemade, cpw, owner)	 VALUES	(" . mb_sql_str($db, $creating_guild_name) . ", " . mb_sql_str($db, $info) . ", '$gid', '$clock', " . mb_sql_str($db, $cpw) . ", '$userid') ");
+		mysqli_query($db, "INSERT INTO guild (gname, info, gid, datemade, cpw, owner)	 VALUES	(" . mb_sql_str($db, $creating_guild_name) . ", " . mb_sql_str($db, $info) . ", '$new_gid', '$clock', " . mb_sql_str($db, $cpw) . ", '$userid') ");
 		mysqli_query($db, "UPDATE user SET guild=" . mb_sql_str($db, $gname) . " WHERE email='$email' AND pw='$pw'");
 		mysqli_query($db, "DELETE FROM guildrequests WHERE applicant='$userid'");
 						

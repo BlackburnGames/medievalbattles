@@ -142,8 +142,6 @@ $UNREACHABLE = array(
 
     // Deliberately skipped: destructive by plain GET. See $SKIP.
     'disband.php'          => 'skipped: destroys the fixture army',
-    'gl-delposts.php'      => 'skipped: deletes guild forum posts',
-    'sl-delposts.php'      => 'skipped: deletes settlement forum posts',
     'logout.php'           => 'skipped: ends the session the crawl depends on',
 
     // Dead in the shipped game, not merely uncovered.
@@ -204,6 +202,32 @@ foreach (array('gl-inputposts.php', 'sl-input.posts.php', 'input.posts.php') as 
         'message'  => "O'Brien is holding the ford.",
     ));
 }
+/*
+ * The two moderation handlers, driven here rather than at the end of the run.
+ *
+ * They destroy forum content, so $SKIP keeps the crawler from following a
+ * Delete link mid-crawl -- but they have to be called BEFORE the crawl anyway,
+ * because both now check that the caller leads the guild or the settlement and
+ * the crawl takes that away. govt.php:20 clears sl for every member of the
+ * settlement on each visit and then re-elects whoever holds the most votes;
+ * the fixture has nobody voting for anybody, so simply opening the page in
+ * passing deposes the tester and every later request is refused.
+ *
+ * Seeded ids rather than the ones posted above, so this does not depend on how
+ * many threads the run happened to create.
+ */
+foreach (array(
+    'sl-delposts.php?delpost=true&mid=1&tid=1',
+    'sl-delposts.php?delete=true&tid=2',
+    'gl-delposts.php?delpost=true&mid=1&tid=1',
+    'gl-delposts.php?delete=true&tid=2',
+) as $path) {
+    $body = $tester->get('/' . $path);
+    $visited++;
+    $scriptsHit[strtok($path, '?')] = true;
+    inspect($path, $body, $tester->lastStatus);
+}
+
 crawl($tester, array('main.php?pageid=news'), $MAX_PAGES);
 
 /*
