@@ -8,9 +8,9 @@ $snum = mb_input('snum');
 if($snum != "")  {  $N_NUM = $snum; }
 if($snum == "") { $N_NUM = $csnum;  }
 
-$ssettlementpic = mysqli_query($db, "SELECT setpic FROM settlement WHERE setid = '$N_NUM'");
+$ssettlementpic = mysqli_query($db, "SELECT setpic FROM settlement WHERE setid = " . mb_sql_int($N_NUM));
   $settlepic = mb_db_result($ssettlementpic, "setpic", 0);
-$ssettlementname = mysqli_query($db, "SELECT setname FROM settlement WHERE setid = '$N_NUM'");
+$ssettlementname = mysqli_query($db, "SELECT setname FROM settlement WHERE setid = " . mb_sql_int($N_NUM));
   $settlename = mb_db_result($ssettlementname, "setname", 0);
 
 echo "
@@ -43,7 +43,7 @@ echo "
     <td class=main2 width=><b class=reg>Experience</b></td>
     <td class=main2 width=><b class=reg>Guild</b></td>";
 
-$query_string = "SELECT userid, ename, race, class, mts, land, exp, guild FROM user WHERE setid = '$N_NUM' ORDER BY userid ASC";
+$query_string = "SELECT userid, ename, race, class, mts, land, exp, guild FROM user WHERE setid = " . mb_sql_int($N_NUM) . " ORDER BY userid ASC";
 $result_id = mysqli_query($db, $query_string);
 while ($row = mysqli_fetch_row($result_id))  {
 
@@ -58,7 +58,7 @@ while ($row = mysqli_fetch_row($result_id))  {
     $SLcheck = mysqli_fetch_array($SL_result);
 
   if($SLcheck[0] == 'yes')  {
-    $SL_SELECT = mysqli_query($db, "SELECT ename FROM user WHERE sl='yes' AND setid='$N_NUM'");
+    $SL_SELECT = mysqli_query($db, "SELECT ename FROM user WHERE sl='yes' AND setid=" . mb_sql_int($N_NUM));
       $SL_S = mb_db_result($SL_SELECT,"SL_S");
   }
 
@@ -87,7 +87,7 @@ while ($row = mysqli_fetch_row($result_id))  {
     <td bgcolor=$color><font class=$yclass>$row[7]</td>\n";
 }
 
-  $COUNT_MEMBERS = mysqli_query($db, "SELECT count(userid) FROM user WHERE setid = '$N_NUM'");
+  $COUNT_MEMBERS = mysqli_query($db, "SELECT count(userid) FROM user WHERE setid = " . mb_sql_int($N_NUM));
     $C_MEM = mb_db_result($COUNT_MEMBERS,"C_MEM");
 
   $totT = $C_MEM;
@@ -107,7 +107,7 @@ while($C_MEM < 10 AND $totT < 10) {
 echo "
 </table><br>";
 
-$SET_STRENGTH = mysqli_query($db, "SELECT sum(exp) FROM user WHERE setid='$N_NUM'");
+$SET_STRENGTH = mysqli_query($db, "SELECT sum(exp) FROM user WHERE setid=" . mb_sql_int($N_NUM));
   $S_STRENGTH = mb_db_result($SET_STRENGTH,"S_STRENGTH");
   $S_STRENGTH = number_format($S_STRENGTH);
 

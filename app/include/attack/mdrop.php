@@ -18,14 +18,14 @@ if($setchg == 1)	{
 		die();
 	}
 			  
-	mysqli_query($db, "UPDATE user SET csnum =\"$snum\" WHERE email='$email' AND pw='$pw'");
+	mysqli_query($db, "UPDATE user SET csnum =" . mb_sql_int($snum) . " WHERE email='$email' AND pw='$pw'");
 
 	echo "
 		<font class=inner2>You are viewing Settlement $snum</font><br><br>
 		<select name=empvalue>
 			<option selected value=ns>-Mountain Attack-</option>";
 
-	$query_string = "SELECT userid, ename FROM user WHERE setid='$snum'";
+	$query_string = "SELECT userid, ename FROM user WHERE setid=" . mb_sql_int($snum);
 	$result_id = mysqli_query($db, $query_string);
 	while ($row = mysqli_fetch_row($result_id))	{
 		echo "<option value=$row[0]>$row[1]\n</option>";

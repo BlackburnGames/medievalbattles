@@ -164,9 +164,9 @@ else	{
 			mysqli_query($db, "INSERT INTO guildnews (date, news, gid, gnid)	VALUES	('$clock', '<font class=orange>$evu[ename] ($evu[setid]) successfully defended their land against $ename ($setid)</font>', '$tgid[0]', '$gnid') ");
 		}
 						
-		mysqli_query($db, "UPDATE user SET nno = nno + 1 WHERE userid='$empvalue'");
+		mysqli_query($db, "UPDATE user SET nno = nno + 1 WHERE userid=" . mb_sql_int($empvalue));
 
-		mysqli_query($db, "INSERT INTO empnews (date, news, yourid)	VALUES	('$clock', '<font class=yellow>We have successfully defended our empire against $ename ($setid)</font>' , '$empvalue') ");
+		mysqli_query($db, "INSERT INTO empnews (date, news, yourid)	VALUES	('$clock', '<font class=yellow>We have successfully defended our empire against $ename ($setid)</font>' , " . mb_sql_int($empvalue) . ") ");
 					
 		echo"<div align=center><font class=yellow>We have failed to attack $evu[ename]($evu[setid])!</font><br><br><font class=orange>$your_losses<br><br></font></div>";
 		include("include/attack/ldrop.php");
@@ -230,8 +230,8 @@ else	{
 	mysqli_query($db, "UPDATE user SET land = land + $landgain WHERE email='$email' AND pw='$pw'");
 	mysqli_query($db, "UPDATE buildings SET aland = aland + $landgain WHERE email='$email' AND pw='$pw'");
 										
-	mysqli_query($db, "UPDATE user SET land = land - $landgain WHERE userid = '$empvalue'");
-	mysqli_query($db, "UPDATE buildings SET home=$evb[home], barrack=$evb[barrack], farm=$evb[farm], wp=$evb[wp], lmill=$evb[lmill], dhome=$evb[dhome], dbarrack=$evb[dbarrack], dfarm=$evb[dfarm], dwp=$evb[dwp], dlmill=$evb[dlmill], aland=$evb[aland] WHERE userid = '$empvalue'");
+	mysqli_query($db, "UPDATE user SET land = land - $landgain WHERE userid = " . mb_sql_int($empvalue));
+	mysqli_query($db, "UPDATE buildings SET home=$evb[home], barrack=$evb[barrack], farm=$evb[farm], wp=$evb[wp], lmill=$evb[lmill], dhome=$evb[dhome], dbarrack=$evb[dbarrack], dfarm=$evb[dfarm], dwp=$evb[dwp], dlmill=$evb[dlmill], aland=$evb[aland] WHERE userid = " . mb_sql_int($empvalue));
 	 		
 	if($landgain >= 10 AND $evu['land'] - $landgain >= 1)	{
 		$sid + $msid + 1;
@@ -269,8 +269,8 @@ else	{
 	if($landgain >= 10 AND $evu['land'] - $landgain >= 1)	{
 		echo"<div align=center><font class=yellow>You have conquered $landgain land from $evu[ename]($evu[setid])!</font><br><br><font class=orange>$your_losses<br><br></font>";
 					
-		mysqli_query($db, "UPDATE user SET nno = nno + 1 WHERE userid='$empvalue'");				
-		mysqli_query($db, "INSERT INTO empnews (date, news, yourid)	VALUES	('$clock', '<font class=yellow>We have unsuccessfully defended our empire against $ename ($setid) and lost $landgain land</font>' , '$empvalue') ");
+		mysqli_query($db, "UPDATE user SET nno = nno + 1 WHERE userid=" . mb_sql_int($empvalue));				
+		mysqli_query($db, "INSERT INTO empnews (date, news, yourid)	VALUES	('$clock', '<font class=yellow>We have unsuccessfully defended our empire against $ename ($setid) and lost $landgain land</font>' , " . mb_sql_int($empvalue) . ") ");
 		include("include/attack/ldrop.php");
 		include("include/attack/table.php");
 	}
@@ -293,7 +293,7 @@ else	{
 		$mailsend = mail("$evu[email]","$subject","$body","$from");
 		
 		// check votefor
-		$V_result = mysqli_query($db, "SELECT votefor FROM user WHERE userid='$empvalue'");
+		$V_result = mysqli_query($db, "SELECT votefor FROM user WHERE userid=" . mb_sql_int($empvalue));
 		$V_check = mysqli_fetch_array($V_result);
 		
 		if($V_check[0] != 'None')	{	mysqli_query($db, "UPDATE user SET vote=vote-1 WHERE ename='$V_check'");	}
@@ -309,12 +309,12 @@ else	{
 				mysqli_query($db, "DELETE FROM guild WHERE owner='$evu[userid]'");
 		}
 		
-		mysqli_query($db, "DELETE FROM user WHERE userid='$empvalue'");
-		mysqli_query($db, "DELETE FROM militaryWHERE userid='$empvalue'");
-		mysqli_query($db, "DELETE FROM buildings WHERE userid='$empvalue'");
-		mysqli_query($db, "DELETE FROM research WHERE userid='$empvalue'");
-		mysqli_query($db, "DELETE FROM returntbl WHERE userid='$empvalue'");
-		mysqli_query($db, "DELETE FROM explore WHERE userid='$empvalue'"); 
+		mysqli_query($db, "DELETE FROM user WHERE userid=" . mb_sql_int($empvalue));
+		mysqli_query($db, "DELETE FROM militaryWHERE userid=" . mb_sql_int($empvalue));
+		mysqli_query($db, "DELETE FROM buildings WHERE userid=" . mb_sql_int($empvalue));
+		mysqli_query($db, "DELETE FROM research WHERE userid=" . mb_sql_int($empvalue));
+		mysqli_query($db, "DELETE FROM returntbl WHERE userid=" . mb_sql_int($empvalue));
+		mysqli_query($db, "DELETE FROM explore WHERE userid=" . mb_sql_int($empvalue)); 
 		mysqli_query($db, "UPDATE user SET votefor='None' WHERE votefor='$evu[ename]'");
 	}
 }

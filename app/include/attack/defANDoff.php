@@ -11,15 +11,15 @@ $uwarrior   = mb_input('uwarrior');
 $uwizard    = mb_input('uwizard');
 		
 // select user table for the empire being attacked
-$result = mysqli_query($db, "SELECT * FROM user WHERE userid='$empvalue'");
+$result = mysqli_query($db, "SELECT * FROM user WHERE userid=" . mb_sql_int($empvalue));
 $evu = mysqli_fetch_array($result);
 
 // select buildings table for the empire being attacked
-$result1 = mysqli_query($db, "SELECT * FROM buildings WHERE userid='$empvalue'");
+$result1 = mysqli_query($db, "SELECT * FROM buildings WHERE userid=" . mb_sql_int($empvalue));
 $evb = mysqli_fetch_array($result1);
 	
 // select military table for the empire being attacked
-$result2 = mysqli_query($db, "SELECT * FROM military WHERE userid='$empvalue'");
+$result2 = mysqli_query($db, "SELECT * FROM military WHERE userid=" . mb_sql_int($empvalue));
 $evm = mysqli_fetch_array($result2);
 
 if($evu['safemode'] > 0)	{

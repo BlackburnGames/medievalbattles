@@ -53,13 +53,13 @@ else	{
 	}
 	else	{
 
-		$result = mysqli_query($db, "SELECT * FROM user WHERE userid='$empvalue'");
+		$result = mysqli_query($db, "SELECT * FROM user WHERE userid=" . mb_sql_int($empvalue));
 		$evu = mysqli_fetch_array($result);
 
-		$result1 = mysqli_query($db, "SELECT * FROM military WHERE userid='$empvalue'");
+		$result1 = mysqli_query($db, "SELECT * FROM military WHERE userid=" . mb_sql_int($empvalue));
 		$evm = mysqli_fetch_array($result1);
 
-		$result2 = mysqli_query($db, "SELECT wp FROM buildings WHERE userid='$empvalue'");
+		$result2 = mysqli_query($db, "SELECT wp FROM buildings WHERE userid=" . mb_sql_int($empvalue));
 		$evb = mysqli_fetch_array($result2);
 
 		if($evu['safemode'] > 0)	{
@@ -76,8 +76,8 @@ else	{
 			echo"<div align=center><font class=yellow>You have failed to gather information on $empireattacked and lost 10% of your thieves.</div></align>";
 		
 			mysqli_query($db, "UPDATE military SET thieves = round($thieves - ($send * .1)) WHERE email='$email' AND pw='$pw'");
-			mysqli_query($db, "UPDATE user SET nno = nno + 1 WHERE userid='$empvalue'");
-			mysqli_query($db, "INSERT INTO empnews (date, news, yourid)	VALUES	('$clock', '<font class=yellow>$ename ($setid) has failed to gather information on you</font>' , '$empvalue') ");
+			mysqli_query($db, "UPDATE user SET nno = nno + 1 WHERE userid=" . mb_sql_int($empvalue));
+			mysqli_query($db, "INSERT INTO empnews (date, news, yourid)	VALUES	('$clock', '<font class=yellow>$ename ($setid) has failed to gather information on you</font>' , " . mb_sql_int($empvalue) . ") ");
 			
 			include("include/S_INTEL.php");
 			die();
@@ -85,8 +85,8 @@ else	{
 		else	{
 	
 			mysqli_query($db, "UPDATE military SET thieves = round($thieves - ($send * .03)) WHERE email='$email' AND pw='$pw'");
-			mysqli_query($db, "UPDATE user SET nno = nno + 1 WHERE userid='$empvalue'");
-			mysqli_query($db, "INSERT INTO empnews (date, news, yourid)	VALUES	('$clock', '<font class=yellow>Thieves have gathered intelligence on your empire</font>' , '$empvalue') ");
+			mysqli_query($db, "UPDATE user SET nno = nno + 1 WHERE userid=" . mb_sql_int($empvalue));
+			mysqli_query($db, "INSERT INTO empnews (date, news, yourid)	VALUES	('$clock', '<font class=yellow>Thieves have gathered intelligence on your empire</font>' , " . mb_sql_int($empvalue) . ") ");
 
 			$tempmodifier = 1.00;
 

@@ -102,11 +102,11 @@ if (!IsSet($change)) {
   elseif($votefor == 'None')  {
 
     //  ename just voted for
-    $selename = mysqli_query($db, "SELECT ename FROM user WHERE userid='$empvalue'");
+    $selename = mysqli_query($db, "SELECT ename FROM user WHERE userid=" . mb_sql_int($empvalue));
       $fename = mb_db_result($selename, "fename", 0);
 
     //  select setid
-    $SELECT_SETID = mysqli_query($db, "SELECT setid FROM user WHERE userid='$empvalue'");
+    $SELECT_SETID = mysqli_query($db, "SELECT setid FROM user WHERE userid=" . mb_sql_int($empvalue));
       $SEL_SID = mb_db_result($SELECT_SETID, "SEL_SID", 0);
 
     if($SEL_SID != $setid)  {
@@ -119,14 +119,14 @@ if (!IsSet($change)) {
     mysqli_query($db, "UPDATE user SET votefor='$fename' WHERE email='$email' AND pw='$pw'");
 
     //  select vote count for empire you voted for
-    $selectedempvotes = mysqli_query($db, "SELECT vote FROM user WHERE userid='$empvalue'");
+    $selectedempvotes = mysqli_query($db, "SELECT vote FROM user WHERE userid=" . mb_sql_int($empvalue));
       $selempvotes = mb_db_result($selectedempvotes, "selempvotes");
 
     //  new vote count for empire voted for
     $newvotecount = $selempvotes + 1;
 
     //  set  number of votes for empire you voted for
-    mysqli_query($db, "UPDATE user SET vote='$newvotecount' WHERE userid='$empvalue'");
+    mysqli_query($db, "UPDATE user SET vote='$newvotecount' WHERE userid=" . mb_sql_int($empvalue));
 
     //  select max amount of votes in your settlement
     $themaxvote = mysqli_query($db, "SELECT max(vote) FROM user WHERE setid='$setid'");
@@ -148,11 +148,11 @@ if (!IsSet($change)) {
   else  {
 
     //  ename voted for
-    $selename = mysqli_query($db, "SELECT ename FROM user WHERE userid='$empvalue'");
+    $selename = mysqli_query($db, "SELECT ename FROM user WHERE userid=" . mb_sql_int($empvalue));
       $fename = mb_db_result($selename, "fename", 0);
 
     //  select setid
-    $SELECT_SETID = mysqli_query($db, "SELECT setid FROM user WHERE userid='$empvalue'");
+    $SELECT_SETID = mysqli_query($db, "SELECT setid FROM user WHERE userid=" . mb_sql_int($empvalue));
       $SEL_SID = mb_db_result($SELECT_SETID, "SEL_SID", 0);
 
     if($SEL_SID != $setid)  {

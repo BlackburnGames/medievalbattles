@@ -2,10 +2,6 @@
 # Request input that reaches a mysqli_query() unescaped, as file, variable
 # and the quoting context it lands in. This list may only ever SHRINK.
 # Regenerate with: php tests/sql-injection-audit.php --accept
-app/attack.php	V_check	quoted
-app/attack.php	empvalue	quoted
-app/attackm.php	empvalue	quoted
-app/attackr.php	empvalue	quoted
 app/barter.php	amount	quoted
 app/barter.php	b_amount	quoted
 app/barter.php	b_cost	quoted
@@ -40,8 +36,6 @@ app/gl-inputposts.php	query5	unquoted
 app/gl-inputposts.php	query6	unquoted
 app/gl-inputposts.php	topic	quoted
 app/gl-inputposts.php	topicid	quoted
-app/govt.php	empvalue	quoted
-app/govt.php	fename	quoted
 app/guildbarter.php	amount	quoted
 app/guildbarter.php	b_amount	quoted
 app/guildbarter.php	b_cost	quoted
@@ -55,24 +49,6 @@ app/guildbarter.php	method	quoted
 app/guildbarter.php	query	unquoted
 app/guildbarter.php	tsetid	quoted
 app/guildbarter.php	type	quoted
-app/include/S_INTEL.php	query_string	unquoted
-app/include/S_INTEL.php	snum	quoted
-app/include/S_MESS.php	query_string	unquoted
-app/include/S_MESS.php	snum	quoted
-app/include/S_SET.php	N_NUM	quoted
-app/include/S_SET.php	query_string	unquoted
-app/include/S_SET.php	row	quoted
-app/include/attack/calculations.php	empvalue	quoted
-app/include/attack/defANDoff.php	empvalue	quoted
-app/include/attack/defANDoff.php	evu	quoted
-app/include/attack/ldrop.php	query_string	unquoted
-app/include/attack/ldrop.php	snum	quoted
-app/include/attack/mdrop.php	query_string	unquoted
-app/include/attack/mdrop.php	snum	unquoted
-app/include/attack/rdrop.php	query_string	unquoted
-app/include/attack/rdrop.php	snum	unquoted
-app/include/attack/scattack.php	query_string	unquoted
-app/include/attack/scattack.php	snum	quoted
 app/input.posts.php	message	quoted
 app/input.posts.php	query1	unquoted
 app/input.posts.php	topic	quoted
@@ -81,11 +57,8 @@ app/inputpostsg.php	message	quoted
 app/inputpostsg.php	query1	unquoted
 app/inputpostsg.php	topic	quoted
 app/inputpostsg.php	topicid	quoted
-app/intel.php	empvalue	quoted
 app/intel.php	send	unquoted
 app/preferences.php	email	quoted
-app/scattack.php	empvalue	quoted
-app/settlement.php	N_NUM	quoted
 app/sl-delposts.php	mid	quoted
 app/sl-delposts.php	mreplies	unquoted
 app/sl-delposts.php	tid	quoted

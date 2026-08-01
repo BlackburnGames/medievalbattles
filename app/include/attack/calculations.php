@@ -136,37 +136,37 @@ if($evtally >= 1)	{	$evpts = $cdefense / $evtally;	}
 if($evm['warriors'] > 0)	{
 	$ev_warloss = (($evm['warriors'] * $evwarhp) - $evpts) / $evwarhp;
 	if($ev_warloss < 0)	{	$ev_warloss = 0;	}
-	mysqli_query($db, "UPDATE military SET warriors = round($ev_warloss) WHERE userid='$empvalue'");
+	mysqli_query($db, "UPDATE military SET warriors = round($ev_warloss) WHERE userid=" . mb_sql_int($empvalue));
 }
 if($evm['wizards'] > 0)	{
 	$ev_wizloss = (($evm['wizards'] * $evwizhp) - $evpts) / $evwizhp;
 	if($ev_warloss < 0)	{	$ev_warloss = 0;	}
-	mysqli_query($db, "UPDATE military SET wizards = round($ev_wizloss) WHERE userid='$empvalue'");
+	mysqli_query($db, "UPDATE military SET wizards = round($ev_wizloss) WHERE userid=" . mb_sql_int($empvalue));
 }
 if($evm['priests'] > 0)	 {
 	$ev_priloss = (($evm['priests'] * $evprihp) - $evpts) / $evprihp;		
 	if($ev_priloss < 0)	{	$ev_priloss = 0;	}
-	mysqli_query($db, "UPDATE military SET priests = round($ev_priloss) WHERE userid='$empvalue'");
+	mysqli_query($db, "UPDATE military SET priests = round($ev_priloss) WHERE userid=" . mb_sql_int($empvalue));
 }
 if($evm['archers'] > 0)	{
 	$ev_archloss = (($evm['archers'] * $evarchhp) - $evpts) / $evarchhp;
 	if($ev_archloss < 0)	{	$ev_archloss = 0;	 }
-	mysqli_query($db, "UPDATE military SET archers = round($ev_archloss) WHERE userid='$empvalue'");
+	mysqli_query($db, "UPDATE military SET archers = round($ev_archloss) WHERE userid=" . mb_sql_int($empvalue));
 }
 if($evm['catapult'] > 0)	{
 	$ev_catapultloss = (($evm['catapult'] * $evcatapulthp) - $evpts) / $evcatapulthp;
 	if($ev_catapultloss < 0)	{	$ev_catapultloss = 0;	 }
-	mysqli_query($db, "UPDATE military SET catapult = round($ev_catapultloss) WHERE userid='$empvalue'");
+	mysqli_query($db, "UPDATE military SET catapult = round($ev_catapultloss) WHERE userid=" . mb_sql_int($empvalue));
 }
 if($evm['golem'] > 0)	{
 	$ev_golemloss = (($evm['golem'] * $evgolemhp) - $evpts) / $evgolemhp;
 	if($ev_golemloss < 0)	{	$ev_golemloss = 0;	 }
-	mysqli_query($db, "UPDATE military SET golem = round($ev_golemloss) WHERE userid='$empvalue'");
+	mysqli_query($db, "UPDATE military SET golem = round($ev_golemloss) WHERE userid=" . mb_sql_int($empvalue));
 }
 if($evm['irongolem'] > 0)	{
 	$ev_irongolemloss = (($evm['irongolem'] * $evirongolemhp) - $evpts) / $evirongolemhp;
 	if($ev_irongolemloss < 0)	{	$ev_irongolemloss = 0;	 }
-	mysqli_query($db, "UPDATE military SET irongolem = round($ev_irongolemloss) WHERE userid='$empvalue'");
+	mysqli_query($db, "UPDATE military SET irongolem = round($ev_irongolemloss) WHERE userid=" . mb_sql_int($empvalue));
 }
 
 $war_loss = round($uwarrior - $subwar);

@@ -43,7 +43,7 @@ else	{
 	if($snum != "")	 {	$N_NUM = $snum;	}
 	if($snum == "")	{	$N_NUM = $csnum;	}
 
-	mysqli_query($db, "UPDATE user SET csnum='$N_NUM' WHERE email='$email'");
+	mysqli_query($db, "UPDATE user SET csnum=" . mb_sql_int($N_NUM) . " WHERE email='$email'");
 
 	include("include/S_SET.php");
 }

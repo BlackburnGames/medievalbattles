@@ -137,9 +137,9 @@ else	{
 		}			
 								
 
-		mysqli_query($db, "UPDATE user SET nno = nno+1 WHERE userid='$empvalue'");
+		mysqli_query($db, "UPDATE user SET nno = nno+1 WHERE userid=" . mb_sql_int($empvalue));
 
-		mysqli_query($db, "INSERT INTO empnews (date, news, yourid) VALUES	('$clock', '<font class=yellow>We have successfully defended our empire against $ename ($setid)</font>' , '$empvalue') ");
+		mysqli_query($db, "INSERT INTO empnews (date, news, yourid) VALUES	('$clock', '<font class=yellow>We have successfully defended our empire against $ename ($setid)</font>' , " . mb_sql_int($empvalue) . ") ");
 		echo"<div align=center><font class=yellow>You have failed to attack $evu[ename]!</font><br><br><font class=orange>$your_losses<br><br></font></div>";
 		include("include/attack/rdrop.php");
 		include("include/attack/table.php");
@@ -167,10 +167,10 @@ else	{
 		mysqli_query($db, "UPDATE user SET lumber = lumber + $lumbergaim WHERE email='$email' AND pw='$pw'");
 		mysqli_query($db, "UPDATE military SET civ = civ + $civgain WHERE email='$email' AND pw='$pw'");
 		
-		mysqli_query($db, "UPDATE user SET gp = gp - $gpgain WHERE userid = '$empvalue'");
-		mysqli_query($db, "UPDATE user SET iron = iron - $irongain WHERE userid = '$empvalue'");
-		mysqli_query($db, "UPDATE user SET lumber = lumber - $lumbergaim WHERE userid = '$empvalue'");
-		mysqli_query($db, "UPDATE military SET civ  = civ - $civgain WHERE userid = '$empvalue'");
+		mysqli_query($db, "UPDATE user SET gp = gp - $gpgain WHERE userid = " . mb_sql_int($empvalue));
+		mysqli_query($db, "UPDATE user SET iron = iron - $irongain WHERE userid = " . mb_sql_int($empvalue));
+		mysqli_query($db, "UPDATE user SET lumber = lumber - $lumbergaim WHERE userid = " . mb_sql_int($empvalue));
+		mysqli_query($db, "UPDATE military SET civ  = civ - $civgain WHERE userid = " . mb_sql_int($empvalue));
 
 		mysqli_query($db, "INSERT INTO setnews (date, news, setid) VALUES ('$clock', '<font class=yellow>$ename ($setid) successfully attacked $evu[ename] ($evu[setid]) for resources</font>', '$setid') ");
 				
@@ -188,9 +188,9 @@ else	{
 		include("include/attack/rdrop.php");
 		include("include/attack/table.php");
 
-		mysqli_query($db, "UPDATE user SET nno = nno + 1 WHERE userid='$empvalue'");
+		mysqli_query($db, "UPDATE user SET nno = nno + 1 WHERE userid=" . mb_sql_int($empvalue));
 
-		mysqli_query($db, "INSERT INTO empnews (date, news, yourid)	VALUES	('$clock', '<font class=yellow>We have unsuccessfully defended our empire against $ename ($setid) and lost $gpgain gold pieces, $irongain iron, $lumbergain lumber, and $civgain civilians.</font>' , '$empvalue') ");
+		mysqli_query($db, "INSERT INTO empnews (date, news, yourid)	VALUES	('$clock', '<font class=yellow>We have unsuccessfully defended our empire against $ename ($setid) and lost $gpgain gold pieces, $irongain iron, $lumbergain lumber, and $civgain civilians.</font>' , " . mb_sql_int($empvalue) . ") ");
 		die();
 	}
 }

@@ -65,16 +65,16 @@ else	{
 		include("include/connect.php");
 
 		// select user values
-			$result = mysqli_query($db, "SELECT * FROM user WHERE userid='$empvalue'");
+			$result = mysqli_query($db, "SELECT * FROM user WHERE userid=" . mb_sql_int($empvalue));
 			$evu = mysqli_fetch_array($result);
 		// select military values
-			$result1 = mysqli_query($db, "SELECT * FROM military WHERE userid='$empvalue'");
+			$result1 = mysqli_query($db, "SELECT * FROM military WHERE userid=" . mb_sql_int($empvalue));
 			$evm = mysqli_fetch_array($result1);
 		// select explore values
-			$result2 = mysqli_query($db, "SELECT * FROM explore WHERE userid='$empvalue'");
+			$result2 = mysqli_query($db, "SELECT * FROM explore WHERE userid=" . mb_sql_int($empvalue));
 			$eve = mysqli_fetch_array($result2);
 		// select building values
-			$result3 = mysqli_query($db, "SELECT * FROM buildings WHERE userid='$empvalue'");
+			$result3 = mysqli_query($db, "SELECT * FROM buildings WHERE userid=" . mb_sql_int($empvalue));
 			$evb = mysqli_fetch_array($result3);
 
 		if($evu['safemode'] > 0)	{
@@ -95,7 +95,7 @@ else	{
 				$surviving_civilians = ($their_civilians - ($send * 2));
 				$surviving_civilians = round($surviving_civilians);
 					if($surviving_civilians <= 0)	{	$surviving_civilians = 0;	 }
-				mysqli_query($db, "UPDATE military SET civ='$surviving_civilians' WHERE userid='$empvalue'");
+				mysqli_query($db, "UPDATE military SET civ='$surviving_civilians' WHERE userid=" . mb_sql_int($empvalue));
 			//	determine how many units died
 				$dead_civs = $their_civilians - $surviving_civilians;
 				$dead_thieves = 0;
@@ -107,7 +107,7 @@ else	{
 				$surviving_thieves = ($their_thieves - ($send * 2));
 				$surviving_thieves = round($surviving_thieves);
 					if($surviving_thieves <= 0)	{	$surviving_thieves = 0;	 }
-				mysqli_query($db, "UPDATE military SET thieves='$surviving_thieves' WHERE userid='$empvalue'");
+				mysqli_query($db, "UPDATE military SET thieves='$surviving_thieves' WHERE userid=" . mb_sql_int($empvalue));
 			//	determine how many units died
 				$dead_thieves = $their_thieves - $surviving_thieves;
 				$dead_civs = 0;
@@ -117,8 +117,8 @@ else	{
 			$new_suicide_civilians = $suicide - $send;
 			mysqli_query($db, "UPDATE military SET suicide='$new_suicide_civilians' WHERE email='$email' AND pw='$pw'");
 		//  attack news - their empire news		
-			mysqli_query($db, "UPDATE user SET nno=nno+1 WHERE userid='$empvalue'");
-			mysqli_query($db, "INSERT INTO empnews (date, news, yourid) VALUES	('$clock', '<font class=yellow>$ename ($setid) has sucessfully suicided on your empire. You lost $dead_civs Civilian(s) and $dead_thieves Thieve(s).</font>', '$empvalue') ");
+			mysqli_query($db, "UPDATE user SET nno=nno+1 WHERE userid=" . mb_sql_int($empvalue));
+			mysqli_query($db, "INSERT INTO empnews (date, news, yourid) VALUES	('$clock', '<font class=yellow>$ename ($setid) has sucessfully suicided on your empire. You lost $dead_civs Civilian(s) and $dead_thieves Thieve(s).</font>', " . mb_sql_int($empvalue) . ") ");
 				
 		echo "<div align=center><font class=yellow>You have successfully suicided on the empire of $evu[ename] ($evu[setid]). You killed $dead_civs Civilian(s) and $dead_thieves Thieve(s).</font></div>";
 		include("include/attack/scattack.php");
