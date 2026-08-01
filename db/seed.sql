@@ -1,0 +1,84 @@
+-- Deterministic test world for Medieval Battles v6.
+--
+-- Runs after db.sql (which supplies the schema, the game_info row and ten
+-- empty settlements). Everything here is fixed-value on purpose: signup
+-- derives starting resources from rand(), and PHP 7.1 rewired rand() to
+-- mt_rand and fixed its modulo bias, so the same seed produces different
+-- numbers on the 5.6 baseline than on 8.x. Seeding users directly keeps the
+-- golden-master comparisons valid across PHP versions.
+--
+-- Passwords are unsalted MD5 because that is what the app computes:
+--   tester@example.com / test1234
+--   idle@example.com   / pass2
+--   poor@example.com   / pass3
+--
+-- User ids are deliberately 1-3. The tick loops from 0 to max(userid) rather
+-- than over the rows that exist, so its cost is driven by the highest id, not
+-- the player count -- high fixture ids would make every test run crawl.
+--
+-- Re-runnable: each load clears its own rows first.
+
+DELETE FROM `user`          WHERE userid IN (1, 2, 3);
+DELETE FROM `buildings`     WHERE userid IN (1, 2, 3);
+DELETE FROM `military`      WHERE userid IN (1, 2, 3);
+DELETE FROM `research`      WHERE userid IN (1, 2, 3);
+DELETE FROM `explore`       WHERE userid IN (1, 2, 3);
+DELETE FROM `emailvalidate` WHERE userid IN (1, 2, 3);
+
+-- check=2 means "activated"; the app refuses to render game pages otherwise.
+INSERT INTO `emailvalidate` (userid, code, `check`, clock) VALUES
+  (1, '16d7a4fca7442dda3ad93c9a726597e4', 2, 48),
+  (2, 'c1572d05424d0ecb2a65ec6a82aeacbf', 2, 48),
+  (3, '3afc79b597f88a72528e864cf81856d2', 2, 48);
+
+-- safemode 0 on the primary tester so combat and tick paths are reachable;
+-- user 2 keeps a low countdown to exercise the inactivity branch of the tick.
+INSERT INTO `user`
+  (email, pw, ename, race, class, gp, iron, lumber, exp, food, land, mts,
+   setid, csnum, userid, online, safemode, countdown, guild, lastlogin, signup_comp_id)
+VALUES
+  ('tester@example.com', '16d7a4fca7442dda3ad93c9a726597e4', 'TestLord',  'Human', 'Warrior', 300000, 5000, 4000, 1000, 1500, 250, 200, 1, 1, 1, 0, 0,  336, 'None', '1/1/03, 12:00am', 'seed'),
+  ('idle@example.com',   'c1572d05424d0ecb2a65ec6a82aeacbf', 'IdleBaron', 'Demon', 'Cleric',  120000, 6200, 3100,  400, 1500, 250, 200, 1, 1, 2, 0, 0,    2, 'None', '1/1/03, 12:00am', 'seed'),
+  ('poor@example.com',   '3afc79b597f88a72528e864cf81856d2', 'PoorSerf',  'Giant', 'Ranger',       0,    0,    0,    0,    0, 250, 200, 2, 2, 3, 0, 0,  336, 'None', '1/1/03, 12:00am', 'seed');
+
+INSERT INTO `buildings` (email, pw, home, barrack, farm, wp, gm, im, aland, amts, userid) VALUES
+  ('tester@example.com', '16d7a4fca7442dda3ad93c9a726597e4', 50, 50, 50, 0, 50, 50, 100, 100, 1),
+  ('idle@example.com',   'c1572d05424d0ecb2a65ec6a82aeacbf', 50, 50, 50, 0, 50, 50, 100, 100, 2),
+  ('poor@example.com',   '3afc79b597f88a72528e864cf81856d2',  1,  1,  1, 0,  1,  1, 100, 100, 3);
+
+INSERT INTO `military`
+  (email, pw, civ, recruits, warriors, wizards, priests, maxciv, userid, warpower,
+   warspeedw, cweapon, wizpower, wizspeeds, cspell, pripower, prispeedw, cstaff,
+   cbow, archspeedw, archpower, wararmor, wizarmor, priarmor, wardef, wizdef,
+   pridef, warspeeda, wizspeeda, prispeeda, archers, suicide)
+VALUES
+  ('tester@example.com', '16d7a4fca7442dda3ad93c9a726597e4', 1200, 200, 3, 3, 3, 200, 1, 2, 6, 'Dagger', 3, 4, 'Magic Missile', 2, 4, 'Quarterstaff', 'Bow', 4, 2, 'Studded Leather', 'Robe', 'Leather', 1, 1, 2, 0, 0, 1, 0, 0),
+  ('idle@example.com',   'c1572d05424d0ecb2a65ec6a82aeacbf', 1300, 250, 5, 0, 5, 300, 2, 2, 6, 'Dagger', 3, 4, 'Magic Missile', 2, 4, 'Quarterstaff', 'Bow', 4, 2, 'Studded Leather', 'Robe', 'Leather', 1, 1, 2, 0, 0, 1, 0, 0),
+  ('poor@example.com',   '3afc79b597f88a72528e864cf81856d2',    0,   0, 0, 0, 0, 100, 3, 2, 6, 'Dagger', 3, 4, 'Magic Missile', 2, 4, 'Quarterstaff', 'Bow', 4, 2, 'Studded Leather', 'Robe', 'Leather', 1, 1, 2, 0, 0, 1, 5, 0);
+
+INSERT INTO `research` (email, pw, userid, r1pts, r13pts, r14pts) VALUES
+  ('tester@example.com', '16d7a4fca7442dda3ad93c9a726597e4', 1, 0, 0, 0),
+  ('idle@example.com',   'c1572d05424d0ecb2a65ec6a82aeacbf', 2, 0, 0, 0),
+  ('poor@example.com',   '3afc79b597f88a72528e864cf81856d2', 3, 0, 125000, 0);
+
+INSERT INTO `explore` (email, pw, userid) VALUES
+  ('tester@example.com', '16d7a4fca7442dda3ad93c9a726597e4', 1),
+  ('idle@example.com',   'c1572d05424d0ecb2a65ec6a82aeacbf', 2),
+  ('poor@example.com',   '3afc79b597f88a72528e864cf81856d2', 3);
+
+-- A guild exists so the guild and guild-forum pages are reachable. Without
+-- membership the crawler cannot enter roughly ten scripts at all, and they
+-- would silently sit outside the regression net.
+DELETE FROM `guild` WHERE gid = 1;
+INSERT INTO `guild` (gname, cpw, strength, gid, datemade, info, owner, mem, notice) VALUES
+  ('Testguild', '', 0, 1, '1/1/03, 12:00am', 'A guild used by the test fixtures.', 'TestLord', 2, 'None');
+
+UPDATE `user` SET guild = 'Testguild' WHERE userid IN (1, 2);
+
+-- Settlements 1 and 2 now hold the seeded users.
+UPDATE `settlement` SET members = 2, setname = 'Testhold'  WHERE setid = 1;
+UPDATE `settlement` SET members = 1, setname = 'Poorhaven' WHERE setid = 2;
+
+-- Make sure the game is not stuck mid-tick; update.php sets this to 'yes' and
+-- never resets it, which makes every page render "Tick in progress" and die.
+UPDATE `game_info` SET tick = 'no';

@@ -25,7 +25,7 @@ if ($signup) {
   $ipaddress = $_SERVER["REMOTE_ADDR"];
   //  select number of players
     $numberplayers = $db->query("SELECT count(userid) FROM user");
-    $noplayers = mysqli_field_seek($numberplayers, "noplayers");
+    $noplayers = mb_db_result($numberplayers, "noplayers");
   //  parse weird chars out of vars
     $ename = trim($ename);
     $ename = strip_tags($ename);
@@ -45,7 +45,7 @@ if ($signup) {
     $emnamecheck1 = strtolower($emnamecheck[0]);
   //  are they a multi?
     $ip_query = $db->query("SELECT count(userid) FROM user WHERE ip='$ipaddress'");
-    $check_ip = mysqli_field_seek($ip_query, "check_ip");
+    $check_ip = mb_db_result($ip_query, "check_ip");
 
   if($enamecheck1 == $ename1 AND $ename != "")  { echo "$ename is already being used!"; die();   }
   elseif($emnamecheck1 == $email1 AND $email != "") { echo "$email is already being used!";  die(); }
@@ -63,21 +63,21 @@ if ($signup) {
 
   //  select minimum amount of members
     $Sett_least = $db->query("SELECT min(members) FROM settlement");
-    $least_set = mysqli_field_seek($Sett_least,"least_set");
+    $least_set = mb_db_result($Sett_least,"least_set");
   //  select a random settlement
     $maxset0 = $db->query("SELECT max(setid) AS maxset FROM settlement");
-    $maxset = mysqli_field_seek($maxset0,"maxset");
+    $maxset = mb_db_result($maxset0,"maxset");
     $sel_mem = rand(1,$maxset);
   //  extract members from settlement
     $Random_mem = $db->query("SELECT members FROM settlement WHERE setid='$sel_mem'");
-    $R_Mem = mysqli_field_seek($Random_mem,"R_Mem");
+    $R_Mem = mb_db_result($Random_mem,"R_Mem");
 
   if($least_set != $R_Mem)  {
      $Sett_least = $db->query("SELECT min(members) FROM settlement");
-     $least_set = mysqli_field_seek($Sett_least,"least_set");
+     $least_set = mb_db_result($Sett_least,"least_set");
 
      $Sel_members = $db->query("SELECT setid FROM settlement WHERE members='$least_set'");
-     $sel_mem = mysqli_field_seek($Sel_members,"sel_mem");
+     $sel_mem = mb_db_result($Sel_members,"sel_mem");
   }
 
   if($least_set == $R_Mem)  {
@@ -91,7 +91,7 @@ if ($signup) {
 
   // create the account
   $buildingsuserid = $db->query("SELECT max(userid) FROM user");
-  $buserid = mysqli_field_seek($buildingsuserid,"buserid");
+  $buserid = mb_db_result($buildingsuserid,"buserid");
   $newbuserid = $buserid + 1;
 
   //  create activation code - bypassing validation for now
@@ -153,7 +153,7 @@ if ($signup) {
       VALUES ('$email', '$pw', '$newbuserid') ");
 
     $selectempire = $db->query("SELECT setid FROM user WHERE email='$email' AND pw='$pw'");
-    $semp = mysqli_field_seek($selectempire,"semp");
+    $semp = mb_db_result($selectempire,"semp");
 
     include("include/clock.php");
 

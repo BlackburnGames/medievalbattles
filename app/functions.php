@@ -12,7 +12,7 @@ $E_Check = mysqli_fetch_array($EMAIL_RESULT);
 if($login == 1 && $pw != "" && $email !="") {
 
 	$uuserid = $db->query("SELECT userid FROM user WHERE email = '$email' AND pw = '$pw'");
-	$userid = mysqli_field_seek($uuserid, 0);
+	$userid = mb_db_result($uuserid, 0);
 
 	// account validation
 	$validate_query = "SELECT * FROM emailvalidate WHERE userid='$userid'";
@@ -222,7 +222,7 @@ $return = mysqli_fetch_array($return_query);
 		$time4 = $return['time4'];		$TIME_4 = $return['time4'];
 	## fleets
 		$FLEETS_ = $db->query("SELECT fleets FROM user WHERE userid='$userid'");
-		$_FLEETS = mysqli_field_seek($FLEETS_, "_FLEETS");
+		$_FLEETS = mb_db_result($FLEETS_, "_FLEETS");
 
 //	total all units together
 	$warquery = "SELECT sum(amount) FROM barter WHERE seller='$ename' AND type='Warrior'";
@@ -434,7 +434,7 @@ $amrbutton = "<form type=get action=aconstruct.php><input class=button type=subm
 	$rechourly = round($rechourly);
 //	max guild id
 	$maxgid = $db->query("SELECT max(gid) FROM guild");
-	$mgid = mysqli_field_seek($maxgid,"mgid");
+	$mgid = mb_db_result($maxgid,"mgid");
 //	some military values
 	$twarriors = $warriors + $war1 + $war2 + $war3 + $war4;
 	$twizards = $wizards + $wiz1 + $wiz2 + $wiz3 + $wiz4;

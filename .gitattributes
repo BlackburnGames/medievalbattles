@@ -1,0 +1,12 @@
+# The dev stack runs in Linux containers and the helper scripts run under bash.
+# Without this, a clone on Windows gets CRLF and the shell scripts fail with
+# "\r: command not found", while Docker build files break more obscurely.
+*.sh            text eol=lf
+Dockerfile      text eol=lf
+*.ini           text eol=lf
+*.yml           text eol=lf
+
+# Golden-master files are compared byte for byte; a line-ending rewrite would
+# show up as a whole-file diff.
+tests/golden/** text eol=lf
+tests/known-issues.txt text eol=lf

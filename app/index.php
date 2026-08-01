@@ -1,16 +1,20 @@
 <?php
 
-if (!$computer_id || $computer_id == "")  {
+$computer_id = isset($_COOKIE['computer_id']) ? $_COOKIE['computer_id'] : '';
+
+if ($computer_id === '') {
   include("include/connect.php");
 
-  $query_get = mysqli_query("SELECT last_comp_id FROM game_info");
+  $query_get = mysqli_query($db, "SELECT last_comp_id FROM game_info");
   $last_id = mysqli_fetch_array($query_get);
 
-  $id = $last_id[last_comp_id] + 1;
+  $id = $last_id['last_comp_id'] + 1;
 
-  setcookie('computer_id', "$id", '9999999999999999999');
+  // Was '9999999999999999999', which overflows the expiry and made the cookie
+  // expire immediately, so a new id was minted on every request.
+  setcookie('computer_id', $id, time() + (10 * 365 * 24 * 60 * 60));
 
-  mysqli_query("UPDATE game_info SET last_comp_id='$id'");
+  mysqli_query($db, "UPDATE game_info SET last_comp_id='$id'");
 }
 ?>
 <html>
@@ -74,10 +78,13 @@ if (!$computer_id || $computer_id == "")  {
     </td>
     <td valign="top">
       <?php
-        $page = $_GET['page'];
-        if (!$page) {
+        // Was include($_GET['page'] . ".php") with no filtering at all, which
+        // let any local .php file be pulled in via a traversal path. basename()
+        // strips directory components and the file must actually exist here.
+        $page = isset($_GET['page']) ? basename((string) $_GET['page']) : '';
+        if ($page === '' || !preg_match('/^[A-Za-z0-9_-]+$/', $page) || !file_exists(__DIR__ . '/' . $page . '.php')) {
           $page = "main-site";
-        };
+        }
         include($page . ".php");
         echo $data;
       ?>

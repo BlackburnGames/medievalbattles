@@ -70,7 +70,7 @@ echo "</b></div><br><br>";
 
 if ($pageid == 'news')  {
   $empnews_sel = $db->query("SELECT count(yourid) FROM empnews WHERE yourid='$userid'") or die(mysql_error());
-  $emp_sel = mysqli_field_seek($empnews_sel, 0);
+  $emp_sel = mb_db_result($empnews_sel, 0);
 
 
   if($emp_sel == 0 OR $emp_sel == "") {

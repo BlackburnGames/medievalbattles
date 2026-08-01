@@ -8,7 +8,7 @@ echo "<p>Starting update process</p>";
 
   mysql_query("UPDATE game_info SET tick='yes'");
   $max_userid = mysql_db_query($dbnam, "SELECT max(userid) FROM user");
-  $max_UID = mysql_result($max_userid, 0, "max_UID");
+  $max_UID = mysql_result($max_userid, 0, 0);
 
 while($INC_ID < $max_UID + 1) {
       $query = "SELECT * FROM emailvalidate WHERE userid='$INC_ID'";
@@ -493,19 +493,19 @@ This email is automated. Your reply will not be recieved.";
 
   while($SET_INC < 31)  {
     $SET_STRENGTH = mysql_db_query($dbnam, "SELECT sum(exp) FROM user WHERE setid = '$SET_INC'");
-      $S_STRENGTH = mysql_result($SET_STRENGTH, 0, "S_STRENGTH");
+      $S_STRENGTH = mysql_result($SET_STRENGTH, 0, 0);
     mysql_query("UPDATE settlement SET setstrength = '$S_STRENGTH' WHERE setid='$SET_INC'");
     $SET_INC = $SET_INC + 1;
   }
 
   $MAX_GUILDID = mysql_db_query($dbnam, "SELECT max(gid) FROM guild");
-    $MAX_GID = mysql_result($MAX_GUILDID, 0, "MAX_GID");
+    $MAX_GID = mysql_result($MAX_GUILDID, 0, 0);
 
   while($GUILD_INC < $MAX_GID + 1)  {
     $guild_name_query = mysql_db_query($dbnam, "SELECT gname FROM guild WHERE gid='$GUILD_INC'");
       $guild_name = mysql_fetch_array($guild_name_query);
     $guild_user_exp = mysql_db_query($dbnam, "SELECT sum(exp) FROM user WHERE guild='$guild_name[gname]'");
-      $user_exp = mysql_result($guild_user_exp, 0, "user_exp");
+      $user_exp = mysql_result($guild_user_exp, 0, 0);
     mysql_query("UPDATE guild SET strength='$user_exp' WHERE gid='$GUILD_INC'");
 
     $GUILD_INC = $GUILD_INC + 1;

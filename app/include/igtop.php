@@ -15,7 +15,7 @@ function callback($buffer)
 include("functions.php");
 
 //$version_query = $db->query("SELECT version FROM game_info") or die(mysql_error());
-//  $version = mysqli_field_seek($version_query, "version");
+//  $version = mb_db_result($version_query, "version");
 ?>
 <html>
 <head>
@@ -60,7 +60,7 @@ if($safemode > 0) {
 
 // are ticks running?
 $tickk = $db->query("SELECT tick FROM game_info");
-$tick = mysqli_field_seek($tickk, "tick");
+$tick = mb_db_result($tickk, "tick");
 if($tick == yes)    {
   echo"<font class=yellow size=4px><center><br>Tick in progress.</center>";
   die();

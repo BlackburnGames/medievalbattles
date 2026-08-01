@@ -15,7 +15,7 @@ include("include/connect.php");
 include("include/clock.php");
 
 $uename = $db->query("SELECT ename FROM user WHERE email='$email' AND pw='$pw'");
-$ename = mysqli_field_seek($uename, "ename");
+$ename = mb_db_result($uename, "ename");
 
 // check user
 $query = "SELECT pw FROM user WHERE email='$email'";
@@ -32,7 +32,7 @@ if ($pwcheck[0] == $pw)	{
 	$db->query("UPDATE user SET current_comp_id='$computer_id' WHERE ename='$ename'");
 
 	$user_set_query = $db->query("SELECT setid FROM user WHERE email='$email' AND pw='$pw'");
-	$set = mysqli_field_seek($user_set_query, "set");
+	$set = mb_db_result($user_set_query, "set");
 
 	$db->query("UPDATE user SET csnum='$set' WHERE email='$email'");
 	unset($_SESSION['bad']);

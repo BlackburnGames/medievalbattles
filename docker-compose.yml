@@ -1,0 +1,57 @@
+# Local-only development stack for Medieval Battles v6.
+#
+# SECURITY: this app has unauthenticated SQL injection, local file inclusion,
+# and stored XSS (see CLAUDE.md). Both ports are deliberately bound to
+# 127.0.0.1 so nothing is reachable from the network. Do not change that.
+
+services:
+  db:
+    image: mysql:5.7
+    command:
+      # The 2003 schema and queries do not survive MySQL's modern defaults:
+      # STRICT_TRANS_TABLES rejects the partial INSERTs the app does, and
+      # ONLY_FULL_GROUP_BY rejects its aggregate queries.
+      - --sql-mode=NO_ENGINE_SUBSTITUTION
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mbv6
+      MYSQL_USER: mb
+      MYSQL_PASSWORD: mb
+    volumes:
+      # db.sql is schema-only; seed.sql adds the rows the app assumes exist.
+      - ./db.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./db/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
+      - dbdata:/var/lib/mysql
+    ports:
+      - "127.0.0.1:3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-umb", "-pmb"]
+      interval: 3s
+      timeout: 5s
+      retries: 30
+
+  web:
+    build: ./docker/php
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      MB_DB_HOST: db
+      MB_DB_NAME: mbv6
+      MB_DB_USER: mb
+      MB_DB_PASS: mb
+      # Emulates PHP 4 register_globals. Required: every form handler in this
+      # app reads bare $pageid / $gid / $umessage and is inert without it.
+      MB_REGISTER_GLOBALS: "1"
+    volumes:
+      # app/ is the docroot; the repo root is also mounted because update.php
+      # includes "app/include/..." and must run with the root as CWD.
+      - ./:/repo
+      - ./app:/var/www/html
+    ports:
+      - "127.0.0.1:8080:80"
+
+volumes:
+  dbdata:
