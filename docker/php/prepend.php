@@ -4,8 +4,8 @@
  *
  * php.ini can only auto_prepend one file, and two unrelated things need to run
  * before every request. Keeping them in separate files matters: compat.php is
- * migration debt that shrinks to nothing when Phase 2 completes, whereas this
- * file is harness support and stays.
+ * migration debt -- now down to a single disabled block -- whereas this file
+ * is harness support and stays.
  */
 
 require_once __DIR__ . '/compat.php';

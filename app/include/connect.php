@@ -10,6 +10,18 @@
  */
 
 /**
+ * mb_db_result() rides along with the connection.
+ *
+ * Every one of its ~47 call sites runs a query, so every one of them reaches
+ * this file -- several only transitively, through functions.php or igtop.php,
+ * which is why the helper is required here rather than included at each site.
+ * __DIR__ because includes in this codebase are otherwise CWD-relative and the
+ * CWD differs between pages (app/), update.php (repo root) and the admin area
+ * (app/css/admin/).
+ */
+require_once __DIR__ . '/db.php';
+
+/**
  * PHP 8.1 made mysqli throw on error instead of returning false. That is the
  * better default, but it is not what this code was written against: it fires
  * ~1300 unchecked queries, several of which have never succeeded (the guild

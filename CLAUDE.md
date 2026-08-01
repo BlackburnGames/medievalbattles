@@ -82,7 +82,7 @@ The abandoned PHP 7 port "fixed" these by resolving the name, which returns null
 - `mysqli_field_seek(...)` (which returns a bool, not a value) had been substituted for `mysql_result` in the converted files.
 - `update.php` was rewritten to the 3-arg form asking for non-existent columns, which disabled **the entire game tick** — the user loop exited immediately.
 
-`mb_db_result($result, $field, $row)` now serves every call site. Note the argument order is *not* `mysql_result`'s: field comes second. It resolves the field name when the query genuinely has that alias and falls back to column 0 otherwise, which is what the 2003 code effectively did. That fallback is load-bearing, not defensive — resolving strictly would return null across signup, login and the guild code.
+`mb_db_result($result, $field, $row)` (in `app/include/db.php`) now serves every call site. Note the argument order is *not* `mysql_result`'s: field comes second. It resolves the field name when the query genuinely has that alias and falls back to column 0 otherwise, which is what the 2003 code effectively did. That fallback is load-bearing, not defensive — resolving strictly would return null across signup, login and the guild code.
 
 When porting a call site: reproduce *column 0 of row 0*, not the name, unless you have confirmed the query has that alias.
 
@@ -117,9 +117,12 @@ Phase 3 should invert the dependency: have the engine read `$GAMEDATA` instead o
 
 `auto_prepend_file` points at `docker/php/prepend.php`, which is harness support and stays: it loads the compat layer and decides whether `display_errors` is on for this request. **Errors are off in the browser and on for the test harness**, which opts in with an `X-MB-Show-Errors: 1` header — a logged-in page emits hundreds of notices, which makes the game unreadable but is exactly what the crawler asserts on. Everything is logged to stderr regardless.
 
-`docker/php/compat.php` is what it loads. It now supplies only `mb_db_result()`, `mb_client_hostname()`, and a `register_globals` emulation gated behind `MB_REGISTER_GLOBALS=1`. The `mysql_db_query()`, `mysql_result()`, `ereg_replace()` and `session_register()` sections were retired in Phase 2 when their call sites were converted.
+`docker/php/compat.php` is what it loads, and it is now down to a single **disabled** block: the `register_globals` emulation gated behind `MB_REGISTER_GLOBALS=1`, which is `"0"`. The `mysql_db_query()`, `mysql_result()`, `ereg_replace()` and `session_register()` sections were retired in Phase 2 when their call sites were converted. `mb_db_result()` and `mb_client_hostname()` moved into the app, where they belong — they were never shims for functions PHP removed, they only lived in the prepend because that saved writing an include line at ~47 call sites:
 
-**Treat it as a debt checklist, not infrastructure.** Each section has a stated exit condition. `register_globals` is now switched off (`MB_REGISTER_GLOBALS: "0"`) and the block is kept only as a bisection aid — flip it to `"1"` to test whether a bug on an uncrawled page is a porting regression, and delete it outright once those pages have coverage. What is genuinely left is moving `mb_db_result()` and `mb_client_hostname()` into `app/include/`, after which nothing but harness support remains.
+- **`app/include/db.php`** — `mb_db_result()`, required by `connect.php` with `__DIR__` (not CWD-relative, because the CWD differs between pages, `update.php` and the admin area). Every call site runs a query, so every call site reaches `connect.php`, several only through `functions.php` or `igtop.php`.
+- **`app/include/hostname.php`** — `mb_client_hostname()`, included by `common.php` and `commong.php`, its only two callers.
+
+**Treat what is left as a debt checklist, not infrastructure.** The `register_globals` block is kept only as a bisection aid — flip it to `"1"` to test whether a bug on an uncrawled page is a porting regression. Delete the file, the env var and `prepend.php`'s `require` once those pages have coverage; after that the prepend is nothing but the `display_errors` switch, which stays.
 
 ## Porting notes
 
