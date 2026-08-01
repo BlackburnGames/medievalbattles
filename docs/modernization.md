@@ -131,6 +131,28 @@ In progress. The known work, in no committed order:
   They were also the only two pages where a guard could be *verified*, because
   closing the coverage gap put them on the crawl. Anywhere the suite still does
   not reach, adding a check is a guess about what the check should permit.
+
+  **The admin area under `app/css/admin/` has no gate at all.** `adminlogin.php`
+  compares against a hardcoded `mako` / `quickshot` and, on success, prints a
+  link to `main.php`. That is the entire mechanism: no session is written, and
+  nothing in the area asks whether one exists, so every page in it serves to
+  anyone who types the URL. Deciding what should replace it is a design
+  question, not a port — the credentials, the session and the ~1300-query
+  surface it exposes all need answering together.
+
+- **Two blind spots in `register-globals-audit.php`,** both of which hid a
+  read the Phase 2 port then missed. One is fixed and one is not:
+
+  - ~~It skipped every name beginning with `_`~~ to avoid reporting the
+    superglobals, and caught `$_mace` with it. **Fixed** — it names the nine
+    superglobals now. That read being missing left the Mace button inert, and
+    with it the six priest weapons that check the Mace as a prerequisite.
+  - **It credits a shared include for a name even in files that do not include
+    it.** `adminlogin.php` reads `$pw`, which `include/session.php` assigns —
+    but that file includes nothing except `request.php`, so the read was
+    suppressed and the port missed it. The admin login has rejected every
+    attempt since. Fixing the audit means resolving includes per file rather
+    than globally, and it will surface entries the ratchet has to absorb.
 - **Invert the manual dependency** so the engine reads `$GAMEDATA` rather than
   its inline literals.
 
