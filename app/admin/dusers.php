@@ -21,14 +21,14 @@ $result_id = mysqli_query($db, "SELECT ename, email, ip, signup_comp_id, current
 while ($row = mysqli_fetch_row($result_id))	{
 	echo "
 	<tr align=center valign=top colspan=10>
-		<td><tt>$row[0]</tt></td>
-		<td><tt>$row[1]</tt></td>
-		<td><tt>$row[2]</tt></td>
-		<td><tt>$row[3]</tt></td>
-		<td><tt>$row[4]</tt></td>
-		<td><tt>$row[5]</tt></td>
-		<td><tt>$row[6]</tt></td>
-		<td><tt>$row[7]</tt></td>";
+		<td><tt>" . mb_h($row[0]) . "</tt></td>
+		<td><tt>" . mb_h($row[1]) . "</tt></td>
+		<td><tt>" . mb_h($row[2]) . "</tt></td>
+		<td><tt>" . mb_h($row[3]) . "</tt></td>
+		<td><tt>" . mb_h($row[4]) . "</tt></td>
+		<td><tt>" . mb_h($row[5]) . "</tt></td>
+		<td><tt>" . mb_h($row[6]) . "</tt></td>
+		<td><tt>" . mb_h($row[7]) . "</tt></td>";
 }
 echo "</table><br>
 </td>

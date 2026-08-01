@@ -175,7 +175,9 @@ php tests/xss-audit.php --stored --accept    # re-accept it
 player at some point. Two baselines rather than one, so the default list keeps
 meaning exactly what this section says it means. `xss-stored.txt` opened at 116
 and is the superset — a fix that clears an entry there usually clears one here
-too.
+too. **It is also at zero now**, which moves what this whole audit is guarding:
+the job is no longer working through a list, it is that a new echo of a stored
+value has to go through `mb_h()` or `mb_attr()` or the run goes red.
 
 Each entry records the HTML context, because it decides the fix:
 

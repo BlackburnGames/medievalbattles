@@ -116,28 +116,28 @@ else	{
 
 echo"
 			<div align=center>
-				<font class=yellow>You have successfully gathered information on $evu[ename] and you only lost 3% of your thieves!<font>
+				<font class=yellow>You have successfully gathered information on " . mb_h($evu['ename']) . " and you only lost 3% of your thieves!<font>
 			</div><br><br>
 
 			The number in () is the power for the unit.<br>
 			<table border=1 width=40% align=center bordercolor=#000000>
-				<tr><td class=main>Empire stats of $evu[ename] ($evu[setid])</td>
+				<tr><td class=main>Empire stats of " . mb_h($evu['ename']) . " (" . mb_h($evu['setid']) . ")</td>
 				<tr>
 					<td class=inner2>
-						Race: $evu[race]<br>
-						Class: $evu[class]<br>
-						Gold Pieces: $evu[gp]<br>
-						Iron: $evu[iron]<br>
-						Lumber: $evu[lumber]<br>
-						Civilians: $evm[civ]<br>
-						Thieves: $evm[thieves]<br>
-						Wooden Platforms: $evb[wp]<br>
-						Warriors: $evm[warriors] ($evm[warpower])<br>
-						Wizards: $evm[wizards] ($evm[wizpower])<br>
-						Priests: $evm[priests] ($evm[pripower])<br>
-						Archers: $evm[archers] ($evm[archpower])<br>
-						Catapults: $evm[catapult] (30)<br>
-						Defense: $evdef<br>
+						Race: " . mb_h($evu['race']) . "<br>
+						Class: " . mb_h($evu['class']) . "<br>
+						Gold Pieces: " . mb_h($evu['gp']) . "<br>
+						Iron: " . mb_h($evu['iron']) . "<br>
+						Lumber: " . mb_h($evu['lumber']) . "<br>
+						Civilians: " . mb_h($evm['civ']) . "<br>
+						Thieves: " . mb_h($evm['thieves']) . "<br>
+						Wooden Platforms: " . mb_h($evb['wp']) . "<br>
+						Warriors: " . mb_h($evm['warriors']) . " (" . mb_h($evm['warpower']) . ")<br>
+						Wizards: " . mb_h($evm['wizards']) . " (" . mb_h($evm['wizpower']) . ")<br>
+						Priests: " . mb_h($evm['priests']) . " (" . mb_h($evm['pripower']) . ")<br>
+						Archers: " . mb_h($evm['archers']) . " (" . mb_h($evm['archpower']) . ")<br>
+						Catapults: " . mb_h($evm['catapult']) . " (30)<br>
+						Defense: " . mb_h($evdef) . "<br>
 					</td>
 			</table>";
 		    

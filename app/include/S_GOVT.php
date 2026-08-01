@@ -37,14 +37,14 @@ while ($row = mysqli_fetch_row($result_id))	{
 			}
 	echo "
 		<tr align='center' valign='top' colspan='7'>
-			<td bgcolor=$color>$row[0]</td>";
+			<td bgcolor=$color>" . mb_h($row[0]) . "</td>";
 if($AIMcheck[0] != "")	{	echo "<td bgcolor=$color>$AIM_VAR</td>";	}
 else	{	echo "<td bgcolor=$color></td>";	}
 	echo "
-			<td bgcolor=$color>$row[2]</td>
-			<td bgcolor=$color>$row[3]</td>
-			<td bgcolor=$color>$row[4]</td>
-			<td bgcolor=$color>$row[5]</td>\n";
+			<td bgcolor=$color>" . mb_h($row[2]) . "</td>
+			<td bgcolor=$color>" . mb_h($row[3]) . "</td>
+			<td bgcolor=$color>" . mb_h($row[4]) . "</td>
+			<td bgcolor=$color>" . mb_h($row[5]) . "</td>\n";
 }
 
 echo "</table>"; 

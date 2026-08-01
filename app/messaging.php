@@ -52,7 +52,7 @@ else	{
 		mysqli_query($db, "UPDATE user SET mno='$thenum' WHERE userid=$q_empvalue");
 		mysqli_query($db, "INSERT INTO messages (origin, datesent, yourid, message, mid)		VALUES	('$ename', '$clock', $q_empvalue, " . mb_sql_str($db, $umessage) . ", '$ymid') ");
 	
-		echo"<div align=center><font class=yellow>Your message has been sent to $empireattacked.</font></div></center>";
+		echo"<div align=center><font class=yellow>Your message has been sent to " . mb_h($empireattacked) . ".</font></div></center>";
 		include("include/S_MESS.php"); 
 		die();
 	}

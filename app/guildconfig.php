@@ -80,7 +80,7 @@ else	{
 		mb_news_guild($db, "$clock", 'blue', "$applicant_ename[ename] has joined $empireguild", $guild_info['gid'], $gnid);
 		mysqli_query($db, "DELETE FROM guildrequests WHERE applicant=$q_auserid");
 
-		echo "<div align=center><font class=yellow><b>$applicant_ename[ename] has been accepted into the guild!</b></font></div>";
+		echo "<div align=center><font class=yellow><b>" . mb_h($applicant_ename['ename']) . " has been accepted into the guild!</b></font></div>";
 		die();
 	}
 	else	{
@@ -105,7 +105,7 @@ else	{
 		mb_news_emp($db, "$clock", 'blue', "You were rejected from $guild_info[gname].", $q_auserid);
 		mysqli_query($db, "DELETE FROM guildrequests WHERE applicant=$q_auserid AND gl_userid='$userid'");
 
-		echo "<div align=center><font class=yellow><b>$applicant_ename[ename] has been rejected from the guild!</b></font></div>";
+		echo "<div align=center><font class=yellow><b>" . mb_h($applicant_ename['ename']) . " has been rejected from the guild!</b></font></div>";
 		die();
 	}
 }
@@ -171,7 +171,7 @@ else	{
 		mb_news_emp($db, "$clock", 'blue', "You were removed from $guild_info[gname].", $q_remp);
 		mb_news_guild($db, "$clock", 'blue', "$empire_info[0] has been removed from the guild.", $guild_info['gid'], 0);
 
-		echo"<div align=center><font class=yellow>$empire_info[0] has been removed from your guild.</font></div>";
+		echo"<div align=center><font class=yellow>" . mb_h($empire_info[0]) . " has been removed from your guild.</font></div>";
 		include("include/S_GKICK.php");
 		include("include/S_GDEL.php");
 		die();

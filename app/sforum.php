@@ -39,11 +39,11 @@ echo "
 
 echo "
 					<tr bgcolor=$color2>
-						<td valign=top><strong class=black-small><a href=" . mb_attr("topic.php?topicid={$r['topicid']}") . ">{$r['topic']}</a></strong></td>
-						<td valign=top align=center>$treplies</td>
+						<td valign=top><strong class=black-small><a href=" . mb_attr("topic.php?topicid={$r['topicid']}") . ">" . mb_h($r['topic']) . "</a></strong></td>
+						<td valign=top align=center>" . mb_h($treplies) . "</td>
 						<td valign=top align=center><strong class=black-small>" . mb_h($r['name']) . mb_sl_badge($r['name'], $mb_leader) . "</strong></td>
 						<td valign=top align=center><strong class=black-small>" . mb_h($r['lastposter']) . mb_sl_badge($r['lastposter'], $mb_leader) . "</strong></td>
-						<td valign=top align=center>{$r['lastpost']}</td>
+						<td valign=top align=center>" . mb_h($r['lastpost']) . "</td>
 					</tr>";
 	}
 }

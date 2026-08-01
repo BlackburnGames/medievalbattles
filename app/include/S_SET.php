@@ -78,13 +78,13 @@ while ($row = mysqli_fetch_row($result_id))  {
 
   echo "
   <tr align=center valign=top colspan=7>
-    <td bgcolor=$color><a href=" . mb_attr("messaging.php?send_to=$row[0]&snum=$N_NUM&setchg=1") . "><font class=$yclass>$row[1]</a>$O_line</td>
-    <td bgcolor=$color><font class=$yclass>$row[2]</td>
-    <td bgcolor=$color><font class=$yclass>$row[3]</td>
-    <td bgcolor=$color><font class=$yclass>$row[4]</td>
-    <td bgcolor=$color><font class=$yclass>$row[5]</td>
-    <td bgcolor=$color><font class=$yclass>$row[6]</td>
-    <td bgcolor=$color><font class=$yclass>$row[7]</td>\n";
+    <td bgcolor=$color><a href=" . mb_attr("messaging.php?send_to=$row[0]&snum=$N_NUM&setchg=1") . "><font class=$yclass>" . mb_h($row[1]) . "</a>$O_line</td>
+    <td bgcolor=$color><font class=$yclass>" . mb_h($row[2]) . "</td>
+    <td bgcolor=$color><font class=$yclass>" . mb_h($row[3]) . "</td>
+    <td bgcolor=$color><font class=$yclass>" . mb_h($row[4]) . "</td>
+    <td bgcolor=$color><font class=$yclass>" . mb_h($row[5]) . "</td>
+    <td bgcolor=$color><font class=$yclass>" . mb_h($row[6]) . "</td>
+    <td bgcolor=$color><font class=$yclass>" . mb_h($row[7]) . "</td>\n";
 }
 
   $COUNT_MEMBERS = mysqli_query($db, "SELECT count(userid) FROM user WHERE setid = " . mb_sql_int($N_NUM));
@@ -111,5 +111,5 @@ $SET_STRENGTH = mysqli_query($db, "SELECT sum(exp) FROM user WHERE setid=" . mb_
   $S_STRENGTH = mb_db_result($SET_STRENGTH,"S_STRENGTH");
   $S_STRENGTH = number_format($S_STRENGTH);
 
-echo "<br><div align=center><b><font class=red>Settlement Strength:</font></b> $S_STRENGTH</div></td></table>";
+echo "<br><div align=center><b><font class=red>Settlement Strength:</font></b> " . mb_h($S_STRENGTH) . "</div></td></table>";
 ?>

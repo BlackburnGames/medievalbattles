@@ -252,7 +252,7 @@ else	{
 	mysqli_query($db, "DELETE FROM barter WHERE barterid=$q_bid");
 	mysqli_query($db, "UPDATE user SET nno=" . mb_sql_int($their_new) . " WHERE userid=$q_b_userid");
 	mysqli_query($db, "UPDATE user SET nno=" . mb_sql_int($your_new_nno) . " WHERE userid='$userid'");
-	echo"<font class=yellow><div align=center>You have bartered with $b_seller.<br><br></font></div>";
+	echo"<font class=yellow><div align=center>You have bartered with " . mb_h($b_seller) . ".<br><br></font></div>";
 	include($mb_panel);
 }
 

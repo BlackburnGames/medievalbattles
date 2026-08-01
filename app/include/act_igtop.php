@@ -16,7 +16,7 @@ $version_query = mysqli_query($db, "SELECT version FROM game_info");
 ?>
 <html>
 <head> 
-<title>Medieval Battles .:::. <? echo "$version"; ?></title>
+<title>Medieval Battles .:::. <? echo mb_h($version); ?></title>
 	<link rel=stylesheet type="text/css" href="css/ingame.css">
 </head>
 

@@ -14,7 +14,7 @@ echo "
 	<b>Current Game Information</b><br>
 	<br>
 	Slots: 450<br>
-	Slots Taken: $num_players<br>
+	Slots Taken: " . mb_h($num_players) . "<br>
 	Slots Left: $spots_left<br>
 
 	</body>

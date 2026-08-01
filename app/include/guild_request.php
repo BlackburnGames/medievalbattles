@@ -19,8 +19,8 @@ while ($row = mysqli_fetch_row($result_id))	{
 
 	echo "
 	<tr align=center valign=top colspan=6>
-		<td bgcolor=#404040>$applicant[ename] ($applicant[setid])</td>
-		<td bgcolor=#404040>$applicant[exp]</td>
+		<td bgcolor=#404040>" . mb_h($applicant['ename']) . " (" . mb_h($applicant['setid']) . ")</td>
+		<td bgcolor=#404040>" . mb_h($applicant['exp']) . "</td>
 		<td bgcolor=#404040><a href=" . mb_attr("guildconfig.php?accept=true&auserid=$row[0]") . ">Accept</a> / <a href=" . mb_attr("guildconfig.php?reject=true&auserid=$row[0]") . ">Reject</a></td>";
 	}
 echo "</table>";

@@ -40,10 +40,10 @@ echo "
 echo "
 	<tr align='center' valign='top' colspan='7'>
 		<td bgcolor='#404040'>$placeno</td>
-		<td bgcolor='#404040' align='left'><font class='red'><b>$row[0] ($SID_S)</b> </font><i>$E_S_G</i></td>
-		<td bgcolor='#404040'>$row[1]</td>
-		<td bgcolor='#404040'>$row[2]</td>
-		<td bgcolor='#404040'>$row[3]</td>";
+		<td bgcolor='#404040' align='left'><font class='red'><b>" . mb_h($row[0]) . " (" . mb_h($SID_S) . ")</b> </font><i>" . mb_h($E_S_G) . "</i></td>
+		<td bgcolor='#404040'>" . mb_h($row[1]) . "</td>
+		<td bgcolor='#404040'>" . mb_h($row[2]) . "</td>
+		<td bgcolor='#404040'>" . mb_h($row[3]) . "</td>";
 }
 echo "
 </table> 

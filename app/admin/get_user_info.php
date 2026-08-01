@@ -65,37 +65,37 @@ echo"
 			</tr>
 			<tr>
 				<td>
-					Empire Name: $evu[ename]<br>
-					Email: $evu[email]<br>
-					Password: $evu[pw]<br>
-					Setid: $evu[setid]<br>
-					GP: $evu[gp]<br>
-					Iron: $evu[iron]<br>
-					Lumber: $evu[lumber]<br>
-					Exp: $evu[exp]<br>
-					Land: $evu[land]<br>
-					Mountains: $evu[mts]<br>
-					AIM: $evu[aim]<br>
-					MSN: $evu[msn]<br>
+					Empire Name: " . mb_h($evu['ename']) . "<br>
+					Email: " . mb_h($evu['email']) . "<br>
+					Password: " . mb_h($evu['pw']) . "<br>
+					Setid: " . mb_h($evu['setid']) . "<br>
+					GP: " . mb_h($evu['gp']) . "<br>
+					Iron: " . mb_h($evu['iron']) . "<br>
+					Lumber: " . mb_h($evu['lumber']) . "<br>
+					Exp: " . mb_h($evu['exp']) . "<br>
+					Land: " . mb_h($evu['land']) . "<br>
+					Mountains: " . mb_h($evu['mts']) . "<br>
+					AIM: " . mb_h($evu['aim']) . "<br>
+					MSN: " . mb_h($evu['msn']) . "<br>
 				</td>
 				<td>
-					Generals: $evu[fleets]<br>
+					Generals: " . mb_h($evu['fleets']) . "<br>
 						<hr width=10%>
-					Warriors: $evm[warriors]<br>
-					Warrior Weapon: $evm[cweapon]<br>
-					Warrior Armor: $evm[wararmor]<br>
+					Warriors: " . mb_h($evm['warriors']) . "<br>
+					Warrior Weapon: " . mb_h($evm['cweapon']) . "<br>
+					Warrior Armor: " . mb_h($evm['wararmor']) . "<br>
 						<hr width=10%>
-					Priests: $evm[priests]<br>
-					Priest Weapon: $evm[cstaff]<br>
-					Warrior Armor: $evm[priarmor]<br>
+					Priests: " . mb_h($evm['priests']) . "<br>
+					Priest Weapon: " . mb_h($evm['cstaff']) . "<br>
+					Warrior Armor: " . mb_h($evm['priarmor']) . "<br>
 						<hr width=10%>
-					Wizards: $evm[wizards]<br>
-					Wizard Spell: $evm[cspell]<br>
-					Warrior Armor: $evm[wizarmor]<br>
+					Wizards: " . mb_h($evm['wizards']) . "<br>
+					Wizard Spell: " . mb_h($evm['cspell']) . "<br>
+					Warrior Armor: " . mb_h($evm['wizarmor']) . "<br>
 						<hr width=10%>
-					Archers: $evm[archers]<br>
-					Archer Weapon: $evm[cbow]<br>
-					Warrior Armor: $evm[archarmor]<br>
+					Archers: " . mb_h($evm['archers']) . "<br>
+					Archer Weapon: " . mb_h($evm['cbow']) . "<br>
+					Warrior Armor: " . mb_h($evm['archarmor']) . "<br>
 				</td>
 			</tr>
 			<tr>
@@ -108,36 +108,36 @@ echo"
 			</tr>
 			<tr>
 				<td class=inner2>
-					Available Mountains: $evb[amts]<br>
-					Available Land: $evb[aland]<br>
-					Homes: $evb[home]<br>
-					Barracks: $evb[barrack]<br>
-					Farms: $evb[farm]<br>
-					Wooden Platforms: $evb[wp]<br>
-					Lumber Mills: $evb[lmill]<br>
-					Gold Mines: $evb[gm]<br>
-					Iron Mines: $evb[im]<br>
+					Available Mountains: " . mb_h($evb['amts']) . "<br>
+					Available Land: " . mb_h($evb['aland']) . "<br>
+					Homes: " . mb_h($evb['home']) . "<br>
+					Barracks: " . mb_h($evb['barrack']) . "<br>
+					Farms: " . mb_h($evb['farm']) . "<br>
+					Wooden Platforms: " . mb_h($evb['wp']) . "<br>
+					Lumber Mills: " . mb_h($evb['lmill']) . "<br>
+					Gold Mines: " . mb_h($evb['gm']) . "<br>
+					Iron Mines: " . mb_h($evb['im']) . "<br>
 				</td>
 				<td>
-					Warriors (party 1): $evr[war1]<br>
-					Priests (party 1): $evr[pri1]<br>
-					Wizards (party 1): $evr[wiz1]<br>
-					Archers (party 1): $evr[arch1]<br>
+					Warriors (party 1): " . mb_h($evr['war1']) . "<br>
+					Priests (party 1): " . mb_h($evr['pri1']) . "<br>
+					Wizards (party 1): " . mb_h($evr['wiz1']) . "<br>
+					Archers (party 1): " . mb_h($evr['arch1']) . "<br>
 						<hr width=10%>
-					Warriors (party 2): $evr[war2]<br>
-					Priests (party 2): $evr[pri2]<br>
-					Wizards (party 2): $evr[wiz2]<br>
-					Archers (party 2): $evr[arch2]<br>
+					Warriors (party 2): " . mb_h($evr['war2']) . "<br>
+					Priests (party 2): " . mb_h($evr['pri2']) . "<br>
+					Wizards (party 2): " . mb_h($evr['wiz2']) . "<br>
+					Archers (party 2): " . mb_h($evr['arch2']) . "<br>
 						<hr width=10%>
-					Warriors (party 3): $evr[war3]<br>
-					Priests (party 3): $evr[pri3]<br>
-					Wizards (party 3): $evr[wiz3]<br>
-					Archers (party 3): $evr[arch3]<br>
+					Warriors (party 3): " . mb_h($evr['war3']) . "<br>
+					Priests (party 3): " . mb_h($evr['pri3']) . "<br>
+					Wizards (party 3): " . mb_h($evr['wiz3']) . "<br>
+					Archers (party 3): " . mb_h($evr['arch3']) . "<br>
 						<hr width=10%>	
-					Warriors (party 4): $evr[war4]<br>
-					Priests (party 4): $evr[pri4]<br>
-					Wizards (party 4): $evr[wiz4]<br>
-					Archers (party 4): $evr[arch4]<br>
+					Warriors (party 4): " . mb_h($evr['war4']) . "<br>
+					Priests (party 4): " . mb_h($evr['pri4']) . "<br>
+					Wizards (party 4): " . mb_h($evr['wiz4']) . "<br>
+					Archers (party 4): " . mb_h($evr['arch4']) . "<br>
 				</td>
 			</tr>
 			<tr>
@@ -150,24 +150,24 @@ echo"
 			</tr>
 			<tr>
 				<td>
-					Explorers on Land: $eve[expland]<br>
-					Explorers on Mountains: $eve[expmt]<br>
+					Explorers on Land: " . mb_h($eve['expland']) . "<br>
+					Explorers on Mountains: " . mb_h($eve['expmt']) . "<br>
 				</td>
 				<td>
-					r1: $evres[r1]&nbsp; &nbsp; &nbsp; r1pts: $evres[r1pts]<br>
-					r2: $evres[r2]&nbsp; &nbsp; &nbsp; r2pts: $evres[r2pts]<br>
-					r3: $evres[r3]&nbsp; &nbsp; &nbsp; r3pts: $evres[r3pts]<br>
-					r4: $evres[r4]&nbsp; &nbsp; &nbsp; r4pts: $evres[r4pts]<br>
-					r5: $evres[r5]&nbsp; &nbsp; &nbsp; r5pts: $evres[r5pts]<br>
-					r6: $evres[r6]&nbsp; &nbsp; &nbsp; r6pts: $evres[r6pts]<br>
-					r7: $evres[r7]&nbsp; &nbsp; &nbsp; r7pts: $evres[r7pts]<br>
-					r8: $evres[r8]&nbsp; &nbsp; &nbsp; r8pts: $evres[r8pts]<br>
-					r9: $evres[r9]&nbsp; &nbsp; &nbsp; r9pts: $evres[r9pts]<br>
-					r10: $evres[r10]&nbsp; &nbsp; &nbsp; r10pts: $evres[r10pts]<br>
-					r11: $evres[r11]&nbsp; &nbsp; &nbsp; r11pts: $evres[r11pts]<br>
-					r12: $evres[r12]&nbsp; &nbsp; &nbsp; r12pts: $evres[r12pts]<br>
-					r13: $evres[r13]&nbsp; &nbsp; &nbsp; r13pts: $evres[r13pts]<br>
-					r14: $evres[r14]&nbsp; &nbsp; &nbsp; r14pts: $evres[r14pts]
+					r1: " . mb_h($evres['r1']) . "&nbsp; &nbsp; &nbsp; r1pts: " . mb_h($evres['r1pts']) . "<br>
+					r2: " . mb_h($evres['r2']) . "&nbsp; &nbsp; &nbsp; r2pts: " . mb_h($evres['r2pts']) . "<br>
+					r3: " . mb_h($evres['r3']) . "&nbsp; &nbsp; &nbsp; r3pts: " . mb_h($evres['r3pts']) . "<br>
+					r4: " . mb_h($evres['r4']) . "&nbsp; &nbsp; &nbsp; r4pts: " . mb_h($evres['r4pts']) . "<br>
+					r5: " . mb_h($evres['r5']) . "&nbsp; &nbsp; &nbsp; r5pts: " . mb_h($evres['r5pts']) . "<br>
+					r6: " . mb_h($evres['r6']) . "&nbsp; &nbsp; &nbsp; r6pts: " . mb_h($evres['r6pts']) . "<br>
+					r7: " . mb_h($evres['r7']) . "&nbsp; &nbsp; &nbsp; r7pts: " . mb_h($evres['r7pts']) . "<br>
+					r8: " . mb_h($evres['r8']) . "&nbsp; &nbsp; &nbsp; r8pts: " . mb_h($evres['r8pts']) . "<br>
+					r9: " . mb_h($evres['r9']) . "&nbsp; &nbsp; &nbsp; r9pts: " . mb_h($evres['r9pts']) . "<br>
+					r10: " . mb_h($evres['r10']) . "&nbsp; &nbsp; &nbsp; r10pts: " . mb_h($evres['r10pts']) . "<br>
+					r11: " . mb_h($evres['r11']) . "&nbsp; &nbsp; &nbsp; r11pts: " . mb_h($evres['r11pts']) . "<br>
+					r12: " . mb_h($evres['r12']) . "&nbsp; &nbsp; &nbsp; r12pts: " . mb_h($evres['r12pts']) . "<br>
+					r13: " . mb_h($evres['r13']) . "&nbsp; &nbsp; &nbsp; r13pts: " . mb_h($evres['r13pts']) . "<br>
+					r14: " . mb_h($evres['r14']) . "&nbsp; &nbsp; &nbsp; r14pts: " . mb_h($evres['r14pts']) . "
 				</td>
 			</tr>
 			</table><br>";
@@ -192,13 +192,13 @@ echo "
 				<td class=inner2 width=20%><b>Date</b></td>
 				<td class=inner22><b>News</b></td>";
 
-	$query_string = "SELECT date, news FROM empnews WHERE yourid=$q_evuid ORDER BY date DESC";
+	$query_string = "SELECT date, news, class FROM empnews WHERE yourid=$q_evuid ORDER BY date DESC";
 	$result_id = mysqli_query($db, $query_string);
 	while ($row = mysqli_fetch_row($result_id))	{
 		echo "
 			<tr align=left valign=TOP>
-				<td bgcolor=404040>$row[0]</td>
-				<td bgcolor=404040>$row[1]</td>\n";
+				<td bgcolor=404040>" . mb_h($row[0]) . "</td>
+				<td bgcolor=404040>" . mb_news_html($row[2], $row[1]) . "</td>\n";
 	}
 
 	die();

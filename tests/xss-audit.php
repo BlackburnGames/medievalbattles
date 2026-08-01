@@ -74,10 +74,15 @@ $MB_XSS_CALLS = $stored ? $MB_STORED_CALLS : $MB_SOURCE_CALLS;
  * through it, but it is called as strip_tags($message, "<i>,<b>"), and an
  * allowed tag keeps its attributes: <i onmouseover=...> survives intact.
  * nl2br() is not here either, for the obvious reason.
+ *
+ * mb_news_html() is, because it is mb_rich() on the text and a whitelist on the
+ * category -- an unknown class falls back rather than reaching the attribute --
+ * so neither of its two arguments can leave it as markup. It is the only
+ * renderer in the app with that property, which is the point of it existing.
  */
 $MB_HTML_SANITIZERS = array_merge($MB_SANITIZERS, array(
     'htmlspecialchars', 'htmlentities', 'urlencode', 'rawurlencode',
-    'number_format', 'date', 'mb_h', 'mb_attr', 'mb_rich',
+    'number_format', 'date', 'mb_h', 'mb_attr', 'mb_rich', 'mb_news_html',
 ));
 
 /** How bad each context is, worst last. */

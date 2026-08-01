@@ -141,7 +141,7 @@ if (!IsSet($change)) {
       mysqli_query($db, "UPDATE user SET sl='yes' WHERE ename = '$MV_emp' AND setid='$setid'");
     }
 
-    echo"<div align=center><font class=yellow>You have voted for $fename.</font></div><br>";
+    echo"<div align=center><font class=yellow>You have voted for " . mb_h($fename) . ".</font></div><br>";
     include ("include/S_GOVT.php");
     die();
   }
@@ -193,7 +193,7 @@ if (!IsSet($change)) {
       mysqli_query($db, "UPDATE user SET sl='yes' WHERE ename='$MV_emp' AND setid='$setid'");
     }
 
-    echo"<div align=center><font class=yellow>You have voted for $fename.</font></div><br>";
+    echo"<div align=center><font class=yellow>You have voted for " . mb_h($fename) . ".</font></div><br>";
   }
 }
 

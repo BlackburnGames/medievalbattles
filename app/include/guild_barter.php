@@ -44,10 +44,10 @@ echo "
 		<tr align=center valign=top colspan=5>
 			<td bgcolor=#404040>$row_num</td>
 			<td bgcolor=#404040><a href=" . mb_attr("messaging.php?value=$row[0]&snum=$s_sel&setchg=1") . ">" . mb_h($row[0]) . "(" . mb_h($s_sel) . ")</a></td>
-			<td bgcolor=#404040>$row[1]</td>
-			<td bgcolor=#404040>$row[2]</td>
-			<td bgcolor=#404040>$row[3]</td>
-			<td bgcolor=#404040>$row[4]</td>
+			<td bgcolor=#404040>" . mb_h($row[1]) . "</td>
+			<td bgcolor=#404040>" . mb_h($row[2]) . "</td>
+			<td bgcolor=#404040>" . mb_h($row[3]) . "</td>
+			<td bgcolor=#404040>" . mb_h($row[4]) . "</td>
 			<td bgcolor=#404040><a href=" . mb_attr("guildbarter.php?barter=1&bid=$row[5]") . ">Barter</a>$endnow</td>\n";
 }
 

@@ -50,7 +50,7 @@ else	{
 
 		mysqli_query($db, "INSERT INTO messages (origin, datesent, yourid, message, mid)		VALUES	('$ename', '$clock', '$owner', " . mb_sql_str($db, $umessage) . ", '$ymid') ");
 	
-		echo "<div align=center><font class=yellow><b>Your message has been sent to the Guild Leader of $g_name.</b></font></div></center>";
+		echo "<div align=center><font class=yellow><b>Your message has been sent to the Guild Leader of " . mb_h($g_name) . ".</b></font></div></center>";
 		unset($_SESSION['gid']);
 	}
 }
@@ -65,7 +65,7 @@ if ($pageid == 'mgl')	{
 	$_SESSION['gid'] = $gid;
 		$guild_name = mysqli_query($db, "SELECT gname FROM guild WHERE gid=" . mb_sql_int($gid));	
 			$g_name = mb_db_result($guild_name,"g_name");
-	echo "<div align=center><font class=yellow><b>You are messaging the Guild Leader of <u>$g_name</u>.</b></font></div>";
+	echo "<div align=center><font class=yellow><b>You are messaging the Guild Leader of <u>" . mb_h($g_name) . "</u>.</b></font></div>";
 ?>
 	
 <form type=post action=gc.php>
@@ -94,7 +94,7 @@ if($request == 'yes')	{
 	}
 	else	{
 		mysqli_query($db, "INSERT INTO guildrequests (applicant, gl_userid)		VALUES	('$userid', '$guild_info[owner]') ");
-		echo "<div align=center><font class=yellow><b>Your request to join <u>$guild_info[gname]</u> has been sent.</b></font></div>";	
+		echo "<div align=center><font class=yellow><b>Your request to join <u>" . mb_h($guild_info['gname']) . "</u> has been sent.</b></font></div>";	
 	}	
 }
 
@@ -134,10 +134,10 @@ while ($row = mysqli_fetch_array($result_id))	{
 	echo "
 	<tr align=center valign=top colspan=6>
 		<td bgcolor=#404040><a href=" . mb_attr($flag) . " target=newwindow><img src=" . mb_attr($flag) . " width=50 height=50 border=0></a></td>
-		<td bgcolor=#404040><a href=" . mb_attr("gc.php?pageid=mgl&gid=$row[3]") . ">$row[0]</a></td>
-		<td bgcolor=#404040>$row[1]</td>
-		<td bgcolor=#404040>$row[5]</td>
-		<td bgcolor=#404040>$row[2]</td>
+		<td bgcolor=#404040><a href=" . mb_attr("gc.php?pageid=mgl&gid=$row[3]") . ">" . mb_h($row[0]) . "</a></td>
+		<td bgcolor=#404040>" . mb_h($row[1]) . "</td>
+		<td bgcolor=#404040>" . mb_h($row[5]) . "</td>
+		<td bgcolor=#404040>" . mb_h($row[2]) . "</td>
 		<td bgcolor=#404040><a href=" . mb_attr("gc.php?request=yes&req_guild=$urlencode_guild") . ">Request<br>Mbrshp.</a></td>";
 }
 echo "</table><br><br>";

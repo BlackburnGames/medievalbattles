@@ -32,9 +32,9 @@ echo "
 echo "
 	<tr align='center' valign='top' colspan='7'>
 		<td bgcolor='#404040'>$placeno</td>
-		<td bgcolor='#404040' align='left'>$row[0]</td>
-		<td bgcolor='#404040'>$guildmem</td>
-		<td bgcolor='#404040'>$row[2]</td>";
+		<td bgcolor='#404040' align='left'>" . mb_h($row[0]) . "</td>
+		<td bgcolor='#404040'>" . mb_h($guildmem) . "</td>
+		<td bgcolor='#404040'>" . mb_h($row[2]) . "</td>";
     }
 
 echo "

@@ -29,13 +29,13 @@ echo "
 	<tr>
 		<td colspan='5' class='main'><b class='reg'>Statistics</b></td>
 	<tr>
-		<td class='main2'><b class='reg' width='20%'>Avg. Civilians:</b> $avg_units[civ]</td>
-		<td class='main2'><b class='reg' width='20%'>Avg. Civilians:</b> $avg_users[sages]</td>
-		<td class='main2'><b class='reg' width='20%'>Avg. Civilians:</b> $avg_users[explorers]</td>
+		<td class='main2'><b class='reg' width='20%'>Avg. Civilians:</b> " . mb_h($avg_units['civ']) . "</td>
+		<td class='main2'><b class='reg' width='20%'>Avg. Civilians:</b> " . mb_h($avg_users['sages']) . "</td>
+		<td class='main2'><b class='reg' width='20%'>Avg. Civilians:</b> " . mb_h($avg_users['explorers']) . "</td>
 	<tr>
-		<td class='main2'><b class='reg' width='20%'>Total Thieves:</b> $avg_units[thieves]</td>
-		<td class='main2'><b class='reg' width='20%'>Total Sages:</b> $avg_units[sages]</td>
-		<td class='main2'><b class='reg' width='20%'>Average Thieves:</b> $avg_units[explorers]</td>
+		<td class='main2'><b class='reg' width='20%'>Total Thieves:</b> " . mb_h($avg_units['thieves']) . "</td>
+		<td class='main2'><b class='reg' width='20%'>Total Sages:</b> " . mb_h($avg_units['sages']) . "</td>
+		<td class='main2'><b class='reg' width='20%'>Average Thieves:</b> " . mb_h($avg_units['explorers']) . "</td>
 </table> 
 </body>
 </html>";

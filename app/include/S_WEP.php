@@ -36,7 +36,7 @@ $archweapon = mysqli_fetch_array($arch_weapon_result);
 				<td class=inner2>
 				<? 
 				if($warweapon['shortsword'] < 1)	{	echo "$shortsword_button";	}
-				elseif($warweapon['shortsword'] > 1)	{	$shortswordtime = $warweapon['shortsword'];	echo "<font class=yellow>Constructing ($shortswordtime ticks)</font>";	}
+				elseif($warweapon['shortsword'] > 1)	{	$shortswordtime = $warweapon['shortsword'];	echo "<font class=yellow>Constructing (" . mb_h($shortswordtime) . " ticks)</font>";	}
 				else	{	echo "<i>Completed</i>";	}
 				?></td>
 			  <tr>
@@ -46,7 +46,7 @@ $archweapon = mysqli_fetch_array($arch_weapon_result);
 				<td class=inner2>
 				<? 
 				if($warweapon['longsword'] < 1)	 {	echo "$longsword_button";	}
-				elseif($warweapon['longsword'] > 1)	{	$longswordtime = $warweapon['longsword'];	echo "<font class=yellow>Constructing ($longswordtime ticks)</font>";	}
+				elseif($warweapon['longsword'] > 1)	{	$longswordtime = $warweapon['longsword'];	echo "<font class=yellow>Constructing (" . mb_h($longswordtime) . " ticks)</font>";	}
 				else	{	echo "<i>Completed</i>";	}
 				?></td>
 			 <tr>
@@ -56,7 +56,7 @@ $archweapon = mysqli_fetch_array($arch_weapon_result);
 				<td class=inner2>
 				<? 
 				if($warweapon['bastardsword'] < 1)	 {	echo "$bastardsword_button";	}
-				elseif($warweapon['bastardsword'] > 1)	{	$bastardtime = $warweapon['bastardsword'];	echo "<font class=yellow>Constructing ($bastardtime ticks)</font>";	}
+				elseif($warweapon['bastardsword'] > 1)	{	$bastardtime = $warweapon['bastardsword'];	echo "<font class=yellow>Constructing (" . mb_h($bastardtime) . " ticks)</font>";	}
 				else	{	echo "<i>Completed</i>";	}
 				?></td>
 			 <tr>
@@ -66,7 +66,7 @@ $archweapon = mysqli_fetch_array($arch_weapon_result);
 				<td class=inner2>
 				<? 
 				if($warweapon['scourge'] < 1)	{	echo "$scourge_button";	}
-				elseif($warweapon['scourge'] > 1)	{	$scourgetime = $warweapon['scourge'];	 echo "<font class=yellow>Constructing ($scourgetime ticks)</font>";	}
+				elseif($warweapon['scourge'] > 1)	{	$scourgetime = $warweapon['scourge'];	 echo "<font class=yellow>Constructing (" . mb_h($scourgetime) . " ticks)</font>";	}
 				else	{	echo "<i>Completed</i>";	}
 				?></td>
 			 <tr>
@@ -76,7 +76,7 @@ $archweapon = mysqli_fetch_array($arch_weapon_result);
 				<td class=inner2>
 				<? 
 				if($warweapon['scimitar'] < 1)	{	echo "$scimitar_button";	}
-				elseif($warweapon['scimitar'] > 1)	{	$scimitartime = $warweapon['scimitar'];	 echo "<font class=yellow>Constructing ($scimitartime ticks)</font>";	}
+				elseif($warweapon['scimitar'] > 1)	{	$scimitartime = $warweapon['scimitar'];	 echo "<font class=yellow>Constructing (" . mb_h($scimitartime) . " ticks)</font>";	}
 				else	{	echo "<i>Completed</i>";	}
 				?></td>
 			 <tr>
@@ -86,7 +86,7 @@ $archweapon = mysqli_fetch_array($arch_weapon_result);
 				<td class=inner2>
 				<? 
 				if($warweapon['romsfury'] < 1)	{	echo "$romsfury_button";	}
-				elseif($warweapon['romsfury'] > 1)	{	$romsfurytime = $warweapon['romsfury'];	 echo "<font class=yellow>Constructing ($romsfurytime ticks)</font>";	}
+				elseif($warweapon['romsfury'] > 1)	{	$romsfurytime = $warweapon['romsfury'];	 echo "<font class=yellow>Constructing (" . mb_h($romsfurytime) . " ticks)</font>";	}
 				else	{	echo "<i>Completed</i>";	}
 				?></td>
 <?
@@ -98,7 +98,7 @@ if($class == 'Fighter')	{
 				<td class=inner2>60,000</td>
 				<td class=inner2>";
 				if($warweapon['broadsword'] < 1)	{	echo "$toledos_button";	}
-				elseif($warweapon['broadsword'] > 1)	 {$broadswordtime = $warweapon['broadsword'];	 echo "<font class=yellow>Constructing ($broadswordtime ticks)</font>";	}
+				elseif($warweapon['broadsword'] > 1)	 {$broadswordtime = $warweapon['broadsword'];	 echo "<font class=yellow>Constructing (" . mb_h($broadswordtime) . " ticks)</font>";	}
 				else	{	echo "<i>Completed</i>";	}
 	echo "
 				</td>
@@ -108,7 +108,7 @@ if($class == 'Fighter')	{
 				<td class=inner2>75,000</td>
 				<td class=inner2>";
 				if($warweapon['gandalara'] < 1)	{	echo "$gandalara_button ";	}
-				elseif($warweapon['gandalara'] > 1)	 {$gandalaratime = $warweapon['gandalara'];	 echo "<font class=yellow>Constructing ($gandalaratime ticks)</font>";	}
+				elseif($warweapon['gandalara'] > 1)	 {$gandalaratime = $warweapon['gandalara'];	 echo "<font class=yellow>Constructing (" . mb_h($gandalaratime) . " ticks)</font>";	}
 				else	{	echo "<i>Completed</i>";	}
 				echo "</td>";
 }
@@ -124,7 +124,7 @@ if($race != 'Giant')	{
 				<td class=inner2>4,000</td>
 				<td class=inner2>";
 				if($priweapon['mace'] < 1)	{	echo "$mace_button";	}
-				elseif($priweapon['mace'] > 1)	{	$macetime = $priweapon['mace'];	 echo "<font class=yellow>Constructing ($macetime ticks)</font>";	}
+				elseif($priweapon['mace'] > 1)	{	$macetime = $priweapon['mace'];	 echo "<font class=yellow>Constructing (" . mb_h($macetime) . " ticks)</font>";	}
 				else	{	echo "<i>Completed</i>";	}
 	echo "
 				</td>
@@ -134,7 +134,7 @@ if($race != 'Giant')	{
 				<td class=inner2>8,000</td>
 				<td class=inner2>";
 				if($priweapon['flail'] < 1)	{	echo "$flail_button";	 }
-				elseif($priweapon['flail'] > 1)	 {	$flailtime = $priweapon['flail'];	 echo "<font class=yellow>Constructing ($flailtime ticks)</font>";	}
+				elseif($priweapon['flail'] > 1)	 {	$flailtime = $priweapon['flail'];	 echo "<font class=yellow>Constructing (" . mb_h($flailtime) . " ticks)</font>";	}
 				else	{	echo "<i>Completed</i>";	}
 	echo "
 				</td>
@@ -144,7 +144,7 @@ if($race != 'Giant')	{
 				<td class=inner2>12,000</td>
 				<td class=inner2>";
 				if($priweapon['zakarum'] < 1)	{	echo "$zakarum_button";	}
-				elseif($priweapon['zakarum'] > 1)	{	$zakarumtime=$priweapon['zakarum'];	echo "<font class=yellow>Constructing ($zakarumtime ticks)</font>";	 }
+				elseif($priweapon['zakarum'] > 1)	{	$zakarumtime=$priweapon['zakarum'];	echo "<font class=yellow>Constructing (" . mb_h($zakarumtime) . " ticks)</font>";	 }
 				else	{	echo "<i>Completed</i>";	}
 	echo "
 				</td>
@@ -154,7 +154,7 @@ if($race != 'Giant')	{
 				<td class=inner2>17,000</td>
 				<td class=inner2>";
 				if($priweapon['footmanflail'] < 1)	{	echo "$footmanflail_button";	}
-				elseif($priweapon['footmanflail'] > 1)	{	$footmantime=$priweapon['footmanflail'];	echo "<font class=yellow>Constructing ($footmantime ticks)</font>";	 }
+				elseif($priweapon['footmanflail'] > 1)	{	$footmantime=$priweapon['footmanflail'];	echo "<font class=yellow>Constructing (" . mb_h($footmantime) . " ticks)</font>";	 }
 				else	{	echo "<i>Completed</i>";	}
 	echo "
 				</td>
@@ -164,7 +164,7 @@ if($race != 'Giant')	{
 				<td class=inner2>29,000</td>
 				<td class=inner2>";
 				if($priweapon['morningstar'] < 1)	{	echo "$morningstar_button";	}
-				elseif($priweapon['morningstar'] > 1)	{	$morningstartime=$priweapon['morningstar'];	echo "<font class=yellow>Constructing ($morningstartime ticks)</font>";	 }
+				elseif($priweapon['morningstar'] > 1)	{	$morningstartime=$priweapon['morningstar'];	echo "<font class=yellow>Constructing (" . mb_h($morningstartime) . " ticks)</font>";	 }
 				else	{	echo "<i>Completed</i>";	}
 	echo "
 				</td>
@@ -174,7 +174,7 @@ if($race != 'Giant')	{
 				<td class=inner2>30,000</td>
 				<td class=inner2>";
 				if($priweapon['thyorastear'] < 1)	{	echo "$thyorastear_button";	}
-				elseif($priweapon['thyorastear'] > 1)	{	$thyoratime=$priweapon['thyorastear'];	echo "<font class=yellow>Constructing ($thyoratime ticks)</font>";	 }
+				elseif($priweapon['thyorastear'] > 1)	{	$thyoratime=$priweapon['thyorastear'];	echo "<font class=yellow>Constructing (" . mb_h($thyoratime) . " ticks)</font>";	 }
 				else	{	echo "<i>Completed</i>";	}
 	echo "
 				</td>";
@@ -189,7 +189,7 @@ if($class == 'Cleric')	{
 				<td class=inner2>40,000</td>
 				<td class=inner2>"; 
 				if($priweapon['isidole'] < 1)	{	echo "$isidole_button";	}
-				elseif($priweapon['isidole'] > 1)	 {	$isidoletime=$priweapon['isidole'];	echo "<font class=yellow>Constructing ($isidoletime ticks)</font>";	}
+				elseif($priweapon['isidole'] > 1)	 {	$isidoletime=$priweapon['isidole'];	echo "<font class=yellow>Constructing (" . mb_h($isidoletime) . " ticks)</font>";	}
 				else	{	echo "<i>Completed</i>";	}
 	echo "
 				</td>
@@ -199,7 +199,7 @@ if($class == 'Cleric')	{
 				<td class=inner2>50,000</td>
 				<td class=inner2>";
 				if($priweapon['eldamarstar'] < 1)	{	echo "$eldamarstar_button";	}
-				elseif($priweapon['eldamarstar'] > 1)	{	$eldamarstartime=$priweapon['eldamarstar'];	echo "<font class=yellow>Constructing ($eldamarstartime ticks)</font>";	 }
+				elseif($priweapon['eldamarstar'] > 1)	{	$eldamarstartime=$priweapon['eldamarstar'];	echo "<font class=yellow>Constructing (" . mb_h($eldamarstartime) . " ticks)</font>";	 }
 				else	{	echo "<i>Completed</i>";	}
 	echo "
 				</td>";
@@ -220,7 +220,7 @@ if($res['r13pts'] >= 125000)	 {
 				<td class=inner2>6,000</td>
 				<td class=inner2>"; 
 				if($archweapon['shortbow'] < 1)	{	echo "$shortbow_button";	}
-				elseif($archweapon['shortbow'] > 1)	 {	$shortbowtime=$archweapon['shortbow'];	echo "<font class=yellow>Constructing ($shortbowtime ticks)</font>";	}
+				elseif($archweapon['shortbow'] > 1)	 {	$shortbowtime=$archweapon['shortbow'];	echo "<font class=yellow>Constructing (" . mb_h($shortbowtime) . " ticks)</font>";	}
 				else	{	echo "<i>Completed</i>";	}
 	echo"
 				</td>
@@ -230,7 +230,7 @@ if($res['r13pts'] >= 125000)	 {
 				<td class=inner2>10,000</td>
 				<td class=inner2>"; 
 				if($archweapon['ferricbow'] < 1)	{	echo "$ferricbow_button";	}
-				elseif($archweapon['ferricbow'] > 1)	 {	$ferricbowtime=$archweapon['ferricbow'];	echo "<font class=yellow>Constructing ($ferricbowtime ticks)</font>";	}
+				elseif($archweapon['ferricbow'] > 1)	 {	$ferricbowtime=$archweapon['ferricbow'];	echo "<font class=yellow>Constructing (" . mb_h($ferricbowtime) . " ticks)</font>";	}
 				else	{	echo "<i>Completed</i>";	}
 	echo"
 				</td>
@@ -240,7 +240,7 @@ if($res['r13pts'] >= 125000)	 {
 				<td class=inner2>14,000</td>
 				<td class=inner2>"; 
 				if($archweapon['keldarsarms'] < 1)	{	echo "$keldararms_button";	}
-				elseif($archweapon['keldarsarms'] > 1)	 {	$keldartime=$archweapon['keldarsarms'];	echo "<font class=yellow>Constructing ($keldartime ticks)</font>";	 }
+				elseif($archweapon['keldarsarms'] > 1)	 {	$keldartime=$archweapon['keldarsarms'];	echo "<font class=yellow>Constructing (" . mb_h($keldartime) . " ticks)</font>";	 }
 				else	{	echo "<i>Completed</i>";	}
 	echo"
 				</td>
@@ -250,7 +250,7 @@ if($res['r13pts'] >= 125000)	 {
 				<td class=inner2>20,000</td>
 				<td class=inner2>";
 				if($archweapon['splensight'] < 1)	{	echo "$splensight_button";	}
-				elseif($archweapon['splensight'] > 1)	{	$splentime=$archweapon['splensight'];	echo "<font class=yellow>Constructing ($splentime ticks)</font>";	 }
+				elseif($archweapon['splensight'] > 1)	{	$splentime=$archweapon['splensight'];	echo "<font class=yellow>Constructing (" . mb_h($splentime) . " ticks)</font>";	 }
 				else	{	echo "<i>Completed</i>";	}
 	echo"
 				</td>
@@ -260,7 +260,7 @@ if($res['r13pts'] >= 125000)	 {
 				<td class=inner2>26,000</td>
 				<td class=inner2>";
 				if($archweapon['bowoftion'] < 1)	{	echo "$bowoftion_button";	}
-				elseif($archweapon['bowoftion'] > 1)	{	$bowoftiontime=$archweapon['bowoftion'];	echo "<font class=yellow>Constructing ($bowoftiontime ticks)</font>";	 }
+				elseif($archweapon['bowoftion'] > 1)	{	$bowoftiontime=$archweapon['bowoftion'];	echo "<font class=yellow>Constructing (" . mb_h($bowoftiontime) . " ticks)</font>";	 }
 				else	{	echo "<i>Completed</i>";	}
 	echo"
 				</td>";
@@ -271,7 +271,7 @@ if($res['r13pts'] >= 125000)	 {
 				<td class=inner2>32,000</td>
 				<td class=inner2>"; 
 				if($archweapon['dynefian'] < 1)	{	echo "$dynefian_button";	}
-				elseif($archweapon['dynefian'] > 1)	 {	$dynefiantime=$archweapon['dynefian'];	echo "<font class=yellow>Constructing ($dynefiantime ticks)</font>";	}
+				elseif($archweapon['dynefian'] > 1)	 {	$dynefiantime=$archweapon['dynefian'];	echo "<font class=yellow>Constructing (" . mb_h($dynefiantime) . " ticks)</font>";	}
 				else	{	echo "<i>Completed</i>";	}
 	if($class == 'Ranger')	{
 		echo"
@@ -282,7 +282,7 @@ if($res['r13pts'] >= 125000)	 {
 				<td class=inner2>45,000</td>
 				<td class=inner2>";
 				if($archweapon['heartsong'] < 1)	{	echo "$heartsong_button";	}
-				elseif($archweapon['heartsong'] > 1)	{	$heartsongtime=$archweapon['heartsong'];	echo "<font class=yellow>Constructing ($heartsongtime ticks)</font>";	 }
+				elseif($archweapon['heartsong'] > 1)	{	$heartsongtime=$archweapon['heartsong'];	echo "<font class=yellow>Constructing (" . mb_h($heartsongtime) . " ticks)</font>";	 }
 				else	{	echo "<i>Completed</i>";	}
 	echo"
 				</td>
@@ -292,7 +292,7 @@ if($res['r13pts'] >= 125000)	 {
 				<td class=inner2>60,000</td>
 				<td class=inner2>";
 				if($archweapon['shyrscreamsbow'] < 1)	{	echo "$shyrscream_button";	}
-				elseif($archweapon['shyrscreamsbow'] > 1)	{	$shyrscreamstime=$archweapon['shyrscreamsbow'];	echo "<font class=yellow>Constructing ($shyrscreamstime ticks)</font>";	 }
+				elseif($archweapon['shyrscreamsbow'] > 1)	{	$shyrscreamstime=$archweapon['shyrscreamsbow'];	echo "<font class=yellow>Constructing (" . mb_h($shyrscreamstime) . " ticks)</font>";	 }
 				else	{	echo "<i>Completed</i>";	}
 	echo"
 				</td>";

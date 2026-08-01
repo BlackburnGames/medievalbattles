@@ -46,11 +46,11 @@ echo "
 
 echo "
 					<tr bgcolor=$color2>
-						<td valign=top><strong class=black-small>&nbsp;&nbsp; <a href=" . mb_attr("topicg.php?topicid={$r['topicid']}") . ">{$r['topic']}</a></strong></td>
-						<td valign=top><strong class=black-small>&nbsp; {$r['name']}</strong></td>
-						<td valign=top><strong class=black-small>&nbsp; {$r['lastposter']}</strong></td>
-						<td valign=top width=61 align=center><strong class=black-small>&nbsp; $topic_replies</strong></td>
-						<td valign=top width=125>&nbsp;<nobr><small class=black-small>{$r['lastpost']}</small></nobr></td>
+						<td valign=top><strong class=black-small>&nbsp;&nbsp; <a href=" . mb_attr("topicg.php?topicid={$r['topicid']}") . ">" . mb_h($r['topic']) . "</a></strong></td>
+						<td valign=top><strong class=black-small>&nbsp; " . mb_h($r['name']) . "</strong></td>
+						<td valign=top><strong class=black-small>&nbsp; " . mb_h($r['lastposter']) . "</strong></td>
+						<td valign=top width=61 align=center><strong class=black-small>&nbsp; " . mb_h($topic_replies) . "</strong></td>
+						<td valign=top width=125>&nbsp;<nobr><small class=black-small>" . mb_h($r['lastpost']) . "</small></nobr></td>
 					</tr>";
 	}
 }

@@ -158,9 +158,9 @@ In progress. The known work, in no committed order:
   the whole of it — every echo in the app that renders something a player
   typed.
 
-  **All 24 attribute-context entries are closed**, and the element-text ones
-  are down to 88. The attributes came first because that is the half escaping
-  alone cannot fix, and because they concentrate the genuinely dangerous shapes:
+  **Both lists are now at zero: 116 stored entries down to none.** The
+  attributes came first because that is the half escaping alone cannot fix, and
+  because they concentrate the genuinely dangerous shapes:
 
   - `S_SET.php` rendered `<img src=$settlepic>` bare, from a URL a settlement
     leader types in — the same shape as `gc.php`'s guild flag, which had
@@ -172,10 +172,33 @@ In progress. The known work, in no committed order:
   - Every listing's action link: the forum thread links, the barter Barter/End
     pair, the guild accept/reject pair, the settlement and guild member links.
 
-  What is left is 88 element-text entries. They are not blocked on anything any
-  more — the values that used to be markup are text now — but a good many are
-  numbers and dates rather than anything a player types, so the list is longer
-  than the risk in it.
+  The remaining 88 were element text, and closing them was mechanical once the
+  values that used to be markup were text — `mb_h()` at every site, in one
+  sweep. Two entries are worth reading anyway, because neither was closed by
+  escaping and both were the shape the SQL work already named:
+
+  - **`S_VMESS.php`'s `$link` is markup in one branch and a bare name in the
+    other.** It starts as the sender's empire name and is replaced by an anchor
+    when that sender still has a settlement. Escaping it at the echo would have
+    escaped the anchor; it is escaped where it is built, at both ends, and the
+    anchor's `href` was bare and is now `mb_attr()`.
+  - **`gameconfig.php`'s `$online` was a ternary on a database column** whose
+    two branches are both constants. The audit cannot see that a tainted
+    condition produces an untainted value, and neither can a reader at a glance.
+    It is an `if` with a literal on each side now, which is how the same marker
+    is written everywhere else in the codebase.
+
+  One entry came off the list without being touched at all. `snews.php` renders
+  through `mb_news_html()`, which escapes both of its arguments — the text via
+  `mb_rich()`, the category against a whitelist — so it belongs on the audit's
+  sanitizer list, and the entry was the audit not knowing that yet.
+
+  A good many of the 88 were numbers and dates rather than anything a player
+  types — 24 of them were one weapon countdown per weapon in `S_WEP.php` — so
+  the list was always longer than the risk in it. They are escaped anyway: a
+  reader cannot tell which columns are safe by looking, which is the same
+  argument that put `mb_sql_str()` at every query site rather than the
+  interesting ones.
 
 ### Rich text, stored as text
 

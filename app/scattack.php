@@ -120,7 +120,7 @@ else	{
 			mysqli_query($db, "UPDATE user SET nno=nno+1 WHERE userid=" . mb_sql_int($empvalue));
 			mb_news_emp($db, "$clock", 'yellow', "$ename ($setid) has sucessfully suicided on your empire. You lost $dead_civs Civilian(s) and $dead_thieves Thieve(s).", $empvalue);
 				
-		echo "<div align=center><font class=yellow>You have successfully suicided on the empire of $evu[ename] ($evu[setid]). You killed $dead_civs Civilian(s) and $dead_thieves Thieve(s).</font></div>";
+		echo "<div align=center><font class=yellow>You have successfully suicided on the empire of " . mb_h($evu['ename']) . " (" . mb_h($evu['setid']) . "). You killed $dead_civs Civilian(s) and $dead_thieves Thieve(s).</font></div>";
 		include("include/attack/scattack.php");
 		die();		
 	}
