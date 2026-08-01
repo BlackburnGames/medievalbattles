@@ -63,8 +63,6 @@ app/functions.php	wiz4
 app/gforums.php	lastpost
 app/gforums.php	lastposter
 app/gforums.php	name
-app/gl-delposts.php	postid
-app/gl-delposts.php	setgid
 app/gl-forum.php	lastpost
 app/gl-forum.php	lastposter
 app/gl-forum.php	name

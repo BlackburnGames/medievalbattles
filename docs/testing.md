@@ -70,15 +70,22 @@ Static, not behavioural: it tokenizes every source and reports variables whose
 first appearance in global scope is a read. That was the checklist for removing
 the `register_globals` shim, and entries remain in
 `tests/register-globals.txt` — all of them now plain uninitialised reads rather
-than request inputs, several of them real bugs:
-
-- `app/gl-delposts.php` passes `$setgid` to `mb_db_result()` where it means
-  `$guild_id`.
-- `app/include/S_WEP.php` echoes `$shortsword_button` and 23 siblings that are
-  never assigned, so the weapon buy buttons render as nothing.
+than request inputs.
 
 **The list should only ever shrink**, and it doubles as a Phase 3 bug list.
 Re-accept with `--accept`.
+
+**Read it as a list of suspects, not defects.** The audit is per-file as well as
+flow-insensitive, so a variable assigned in one file and read in another looks
+unassigned. Both readings have to be checked before acting:
+
+- `app/gl-delposts.php` passing `$setgid` to `mb_db_result()` where it means
+  `$guild_id` was **real** — `$setgid` appeared exactly once in the whole
+  codebase, as that argument.
+- `app/include/S_WEP.php` echoing `$shortsword_button` and 23 siblings was
+  **not** — all 24 are assigned in `include/buttons.php`, which `S_WEP.php`
+  includes on its first line. The weapon buy buttons render fine; this entry
+  and its siblings are an artefact of the per-file analysis.
 
 ### `tests/query-audit.sh`
 

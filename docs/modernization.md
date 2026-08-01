@@ -70,8 +70,14 @@ Not started. The known work, in no committed order:
   not have, against code that checks no return value. The engine was right and
   the schema was short — so the fix was almost entirely `db.sql`.
 - **The bug list.** `tests/register-globals.txt` and `$GAMEDATA['quirks']` are
-  both inventories of real defects, kept in a form that shrinks as they are
-  fixed.
+  both inventories, kept in a form that shrinks as they are fixed. Treat the
+  first as suspects rather than defects — it is per-file and flow-insensitive,
+  so a variable assigned in one file and read in another looks unassigned.
+- **Authorization.** Nothing checks that you own what you are acting on beyond
+  the queries' own `WHERE` clauses. `gl-delposts.php` deletes a guild thread by
+  id with no guild scoping at all, so any logged-in player can delete any
+  guild's posts by guessing a topicid; `sl-delposts.php` at least scopes by
+  `setid`. The forum-moderation pages are the clearest cases, not the only ones.
 - **Invert the manual dependency** so the engine reads `$GAMEDATA` rather than
   its inline literals.
 
