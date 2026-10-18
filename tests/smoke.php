@@ -63,6 +63,7 @@ $ADMIN_PAGES = array(
     'admin/index.php',
     'admin/main.php',
     'admin/gameconfig.php',
+    'admin/rounds.php',
     'admin/dempire.php',
     'admin/get_user_info.php',
     'admin/dusers.php',

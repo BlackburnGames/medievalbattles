@@ -1,6 +1,6 @@
 <center>
 <font size=3>
-	<a href="main.php">Main Menu</a>
+	<a href="main.php">Main Menu</a> <a href="rounds.php">Rounds</a>
 	<br>
 	<a href="get_user_info.php">Get Info</a>
 	<a href="dempire.php">Delete User</a> 

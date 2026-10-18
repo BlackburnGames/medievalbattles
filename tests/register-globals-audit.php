@@ -168,6 +168,11 @@ function mb_scan_globals($src)
         if ($prev === '&') {
             $isWrite = true;
         }
+        // catch (SomeException $e): the catch binds it.
+        for ($k = $i - 1; $k >= 0 && $k > $i - 12; $k--) {
+            if (is_array($t[$k]) && $t[$k][0] === T_CATCH) { $isWrite = true; break; }
+            if ($t[$k] === ')' || $t[$k] === ';' || $t[$k] === '{' || $t[$k] === '}') { break; }
+        }
         // list($a, $b) = ...
         for ($k = $i; $k >= 0 && $k > $i - 60; $k--) {
             if (is_array($t[$k]) && $t[$k][0] === T_LIST) { $isWrite = true; break; }

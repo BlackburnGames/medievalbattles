@@ -1,12 +1,12 @@
 # Rounds and accounts
 
-**Status: partly built.** Steps 1, 2 and 5 under "Order of work" are done:
-permanent accounts beside the round's tables, and a round that holds neither the
-address nor the password. Step 3 is under way: the `round` table exists, every
-round table carries a `round_id`, every query on one is confined to a
-round, and `bin/round.php` ends a round into its results and opens, starts
-and ends the next. What is left of it is the players' side: the round list,
-join and history pages. This
+**Status: built, one round at a time.** Steps 1, 2, 3 and 5 under "Order of
+work" are done: permanent accounts, a round that holds neither the address
+nor the password, and rounds themselves -- every round table carries a
+`round_id` and every query on one is confined to a round, a round is opened,
+started and ended into its results from `bin/round.php` or the admin area,
+and a player joins one from the round list and reads their history there.
+Step 4, more than one round in play at once, is design only. This
 records how the game is meant to end a round and start the next one without
 deleting its players, and the decisions that shape it.
 
@@ -169,23 +169,28 @@ fingerprint of the account's address and hash:
   from the `account` table on every request, as it read `user.admin`, so
   revoking still takes effect on the next click. An admin doesn't need a
   kingdom in any round.
-- **The admin area acts on one round at a time**, chosen in the area. Its
-  current pages are per-round already, because they query the round's tables.
-- **`bin/round.php` replaces `newgame.php`:**
-  - `open <name> --ruleset classic` inserts the `round` row, with its
-    ruleset ([rulesets.md](rulesets.md)), and seeds that round's settlements
-    and `game_info`.
-  - `start <round>` and `end <round>` move the status. `end` stops the tick
-    (`game_info.tick = 'no'`), writes every kingdom's round result to
-    `round_result`, and marks the round ended. After that, the pages refuse
-    writes to it.
-  - Deleting an ended round's rows is a separate, explicit command. It is
-    never a side effect of opening the next round.
-- **`newgame.php` and gameconfig's "delete every account" are retired.**
-  Deleting one player stays an admin action, but it now has two forms:
-  deleting a kingdom from a round, or deleting an account. Deleting an account
-  anonymizes its round results rather than removing them, so a round's final
-  rankings don't develop gaps.
+- **The admin area acts on the current round** -- the one in play, while
+  only one can be. Choosing among several waits for step 4.
+- **`bin/round.php` replaces `newgame.php`** (built), and `admin/rounds.php`
+  takes the same steps from the area, each a POST, ending only with a box
+  ticked:
+  - `open <name>` inserts the `round` row and seeds its settlements. It does
+    not take a ruleset yet: there is one, `classic`, the column's default
+    ([rulesets.md](rulesets.md)).
+  - `start` and `end` move the current round's status. `end` writes every
+    kingdom's round result to `round_result` and marks the round ended, in
+    one transaction. The tick only ever advances a running round, so it
+    needs no flag set, and the session refuses a kingdom of an ended round,
+    which is how the pages refuse writes to it.
+  - Deleting an ended round's rows is to be a separate, explicit command,
+    never a side effect of opening the next. Not built: nothing yet needs
+    the space.
+- **`newgame.php` and gameconfig's "delete every account" are retired**
+  (done). An administrator deletes a kingdom from the current round on
+  gameconfig.php, and a player deletes their own account from preferences.
+  Deleting an account anonymizes its round results -- `account_id` 0 --
+  rather than removing them, so a round's final rankings don't develop
+  gaps.
 
 ## Testing
 
@@ -351,8 +356,11 @@ fingerprint of the account's address and hash:
       `tests/newgame.php`. gameconfig.php's other bulk actions stay, on the
       current round.
 
-      **Left:** an admin page for `bin/round.php`'s steps, and deleting an
-      account anonymizing its round results.
+      ~~**Administration.**~~ **Done.** `admin/rounds.php` opens, starts
+      and ends rounds as `bin/round.php` does, from POSTs only, and ending
+      wants a box ticked. The admin gate asks for the account alone, so an
+      administrator whose kingdom ended with the round can still open the
+      next. Deleting an account sets its round results' `account_id` to 0.
 4. **Concurrent rounds.** The session chooses among running rounds, and the
    tick runs once per round. This lands with, or after, the ruleset loader
    from [rulesets.md](rulesets.md), since two rounds at once is how classic

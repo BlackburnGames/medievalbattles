@@ -165,9 +165,14 @@ if (!function_exists('mb_account_delete')) {
     /**
      * Delete an account. Its kingdom is the round's to remove, and the caller
      * removes it first: include/empire.php's mb_empire_remove().
+     *
+     * Its round results stay, so an ended round's rankings do not develop
+     * gaps, but no longer say whose they were: the kingdom's name is the
+     * round's, the link to the account is the player's (docs/rounds.md).
      */
     function mb_account_delete($account_id)
     {
+        mb_query(mb_db(), "UPDATE round_result SET account_id=0 WHERE account_id=?", array((int) $account_id));
         mb_query(mb_db(), "DELETE FROM account WHERE account_id=?", array((int) $account_id));
     }
 }

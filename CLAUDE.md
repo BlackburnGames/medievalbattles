@@ -25,7 +25,7 @@ The reference material lives in `docs/`. Read the relevant one before working in
 | [docs/modernization.md](docs/modernization.md) | Deciding what to work on next |
 | [docs/deployment.md](docs/deployment.md) | Touching `deploy/`, the host, or the host — production and the local stack are both MySQL 8.4 |
 | [docs/rulesets.md](docs/rulesets.md) | Changing gameplay, or moving a value into `gamedata.php` — design for running classic and modern rules side by side, not yet built |
-| [docs/rounds.md](docs/rounds.md) | Touching accounts, signup, login, joining or ending a round — accounts, rounds, round results, the round list and joining are built; the admin round page is not |
+| [docs/rounds.md](docs/rounds.md) | Touching accounts, signup, login, joining or ending a round — built, one round in play at a time |
 | [docs/v7-design-notes.md](docs/v7-design-notes.md) | Reference only — it describes a **different, unbuilt game**. Never answer a question about game behaviour from it. |
 
 The things load-bearing enough to repeat here:
@@ -88,6 +88,6 @@ Fixture logins are `tester@example.com` / `test1234` (plus `idle@` / `pass2`, `p
 
 The admin area is `http://127.0.0.1:8080/admin/`. There is no admin password: an administrator is an account with `account.admin` set, logged into the game as usual — the fixture's is `tester@`. Grant and revoke from the command line: `docker compose exec web php /repo/bin/admin.php list | grant <email> | revoke <email>`. A new signup is unverified and held at the activation gate; local mail goes nowhere, so confirm it with `bin/admin.php verify <email>`. See `app/admin/include/auth.php`.
 
-Rounds are opened, started and ended from the command line: `docker compose exec web php /repo/bin/round.php list | open <name> | start | end`. One round is in play at a time; `end` writes `round_result` and logs that round's players out. The fixture's world is round 1, running. See [docs/rounds.md](docs/rounds.md).
+Rounds are opened, started and ended from the command line — `docker compose exec web php /repo/bin/round.php list | open <name> | start | end` — or from `admin/rounds.php`. One round is in play at a time; `end` writes `round_result` and logs that round's players out. Signup makes an account only; an account with no kingdom in the current round logs in to `rounds.php`, joins with `join.php`, and reads its history there. The fixture's world is round 1, running. See [docs/rounds.md](docs/rounds.md).
 
 **On Windows, prefix `docker compose exec` with `MSYS_NO_PATHCONV=1`** when passing container paths, or Git Bash rewrites `/repo/...` into a Windows path and the command fails. The scripts in `tests/` already set it.

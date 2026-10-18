@@ -18,6 +18,10 @@
  *      kingdom, as a later login is.
  *   5. The tick leaves an open round alone, and advances it once started,
  *      while round 1's rows stay as they ended.
+ *   6. The admin area's round page ends round 2, but only with its box
+ *      ticked; an administrator whose kingdom ended with it can still reach
+ *      the page and open round 3, and a player cannot.
+ *   7. Deleting an account keeps its round results, anonymized.
  *
  * It reloads the schema, so it destroys whatever world it runs against.
  *
@@ -165,6 +169,37 @@ check('...and leaves round 1 as it ended', round_rows($db, 1) === $frozen);
 
 list($rc, $out) = round_cli('list');
 check('the list shows both', $rc === 0 && preg_match('/^1\tended\t3 kingdoms/m', $out) && preg_match('/^2\trunning\t1 kingdoms/m', $out), $out);
+
+// 6. The same steps from the admin area. tester@ is the fixture's
+// administrator, playing in round 2.
+$admin = login($BASE, 'tester@example.com', 'test1234');
+$admin->post('/admin/rounds.php', array('step' => 'end'));
+check('the admin page will not end a round without the box ticked',
+    row($db, "SELECT status FROM `round` WHERE round_id = 2")['status'] === 'running');
+$body = $admin->post('/admin/rounds.php', array('step' => 'end', 'sure' => 'yes'));
+check('the admin page ends round 2', row($db, "SELECT status FROM `round` WHERE round_id = 2")['status'] === 'ended'
+    && (int) row($db, "SELECT count(*) AS n FROM round_result WHERE round_id = 2")['n'] === 1, trim(substr(strip_tags($body), 0, 200)));
+
+// The administrator's kingdom ended with it; the account still administers.
+$admin = new MbClient($BASE);
+$admin->get('/index.php');
+$admin->post('/checklogin.php', array('email' => 'tester@example.com', 'pw' => 'test1234', 'login' => 'Login'));
+$admin->get('/admin/rounds.php');
+check('an administrator with no kingdom reaches the admin area', $admin->lastStatus === 200);
+$admin->post('/admin/rounds.php', array('step' => 'open', 'name' => 'Round 3'));
+check('...and opens round 3 from it', row($db, "SELECT status FROM `round` WHERE round_id = 3")['status'] === 'open');
+$poorer = new MbClient($BASE);
+$poorer->get('/index.php');
+$poorer->post('/checklogin.php', array('email' => 'poor@example.com', 'pw' => 'pass3', 'login' => 'Login'));
+$poorer->get('/admin/rounds.php');
+check('a player who is not one does not', $poorer->lastStatus === 403);
+
+// 7. Deleting an account keeps its results, without its name on them.
+require_once __DIR__ . '/../app/include/accounts.php';
+mb_account_delete(3);
+check('a deleted account\'s results stay, no longer its',
+    row($db, "SELECT account_id FROM round_result WHERE round_id = 1 AND ename = 'PoorSerf'")['account_id'] === '0'
+    && (int) row($db, "SELECT count(*) AS n FROM round_result WHERE round_id = 1")['n'] === 3);
 
 loadFixture($db);
 

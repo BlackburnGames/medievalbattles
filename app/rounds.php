@@ -49,7 +49,9 @@ $round = $current ? mysqli_fetch_assoc(mb_query($db, "SELECT r.round_id, r.name,
 <table width="100%" border="1" bordercolor="#990000" cellspacing="3" cellpadding="8">
 <tr><td bgcolor="#000000" valign="top">
 
-<p>Logged in as <b><?php echo mb_h($account['handle']); ?></b>. <a href="logout.php">Log out</a></p>
+<p>Logged in as <b><?php echo mb_h($account['handle']); ?></b>.
+<?php if ((int) $account['admin'] === 1) { echo '<a href="admin/rounds.php">Administration</a> '; } ?>
+<a href="logout.php">Log out</a></p>
 
 <hr color="#660000">
 <h3>This round</h3>

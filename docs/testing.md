@@ -188,7 +188,12 @@ session ended with it, the account still able to log in and told it has no
 kingdom, signup refused and the tick idle; round 2 opened with settlements
 11-20, joined by signup under the old kingdom name, and logged into; the tick
 leaving round 2 alone while it is open and advancing it once started, with
-round 1's rows unchanged throughout. Reloads the schema.
+round 1's rows unchanged throughout. Between them it reads the round list an
+account without a kingdom lands on -- its own result, the ended round's
+leading kingdoms and guilds -- and joins from it. Then the admin page: it will
+not end round 2 without its box ticked, does with it, still admits the
+administrator whose kingdom ended, opens round 3, and refuses a player. Last,
+deleting an account keeps its results, anonymized. Reloads the schema.
 
 ### `tests/smoke.php`
 

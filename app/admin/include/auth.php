@@ -33,11 +33,13 @@ if (!function_exists('mb_admin_logged_in')) {
      */
     function mb_admin_logged_in()
     {
-        global $userid, $mb_account_id;
+        global $mb_account_id;
 
-        // session.php has already checked these against the account and the
-        // kingdom, and blanked them if either failed.
-        if ($userid === '' || !$mb_account_id) {
+        // session.php has already checked the account, and the kingdom if the
+        // session has one, and blanked them if either failed. An administrator
+        // needs no kingdom: one with none in the current round is logged in
+        // with the account alone, and can still end a round or open the next.
+        if (!$mb_account_id) {
             return false;
         }
 
