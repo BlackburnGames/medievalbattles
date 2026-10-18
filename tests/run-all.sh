@@ -34,6 +34,15 @@ if ! docker compose exec -T web php /repo/tests/news-render.php; then
   status=1
 fi
 
+# Concurrent requests against one barter listing. Needs the fixture's listings,
+# which the crawl consumes, so it gets a fresh database of its own.
+echo
+echo "=== barter concurrency ==="
+bash tests/reset-db.sh > /dev/null
+if ! docker compose exec -T web php /repo/tests/barter-race.php; then
+  status=1
+fi
+
 # Static, so order does not matter; last because it is the port checklist
 # rather than a behavioural test.
 echo

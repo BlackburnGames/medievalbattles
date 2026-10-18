@@ -652,6 +652,24 @@ Both boards are on the crawl. Listing, buying and cancelling are driven
 explicitly rather than followed, because buying and cancelling are GET links
 that consume the row they point at.
 
+**And a listing could be sold more than once.** Every branch read the listing
+and both balances at page load, checked them, and then wrote absolute figures
+computed from what it had read — `gp=$newgp`, `archers=$archers+$amount` — with
+the `DELETE` that ended the listing at the bottom and its row count never
+looked at. Two buyers in flight both passed every check. Twelve simultaneous
+buys of one listing let between five and twelve through, and paid the seller
+for several; cancels refunded the same way, and listing could put the same
+hundred archers up twice.
+
+The tables are MyISAM, so there is no transaction to reach for. What there is
+instead is that one statement is atomic and says how many rows it touched, so
+each branch now **claims before it moves**: the payment is taken only
+`AND gp >= cost`, the listing is claimed by deleting it and checking that one
+row went, and everything after is relative — `col = col + delta`. A buyer who
+loses the claim is refunded.
+
+The crawl cannot see a race, so `tests/barter-race.php` makes one.
+
 ### Prerequisite: coverage — done
 
 The smoke crawl reached 39 of 69 top-level scripts when Phase 3 opened. It

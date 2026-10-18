@@ -101,34 +101,48 @@ if (!function_exists('mb_barter_move_stock')) {
 	 * Pass a negative $delta to take them away. Does nothing for a type that is
 	 * not tradeable, which is the same thing the ten-way switches did.
 	 *
-	 * The counts are read from $GLOBALS because that is where functions.php
-	 * puts them and where include/nexplode.php strips the thousands separators
-	 * that functions.php added -- passing a dozen of them in by hand would move
-	 * the coupling rather than remove it. Callers must have included
-	 * nexplode.php first, or "1,200" arrives here and casts to 1.
+	 * The write is relative -- `column = column + delta` -- and that is the
+	 * point of it. It used to write the absolute figure the page had read at
+	 * load time, so two requests in flight both started from the same count and
+	 * the second overwrote the first.
+	 *
+	 * A debit is conditional on the gating column covering it, and the return
+	 * value says whether it did. The caller's own "you don't have that many"
+	 * check reads a figure from page load; this is the one that cannot be raced.
+	 *
+	 * The $GLOBALS copies are kept in step for whatever the page renders after,
+	 * and they are the reason callers must have included nexplode.php first --
+	 * functions.php formats them with thousands separators.
 	 *
 	 * @param mysqli $db
 	 * @param string $type  one of $MB_BARTER_STOCK's keys
 	 * @param int    $delta signed change
+	 * @return bool  false if a debit found too few units, and nothing moved
 	 */
 	function mb_barter_move_stock($db, $type, $delta)
 	{
 		global $MB_BARTER_STOCK, $email, $pw;
 
 		if (!isset($MB_BARTER_STOCK[$type])) {
-			return;
+			return true;
 		}
 
 		$where = " WHERE email=" . mb_sql_str($db, $email) . " AND pw=" . mb_sql_str($db, $pw);
+		$q_delta = mb_sql_int($delta);
 
-		foreach ($MB_BARTER_STOCK[$type] as $slot) {
+		foreach ($MB_BARTER_STOCK[$type] as $i => $slot) {
 			list($table, $column, $global) = $slot;
 
-			$value = isset($GLOBALS[$global]) ? $GLOBALS[$global] + $delta : $delta;
-			$GLOBALS[$global] = $value;
+			// The first slot gates a sale; see $MB_BARTER_STOCK.
+			$guard = ($i === 0 && $delta < 0) ? " AND $column >= " . mb_sql_int(-$delta) : '';
+			mysqli_query($db, "UPDATE $table SET $column = $column + $q_delta" . $where . $guard);
+			if ($guard !== '' && mysqli_affected_rows($db) !== 1) {
+				return false;
+			}
 
-			mysqli_query($db, "UPDATE $table SET $column=" . mb_sql_int($value) . $where);
+			$GLOBALS[$global] = (isset($GLOBALS[$global]) ? $GLOBALS[$global] : 0) + $delta;
 		}
+		return true;
 	}
 }
 
@@ -194,9 +208,6 @@ else	{
 	$barter_user_query = mysqli_query($db, "SELECT * FROM user WHERE userid=$q_b_userid");
 	$barter_user = mysqli_fetch_array($barter_user_query);
 		$tsetid     = $barter_user['setid'];
-		$barts_gp   = $barter_user['gp'];
-		$barts_iron = $barter_user['iron'];
-		$b_nno      = $barter_user['nno'];
 
 	if($b_userid == $userid)	 {	echo"<font class=yellow><div align=center>You can't buy your own barter items!</div></font><br><br>";	die();	 }
 	elseif($mb_guild_board AND $b_guild != $empireguild)	 {	echo"<font class=yellow><div align=center>They are not in your guild!</div></font><br><br>";	 die();	}
@@ -211,26 +222,44 @@ else	{
 	elseif($class == 'Ranger' AND $b_type == 'Wizard')	{	echo"<font class=yellow><div align=center>Rangers can't possess Wizards!</div></font><br><br>";	die();	 }
 	elseif($res['r13pts'] < 125000 AND $b_type == 'Archer')	{echo"<font class=yellow><div align=center>You must research Archery for Archers.<br><br></div></font>";	die();	 }
 
-	// Hand the units over, then take the payment. The payment used to sit
-	// inside each of the ten unit branches -- forty UPDATEs that differed only
-	// in which `if` they were written in. $b_type matches at most one, so the
-	// copies were mutually exclusive and this does the same work once.
-	mb_barter_move_stock($db, $b_type, $b_amount);
-
+	// Everything above read the listing and both balances once, at page load,
+	// and nothing below may trust that they are still true. Two buyers could
+	// both find the row, both pass every check, and both be handed the units --
+	// the DELETE that ended the listing never said whether it had removed
+	// anything, and the payments wrote absolute balances computed from the
+	// figures read above. The tables are MyISAM, so there is no transaction to
+	// reach for; what there is, is that each statement is atomic and reports
+	// how many rows it touched. So the order is:
+	//
+	//   1. take the payment, only if the buyer still has it;
+	//   2. claim the listing by deleting it -- exactly one request can;
+	//   3. only then move anything, all of it relative to what is there now.
+	//
+	// A buyer who loses the claim at 2 is refunded what 1 took.
 	$q_where_me = " WHERE email=" . mb_sql_str($db, $email) . " AND pw=" . mb_sql_str($db, $pw);
+	$q_cost     = mb_sql_int($b_cost);
+	$mb_col     = ($b_meth == 'gp') ? 'gp' : 'iron';
 
-	if($b_meth == 'gp')	{
-		$B_NEW_gp = $barts_gp + $b_cost;
-		$newgp    = $gp - $b_cost;
-		mysqli_query($db, "UPDATE user SET gp=" . mb_sql_int($newgp) . $q_where_me);
-		mysqli_query($db, "UPDATE user SET gp=" . mb_sql_int($B_NEW_gp) . " WHERE userid=$q_b_userid");
+	mysqli_query($db, "UPDATE user SET $mb_col = $mb_col - $q_cost" . $q_where_me . " AND $mb_col >= $q_cost");
+	if (mysqli_affected_rows($db) !== 1)	{
+		if ($mb_col == 'gp')	{	echo"<font class=yellow><div align=center>Not enough gold!</div></font><br><br>";	}
+		else	{	echo"<font class=yellow><div align=center>Not enough iron!</div></font><br><br>";	}
+		die();
 	}
-	if($b_meth == 'iron')	{
-		$B_NEW_iron = $barts_iron + $b_cost;
-		$newiron    = $iron - $b_cost;
-		mysqli_query($db, "UPDATE user SET iron=" . mb_sql_int($newiron) . $q_where_me);
-		mysqli_query($db, "UPDATE user SET iron=" . mb_sql_int($B_NEW_iron) . " WHERE userid=$q_b_userid");
+
+	mysqli_query($db, "DELETE FROM barter WHERE barterid=$q_bid AND $mb_scope");
+	if (mysqli_affected_rows($db) !== 1)	{
+		mysqli_query($db, "UPDATE user SET $mb_col = $mb_col + $q_cost" . $q_where_me);
+		echo"<font class=yellow><div align=center>There is no such barter.</font></div>";
+		include($mb_panel);
+		die();
 	}
+
+	// Hand the units over, then pay the seller. The payment used to sit inside
+	// each of the ten unit branches -- forty UPDATEs that differed only in which
+	// `if` they were written in.
+	mb_barter_move_stock($db, $b_type, $b_amount);
+	mysqli_query($db, "UPDATE user SET $mb_col = $mb_col + $q_cost WHERE userid=$q_b_userid");
 
 	// The news lines are built from stored columns -- the seller's empire name
 	// and settlement id, and the type and method they picked when they listed
@@ -247,11 +276,9 @@ else	{
 	mb_news_emp($db, "$clock", 'yellow', $their_news, $q_b_userid);
 	mb_news_emp($db, "$clock", 'yellow', $your_news, $userid);
 
-	$your_new_nno = $nno + 1;
-	$their_new    = $b_nno + 1;
-	mysqli_query($db, "DELETE FROM barter WHERE barterid=$q_bid");
-	mysqli_query($db, "UPDATE user SET nno=" . mb_sql_int($their_new) . " WHERE userid=$q_b_userid");
-	mysqli_query($db, "UPDATE user SET nno=" . mb_sql_int($your_new_nno) . " WHERE userid='$userid'");
+	// The unread-news counters, relative for the same reason as the rest.
+	mysqli_query($db, "UPDATE user SET nno = nno + 1 WHERE userid=$q_b_userid");
+	mysqli_query($db, "UPDATE user SET nno = nno + 1 WHERE userid=" . mb_sql_int($userid));
 	echo"<font class=yellow><div align=center>You have bartered with " . mb_h($b_seller) . ".<br><br></font></div>";
 	include($mb_panel);
 }
@@ -335,6 +362,15 @@ else	{
 	elseif($mb_have < $amount)	{	echo"<font class=yellow><div align=center>You don't have that many " . mb_h($type) . "(s)!</font></div><br><br>";	die();	 }
 	elseif($mb_have <= 0)	{	echo"<font class=yellow><div align=center>Invaild number.</font></div><br><br>";	die();	 }
 
+	// Take the units before the listing exists, and only if they are still
+	// there. The checks above read the count from page load, so two listings
+	// submitted together could each pass against the same hundred archers and
+	// put two hundred up for sale.
+	if (!mb_barter_move_stock($db, $type, -$amount))	{
+		echo"<font class=yellow><div align=center>You don't have that many " . mb_h($type) . "(s)!</font></div><br><br>";
+		die();
+	}
+
 	$themaxbarterid = mysqli_query($db, "SELECT max(barterid) FROM barter");
 	$maxbid = mb_db_result($themaxbarterid,"maxbid");
 	$maxbid = $maxbid + 1;
@@ -355,8 +391,6 @@ else	{
 		. mb_sql_str($db, $method) . ", "
 		. mb_sql_str($db, $mb_page)  . ", "
 		. mb_sql_str($db, $mb_guild) . ") ");
-
-	mb_barter_move_stock($db, $type, -$amount);
 
 	echo "<font class=yellow><div align=center>Your barter has been placed.</font></div><br><br>";
 	die();
@@ -388,9 +422,16 @@ else	{
 
 	if($b_userid != $userid)	{	echo"<font class=yellow><div align=center>You cannot cancel other empire barters.</font></div><br><br>";	die();	 }
 
-	mb_barter_move_stock($db, $b_type, $b_amount);
+	// Claimed before it is refunded, as a sale is: two cancels in flight, or a
+	// cancel racing a buyer, used to refund the seller and hand the buyer the
+	// same units. Whichever DELETE lands first owns the listing.
+	mysqli_query($db, "DELETE FROM barter WHERE barterid=$q_bid AND userid=" . mb_sql_int($userid));
+	if (mysqli_affected_rows($db) !== 1)	{
+		echo"<font class=yellow><div align=center>There is no such barter.</font></div>";
+		die();
+	}
 
-	mysqli_query($db, "DELETE FROM barter WHERE barterid=$q_bid");
+	mb_barter_move_stock($db, $b_type, $b_amount);
 
 	echo"<font class=yellow><div align=center>Your barter has been cancelled.</font></div>";
 }

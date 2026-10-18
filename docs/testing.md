@@ -229,6 +229,24 @@ rather than landing in the unquoted `class=` attribute.
 It writes to the three news tables on ids far outside the fixture's and deletes
 what it wrote, so it is order-independent and safe against a live world.
 
+### `tests/barter-race.php`
+
+The one test that makes requests overlap. The crawl is strictly sequential, so
+it cannot see a handler that is correct one request at a time and wrong two at
+a time — which is what both barter handlers were: they checked the listing and
+the balances at page load, then wrote absolute figures from them, and never
+asked whether the `DELETE` that ended the listing had removed anything.
+
+It logs the tester in twelve times and fires one buy, then one cancel, from
+all twelve sessions at once with `curl_multi`. Separate sessions matter: PHP's
+file session handler holds a lock for the whole request, so requests sharing a
+cookie queue and never race. It asserts that exactly one succeeds and that
+every balance moved by exactly one sale's worth. Against the old handler it
+failed five runs in five.
+
+It needs the fixture's listings, which the crawl consumes, so `run-all.sh`
+resets the database before it.
+
 ### `tests/query-audit.sh`
 
 Not a test — an inventory generator, and the only thing that runs the stack
