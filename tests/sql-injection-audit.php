@@ -9,8 +9,9 @@
  * does.
  *
  * Method: tokenize each source, mark every variable that derives from request
- * input, then report those that survive into the second argument of
- * mysqli_query() -- the codebase's only query entry point, all 1124 of them.
+ * input, then report those that survive into the arguments of a query call:
+ * mysqli_query() and its siblings, or ->query() on a connection object. See
+ * mb_is_query_sink() for why the second form is not optional.
  *
  * Taint sources are mb_input() and the superglobals it reads. Taint spreads
  * through assignment: if the right-hand side mentions a tainted name, the
@@ -59,7 +60,40 @@ $accept   = in_array('--accept', $argv, true);
 require_once __DIR__ . '/taint-lib.php';
 
 /**
- * Tainted variables interpolated into a mysqli_query() argument.
+ * Every way this codebase hands SQL to the server. Procedural calls are named
+ * functions; the object form is a method on whatever connection variable is in
+ * scope, so it is matched by name after `->` rather than by receiver.
+ *
+ * The object form is not a curiosity. Sixty calls use it, and they cluster in
+ * exactly the pages an unauthenticated visitor reaches -- signup, login and
+ * account activation -- because those were the last pages rewritten in 2003.
+ * Matching only mysqli_query() reported zero while all sixty went unread.
+ */
+$MB_QUERY_FUNCTIONS = array('mysqli_query', 'mysqli_real_query', 'mysqli_multi_query', 'mysqli_prepare');
+$MB_QUERY_METHODS   = array('query', 'real_query', 'multi_query', 'prepare');
+
+function mb_is_query_sink(array $t, $i)
+{
+    global $MB_QUERY_FUNCTIONS, $MB_QUERY_METHODS;
+
+    if (!is_array($t[$i]) || $t[$i][0] !== T_STRING) {
+        return false;
+    }
+    $name = strtolower($t[$i][1]);
+    $prev = $i - 1;
+    while ($prev >= 0 && is_array($t[$prev]) && $t[$prev][0] === T_WHITESPACE) {
+        $prev--;
+    }
+    $isMethod = $prev >= 0 && is_array($t[$prev])
+        && ($t[$prev][0] === T_OBJECT_OPERATOR
+            || (defined('T_NULLSAFE_OBJECT_OPERATOR') && $t[$prev][0] === T_NULLSAFE_OBJECT_OPERATOR));
+
+    return $isMethod ? in_array($name, $MB_QUERY_METHODS, true)
+                     : in_array($name, $MB_QUERY_FUNCTIONS, true);
+}
+
+/**
+ * Tainted variables interpolated into a query argument.
  *
  * @return array<string,string> variable name => "quoted"|"unquoted"
  */
@@ -70,8 +104,7 @@ function mb_scan_queries($src, array $tainted, array $sourceGlobals, array $sani
     $found = array();
 
     for ($i = 0; $i < $n; $i++) {
-        if (!is_array($t[$i]) || $t[$i][0] !== T_STRING
-            || strtolower($t[$i][1]) !== 'mysqli_query') {
+        if (!mb_is_query_sink($t, $i)) {
             continue;
         }
         $open = mb_sig($t, $i + 1);
@@ -139,7 +172,7 @@ $current = array();
 foreach (mb_app_files($appRoot) as $path) {
     $rel = ltrim(str_replace(str_replace('\\', '/', $repoRoot), '', $path), '/');
     $src = file_get_contents($path);
-    if (strpos($src, 'mysqli_query') === false) {
+    if (strpos($src, 'mysqli_') === false && strpos($src, '->') === false) {
         continue;
     }
     $tainted = mb_tainted_names($src, $MB_SOURCE_GLOBALS, $MB_SANITIZERS);
@@ -156,7 +189,7 @@ exit(mb_ratchet(array(
     'accept'   => $accept,
     'header'   => "# SQL injection audit baseline -- see tests/sql-injection-audit.php
 "
-                . "# Request input that reaches a mysqli_query() unescaped, as file, variable
+                . "# Request input that reaches a query call unescaped, as file, variable
 "
                 . "# and the quoting context it lands in. This list may only ever SHRINK.
 "

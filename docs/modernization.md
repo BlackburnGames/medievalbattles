@@ -39,7 +39,15 @@ emptied down to the one disabled block that remains.
 
 In progress. The known work, in no committed order:
 
-- ~~**SQL injection.**~~ **The audit is at zero: 161 entries down to none.** All ~1300 queries
+- **SQL injection.** **The audit reached zero, 161 entries down to none — and
+  then reopened at 11, because it had only ever been reading half the sinks.**
+  It matched the `mysqli_query` token, and sixty calls in seven files use the
+  object form, `$db->query()`. Those cluster in exactly the pages a visitor
+  reaches before logging in: `checksignup.php`, `checklogin.php` and
+  `activate_account.php`. So the zero was true of every authenticated page and
+  silent about the three that need no account at all — `checksignup.php`
+  interpolates the address into a `SELECT` twenty lines before it validates it.
+  `mb_is_query_sink()` matches both forms now. All ~1300 queries
   are built by string interpolation with no escaping. This is the reason the
   app must not be exposed to a network. `tests/sql-injection-audit.php` finds
   the reachable half of it — request input that survives into a

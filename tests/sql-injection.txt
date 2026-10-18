@@ -1,5 +1,15 @@
 # SQL injection audit baseline -- see tests/sql-injection-audit.php
-# Request input that reaches a mysqli_query() unescaped, as file, variable
+# Request input that reaches a query call unescaped, as file, variable
 # and the quoting context it lands in. This list may only ever SHRINK.
 # Regenerate with: php tests/sql-injection-audit.php --accept
-
+app/activate_account.php	act_code	quoted
+app/activate_account.php	act_userid	quoted
+app/checklogin.php	ipaddress	quoted
+app/checksignup.php	aim	quoted
+app/checksignup.php	class	quoted
+app/checksignup.php	email	quoted
+app/checksignup.php	ename	quoted
+app/checksignup.php	ipaddress	quoted
+app/checksignup.php	msn	quoted
+app/checksignup.php	pw	quoted
+app/checksignup.php	race	quoted
