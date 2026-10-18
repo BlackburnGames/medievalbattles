@@ -6,8 +6,8 @@ masters catch and unit tests would not.
 
 ## The suite
 
-`bash tests/run-all.sh` runs the tick golden master, the smoke crawl and the
-`register_globals` audit.
+`bash tests/run-all.sh` runs the tick and combat golden masters, the smoke
+crawl and the `register_globals` audit.
 
 ### `tests/tick-golden.sh`
 
@@ -23,6 +23,48 @@ whole port.
 
 Treat re-accepting a golden as a review step: read the diff and confirm every
 changed number was intended. Re-accept with `--accept`.
+
+### `tests/combat-golden.sh`
+
+Pins combat — `attack.php`, `attackr.php`, `attackm.php`, `scattack.php` and
+the two shared includes — which the tick never runs and the crawl drives only
+far enough to prove it renders. Thirty-seven scenarios, each from a fresh
+fixture: `tests/combat-golden.php` drops every table and reloads `db.sql` and
+`db/seed.sql` itself, applies a few `UPDATE`s to set up the two armies, logs in
+as `tester@` and posts the attack. It prints what the page said and **every
+column that changed in every table**, as before → after, and diffs that against
+`tests/golden/combat.txt`. About four seconds for the lot.
+
+The golden file is meant to be read. Each scenario prints its own one-line
+reason, and a reviewer can check a battle by hand from the numbers in it.
+`php tests/combat-golden.php <name>` runs one scenario.
+
+**The scenarios are chosen by branch, and then by scale.** Every outcome of
+every page, the land-gain brackets, the order land is taken in, and the
+refusals that run after the target is fetched are covered. The quirks are too:
+every combat entry in `$GAMEDATA['quirks']` has a `quirk-` scenario that pins
+the bug as it is now. Fixing one should change that scenario and nothing else,
+and the commit removes the quirk entry. But small armies hide small changes in
+the rounding: three hundred warriors at 100 or 101 hit points both come home
+297 strong. So `land-win-large` fields every unit type on both sides in the
+hundreds of thousands, and the `modifier-` sweep attacks once as each class
+and each race that has a modifier. Each of these was checked by moving one
+constant by one point (unit power and hit points, every modifier, the gain
+rates) and watching the test fail. Sixteen were tried and all sixteen failed
+the test.
+
+**Only failed queries and errors are reported from PHP's diagnostics.** PHP 8
+reports a read of an unassigned name as a Warning, but the database changes
+already show what that read did to the battle, and listing those warnings would
+churn the golden on every commit that starts a tally from zero. They are the
+crawl's business. Line numbers and the bcrypt hash a failed query quotes are
+masked for the same reason.
+
+**Wait two seconds after an edit before trusting a result.** The image runs
+opcache with `revalidate_freq=2`, so Apache keeps serving the file it cached
+for up to two seconds after a change. An edit followed at once by a test run
+can pass against the old code. This matters for scripted mutation checks, not
+for an ordinary edit-then-test cycle.
 
 ### `tests/smoke.php`
 

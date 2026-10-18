@@ -39,7 +39,7 @@ Four things load-bearing enough to repeat here:
 ```bash
 docker compose up -d --build     # start the stack on PHP 8.3; app on http://127.0.0.1:8080
 docker compose logs -f web       # PHP errors always go to stderr, whatever display_errors says
-bash tests/run-all.sh            # full suite (tick golden master + smoke crawl + audit)
+bash tests/run-all.sh            # full suite (tick + combat golden masters, smoke crawl, audits)
 bash tests/reset-db.sh           # restore the fixture world
 ```
 
@@ -59,6 +59,8 @@ Individual tests:
 ```bash
 bash tests/tick-golden.sh                 # tick regression test
 bash tests/tick-golden.sh --accept        # re-accept after an intended change
+bash tests/combat-golden.sh               # combat regression test (--accept likewise)
+docker compose exec -T web php /repo/tests/combat-golden.php land-win   # one combat scenario
 docker compose exec -T web php /repo/tests/smoke.php        # page crawl only
 docker compose exec -T web php /repo/tests/news-render.php  # news writers + renderer
 docker compose exec -T web php /repo/tests/dump-state.php   # dump DB as text

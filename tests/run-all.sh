@@ -15,6 +15,14 @@ if ! bash tests/tick-golden.sh; then
   status=1
 fi
 
+# Rebuilds the fixture per scenario and resets the database when it is done,
+# so it neither needs nor leaves anything for the tests around it.
+echo
+echo "=== combat golden master ==="
+if ! bash tests/combat-golden.sh; then
+  status=1
+fi
+
 # Deliberately after the tick test, which resets the database: the crawl reads
 # and writes game state, so running it first would poison the tick fixture.
 echo

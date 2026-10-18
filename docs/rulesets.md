@@ -158,7 +158,8 @@ database, and nothing here prevents it later.
 produced from the same fixture world. `tick-golden.sh --ruleset modern` sets
 `game_info.ruleset` after the reset, so the two goldens differ only where the
 rules do. That difference is itself a reviewable statement of what modern
-changes.
+changes. `tests/golden/combat.txt` splits the same way, and its scenarios set
+the ruleset after each fixture reload.
 
 **The two goldens have different re-accept rules**, and this is how classic is
 kept from drifting:
@@ -196,10 +197,12 @@ dependency" in [modernization.md](modernization.md)).
 
 **2. Broaden the fixture.** A move is only proven if perturbing the value fails
 a test. The other six score weights and most race and class modifiers wait for
-a fixture empire that holds the units or plays the combination. The combat
-code waits for the most: the tick golden master doesn't run attacks, and the
-crawl only reaches the attack forms. That same coverage is needed before the
-combat quirks can be fixed, so the work is shared.
+a fixture empire that holds the units or plays the combination. Combat no
+longer waits: `tests/combat-golden.sh` attacks with every unit type at a scale
+where a one-point change shows, and once as each class and modified race. Every
+combat constant and combat modifier it was checked against fails it when
+moved (see [testing.md](testing.md)). It also pins each combat quirk, so the
+quirks can now be fixed one at a time, each as its own reviewable diff.
 
 **3. The loader.** Move `gamedata.php` to `rulesets/classic.php`, add
 `game_info.ruleset`, write the loader and `mb_ruleset_overlay()`, and add the
