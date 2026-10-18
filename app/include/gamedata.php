@@ -452,6 +452,5 @@ $GAMEDATA['quirks'] = array(
     'The explore page shows special rates for Angels (fewer explorers needed) and Demons (more needed), but the tick only implements the Human rate; everyone else gets the default. (include/S_EXPLORE.php:33-36 vs update.php:88)',
     'Night Elves are dealt 4-10 archers at signup, but the free Archery research is immediately overwritten unless they are also Rangers. (checksignup.php:130-134)',
     'The attacker\'s race/class combat modifier is applied to the defender\'s power as well as their own. (attack/defANDoff.php:68-70)',
-    'An attacking golem\'s hit points are computed from your wizards\' defence, and the golem survivor formula multiplies by the archer\'s hit points rather than the golem\'s -- so how many golems come home depends on two unrelated units. (attack/calculations.php:22-23, attack/calculations.php:71)',
     'Sage accounting disagrees with itself about how many research projects there are. Points accrue across all eighteen, the assigned-sage totals on the status and research screens count the first sixteen, and your score counts only the first fourteen -- so a sage on Animation or Advanced Animation is invisible to both totals, and one on Advanced Farming or Advanced Construction is invisible to your score. (update.php:203 vs functions.php:240 and cresearch.php:112 vs update.php:292)',
 );

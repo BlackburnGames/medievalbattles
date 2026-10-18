@@ -19,8 +19,8 @@ $warhp = $wardef * 100;
 $archhp = ($archdef == 0 ? 1 : $archdef) * 120;	// unarmoured archers defend at 1, as the defender's do below
 $prihp = $pridef * 80;
 $wizhp = $wizdef * 75;
-$golemhp = $wizdef * 100;
-$irongolemhp = $wizdef * 100;
+$golemhp = 100 * 20;	// a golem's own, as a defending golem's below
+$irongolemhp = 100 * 25;
 $u_tally = 0;	// an elseif chain, so always 1: each type takes the whole blow. Formula, not port.
 if($uwarrior > 0)	{	$u_tally = $u_tally + 1;	 }
 elseif($uwizard > 0)	{	$u_tally = $u_tally + 1;	 }
@@ -68,7 +68,7 @@ if($uarcher > 0)	{
 	mysqli_query($db, "UPDATE military SET archers='$archers' WHERE email='$email' AND pw='$pw'");
 }
 if($ugolem > 0)	{
-	$subgolem = (($ugolem * $archhp) - $divided_pts) / $golemhp;
+	$subgolem = (($ugolem * $golemhp) - $divided_pts) / $golemhp;
 	if($subgolem < 0)	{	$subgolem = 0;	}
 		$subgolem = round($subgolem);
 		$golemcol = "golem" . "$tfleets";

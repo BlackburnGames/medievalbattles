@@ -269,8 +269,8 @@ $SCENARIOS = array(
     /* ---- the recorded quirks, pinned as they are ---- */
 
     array(
-        'name'  => 'quirk-golem-survivors',
-        'why'   => 'QUIRK: golem hit points come from wizard defence, and the survivor formula multiplies by archer hit points. archdef 3 and wizdef 1 make both visible.',
+        'name'  => 'golem-survivors',
+        'why'   => 'Attacking golems have a golem\'s own hit points, 2,000, as defending ones do. They were wizdef x 100, and the survivor formula multiplied by archer hit points, so 40 sent could come home as 141; archdef 3 and wizdef 1 would show either coming back.',
         'setup' => array(army($A, array('warriors' => 300, 'golem' => 40)), researched($A, array(17)),
             set('military', $A, array('archdef' => 3, 'wizdef' => 1)), $defenders, $defenderStats),
         'requests' => array(array('attack.php', array('empvalue' => $D, 'uwarrior' => 300, 'ugolem' => 40))),
