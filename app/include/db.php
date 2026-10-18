@@ -69,72 +69,89 @@ if (!function_exists('mb_sql_int')) {
 
 if (!function_exists('mb_query')) {
     /**
-     * Run a query with its values bound rather than interpolated.
+     * Run a query with its values bound to placeholders rather than written
+     * into the SQL by hand.
      *
      *     mb_query($db, "SELECT userid FROM user WHERE email=? AND pw=?", array($email, $pw))
      *
-     * This is what mb_sql_str() and mb_sql_int() were standing in for. They
-     * close the hole at a call site by escaping or casting the value into the
-     * SQL text; here the value never enters the text at all, so there is
-     * nothing to get wrong -- no quoting context to read, no escape to forget
-     * on a value read back from the database. The SQL argument should be a
-     * literal: tests/sql-injection-audit.php reads it as a query sink like
+     * This is what mb_sql_str() and mb_sql_int() were standing in for. Every
+     * value goes through this one function, so no call site chooses quotes,
+     * remembers an escape or decides whether a value read back from the
+     * database is safe. The SQL argument should be a literal:
+     * tests/sql-injection-audit.php reads it as a query sink like
      * mysqli_query(), and the params array as safe.
      *
-     * An int is bound as an integer. Anything else is bound as a string --
-     * null as '', which is what interpolating it produced and what
-     * mb_sql_str() produces, and a float as the digits PHP would have
-     * interpolated. That last is on purpose: MySQL reads a number written into
-     * the SQL as an exact decimal and a bound double as approximate, and
-     * ROUND() of the two can differ on a .5. A string carrying the same digits
-     * is converted exactly as the quoted literal it replaces was.
+     * Each ? is replaced, in order, by its value: an int as an integer literal,
+     * anything else as a string literal escaped by the driver for this
+     * connection's character set -- null as '', which is what interpolating it
+     * produced, and a float as the digits PHP would have interpolated.
+     *
+     * Substituted here rather than sent as a server-side prepared statement,
+     * on purpose. A prepared statement's result comes back natively typed --
+     * an INT column as a PHP int -- where every query this code was written
+     * against returns strings, and the code compares with === and is_string()
+     * on those strings: the guild-leader check is "$owner === $userid". Binding
+     * server-side would change the type of every value read back, across 1300
+     * call sites at once. Substituting keeps every result exactly as it was,
+     * and is the same thing PDO does by default. Moving to server-side
+     * prepares later means auditing those comparisons first.
+     *
+     * A ? inside a quoted literal in the SQL is left alone; the conversion
+     * tool refuses any query that has one.
      *
      * Failures report the way every other query in the app does: connect.php's
-     * MYSQLI_REPORT_ERROR turns a failed prepare or execute into a warning,
-     * which the crawl and the tick fail on, and the return value is false.
+     * MYSQLI_REPORT_ERROR turns one into a warning, which the crawl and the
+     * tick fail on, and the return value is false.
      *
      * @param mysqli $db
      * @param string $sql    with a ? for each value
      * @param array  $params the values, in order
-     * @return mysqli_result|bool a result for a statement that returns rows,
-     *                            true for one that does not, false on failure
+     * @return mysqli_result|bool as mysqli_query() returns
      */
     function mb_query($db, $sql, array $params = array())
     {
-        $stmt = mysqli_prepare($db, $sql);
-        if (!$stmt) {
-            return false;
-        }
-
         if ($params) {
-            $types = '';
-            $values = array();
-            foreach ($params as $value) {
-                if (is_int($value)) {
-                    $types .= 'i';
-                } else {
-                    $types .= 's';
-                    $value = (string) $value;
+            $params = array_values($params);
+            $out = '';
+            $next = 0;
+            $quote = null;
+            $len = strlen($sql);
+            for ($i = 0; $i < $len; $i++) {
+                $c = $sql[$i];
+                if ($quote !== null) {
+                    $out .= $c;
+                    if ($c === "\\" && $i + 1 < $len) {
+                        $out .= $sql[++$i];
+                    } elseif ($c === $quote) {
+                        $quote = null;
+                    }
+                    continue;
                 }
-                $values[] = $value;
+                if ($c === "'" || $c === '"') {
+                    $quote = $c;
+                    $out .= $c;
+                    continue;
+                }
+                if ($c !== '?') {
+                    $out .= $c;
+                    continue;
+                }
+                if (!array_key_exists($next, $params)) {
+                    trigger_error('mb_query(): more placeholders than values', E_USER_WARNING);
+                    return false;
+                }
+                $value = $params[$next++];
+                $out .= is_int($value) ? (string) $value
+                    : "'" . mysqli_real_escape_string($db, (string) $value) . "'";
             }
-            mysqli_stmt_bind_param($stmt, $types, ...$values);
+            if ($next !== count($params)) {
+                trigger_error('mb_query(): more values than placeholders', E_USER_WARNING);
+                return false;
+            }
+            $sql = $out;
         }
 
-        if (!mysqli_stmt_execute($stmt)) {
-            mysqli_stmt_close($stmt);
-            return false;
-        }
-
-        $result = mysqli_stmt_get_result($stmt);
-        if ($result === false) {
-            // No result set: an INSERT, UPDATE or DELETE that succeeded.
-            $ok = mysqli_stmt_errno($stmt) === 0;
-            mysqli_stmt_close($stmt);
-            return $ok;
-        }
-        mysqli_stmt_close($stmt);
-        return $result;
+        return mysqli_query($db, $sql);
     }
 }
 
