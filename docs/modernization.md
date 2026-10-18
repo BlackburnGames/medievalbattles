@@ -39,6 +39,15 @@ emptied down to the one disabled block that remains.
 
 In progress. The known work, in no committed order:
 
+- **MySQL 8.4 — critical, and a gate on deploying anywhere.** The host
+  ([deployment.md](deployment.md)) runs MySQL 8.4; the local stack and so
+  every golden master, crawl and audit run on 5.7. Nothing yet shows the
+  code works on the server it is going to. The work: move the `db` service
+  to `mysql:8.4`, set `sql_mode` per connection in `connect.php` and
+  `accounts.php` (a shared host's global mode cannot be changed, and 8.x's
+  default is strict), create the databases as `utf8mb4_unicode_ci`, and run
+  the suite. Whatever it finds is a Phase 3 bug. The specific risks are
+  listed under Blockers in deployment.md.
 - **SQL injection.** **The audit reached zero, 161 entries down to none — and
   then reopened at 11, because it had only ever been reading half the sinks.**
   It matched the `mysqli_query` token, and sixty calls in seven files use the
