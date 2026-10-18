@@ -137,28 +137,24 @@ $military = mysqli_fetch_array($military_query);
 		$warpower = $military['warpower'];
 		$wararmor = $military['wararmor'];
 		$wardef = $military['wardef'];
-		$twarriors = $warriors + $war1 + $war2 + $war3 + $war4;
 	## wizard info
 		$wizspeeds = $military['wizspeeds'];
 		$wizspeeda = $military['wizspeeda'];
 		$wizpower = $military['wizpower'];
 		$wizarmor = $military['wizarmor'];
 		$wizdef = $military['wizdef'];
-		$twizards = $wizards + $wiz1 + $wiz2 + $wiz3 + $wiz4;
 	## priest info
 		$prispeedw = $military['prispeedw'];
 		$prispeeda = $military['prispeeda'];
 		$pripower = $military['pripower'];
 		$priarmor = $military['priarmor'];
 		$pridef = $military['pridef'];
-		$tpriests = $priests + $pri1 + $pri2 + $pri3 + $pri4;
 	## archer info
 		$archspeedw = $military['archspeedw'];
 		$archspeeda = $military['archspeeda'];
 		$archpower = $military['archpower'];
 		$archarmor = $military['archarmor'];
 		$archdef = $military['archdef'];
-		$tarchers = $archers + $arch1 + $arch2 + $arch3 + $arch4;
 	## units in creation
 		$dbexplorer = $military['dbexplorer'];
 		$dbsage = $military['dbsage'];
@@ -471,6 +467,15 @@ $amrbutton = "<form type=get action=aconstruct.php><input class=button type=subm
 	$warriorc = floor($warriorc);
 	$archerc = floor($archerc);
 
+//	how many buildings the gold on hand pays for. These four were never
+//	initialised, and the zero checks below tested $bcost and $bmcost, which
+//	nothing assigns, so they never fired. Starting the loops from null made
+//	that harmless: null compares below any numeric string, so the first pass
+//	always ran and its cost check undid it. From zero it does not, and the
+//	zero check on the real names is what still says 0 with negative gold.
+	$max_land = 0;	$lcost = 0;
+	$max_mt = 0;	$tmcost = 0;
+
 	while($max_land < $aland AND $lcost < $gp)	 {
 		$max_land = $max_land + 1;
 		$lcost = $max_land * $b_cost;
@@ -483,8 +488,8 @@ $amrbutton = "<form type=get action=aconstruct.php><input class=button type=subm
 
 	if($lcost > $gp)	{	$max_land = $max_land -1;	}
 	if($tmcost > $gp)	 {	$max_mt = $max_mt - 1;	}
-	if($aland == 0 OR $gp == 0 OR $bcost > $gp)	{	$max_land = 0 ;	}
-	if($amts == 0 OR $gp == 0 OR $bmcost > $gp)	{	$max_mt = 0;	}
+	if($aland == 0 OR $gp == 0 OR $b_cost > $gp)	{	$max_land = 0 ;	}
+	if($amts == 0 OR $gp == 0 OR $bm_cost > $gp)	{	$max_mt = 0;	}
 
 // format numbers
 	## hourly values
@@ -534,7 +539,6 @@ $amrbutton = "<form type=get action=aconstruct.php><input class=button type=subm
 		$dbirongolem = number_format($dbirongolem);
 		// maximum values
 		$maxciv = number_format($maxciv);
-		$maxtrain = number_format($maxtrain);
 	## explore values
 		$expland = number_format($expland);
 		$expmt = number_format($expmt);
