@@ -30,12 +30,24 @@ if (!$db) {
 }
 mysqli_set_charset($db, 'utf8mb4');
 
+// The accounts database, beside the round: docs/rounds.md. Only loadFixture()
+// uses it; nothing here snapshots it, because no action moves an account.
+$adb = @mysqli_connect($host, $user, $pass,
+    getenv('MB_ACCOUNTS_DB_NAME') ? getenv('MB_ACCOUNTS_DB_NAME') : 'mb_accounts');
+if (!$adb) {
+    fwrite(STDERR, "Cannot connect to the accounts database: " . mysqli_connect_error() . "\n");
+    exit(2);
+}
+mysqli_set_charset($adb, 'utf8mb4');
+
 /*
- * Columns left out of the comparison. The login before each scenario rehashes
- * the tester's MD5 into a salted bcrypt, so `pw` differs on every run; the
- * rest are wall-clock.
+ * Columns left out of the comparison, all of them wall-clock. `pw` used to be
+ * one too, because the login before each scenario rehashed the tester's MD5
+ * into a salted bcrypt in all six tables. The hash is the account's now and
+ * the round holds a fixed kingdom key, so `pw` is compared like any column:
+ * a page that moved it would be moving the credential.
  */
-$IGNORED_COLUMNS = array('pw', 'ip', 'lastlogin', 'lastlog', 'date', 'datestamp');
+$IGNORED_COLUMNS = array('ip', 'lastlogin', 'lastlog', 'date', 'datestamp');
 
 /** Set columns on one empire's row in one table. Returns SQL for a `setup`. */
 function set($table, $userid, array $columns)
@@ -165,31 +177,41 @@ function runScenarios(array $scenarios, $fields = null)
  */
 function loadFixture($db)
 {
-    $result = mysqli_query($db, 'SHOW TABLES');
+    global $adb;
+    loadDatabase($db, array(__DIR__ . '/../../db.sql', __DIR__ . '/../../db/seed.sql'));
+    // The accounts too: an account left over from a scenario -- a signup, an
+    // address change -- would otherwise log into the next one's kingdoms.
+    loadDatabase($adb, array(__DIR__ . '/../../db/accounts.sql', __DIR__ . '/../../db/accounts-seed.sql'));
+}
+
+/** Drop every table in a database and load these files into it. */
+function loadDatabase($conn, array $files)
+{
+    $result = mysqli_query($conn, 'SHOW TABLES');
     $tables = array();
     while ($row = mysqli_fetch_row($result)) {
         $tables[] = '`' . $row[0] . '`';
     }
     if ($tables) {
-        mysqli_query($db, 'DROP TABLE ' . implode(', ', $tables));
+        mysqli_query($conn, 'DROP TABLE ' . implode(', ', $tables));
     }
 
-    foreach (array(__DIR__ . '/../../db.sql', __DIR__ . '/../../db/seed.sql') as $file) {
-        if (!mysqli_multi_query($db, file_get_contents($file))) {
-            fwrite(STDERR, "FATAL: loading $file: " . mysqli_error($db) . "\n");
+    foreach ($files as $file) {
+        if (!mysqli_multi_query($conn, file_get_contents($file))) {
+            fwrite(STDERR, "FATAL: loading $file: " . mysqli_error($conn) . "\n");
             exit(2);
         }
         do {
-            if ($r = mysqli_store_result($db)) {
+            if ($r = mysqli_store_result($conn)) {
                 mysqli_free_result($r);
             }
-            if (mysqli_errno($db)) {
-                fwrite(STDERR, "FATAL: loading $file: " . mysqli_error($db) . "\n");
+            if (mysqli_errno($conn)) {
+                fwrite(STDERR, "FATAL: loading $file: " . mysqli_error($conn) . "\n");
                 exit(2);
             }
-        } while (mysqli_more_results($db) && mysqli_next_result($db));
-        if (mysqli_errno($db)) {
-            fwrite(STDERR, "FATAL: loading $file: " . mysqli_error($db) . "\n");
+        } while (mysqli_more_results($conn) && mysqli_next_result($conn));
+        if (mysqli_errno($conn)) {
+            fwrite(STDERR, "FATAL: loading $file: " . mysqli_error($conn) . "\n");
             exit(2);
         }
     }

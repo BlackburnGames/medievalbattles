@@ -466,6 +466,10 @@ restarts the container twice; run it by hand after touching request handling.
   `reset-db.sh` drops and reloads the whole database. It must drop *all*
   tables, not just the 22 in `db.sql`, because the app creates per-settlement
   tables (`setmain<id>`, `setmsgs<id>`) at runtime.
+- **There are two databases, and both are reset.** `reset-db.sh` and the
+  golden harness's `loadFixture()` reload the accounts database alongside the
+  round. An account left over from an earlier run — a signup, a moved address
+  — would otherwise log into the next run's kingdoms.
 - **Fixture user ids are deliberately 1–3**: the tick loops from 0 to
   `max(userid)` rather than over existing rows, so high ids make every run
   crawl.
@@ -586,10 +590,15 @@ the resource raid behind it with none, and its news assertion fails.
 untidiness.** `idle@` is bcrypt — what `app/include/password.php` writes now —
 while `tester@` and `poor@` keep the unsalted MD5 the game stored until Phase 3,
 so every run drives both arms of `mb_password_verify()` *and* the rehash that
-follows a legacy login. That rehash is six `UPDATE`s across six tables, and a
-missed one is invisible from the outside: the session token keeps matching
-`user` while the table it missed goes quietly empty. Deleting the MD5 rows would
-delete the only coverage that path has.
+follows a legacy login. The hashes are in `db/accounts-seed.sql`, because the
+password is the account's; the round's six `pw` columns hold fixed kingdom
+keys, so the rehash moves no round row and the tick golden master is the same
+on every run. Deleting the MD5 rows would delete the only coverage that path
+has.
+
+`pw` is no longer on the golden harness's ignore list. It was there only
+because every login rehashed it in six tables; now a scenario that moves it is
+moving the credential, and should say so.
 
 `passwordChange()` closes the other half, on `idle2@` after the email change.
 It refuses a wrong current password, changes the password, and then logs in on
@@ -603,7 +612,7 @@ admin phase because the account does not exist afterwards — nothing after it
 may log in as `idle@` or `idle2@`.
 
 The email change in `preferences.php` is driven on the *member*, not the
-primary tester: it rewrites six tables and the session, and every fixture the
+primary tester: it rewrites the account, six tables and the session, and every fixture the
 primary pass depends on is keyed on that address. Both arms are asserted — an
 address containing a quote must be refused, a valid one must go through — and
 then the next request is checked for still being logged in, which is what

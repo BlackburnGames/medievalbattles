@@ -22,10 +22,14 @@
  *   6. A session idle past MB_SESSION_IDLE, or older than MB_SESSION_MAX, is
  *      ended. Waiting hours is not a test, so the clock is wound back in the
  *      session file itself, from the CLI, which shares the save path.
+ *   7. A session ends when its account is gone, or its kingdom key stops
+ *      naming a kingdom of that account, and a key that is not one -- the
+ *      password hash a session held before accounts moved -- never logs in.
+ *      The account's address changing does not end it: the link is the id.
  *
- * Uses poor@ and restores its password, so it is safe after the crawl. The
- * hash does change format on the way -- md5 to bcrypt -- which is what any
- * login does to a legacy row.
+ * Uses poor@ and restores its password and rows, so it is safe after the
+ * crawl. The account's hash does change format on the way -- md5 to bcrypt --
+ * which is what any login does to a legacy account.
  *
  *   docker compose exec -T web php /repo/tests/session.php
  */
@@ -193,6 +197,70 @@ check('a session older than the limit is ended, however busy', !loggedIn($s));
 $s = login();
 windBack($s, 'mb_seen', MB_SESSION_IDLE - 60);
 check('a session inside the idle limit carries on', loggedIn($s));
+
+// --- 7. The account and the kingdom, each checked on every request. ---
+// The password is the account's, in the accounts database; the session's $pw
+// is the kingdom's key. Either one ceasing to match ends the session. Driven
+// by editing the rows directly, from the CLI, and putting them back.
+$host = getenv('MB_DB_HOST') ? getenv('MB_DB_HOST') : 'db';
+$dbu  = getenv('MB_DB_USER') ? getenv('MB_DB_USER') : 'mb';
+$dbp  = getenv('MB_DB_PASS') ? getenv('MB_DB_PASS') : 'mb';
+$round    = mysqli_connect($host, $dbu, $dbp, getenv('MB_DB_NAME') ? getenv('MB_DB_NAME') : 'mbv6');
+$accounts = mysqli_connect($host, $dbu, $dbp, getenv('MB_ACCOUNTS_DB_NAME') ? getenv('MB_ACCOUNTS_DB_NAME') : 'mb_accounts');
+$qEmail = "'" . mysqli_real_escape_string($round, $EMAIL) . "'";
+$key = mysqli_fetch_row(mysqli_query($round, "SELECT pw FROM user WHERE email = $qEmail"))[0];
+check('the kingdom holds a key, not a password hash', preg_match('/^[0-9a-f]{64}$/', $key) === 1, $key);
+
+$s = login();
+check('...a session logged in to begin with', loggedIn($s));
+mysqli_query($round, "UPDATE user SET pw = '" . str_repeat('0', 64) . "' WHERE email = $qEmail");
+check('a session whose kingdom key no longer names a kingdom is ended', !loggedIn($s));
+mysqli_query($round, "UPDATE user SET pw = '$key' WHERE email = $qEmail");
+
+// The link is user.account_id, not the address, so the account's own address
+// changing does not end the session -- only the kingdom ceasing to answer
+// does. The round's copy of the address is what the session carries.
+$s = login();
+check('...a session logged in to begin with', loggedIn($s));
+mysqli_query($accounts, "UPDATE account SET email = 'moved@example.com' WHERE email = $qEmail");
+check('a session survives its account\'s address changing', loggedIn($s));
+mysqli_query($accounts, "UPDATE account SET email = $qEmail WHERE email = 'moved@example.com'");
+
+$s = login();
+check('...a session logged in to begin with', loggedIn($s));
+$row = mysqli_fetch_assoc(mysqli_query($accounts, "SELECT * FROM account WHERE email = $qEmail"));
+mysqli_query($accounts, "DELETE FROM account WHERE email = $qEmail");
+check('a session whose account is gone is ended', !loggedIn($s));
+mysqli_query($accounts, "INSERT INTO account (account_id, email, pw, admin, signup_comp_id, created) VALUES ("
+    . (int) $row['account_id'] . ", $qEmail, '" . mysqli_real_escape_string($accounts, $row['pw']) . "', "
+    . (int) $row['admin'] . ", '" . mysqli_real_escape_string($accounts, $row['signup_comp_id']) . "', '{$row['created']}')");
+
+$s = login();
+check('...a session logged in to begin with', loggedIn($s));
+mysqli_query($round, "UPDATE user SET account_id = 0 WHERE email = $qEmail");
+check('a session whose kingdom belongs to another account is ended', !loggedIn($s));
+mysqli_query($round, "UPDATE user SET account_id = " . (int) $row['account_id'] . " WHERE email = $qEmail");
+
+/** Replace a string value in a session file, keeping PHP's serialization valid. */
+function setInSession($sid, $name, $value)
+{
+    $file = rtrim(ini_get('session.save_path'), '/') . '/sess_' . $sid;
+    $data = @file_get_contents($file);
+    if ($data === false) {
+        return false;
+    }
+    $data = preg_replace_callback('/(^|;|\})' . preg_quote($name, '/') . '\|s:\d+:"[^"]*";/', function ($m) use ($name, $value) {
+        return $m[1] . $name . '|s:' . strlen($value) . ':"' . $value . '";';
+    }, $data, 1, $n);
+    return $n === 1 && file_put_contents($file, $data) !== false;
+}
+
+// A key that is not one never reaches a query. What a session from before the
+// accounts moved held as $pw -- the password hash -- is the realistic case.
+$s = login();
+check('...a session logged in to begin with', loggedIn($s));
+check('a session\'s key can be rewritten', setInSession($s, 'pw', '3afc79b597f88a72528e864cf81856d2'));
+check('a session holding a password hash as its key is not logged in', !loggedIn($s));
 
 echo "\n";
 if ($failed > 0) {

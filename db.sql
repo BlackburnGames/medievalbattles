@@ -716,9 +716,12 @@ CREATE TABLE `user` (
   `barterclock` int(3) NOT NULL default '336',
   `current_comp_id` varchar(255) NOT NULL default '',
   `signup_comp_id` varchar(255) NOT NULL default '',
-  -- May use app/admin/. Granted from the command line: bin/admin.php.
-  `admin` tinyint(1) NOT NULL default '0',
-  PRIMARY KEY  (`userid`)
+  -- The account this kingdom belongs to, in the accounts database
+  -- (db/accounts.sql). The link, rather than `email`: an address can change,
+  -- and a round that has ended keeps the one it had.
+  `account_id` int unsigned NOT NULL default '0',
+  PRIMARY KEY  (`userid`),
+  KEY `account_id` (`account_id`)
 ) ENGINE=MyISAM;
 
 #

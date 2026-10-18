@@ -33,7 +33,14 @@ include("include/igtop.php");
  * The queries below bind $email and $pw with mb_query(), so the AIM and MSN
  * updates after an address change filter on the new address by reading
  * $email after it is reassigned.
+ *
+ * The password and the address are the account's, in the accounts database
+ * (include/accounts.php); $pw is the kingdom's key. So every password check
+ * here is against the account's hash, and an address change moves the
+ * account as well as the kingdom's six rows.
  */
+$mb_account = mb_account_get($mb_account_id);
+$account_hash = $mb_account ? $mb_account['pw'] : '';
 
 if(!IsSet($empnews))	{
 	echo "<div align=center><a href=preferences.php?empnews=true>Delete Empire News</a>";
@@ -53,12 +60,12 @@ if(!IsSet($changepw))	{
 else	{
 	include("include/S_SINFOS.php");
 
-	// Verified against the stored hash rather than compared to it. $pw IS the
-	// stored hash -- it is what the session carries and what every query in the
-	// game filters on -- so with md5 the check could be digest == digest. A
-	// salted hash cannot be recomputed from the password alone, which is the
-	// point of it, so the plaintext goes to include/password.php instead.
-	if(!mb_password_verify($currentpw, $pw))	{
+	// Verified against the account's hash rather than compared to it. With md5
+	// the check could be digest == digest; a salted hash cannot be recomputed
+	// from the password alone, which is the point of it, so the plaintext goes
+	// to include/password.php instead. Not against $pw, which was the hash
+	// once and is the kingdom's key now.
+	if(!mb_password_verify($currentpw, $account_hash))	{
 		echo"<div align=center><font class=yellow>Your current password is not correct.</font></div>";
 		include("include/chngpw_table.php");
 		include("include/S_PREF.php");
@@ -75,10 +82,6 @@ else	{
 
 	// change their password
 	//
-	// The digest gets its own name. What the six UPDATEs interpolate is 32 hex
-	// characters and always was, but with the request value and the hash of it
-	// sharing one name, that is only true if you read all three lines in order.
-	//
 	// mb_password_hash($newpw), not md5(htmlspecialchars($newpw)). Escaping the
 	// password before hashing it was the same 2003 reflex as escaping everything
 	// else on the way in, and here it locked people out: checksignup.php and
@@ -88,15 +91,14 @@ else	{
 	// it. The line above it did the same thing to the *current* password check
 	// and was harmless only because the next line immediately overwrote it.
 	//
-	// The six UPDATEs moved to include/password.php, because checklogin.php has
-	// to run exactly the same set when it rehashes a legacy row, and two copies
-	// of a six-table list is how one of them ends up short.
+	// One row, the account's. It was six UPDATEs while the hash was copied into
+	// every kingdom table; the kingdom's key does not change with the password.
 	$newpw_hash = mb_password_hash($newpw);
-	mb_password_store($db, $email, $pw, $newpw_hash);
-	$pw = $newpw_hash;
-	// Every other session on this account still holds the old hash, and is
-	// ended by include/session.php on its next request.
-	mb_session_rotate($email, $pw);
+	mb_password_store($mb_account_id, $newpw_hash);
+	$account_hash = $newpw_hash;
+	// Every other session on this account still holds the old hash's
+	// fingerprint, and is ended by include/session.php on its next request.
+	mb_session_rotate($email, $pw, $account_hash);
 
 	echo"<div align=center><font class=yellow>Your password has been changed.</font></div>";
 	include("include/chngpw_table.php");
@@ -130,7 +132,12 @@ else	{
 
 	$New_Email[0] = strtolower($New_Email[0]);
 
-	if($New_Email[0] == $cnewemail AND $newemail != $email)	{
+	// And the accounts, which hold addresses whose kingdoms are gone. Another
+	// account's address is taken whether or not it plays this round.
+	$E_Account = mb_account_find($cnewemail);
+	$taken_by_account = $E_Account && (int) $E_Account['account_id'] !== $mb_account_id;
+
+	if(($New_Email[0] == $cnewemail AND $newemail != $email) OR $taken_by_account)	{
 		echo"<div align=center><font class=yellow>This email is already in use.</font></div>";
 		include("include/chngpw_table.php");
 		include("include/S_PREF.php");
@@ -146,13 +153,20 @@ else	{
 	// image this suite also runs against. The values are bound now, and
 	// mb_valid_email() above has already refused every character it was
 	// standing between MySQL and. The table names are a literal list.
+	//
+	// The account first, then the round's copy in the kingdom's six tables.
+	// The kingdom is linked to the account by user.account_id, so the copy is
+	// not what holds them together -- but it is what every "email=? AND pw=?"
+	// in the game matches, and this session moves onto it below. An ended
+	// round keeps the address it had.
+	mb_account_set_email($mb_account_id, $newemail);
 	foreach (array('user', 'buildings', 'military', 'research', 'returntbl', 'explore') as $table) {
 		mb_query($db, "UPDATE $table SET email=? WHERE email=? AND pw=?", array($newemail, $email, $pw)) or die(mysqli_error($db)); // mb-unbound-ok: table names from a literal list
 	}
 	$email = $newemail;
-	mb_session_rotate($email, $pw);
+	mb_session_rotate($email, $pw, $account_hash);
 
-	// The six UPDATEs above have just moved the account onto the new address,
+	// The six UPDATEs above have just moved the kingdom onto the new address,
 	// and $email now holds it, so these filter on that one.
 	mb_query($db, "UPDATE user SET aim=? WHERE email=? AND pw=?", array($newaim, $email, $pw));
 	mb_query($db, "UPDATE user SET msn=? WHERE email=? AND pw=?", array($newmsn, $email, $pw));
@@ -184,7 +198,7 @@ else	{
 		include("include/S_PD.php");
 		die();
 	}
-	elseif(!mb_password_verify($dpw, $pw))	{
+	elseif(!mb_password_verify($dpw, $account_hash))	{
 		echo"<div align=center><font class=yellow>Incorrect password.</font><div>";
 		include("include/chngpw_table.php");
 		include("include/S_PREF.php");
@@ -214,6 +228,9 @@ else	{
 		// instead, which included two DROP TABLEs.
 		require_once __DIR__ . '/include/empire.php';
 		mb_empire_remove($db, $userid);
+		// And the account: this is the one place a player deletes theirs, not
+		// just the kingdom it plays this round.
+		mb_account_delete($mb_account_id);
 
 		mb_session_end();
 		$login = $email = $pw = '';

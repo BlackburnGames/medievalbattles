@@ -38,12 +38,14 @@ require_once __DIR__ . '/html.php';
 require_once __DIR__ . '/news.php';
 
 /**
- * And the password helpers, which need mb_query() for the same reason.
+ * And the accounts, with the password helpers that act on them.
  *
- * Only three files hash or verify a password, but one of them is
- * checklogin.php, which upgrades a legacy hash in place -- six UPDATEs that
- * have to run before anything else queries with the credential.
+ * The account -- address, password hash, admin flag -- lives in a database of
+ * its own beside this round's, and include/session.php asks it about every
+ * logged-in request. Its connection opens on first use, not here, so a page
+ * that never touches an account never makes it.
  */
+require_once __DIR__ . '/accounts.php';
 require_once __DIR__ . '/password.php';
 
 /**

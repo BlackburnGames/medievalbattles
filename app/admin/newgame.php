@@ -26,9 +26,12 @@ mysqli_query($db, "DELETE FROM setforums");
 mysqli_query($db, "DELETE FROM setforumsmsgs");
 echo "<div align=center><b>All settlement forum posts have been deleted from the database.</b></div>";
 
-// Every account but the administrators', who are player accounts and would
+// Every kingdom but the administrators', who are player accounts and would
 // otherwise delete themselves -- and lose this page -- by starting a new game.
-mysqli_query($db, "DELETE FROM user WHERE admin = 0");
+// The accounts themselves are kept: they live in the accounts database and
+// outlast the round, and a player comes back by signing up again with the
+// same address and password. See include/kingdom.php.
+mb_kingdom_delete_players($db);
 mysqli_query($db, "DELETE FROM returntbl WHERE userid NOT IN (SELECT userid FROM user)");
 mysqli_query($db, "DELETE FROM research WHERE userid NOT IN (SELECT userid FROM user)");
 mysqli_query($db, "DELETE FROM military WHERE userid NOT IN (SELECT userid FROM user)");
@@ -36,7 +39,7 @@ mysqli_query($db, "DELETE FROM explore WHERE userid NOT IN (SELECT userid FROM u
 mysqli_query($db, "DELETE FROM buildings WHERE userid NOT IN (SELECT userid FROM user)");
 mysqli_query($db, "DELETE FROM barter WHERE userid NOT IN (SELECT userid FROM user)");
 mysqli_query($db, "DELETE FROM empnews WHERE yourid NOT IN (SELECT userid FROM user)");
-echo "<div align=center><b>All accounts except administrators have been deleted from the database.</b></div>";
+echo "<div align=center><b>All kingdoms except administrators' have been deleted from the database. Accounts are kept.</b></div>";
 
 mysqli_query($db, "DELETE FROM guild");
 mysqli_query($db, "DELETE FROM guildmsgs");

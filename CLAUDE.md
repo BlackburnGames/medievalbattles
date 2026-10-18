@@ -10,7 +10,7 @@ The work in progress is a staged modernization. Phase 1 (a running, test-covered
 
 **Do not expose this app to a network.** Every query now takes its values through `mb_query()` — none is built by interpolation — but the admin area behind its gate can still delete the world from one link. Both container ports bind to 127.0.0.1 deliberately — keep it that way.
 
-**Every session starts in `app/include/session.php`.** It sets the cookie rules (HttpOnly, SameSite=Strict, strict ids), refuses a session to any request another site made (`Sec-Fetch-Site`), expires sessions after 2 hours idle or 24 hours total, and ends a session whose email and hash no longer name a row — which is how a password change logs out the account's other sessions. Do not call `session_start()` anywhere else, and write the credential only through `mb_session_login()` / `mb_session_rotate()` / `mb_session_end()`. `tests/session.php` holds each rule to account.
+**Every session starts in `app/include/session.php`.** It sets the cookie rules (HttpOnly, SameSite=Strict, strict ids), refuses a session to any request another site made (`Sec-Fetch-Site`), expires sessions after 2 hours idle or 24 hours total, and ends a session whose account no longer has its address and password hash, or whose kingdom key no longer names a kingdom — which is how a password change logs out the account's other sessions. Do not call `session_start()` anywhere else, and write the credential only through `mb_session_login()` / `mb_session_rotate()` / `mb_session_end()`. `tests/session.php` holds each rule to account.
 
 ## Documentation
 
@@ -31,7 +31,7 @@ Four things load-bearing enough to repeat here:
 
 - **`mb_db_result()`'s column-0 fallback is deliberate**, not defensive. Resolving field names strictly returns null across signup, login and the guild code, and has already silently disabled the entire game tick once. Read the trap writeup in [docs/porting-notes.md](docs/porting-notes.md) before changing it.
 - **`tests/known-issues.txt`, `tests/register-globals.txt`, `tests/broken-queries.txt`, `tests/sql-injection.txt`, `tests/sql-injection-stored.txt`, `tests/xss.txt` and `tests/xss-stored.txt` may only ever shrink.** They are ratchets, and the last six double as Phase 3 bug lists. Regenerate with `--accept` on the matching script (`--stored --accept` for the two stored lists). The four injection and output lists are all **empty**, and they stay that way only if new queries bind their values with `mb_query($db, $sql, $params)` — `tests/unbound-queries.txt` is empty too, and fails on any query that builds its SQL out of values — and new output goes through `mb_h()` / `mb_attr()` — including values read back from the database. All four are per-file, so moving a query or an echo into an include away from its source clears the entry without fixing anything, and a value a shared include loads (`$empireguild`, `$ename`) is invisible to them: escape it anyway.
-- **The credential is validated, not escaped, at `app/include/session.php`.** `$email` and `$pw` are interpolated bare into ~1300 `WHERE` clauses, so `app/include/credentials.php` constrains what they may be instead, at signup, at the preferences change and on the way back out of the session. Loosening that rule re-opens every one of those call sites. `mb_valid_pw_hash()` accepts bcrypt or the legacy MD5, and `app/include/password.php` pins `PASSWORD_BCRYPT` so that alphabet is a fact rather than whatever `PASSWORD_DEFAULT` becomes — a password change is six `UPDATE`s, and `mb_password_store()` is the only place that list may live.
+- **The credential is validated, not escaped, at `app/include/session.php`.** `$email` and `$pw` name the kingdom in ~1300 `WHERE email=? AND pw=?` clauses. They are bound now, but `app/include/credentials.php` still constrains what they may be, at signup, at the preferences change and on the way back out of the session, so a query written the old way cannot re-open it. `$pw` is the **kingdom key** (64 hex, `mb_valid_kingdom_key()`), not the password hash: the hash is the account's, in the separate `mb_accounts` database (`app/include/accounts.php`), and is only ever bound. A kingdom belongs to its account by `user.account_id`, never by address — the round's `email` columns are a copy. A password change is one `UPDATE` on the account through `mb_password_store()`; an address change rewrites the account and the kingdom's six tables. See [docs/rounds.md](docs/rounds.md).
 - **`connect.php` reports query errors as warnings, not exceptions**, and the crawl and the tick both fail on one. Going further to `MYSQLI_REPORT_STRICT` needs the ~1300 call sites to check their return values first. `bash tests/query-audit.sh` regenerates the combined inventory.
 - **`app/include/gamedata.php` is the only place a game value may be written**, and every value carries a `file:line` citation. Change a cited engine line and the citation must change with it.
 
@@ -41,8 +41,10 @@ Four things load-bearing enough to repeat here:
 docker compose up -d --build     # start the stack on PHP 8.3; app on http://127.0.0.1:8080
 docker compose logs -f web       # PHP errors always go to stderr, whatever display_errors says
 bash tests/run-all.sh            # full suite (tick + combat golden masters, smoke crawl, audits)
-bash tests/reset-db.sh           # restore the fixture world
+bash tests/reset-db.sh           # restore the fixture world (both databases: mbv6 and mb_accounts)
 ```
+
+A `dbdata` volume made before the accounts database existed has no `mb_accounts`, and every login fails until `bash tests/reset-db.sh` creates it (MySQL runs its init scripts only on an empty volume). A real world is moved over with `docker compose exec web php /repo/bin/accounts-migrate.php` instead, which keeps its players.
 
 PHP 5.6 is **no longer a per-change gate**. It was the Phase 2 port's proof
 that behaviour did not move, and the shared golden master now does that on
@@ -76,6 +78,6 @@ docker compose exec -w /repo web php update.php
 
 Fixture logins are `tester@example.com` / `test1234` (plus `idle@` / `pass2`, `poor@` / `pass3`).
 
-The admin area is `http://127.0.0.1:8080/admin/`. There is no admin password: an administrator is a player account with `user.admin` set, logged into the game as usual — the fixture's is `tester@`. Grant and revoke from the command line: `docker compose exec web php /repo/bin/admin.php list | grant <email> | revoke <email>`. See `app/admin/include/auth.php`.
+The admin area is `http://127.0.0.1:8080/admin/`. There is no admin password: an administrator is an account with `account.admin` set (in `mb_accounts`), logged into the game as usual — the fixture's is `tester@`. Grant and revoke from the command line: `docker compose exec web php /repo/bin/admin.php list | grant <email> | revoke <email>`. See `app/admin/include/auth.php`.
 
 **On Windows, prefix `docker compose exec` with `MSYS_NO_PATHCONV=1`** when passing container paths, or Git Bash rewrites `/repo/...` into a Windows path and the command fails. The scripts in `tests/` already set it.

@@ -1,6 +1,6 @@
 <?php
 /**
- * What an email address, a password hash and an empire name are allowed to be.
+ * What an email address, a kingdom key and an empire name are allowed to be.
  *
  * This exists because of one entry on tests/sql-injection.txt that could not be
  * fixed where it was reported. preferences.php lets a player choose a new
@@ -28,14 +28,12 @@
  *   - include/session.php, so a row that predates this file cannot log in and
  *     put one back into scope.
  *
- * The password half costs nothing, and the reason is worth stating rather than
- * assuming. The app stores what include/password.php produces, which is bcrypt
- * -- pinned to PASSWORD_BCRYPT rather than PASSWORD_DEFAULT precisely so that
- * its alphabet is known here. Bcrypt emits `$2y$`, a two-digit cost and 53
- * characters of [./A-Za-z0-9], and none of that carries meaning inside a SQL
- * string literal. The 32-character hex digest is the legacy md5 form, still
- * accepted because a row that predates the change has to be able to log in
- * once so that checklogin.php can rehash it.
+ * The other half of the credential is not the password hash any more. The hash
+ * is the account's, in the accounts database (include/accounts.php), and is
+ * only ever bound. What the session carries as $pw, and what the round's six
+ * `pw` columns hold, is a kingdom key: 64 lowercase hex characters from
+ * include/kingdom.php's mb_kingdom_key(). That is a stricter rule than the one
+ * it replaces, which had to admit both bcrypt's alphabet and the legacy md5.
  *
  * The address half does cost something, and it is worth being explicit about
  * it. An apostrophe is legal in the local part of a real address, and
@@ -46,24 +44,14 @@
  * can relax to FILTER_VALIDATE_EMAIL alone.
  */
 
-if (!function_exists('mb_valid_pw_hash')) {
+if (!function_exists('mb_valid_kingdom_key')) {
     /**
      * @param  mixed $value
-     * @return bool  true for a bcrypt hash, or for the legacy md5 digest
+     * @return bool  true for a key as mb_kingdom_key() makes one
      */
-    function mb_valid_pw_hash($value)
+    function mb_valid_kingdom_key($value)
     {
-        if (!is_string($value)) {
-            return false;
-        }
-        // Bcrypt, as include/password.php produces it: $2y$ (or the $2a$/$2b$
-        // an older PHP wrote), a two-digit cost, and 53 characters of salt and
-        // digest from bcrypt's own alphabet. Nothing outside [./A-Za-z0-9$],
-        // which is the property the 1300 interpolations depend on.
-        if (preg_match('~^\$2[aby]\$[0-9]{2}\$[./A-Za-z0-9]{53}$~', $value) === 1) {
-            return true;
-        }
-        return preg_match('/^[0-9a-f]{32}$/i', $value) === 1;
+        return is_string($value) && preg_match('/^[0-9a-f]{64}$/', $value) === 1;
     }
 }
 
@@ -74,7 +62,11 @@ if (!function_exists('mb_valid_email')) {
      */
     function mb_valid_email($value)
     {
-        if (!is_string($value) || $value === '' || strlen($value) > 255) {
+        // 50, not the 254 an address may run to: every table that holds one
+        // is varchar(50), and with this server's non-strict sql_mode a longer
+        // address was stored cut short without a word -- so the account it
+        // made could never log in, because nothing matched what it typed.
+        if (!is_string($value) || $value === '' || strlen($value) > 50) {
             return false;
         }
 

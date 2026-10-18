@@ -1,7 +1,7 @@
 <?php
 /**
  * Who may use the admin area: a logged-in player whose account is flagged
- * `user.admin`.
+ * `account.admin`, in the accounts database (include/accounts.php).
  *
  * Until Phase 3 nothing gated the area at all -- adminlogin.php compared a
  * hardcoded `mako` / `quickshot` and printed a link, and no page checked
@@ -33,22 +33,19 @@ if (!function_exists('mb_admin_logged_in')) {
      */
     function mb_admin_logged_in()
     {
-        global $email, $pw;
+        global $email, $pw, $mb_account_id;
 
         // session.php has already validated and checked these against the
-        // account, and blanked them if either failed.
-        if ($email === '' || $pw === '') {
+        // account and the kingdom, and blanked them if either failed.
+        if ($email === '' || $pw === '' || !$mb_account_id) {
             return false;
         }
 
-        // Global first, so that if this is the include that connects, the
-        // connection lands in the global rather than this function's scope.
-        global $db;
-        require_once __DIR__ . '/../../include/connect.php';
-        $r = mb_query($db, "SELECT admin FROM user WHERE email=? AND pw=?", array($email, $pw));
-        $row = $r ? mysqli_fetch_row($r) : null;
+        // The flag is the account's, in the accounts database, not the
+        // kingdom's -- an administrator stays one from round to round.
+        $account = mb_account_get($mb_account_id);
 
-        return $row && (int) $row[0] === 1;
+        return $account && (int) $account['admin'] === 1;
     }
 }
 

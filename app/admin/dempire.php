@@ -12,7 +12,7 @@ if(!IsSet($daccount))	{
 	echo "<form type=post action=dempire.php>
 		<table border=1 bordercolor=#000000 align=center cellpadding=0 cellspacing=0>
 			<tr>
-				<td colspan=2><b>Delete Account</b></td>
+				<td colspan=2><b>Delete Kingdom</b></td>
 			<tr>
 				<td><input type=\"text\" name=\"empre\" maxlength=\"50\"></td>
 				<td><input type=\"submit\" name=\"daccount\" value=\"Delete\"></td>
@@ -26,7 +26,9 @@ else	{
 
 	// The empire name is typed into the form, and the address and settlement id
 	// are read back out of the row it names -- so all three reach the DELETEs
-	// below, and the last of them removes an account.
+	// below, and the last of them removes the kingdom. Not the account: that
+	// lives in the accounts database and outlasts the round, and its owner can
+	// sign up again for a new kingdom with the same address and password.
 
 	//SELECTING SETID
 		$empreset = mb_query($db, "SELECT setid FROM user WHERE ename=?", array($empre));

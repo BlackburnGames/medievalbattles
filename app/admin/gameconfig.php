@@ -86,17 +86,21 @@ $MB_ADMIN_ACTIONS = array(
 		),
 	),
 	// Administrators are player accounts, so deleting every account used to
-	// delete the admin running it, who was then locked out of this page. Admin
-	// accounts are kept, and the other tables are cleared of every row whose
-	// empire is gone rather than emptied. That kept the admins' kingdoms too,
-	// mid-game, so 'then' puts them back to their starting state -- see
-	// include/kingdom.php -- and the settlements are recounted, since signup
-	// places new empires by their member counts.
+	// delete the admin running it, who was then locked out of this page.
+	// Accounts are not the round's to delete at all now -- they live in the
+	// accounts database and are kept, so a player whose kingdom went comes back
+	// through signup -- and 'first' deletes every kingdom but the admins'.
+	// The other tables are cleared of every row whose kingdom is gone rather
+	// than emptied. That keeps the admins' kingdoms too, mid-game, so 'then'
+	// puts them back to their starting state -- see include/kingdom.php -- and
+	// the settlements are recounted, since signup places new empires by their
+	// member counts. The action keeps its key, which the crawl and
+	// tests/newgame.php post.
 	'accounts' => array(
-		'label'      => 'Delete every account except administrators, and reset theirs',
+		'label'      => "Delete every kingdom except administrators', and reset theirs",
+		'first'      => 'mb_kingdom_delete_players',
 		'then'       => 'mb_kingdom_reset_admins',
 		'statements' => array(
-			'DELETE FROM user WHERE admin = 0',
 			'DELETE FROM buildings WHERE userid NOT IN (SELECT userid FROM user)',
 			'DELETE FROM military WHERE userid NOT IN (SELECT userid FROM user)',
 			'DELETE FROM research WHERE userid NOT IN (SELECT userid FROM user)',
@@ -120,12 +124,15 @@ if (IsSet($action)) {
 	if (!isset($MB_ADMIN_ACTIONS[$action])) {
 		echo "<b>No such action.</b><br><br>";
 	} else {
+		// Fixed function names from the list, never request input.
+		require_once __DIR__ . '/../include/kingdom.php';
+		if (isset($MB_ADMIN_ACTIONS[$action]['first'])) {
+			call_user_func($MB_ADMIN_ACTIONS[$action]['first'], $db);
+		}
 		foreach ($MB_ADMIN_ACTIONS[$action]['statements'] as $sql) {
 			mysqli_query($db, $sql) or die(mysqli_error($db)); // mb-unbound-ok: fixed statements from $MB_ADMIN_ACTIONS
 		}
-		// A fixed function name from the list, never request input.
 		if (isset($MB_ADMIN_ACTIONS[$action]['then'])) {
-			require_once __DIR__ . '/../include/kingdom.php';
 			call_user_func($MB_ADMIN_ACTIONS[$action]['then'], $db);
 		}
 		echo "<b>" . htmlspecialchars($MB_ADMIN_ACTIONS[$action]['label']) . "</b>: done.<br><br>";
@@ -150,10 +157,12 @@ if (IsSet($daccount)) {
 		die();
 	}
 
-	// An administrator's account is not deleted from here, the admin running
-	// this page's own included. Revoke the flag first: bin/admin.php.
-	$empreadmin = mb_query($db, "SELECT admin FROM user WHERE ename=?", array($empre));
-	if ((int) mb_db_result($empreadmin, "empreadmin") === 1) {
+	// An administrator's kingdom is not deleted from here, the admin running
+	// this page's own included. Revoke the flag first: bin/admin.php. The
+	// flag is the account's, and user.account_id is what links the two.
+	$empreacct = mb_query($db, "SELECT account_id FROM user WHERE ename=?", array($empre));
+	$empreaccount = mb_account_get(mb_db_result($empreacct, "empreacct"));
+	if ($empreaccount && (int) $empreaccount['admin'] === 1) {
 		echo "<b>" . htmlspecialchars($empre) . " is an administrator. Revoke that first, with bin/admin.php.</b><br><br>";
 		echo "<a href=gameconfig.php>Return</a></center>";
 		die();
@@ -197,12 +206,16 @@ echo "<tr><td>Delete one account, by empire name</td>"
 	. "<input type=submit name=daccount value=\"Delete\"></form></td></tr>";
 echo "</table><br>";
 
-// --- every account, as the credential dump this page has always been ---------
+// --- every kingdom ---------------------------------------------------------
+//
+// It was "the credential dump this page has always been": the second column was
+// the password hash, which was also the session token. The hash is the
+// account's now and `pw` holds the kingdom key, which is a session token still,
+// so the column is gone rather than relabelled.
 
 echo "<table border=1 width=\"100%\">
 	<tr>
 		<td><b>Empire Name</b></td>
-		<td><b>Password (MD5)</b></td>
 		<td><b>Email</b></td>
 		<td><b>AIM</b></td>
 		<td><b>MSN</b></td>
@@ -211,13 +224,13 @@ echo "<table border=1 width=\"100%\">
 
 // One query, not one per row. The online marker used to be a second SELECT
 // inside the loop, filtered on the empire name it had just fetched.
-$result_id = mysqli_query($db, "SELECT ename, pw, email, aim, msn, ip, online FROM user ORDER BY ip");
+$result_id = mysqli_query($db, "SELECT ename, email, aim, msn, ip, online FROM user ORDER BY ip");
 while ($row = mysqli_fetch_row($result_id)) {
-	// Assigned in two statements rather than by a ternary on $row[6]: the marker
+	// Assigned in two statements rather than by a ternary on $row[5]: the marker
 	// is a constant either way, and taking the value out of the assignment is
 	// what makes that visible to tests/xss-audit.php as well as to a reader.
 	$online = "";
-	if ($row[6] == 1) {
+	if ($row[5] == 1) {
 		$online = "<font color=red>*</font>";
 	}
 	echo "<tr align=center valign=top>"
@@ -225,8 +238,7 @@ while ($row = mysqli_fetch_row($result_id)) {
 		. "<td>" . htmlspecialchars($row[1]) . "</td>"
 		. "<td>" . htmlspecialchars($row[2]) . "</td>"
 		. "<td>" . htmlspecialchars($row[3]) . "</td>"
-		. "<td>" . htmlspecialchars($row[4]) . "</td>"
-		. "<td>" . htmlspecialchars($row[5]) . "</td></tr>\n";
+		. "<td>" . htmlspecialchars($row[4]) . "</td></tr>\n";
 }
 
 echo "</table></center>

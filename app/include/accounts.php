@@ -1,0 +1,170 @@
+<?php
+/**
+ * Accounts: who a player is, kept in a database of its own.
+ *
+ * One `user` row used to be both who you are -- the address, the password
+ * hash, the admin flag -- and what you played this round. So a round could not
+ * end without deleting the login along with the kingdom, and that is what both
+ * world wipes did. docs/rounds.md splits the two, and this is the first half:
+ * the account lives in the accounts database (db/accounts.sql), beside the
+ * round, and outlasts it.
+ *
+ * The round is linked to the account by `user.account_id`, not by address: an
+ * address can change, and an ended round keeps whichever it had. The round's
+ * six `pw` columns no longer hold the password hash: they hold a
+ * kingdom key, a random token written when the kingdom is made. Every one of
+ * the game's "WHERE email=? AND pw=?" queries keeps meaning "this kingdom"
+ * without being touched, and the password exists in exactly one row.
+ *
+ * The connection is opened on first use rather than with connect.php's, since
+ * most requests that need it are logged in and the session check asks for it
+ * once; the pages that never touch an account never connect.
+ */
+
+require_once __DIR__ . '/db.php';
+
+if (!function_exists('mb_accounts_db')) {
+    /**
+     * The accounts database's connection, opened once per request.
+     *
+     * The same server and user as the round's, and a different database:
+     * MB_ACCOUNTS_DB_NAME, as MB_DB_NAME names the round. A failure stops the
+     * request the way connect.php's does, since a page that cannot tell who
+     * is asking cannot safely carry on as though nobody is.
+     *
+     * @return mysqli
+     */
+    function mb_accounts_db()
+    {
+        static $adb = null;
+        if ($adb instanceof mysqli) {
+            return $adb;
+        }
+
+        $name = getenv('MB_ACCOUNTS_DB_NAME') ? getenv('MB_ACCOUNTS_DB_NAME') : 'mb_accounts';
+        $host = getenv('MB_DB_HOST') ? getenv('MB_DB_HOST') : '127.0.0.1';
+        $user = getenv('MB_DB_USER') ? getenv('MB_DB_USER') : 'mb';
+        $pass = getenv('MB_DB_PASS') ? getenv('MB_DB_PASS') : 'mb';
+
+        $adb = @mysqli_connect($host, $user, $pass, $name);
+        if (!$adb) {
+            if (!headers_sent()) {
+                header('Content-Type: text/plain', true, 500);
+            }
+            echo "Error: Unable to connect to the accounts database.\n";
+            echo mysqli_connect_error() . "\n";
+            exit;
+        }
+        mysqli_set_charset($adb, 'utf8mb4');
+        return $adb;
+    }
+}
+
+if (!function_exists('mb_account_find')) {
+    /**
+     * The account with this address, or null.
+     *
+     * @return array|null  account_id, email, pw, admin
+     */
+    function mb_account_find($email)
+    {
+        $r = mb_query(mb_accounts_db(),
+            "SELECT account_id, email, pw, admin FROM account WHERE email=?", array((string) $email));
+        $row = $r ? mysqli_fetch_assoc($r) : null;
+        return $row ? $row : null;
+    }
+}
+
+if (!function_exists('mb_account_get')) {
+    /**
+     * The account with this id, or null.
+     *
+     * @return array|null  account_id, email, pw, admin
+     */
+    function mb_account_get($account_id)
+    {
+        $r = mb_query(mb_accounts_db(),
+            "SELECT account_id, email, pw, admin FROM account WHERE account_id=?", array((int) $account_id));
+        $row = $r ? mysqli_fetch_assoc($r) : null;
+        return $row ? $row : null;
+    }
+}
+
+if (!function_exists('mb_account_create')) {
+    /**
+     * Make an account. The caller has validated the address and hashed the
+     * password; signup is the only caller.
+     *
+     * @return int  the new account's id
+     */
+    function mb_account_create($email, $hash, $computer_id)
+    {
+        $adb = mb_accounts_db();
+        mb_query($adb, "INSERT INTO account (email, pw, signup_comp_id, created) VALUES (?, ?, ?, NOW())",
+            array((string) $email, (string) $hash, (string) $computer_id));
+        return (int) mysqli_insert_id($adb);
+    }
+}
+
+if (!function_exists('mb_account_set_email')) {
+    function mb_account_set_email($account_id, $email)
+    {
+        mb_query(mb_accounts_db(), "UPDATE account SET email=? WHERE account_id=?",
+            array((string) $email, (int) $account_id));
+    }
+}
+
+if (!function_exists('mb_account_set_admin')) {
+    function mb_account_set_admin($account_id, $admin)
+    {
+        mb_query(mb_accounts_db(), "UPDATE account SET admin=? WHERE account_id=?",
+            array($admin ? 1 : 0, (int) $account_id));
+    }
+}
+
+if (!function_exists('mb_account_delete')) {
+    /**
+     * Delete an account. Its kingdom is the round's to remove, and the caller
+     * removes it first: include/empire.php's mb_empire_remove().
+     */
+    function mb_account_delete($account_id)
+    {
+        mb_query(mb_accounts_db(), "DELETE FROM account WHERE account_id=?", array((int) $account_id));
+    }
+}
+
+if (!function_exists('mb_account_admin_ids')) {
+    /**
+     * The ids of every administrator's account, for the round-side code that
+     * has to tell their kingdoms apart: the two world wipes keep and reset them.
+     *
+     * @return int[]
+     */
+    function mb_account_admin_ids()
+    {
+        $ids = array();
+        $r = mb_query(mb_accounts_db(), "SELECT account_id FROM account WHERE admin <> 0 ORDER BY account_id");
+        while ($r && ($row = mysqli_fetch_row($r))) {
+            $ids[] = (int) $row[0];
+        }
+        return $ids;
+    }
+}
+
+if (!function_exists('mb_account_fingerprint')) {
+    /**
+     * What the session remembers of the account's password hash.
+     *
+     * include/session.php ends a session once the hash it logged in against
+     * has changed -- that is how a password change logs out the account's
+     * other sessions -- so it has to keep something to compare. A digest of
+     * the hash rather than the hash, so a session file is not a copy of the
+     * one value an offline attack wants.
+     *
+     * @return string
+     */
+    function mb_account_fingerprint($hash)
+    {
+        return hash('sha256', (string) $hash);
+    }
+}

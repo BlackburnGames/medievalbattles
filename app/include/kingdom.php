@@ -16,10 +16,53 @@
  * starts with is made here, once, and both agree.
  *
  * This is the interim fix. docs/rounds.md is the real one: permanent accounts,
- * and a new round as a new world rather than a wipe of the old.
+ * and a new round as a new world rather than a wipe of the old. The accounts
+ * are permanent now -- include/accounts.php -- so a wipe deletes kingdoms
+ * and leaves every login standing.
  */
 
 require_once __DIR__ . '/db.php';
+// mb_account_admin_ids(): who an administrator is is the account's to say.
+require_once __DIR__ . '/accounts.php';
+
+if (!function_exists('mb_kingdom_key')) {
+	/**
+	 * A new kingdom's key: what its six `pw` columns hold, and what the
+	 * session carries as $pw.
+	 *
+	 * Those columns used to hold the password hash, which made the hash the
+	 * bearer token for every "WHERE email=? AND pw=?" in the game and put a
+	 * copy of it in six tables. The password is the account's now, in one row
+	 * of the accounts database, and the round holds a token that means only
+	 * "this kingdom". 64 lowercase hex characters, which is exactly what
+	 * include/credentials.php's mb_valid_kingdom_key() lets through.
+	 *
+	 * @return string
+	 */
+	function mb_kingdom_key()
+	{
+		return bin2hex(random_bytes(32));
+	}
+}
+
+if (!function_exists('mb_kingdom_find')) {
+	/**
+	 * The kingdom this account plays in this round, or null.
+	 *
+	 * By account id, not by address. The round keeps a copy of the address in
+	 * its six tables for the game's "email=? AND pw=?" queries, and that copy
+	 * is the kingdom's, not the account's: a round that has ended keeps the
+	 * address it had, whatever the account has moved to since.
+	 *
+	 * @return array|null  userid, email -- the round's copy -- and pw, the key
+	 */
+	function mb_kingdom_find($db, $account_id)
+	{
+		$r = mb_query($db, "SELECT userid, email, pw FROM user WHERE account_id=?", array((int) $account_id));
+		$row = $r ? mysqli_fetch_assoc($r) : null;
+		return $row ? $row : null;
+	}
+}
 
 if (!function_exists('mb_kingdom_start')) {
 	/**
@@ -101,8 +144,8 @@ if (!function_exists('mb_kingdom_seed')) {
 	 * Write a kingdom's buildings, military, research, explore and return rows.
 	 *
 	 * Everything but the user row, which signup inserts and a reset updates.
-	 * `email` and `pw` are written to each, because the credential is
-	 * denormalized across all six tables.
+	 * `email` and `pw` -- the kingdom key -- are written to each, because the
+	 * game's queries filter every one of the six tables on the pair.
 	 *
 	 * @param array $start  what mb_kingdom_start() returned
 	 */
@@ -133,8 +176,8 @@ if (!function_exists('mb_kingdom_reset')) {
 	/**
 	 * Put an existing kingdom back to what signup would have given it.
 	 *
-	 * Keeps who the account is -- email, password, empire name, race, class,
-	 * contact fields, computer ids, the admin flag -- and its settlement, which
+	 * Keeps who the kingdom is -- its account, email, kingdom key, empire name, race, class,
+	 * contact fields, computer ids -- and its settlement, which
 	 * the caller recounts. Everything the game changes is returned to its
 	 * column default and then to a fresh roll for the kingdom's race and
 	 * class. Its child rows are deleted and re-seeded rather than updated, so
@@ -192,8 +235,13 @@ if (!function_exists('mb_kingdom_reset_admins')) {
 	 */
 	function mb_kingdom_reset_admins($db)
 	{
+		$admins = mb_account_admin_ids();
+		if (!$admins) {
+			return 0;
+		}
 		$ids = array();
-		$r = mb_query($db, "SELECT userid FROM user WHERE admin <> 0");
+		$marks = implode(',', array_fill(0, count($admins), '?'));
+		$r = mb_query($db, "SELECT userid FROM user WHERE account_id IN ($marks)", $admins); // mb-unbound-ok: one placeholder per account
 		while ($row = mysqli_fetch_row($r)) {
 			$ids[] = (int) $row[0];
 		}
@@ -201,5 +249,28 @@ if (!function_exists('mb_kingdom_reset_admins')) {
 			mb_kingdom_reset($db, $id);
 		}
 		return count($ids);
+	}
+}
+
+if (!function_exists('mb_kingdom_delete_players')) {
+	/**
+	 * Delete every kingdom but the administrators', for the two world wipes.
+	 *
+	 * Only the `user` rows; the wipes then clear every other table of rows
+	 * whose userid is gone. The accounts are kept -- they are not the round's
+	 * to delete -- so a player whose kingdom went comes back through signup
+	 * with the same address and password, and gets a new one.
+	 *
+	 * @return void
+	 */
+	function mb_kingdom_delete_players($db)
+	{
+		$admins = mb_account_admin_ids();
+		if (!$admins) {
+			mb_query($db, "DELETE FROM user");
+			return;
+		}
+		$marks = implode(',', array_fill(0, count($admins), '?'));
+		mb_query($db, "DELETE FROM user WHERE account_id NOT IN ($marks)", $admins); // mb-unbound-ok: one placeholder per account
 	}
 }

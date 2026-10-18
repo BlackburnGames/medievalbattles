@@ -90,6 +90,20 @@ if ($signup) {
   //elseif($class != Cleric AND $class != Fighter AND $class != Mage AND $class != Ranger)   {  echo "That class doesn't exist!";  die(); }
   elseif($check_ip[0] >= 1)  {  echo "You are only allowed one account per computer!";   die(); }
 
+  // The account. The check above found no kingdom with this address in the
+  // round, but the address may still have an account: accounts outlast their
+  // kingdoms (include/accounts.php), so a player whose kingdom was deleted
+  // comes back this way. With the account's password, this signup makes the
+  // account a new kingdom. With any other, the address is taken, as it always
+  // was -- and says no more than that.
+  //
+  // And an account plays one kingdom a round, which is asked by account id:
+  // the round keeps the address the kingdom was made with, and the account
+  // may have moved to another since.
+  $account = mb_account_find($email);
+  if ($account && !mb_password_verify($pw, $account['pw'])) { echo mb_h($email) . " is already being used!";  die(); }
+  if ($account && mb_kingdom_find($db, $account['account_id'])) { echo mb_h($email) . " is already being used!";  die(); }
+
   //  select minimum amount of members
     $Sett_least = mb_query($db, "SELECT min(members) FROM settlement");
     $least_set = mb_db_result($Sett_least,"least_set");
@@ -133,18 +147,31 @@ if ($signup) {
   mb_query($db, "INSERT INTO emailvalidate (userid, code, `check`) VALUES (?, ?, '2')", array((int) $newbuserid, $act_code));
 
   if (($email === $cemail) and ($pw === $cpw) and ($email != "") and ($cemail != "") and ($pw != "") and ($cpw != ""))  {
-    // Hashed here, once, after every comparison that needed the plaintext. Six
-    // INSERTs below write it, because `pw` is denormalized across six tables.
-    $pw = mb_password_hash($pw);
+    // Hashed here, once, after every comparison that needed the plaintext, and
+    // stored on the account and nowhere else. An account that already exists
+    // keeps the hash it has; the address is the one it holds, should the case
+    // typed differ.
+    if ($account) {
+      $email = $account['email'];
+      $account_id = (int) $account['account_id'];
+    } elseif (!($account_id = mb_account_create($email, mb_password_hash($pw), $computer_id))) {
+      // Another signup took the address between the check and here; the
+      // accounts table's unique key refused this one.
+      echo mb_h($email) . " is already being used!";  die();
+    }
+
+    // What the six INSERTs below write as `pw` is the kingdom's key, not the
+    // password: see include/kingdom.php.
+    $pw = mb_kingdom_key();
 
   // What the empire starts with is include/kingdom.php's, shared with the
   // reset a new game runs on the administrators' kingdoms.
     $start = mb_kingdom_start($race, $class);
     $u = $start['user'];
 
-    mb_query($db, "INSERT INTO user (email,  pw, ename, msn, aim, gp, iron, exp, food, land, mts, setid, class, userid, race, safemode, signup_comp_id)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-      array($email, $pw, $ename, $msn, $aim, $u['gp'], $u['iron'], $u['exp'], $u['food'], $u['land'], $u['mts'], (int) $snum, $class, (int) $newbuserid, $race, $u['safemode'], $computer_id));
+    mb_query($db, "INSERT INTO user (email,  pw, ename, msn, aim, gp, iron, exp, food, land, mts, setid, class, userid, race, safemode, signup_comp_id, account_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      array($email, $pw, $ename, $msn, $aim, $u['gp'], $u['iron'], $u['exp'], $u['food'], $u['land'], $u['mts'], (int) $snum, $class, (int) $newbuserid, $race, $u['safemode'], $computer_id, $account_id));
 
     mb_kingdom_seed($db, $newbuserid, $email, $pw, $start);
 

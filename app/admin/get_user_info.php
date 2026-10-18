@@ -66,7 +66,6 @@ echo"
 				<td>
 					Empire Name: " . mb_h($evu['ename']) . "<br>
 					Email: " . mb_h($evu['email']) . "<br>
-					Password: " . mb_h($evu['pw']) . "<br>
 					Setid: " . mb_h($evu['setid']) . "<br>
 					GP: " . mb_h($evu['gp']) . "<br>
 					Iron: " . mb_h($evu['iron']) . "<br>

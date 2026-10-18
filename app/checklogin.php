@@ -45,31 +45,46 @@ if (!mb_valid_email($email)) {
 	exit();
 }
 
-// One lookup, by address alone. It used to run this query and a second one
+// One lookup, by address alone, and in the accounts database: the password is
+// the account's, not the kingdom's. It used to run this query and a second one
 // filtering on the digest as well, then compare the two results with ==, which
 // is a numeric comparison whenever both strings look numeric -- see
 // mb_password_verify().
-$result = mb_query($db, "SELECT pw FROM user WHERE email=?", array($email));
-$pwcheck = mysqli_fetch_array($result);
-$stored = isset($pwcheck[0]) ? $pwcheck[0] : '';
+$account = mb_account_find($email);
+$stored = $account ? $account['pw'] : '';
 
-if (mb_password_verify($plain_pw, $stored)) {
-	$pw = $stored;
-
+if ($account && mb_password_verify($plain_pw, $stored)) {
 	/*
-	 * Upgrade an md5 row in place, before anything else queries with the
-	 * credential.
-	 *
-	 * The hash is denormalized across six tables and is half of every WHERE
-	 * clause in the game, so this has to be all six or none -- and $pw has to
-	 * become the new value here, or the session carries a token that no longer
-	 * matches any row and every page after the redirect renders empty.
+	 * Upgrade an md5 account in place. One row, in the accounts database; the
+	 * round never held a copy of the hash after this change, so nothing in it
+	 * moves.
 	 */
 	if (mb_password_needs_upgrade($stored)) {
-		$upgraded = mb_password_hash($plain_pw);
-		mb_password_store($db, $email, $stored, $upgraded);
-		$pw = $upgraded;
+		$stored = mb_password_hash($plain_pw);
+		mb_password_store($account['account_id'], $stored);
 	}
+
+	/*
+	 * The kingdom this account plays in the round, found by account id. Its
+	 * address and key are what the session carries as $email and $pw, and
+	 * what every page's "WHERE email=? AND pw=?" matches -- the round's copy
+	 * of the address, not the one typed, whose case the lookup ignored.
+	 *
+	 * There may be none. Accounts outlast kingdoms -- the tick deletes an
+	 * inactive one, an administrator can delete one, and a new game deletes
+	 * every player's -- and the way back is signing up again with the same
+	 * address and password, which makes this account a new kingdom.
+	 */
+	require_once __DIR__ . '/include/kingdom.php';
+	$kingdom = mb_kingdom_find($db, $account['account_id']);
+	if (!$kingdom) {
+		unset($_SESSION['login'], $_SESSION['email'], $_SESSION['pw'], $_SESSION['mb_account'], $_SESSION['mb_account_fp']);
+		echo "Your account has no kingdom in this round.<br>";
+		echo "<a href=index.php?page=signup>Sign up</a> with the same email and password to start one.";
+		exit();
+	}
+	$email = $kingdom['email'];
+	$pw = $kingdom['pw'];
 
 	// insert ip address into db
 	$ipaddress = $_SERVER["REMOTE_ADDR"];
@@ -92,13 +107,14 @@ if (mb_password_verify($plain_pw, $stored)) {
 	unset($_SESSION['bad']);
 	$login = 1;
 	// A fresh session id for the logged-in session; see include/session.php.
-	mb_session_login($email, $pw);
+	mb_session_login($account['account_id'], $stored, $email, $pw);
 	header("Location: main.php?pageid=news");
 	exit();
 } else {
 	unset($_SESSION['login']);
 	unset($_SESSION['email']);
 	unset($_SESSION['pw']);
+	unset($_SESSION['mb_account'], $_SESSION['mb_account_fp']);
 	echo "Your email or password is incorrect.<br>";
 	echo "<a href=index.php>Login again.</a>";
 	exit();

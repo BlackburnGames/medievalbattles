@@ -19,10 +19,14 @@ services:
       MYSQL_DATABASE: mbv6
       MYSQL_USER: mb
       MYSQL_PASSWORD: mb
+      MB_ACCOUNTS_DB: mb_accounts
     volumes:
       # db.sql is schema-only; seed.sql adds the rows the app assumes exist.
       - ./db.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
       - ./db/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
+      # The accounts database, which outlasts a round: docs/rounds.md.
+      - ./docker/db/accounts.sh:/docker-entrypoint-initdb.d/03-accounts.sh:ro
+      - ./db:/mb-db:ro
       - dbdata:/var/lib/mysql
     ports:
       - "127.0.0.1:3307:3306"
@@ -40,6 +44,9 @@ services:
     environment:
       MB_DB_HOST: db
       MB_DB_NAME: mbv6
+      # Who a player is, as against the round MB_DB_NAME names; see
+      # app/include/accounts.php.
+      MB_ACCOUNTS_DB_NAME: mb_accounts
       MB_DB_USER: mb
       MB_DB_PASS: mb
       # Emulates PHP 4 register_globals. Off: the form handlers read their

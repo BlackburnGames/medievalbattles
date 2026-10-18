@@ -677,15 +677,17 @@ crawl($member, array('main.php?pageid=news'), $MAX_MEMBER_PAGES);
 
 /*
  * Changing the account's email address, on the member rather than the primary
- * tester -- it rewrites six tables and the session, and every fixture the
- * primary pass depends on is keyed on that address.
+ * tester -- it rewrites the account, the kingdom's six tables and the session,
+ * and every fixture the primary pass depends on is keyed on that address.
  *
  * This is the last entry that was on tests/sql-injection.txt. A player-chosen
  * address is written here and then interpolated into every "WHERE
  * email='$email'" in the game, so include/credentials.php now says what an
  * address may be and signup, this page and include/session.php all enforce it.
  * The refusal is the assertion that matters; the accepted case is here so the
- * six UPDATEs and the session rewrite are still known to work.
+ * account, the six UPDATEs and the session rewrite are still known to work --
+ * and the password change below logs in by the new address, which only the
+ * account can answer to.
  */
 prefsEmailChange($member);
 
@@ -695,13 +697,13 @@ prefsEmailChange($member);
  * The fixture carries both formats on purpose -- idle@ is bcrypt, tester@ and
  * poor@ are the unsalted MD5 the game stored until this change -- so the
  * logins above have already driven both arms of mb_password_verify(). What
- * they cannot show is what happened afterwards: an upgraded row is rewritten
- * across six tables, and if one of them is missed the session's token stops
- * matching there and only that table's pages go quietly empty.
+ * they cannot show is what happens afterwards. The hash is the account's, in
+ * the accounts database, and a change rewrites that one row; the kingdom's six
+ * tables hold its key, which must not move with it.
  *
- * So the credential is used again, after the upgrade, on a fresh session. A
- * second login proves `user` was rewritten consistently with what the session
- * carries, and a page that reads a different table proves the rest were.
+ * So the credential is used again, after the change, on a fresh session. A
+ * second login proves the account took the new hash, and a page that reads
+ * the kingdom proves the key it handed the session still names it.
  *
  * On idle2@ rather than the primary tester: the crawl leaves the tester's
  * fixture spent, and this is the account the email change above just moved.
@@ -767,7 +769,7 @@ function passwordChange($base, $email, $oldPass, $newPass)
     $after->post('/checklogin.php', array('email' => $email, 'pw' => $newPass, 'login' => 'Login'));
     if ($after->lastStatus !== 302) {
         $failures['checklogin.php | the changed password does not authenticate'] =
-            'mb_password_store() and mb_password_verify() disagree, or a table was missed';
+            'mb_password_store() and mb_password_verify() disagree';
         return;
     }
 
@@ -778,7 +780,7 @@ function passwordChange($base, $email, $oldPass, $newPass)
     $visitedNote = stripos($body, 'IdleBaron');
     if ($visitedNote === false) {
         $failures['main.php | logged in but the account reads as empty after a password change'] =
-            'one of the six pw columns still holds the old hash';
+            'the key the session carries no longer names the kingdom';
     }
 
     // The old password must stop working. Same client, so this is purely the

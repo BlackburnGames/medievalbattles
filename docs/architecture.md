@@ -24,13 +24,14 @@ folder, `include/...` resolves inside it — whose files are thin forwarders to
 `app/include/` rather than the copies they used to be. It lived under
 `app/css/admin/`, inside the stylesheet directory, until Phase 3.
 
-Its gate is `app/admin/include/auth.php`: an administrator is a player account
-with `user.admin` set, logged in through the game's own login. `mb_admin_require()`
-reads the flag from the database on every request, so a revocation or a
-session that `session.php` logs out takes the privilege with it. Being logged
+Its gate is `app/admin/include/auth.php`: an administrator is an account with
+`account.admin` set, logged in through the game's own login. `mb_admin_require()`
+reads the flag from the accounts database on every request, so a revocation or
+a session that `session.php` logs out takes the privilege with it. Being logged
 into the game is not being an admin, and the smoke crawl asserts both
 refusals. Flags are granted and revoked with `bin/admin.php`; the world-wipe
-actions keep admin accounts, and an admin cannot be deleted from the page. Pages inherit the call through `include/igtop.php`;
+actions delete every kingdom but the admins' and keep every account, and an
+admin's kingdom cannot be deleted from `gameconfig.php`. Pages inherit the call through `include/igtop.php`;
 `gameconfig.php` and `newgame.php` do not include it and call it themselves.
 
 ## Page flow
@@ -49,27 +50,42 @@ loads the logged-in user's entire state into globals (`$gp`, `$civ`, `$land`,
 
 ## Auth
 
-`$_SESSION['email']` plus `$_SESSION['pw']` (the stored password hash) are the
-credential, and nearly every query filters
-`WHERE email='$email' AND pw='$pw'`. Both live in the server-side session; what
-the browser holds is the session id, and `app/include/session.php` is what
-guards it — cookie flags, a new id at login, expiry, a full logout, no session
-for a request another site made, and a per-request check that the pair still
-names a row. Every session in the game, the admin area's included, starts
-there.
+**Two databases.** The round (`MB_DB_NAME`, `mbv6`, `db.sql`) is the world:
+kingdoms and everything hanging off them. The accounts database beside it
+(`MB_ACCOUNTS_DB_NAME`, `mb_accounts`, `db/accounts.sql`) holds one table,
+`account` — address, password hash, admin flag — and outlasts the round, so
+nothing that ends a kingdom deletes a login. `app/include/accounts.php` opens
+its connection on first use. The kingdom is linked to its account by `user.account_id`, not by
+address: an address can change, and an ended round keeps the one it had.
+See [rounds.md](rounds.md), which this is step 2 of.
+
+`$_SESSION['email']` plus `$_SESSION['pw']` are the kingdom's credential, and
+nearly every query filters `WHERE email=? AND pw=?`. `pw` is not the password
+hash: it is the **kingdom key**, 64 hex characters from `mb_kingdom_key()`,
+written to all six of the kingdom's tables when it is made. The session also
+carries the account id and a SHA-256 fingerprint of the account's hash. All of
+it lives in the server-side session; what the browser holds is the session id,
+and `app/include/session.php` is what guards it — cookie flags, a new id at
+login, expiry, a full logout, no session for a request another site made, and
+a per-request check that the account still has that address and that hash,
+and that the key still names a kingdom. Every session in the game, the admin
+area's included, starts there.
 
 The hash is **bcrypt** as of Phase 3 — `app/include/password.php`, pinned to
-`PASSWORD_BCRYPT` rather than `PASSWORD_DEFAULT` because
-`include/credentials.php` asserts the alphabet on the way out of the session.
-Rows still holding the old unsalted MD5 verify once and are rehashed in place
-by `checklogin.php`. What did *not* change is the hash's second job: it is
-half of the credential every query compares for equality, which bcrypt
-satisfies exactly as MD5 did.
+`PASSWORD_BCRYPT`. Accounts still holding the old unsalted MD5 verify once and
+are rehashed in place by `checklogin.php`. Login verifies against the account,
+then looks the kingdom up by `account_id`; an account with no kingdom in the round
+is told so, and signing up again with the same address and password gives it
+a new one.
 
-The email/hash pair is **denormalized into `buildings`, `military`, `research`,
-`returntbl` and `explore`**, so changing the auth model means touching the
-schema and almost every query in the app — and so a password change is six
-`UPDATE`s, which is why they live in one function rather than at each site.
+The email/key pair is **denormalized into `buildings`, `military`, `research`,
+`returntbl` and `explore`**, as the email/hash pair was. A password change no
+longer touches any of them — it is one `UPDATE` on the account,
+`mb_password_store()` — but an address change still rewrites the account and
+all six in the live round, since the game's queries match on the copy.
+
+`bin/accounts-migrate.php` moves a world that predates this (hashes in `pw`,
+the flag in `user.admin`, no `user.account_id`) into that shape, once.
 
 `app/include/session.php` is the single bootstrap: it starts the session and
 loads `$login`/`$email`/`$pw`, and every page that needs the credential
@@ -107,7 +123,10 @@ It is HTTP-invokable with no authentication.
 `db.sql`: 22 MyISAM tables, almost no indexes, no charset declared, types
 nearly all `bigint(255)`/`varchar(255)`. It is **not schema-only** — it seeds
 the `game_info` row and ten empty settlements. `db/seed.sql` adds the
-deterministic test world on top.
+deterministic test world on top. The accounts database is `db/accounts.sql`
+(one InnoDB table) and `db/accounts-seed.sql`, loaded by
+`docker/db/accounts.sh` on the volume's first boot and by `reset-db.sh` on
+every reset.
 
 The app also creates per-settlement tables (`setmain<id>`, `setmsgs<id>`) at
 runtime, which is why the test reset has to drop *all* tables rather than the

@@ -3,42 +3,33 @@
  * Password hashing.
  *
  * The 2003 code stored md5($pw) -- unsalted, unstretched, and denormalized into
- * six tables beside the email address that identifies the row. Two properties
- * of that are worth separating, because only one of them is being changed here.
+ * six tables beside the email address that identifies the row -- and the
+ * digest did two jobs. It protected the account, and it was the bearer token:
+ * the session carried it and roughly 1300 queries filtered on
  *
- * **The digest is also a bearer token, and it stays one.** Roughly 1300 queries
- * in this codebase filter on
+ *     ... WHERE email=? AND pw=?
  *
- *     ... WHERE email='$email' AND pw='$pw'
+ * Both jobs have moved. The hash protects the account, and lives in one row of
+ * the accounts database (include/accounts.php). The token is a kingdom key the
+ * round holds instead (include/kingdom.php), so those 1300 queries are
+ * untouched and none of them ever sees a password hash.
  *
- * where $pw is the stored hash, carried in the session. That is the app's whole
- * notion of "who is asking", and rewriting it is a different change of a
- * different size -- it touches every file. What matters for this one is that the
- * property those queries rely on is *equality against the stored string*, which
- * a bcrypt hash satisfies exactly as an md5 digest does. Nothing above this file
- * has to know which it is holding.
- *
- * **The digest is what protects the account, and that is what changes.** An
- * unsalted md5 of a human-chosen password is recoverable from a rainbow table in
- * the time it takes to type the query. password_hash() salts per row and costs
- * enough to make a stolen table expensive rather than free.
- *
- * PASSWORD_BCRYPT rather than PASSWORD_DEFAULT, deliberately. The hash is
- * interpolated bare into those 1300 queries and validated on the way out of the
- * session by include/credentials.php, so its *alphabet* is load-bearing: bcrypt
- * emits only [./A-Za-z0-9$], none of which carries meaning inside a SQL string
- * literal. PASSWORD_DEFAULT is bcrypt today and is documented to change, and the
- * argon2 formats it may change to contain `=`, `,` and `+`. Pinning the
- * algorithm keeps the guarantee that credentials.php is asserting rather than
- * making it depend on which PHP the app happens to be running under.
+ * password_hash() salts per row and costs enough to make a stolen table
+ * expensive rather than free. PASSWORD_BCRYPT rather than PASSWORD_DEFAULT:
+ * the pin was load-bearing while the hash was interpolated into queries and
+ * include/credentials.php vouched for its alphabet. It is only ever bound now,
+ * so moving to a newer algorithm is a decision about cost and compatibility,
+ * not about injection -- but it is a decision, and PASSWORD_DEFAULT would make
+ * it silently on a PHP upgrade.
  *
  * Legacy rows still verify. There is exactly one corpus of this game's data and
  * it is not this repo's fixture, so a login that stopped working for every
  * existing account would be a behaviour change nothing here could catch. An md5
- * row is accepted once and rehashed in place on the way through -- see
- * mb_password_store(), which is the same six UPDATEs preferences.php has always
- * run to change a password.
+ * account is accepted once and rehashed in place on the way through.
  */
+
+// mb_accounts_db(), for mb_password_store().
+require_once __DIR__ . '/accounts.php';
 
 if (!function_exists('mb_password_hash')) {
     /**
@@ -114,31 +105,26 @@ if (!function_exists('mb_password_needs_upgrade')) {
 
 if (!function_exists('mb_password_store')) {
     /**
-     * Write a new hash to all six tables that carry one.
+     * Write a new hash to the account.
      *
-     * `pw` is denormalized across user, buildings, military, research,
-     * returntbl and explore, and every page's queries name it beside the email
-     * -- so a row left holding the old hash is a page that silently stops
-     * matching. preferences.php has always run these six statements; they live
-     * here now because the login upgrade path has to run exactly the same set,
-     * and two copies of a list like this is how one of them ends up short.
+     * One UPDATE. It used to be six -- `pw` was denormalized across user,
+     * buildings, military, research, returntbl and explore, and a table left
+     * holding the old hash was a page that silently stopped matching -- and
+     * the list lived here so that preferences.php and the login upgrade could
+     * not disagree about it. The round's six columns hold the kingdom key now,
+     * which a password change does not touch.
      *
-     * The old hash is part of the WHERE for the same reason it is part of every
-     * other query in the game: it is the credential. Every value is bound
-     * even so -- the caller has usually validated them, but a helper that is
-     * safe only when its caller was careful is not safe. The table names cannot
-     * be bound and do not need to be: they are the literal list below.
+     * The session that made the change has to carry the new hash's
+     * fingerprint, or include/session.php ends it with the others:
+     * mb_session_rotate().
      *
-     * @param  mysqli $db
-     * @param  mixed  $email
-     * @param  mixed  $oldHash the hash currently stored
-     * @param  mixed  $newHash
+     * @param  int   $account_id
+     * @param  mixed $newHash
      * @return void
      */
-    function mb_password_store($db, $email, $oldHash, $newHash)
+    function mb_password_store($account_id, $newHash)
     {
-        foreach (array('user', 'buildings', 'military', 'research', 'returntbl', 'explore') as $table) {
-            mb_query($db, "UPDATE $table SET pw=? WHERE email=? AND pw=?", array($newHash, $email, $oldHash)); // mb-unbound-ok: table names from a literal list
-        }
+        mb_query(mb_accounts_db(), "UPDATE account SET pw=? WHERE account_id=?",
+            array((string) $newHash, (int) $account_id));
     }
 }

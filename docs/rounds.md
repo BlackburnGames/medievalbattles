@@ -1,6 +1,8 @@
 # Rounds and accounts
 
-**Status: design, not built.** Nothing below exists in the code yet. This
+**Status: partly built.** Steps 1 and 2 under "Order of work" are done:
+permanent accounts in their own database, and a kingdom key in place of the
+password hash. Rounds themselves — step 3 on — are design only. This
 records how the game is meant to end a round and start the next one without
 deleting its players, and the decisions that shape it.
 
@@ -219,10 +221,44 @@ live round database.
    `app/include/kingdom.php` holds signup's starting rolls and inserts, and
    `mb_kingdom_reset()` returns a kingdom to them. `tests/newgame.php`
    compares each reset kingdom against a twin signed up afterwards.
-2. **Accounts.** Add `mb_accounts` with the `account` table. Login, signup,
-   the session and `mb_admin_require()` move to it. The kingdom key replaces
-   the hash in the round database. There is still exactly one round database,
-   today's, and the golden masters don't move.
+2. ~~**Accounts.**~~ **Done.** `mb_accounts` holds the `account` table
+   (`db/accounts.sql`, `app/include/accounts.php`). Login, signup, the
+   session and `mb_admin_require()` use it; `user.admin` is gone. The round's
+   six `pw` columns hold a kingdom key, and `bin/accounts-migrate.php` moves
+   an existing world over. There is still exactly one round database.
+
+   The golden masters didn't move except where they had to: the tick golden
+   was re-accepted with only its `pw` values, the dropped `user.admin` and
+   the new `user.account_id` changed, checked by diffing with those
+   normalised away.
+   The combat and actions goldens passed untouched, and now compare `pw`
+   rather than ignoring it.
+
+   Decided on the way, ahead of step 3:
+
+   - **The link is `user.account_id`**, not the address. An address can
+     change, and an ended round is frozen with whatever address it had, so
+     an id is the only link that survives into history. `mb_kingdom_find()`
+     looks the kingdom up by it; signup refuses a second kingdom for the
+     same account by it; the wipes and the admin checks use it. The round's
+     `email` columns are a copy kept for the game's `email=? AND pw=?`
+     queries until step 5, and an address change still rewrites them in the
+     live round. The session survives the account's address changing; it
+     ends when the kingdom stops answering to its account id, address and
+     key.
+   - **Nothing in the round deletes an account.** The two wipes, the tick's
+     inactivity deletions and the admin's "delete kingdom" remove the kingdom
+     only. Only a player deleting their own account in `preferences.php`
+     removes the account too.
+   - **Signup doubles as join until step 3.** An account with no kingdom that
+     signs up again with its own password gets a new kingdom; with any other
+     password the address is taken. Login tells such an account it has no
+     kingdom rather than logging it in.
+   - **Revocation**, as designed above: a SHA-256 fingerprint of the hash in
+     the session, compared with the account's on every request, plus the
+     kingdom key still naming a row. `tests/session.php` drives both.
+   - **Addresses are capped at 50**, the round's column width. A longer one
+     was silently truncated on insert and could never log in.
 3. **Rounds.** Add the `round` and `round_result` tables and `bin/round.php`.
    Make the round list, join and history pages. Retire `newgame.php`.
 4. **Concurrent rounds.** The session chooses among running rounds, and the

@@ -12,18 +12,25 @@
  * are unaffected by the double load.
  *
  * $login/$email/$pw are the credential nearly every query filters on --
- * "WHERE email='$email' AND pw='$pw'", about 1300 times. $pw is the stored
- * password hash. It never leaves the server: the session lives in a file under
+ * "WHERE email=? AND pw=?", about 1300 times. $pw is the kingdom's key, which
+ * the round holds in place of the password hash it used to (see
+ * include/kingdom.php); the hash is the account's, in the accounts database,
+ * and the session keeps only a fingerprint of it. $mb_account_id says which
+ * account is logged in, for the pages that act on the account rather than the
+ * kingdom: preferences.php and the admin gate.
+ *
+ * None of it leaves the server: the session lives in a file under
  * session.save_path, and what the browser holds is the session id. So the
  * thing to defend is that id, and the 2003 code defended it with nothing --
  * no expiry, a cookie script could read, the same id before and after login,
  * a logout that left the session standing, and no protection against another
- * site making the request. Each of those is answered below; the 1300 queries
- * are untouched, because what they interpolate has not changed.
+ * site making the request. Each of those is answered below.
  */
 
-// mb_valid_email() and mb_valid_pw_hash(); see "checked on the way out" below.
+// mb_valid_email() and mb_valid_kingdom_key(); see "checked on the way out".
 require_once __DIR__ . '/credentials.php';
+// mb_account_get() and mb_account_fingerprint(), for the check against the account.
+require_once __DIR__ . '/accounts.php';
 
 if (!defined('MB_SESSION_IDLE')) {
 	/** Seconds without a request before a session is ended. */
@@ -116,13 +123,22 @@ if (!function_exists('mb_session_login')) {
 	 *
 	 * The id is replaced so that one obtained before logging in -- planted,
 	 * or simply observed -- is worth nothing after.
+	 *
+	 * @param int    $account_id  who logged in
+	 * @param string $hash        the account's password hash as it now stands
+	 *                            -- after any rehash -- of which only the
+	 *                            fingerprint is kept
+	 * @param string $email       the address, which names the kingdom too
+	 * @param string $key         the kingdom's key
 	 */
-	function mb_session_login($email, $pw)
+	function mb_session_login($account_id, $hash, $email, $key)
 	{
 		session_regenerate_id(true);
 		$_SESSION['login']       = 1;
+		$_SESSION['mb_account']  = (int) $account_id;
+		$_SESSION['mb_account_fp'] = mb_account_fingerprint($hash);
 		$_SESSION['email']       = $email;
-		$_SESSION['pw']          = $pw;
+		$_SESSION['pw']          = $key;
 		$_SESSION['mb_auth_at']  = time();
 		$_SESSION['mb_seen']     = time();
 	}
@@ -133,20 +149,22 @@ if (!function_exists('mb_session_rotate')) {
 	 * Carry a changed credential, under a new session id.
 	 *
 	 * For the password and address changes in preferences.php. The player's
-	 * other sessions hold the old value, which no longer matches the row, so
-	 * the check below ends them on their next request.
+	 * other sessions hold the old value -- the old hash's fingerprint, or the
+	 * old address -- which no longer matches the account, so the check below
+	 * ends them on their next request.
 	 *
 	 * preferences.php has rendered its frame by the time it changes anything,
 	 * and a new id needs a new cookie; past that point the id stays and only
 	 * the values move. The other sessions end either way.
 	 */
-	function mb_session_rotate($email, $pw)
+	function mb_session_rotate($email, $key, $hash)
 	{
 		if (!headers_sent()) {
 			session_regenerate_id(true);
 		}
 		$_SESSION['email'] = $email;
-		$_SESSION['pw']    = $pw;
+		$_SESSION['pw']    = $key;
+		$_SESSION['mb_account_fp'] = mb_account_fingerprint($hash);
 	}
 }
 
@@ -193,46 +211,66 @@ if (session_status() === PHP_SESSION_ACTIVE) {
 $login = isset($_SESSION['login']) ? $_SESSION['login'] : '';
 $email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
 $pw    = isset($_SESSION['pw'])    ? $_SESSION['pw']    : '';
+$mb_account_id = isset($_SESSION['mb_account']) ? (int) $_SESSION['mb_account'] : 0;
 
 /*
  * The credential is checked on the way out, not just on the way in.
  *
- * $email and $pw are what ~1300 queries filter on, interpolated straight into
- * "WHERE email='$email' AND pw='$pw'" with no escaping. Fixing that at the call
- * sites is not on the table -- there are 1300 of them, and most are in files
- * that never see where the value came from. Constraining what the two names can
- * hold makes every one of those interpolations safe by construction, and this
- * is the one place every request passes through.
+ * $email and $pw are what ~1300 queries filter on. They are bound now, but
+ * they were interpolated bare for twenty years, and constraining what the two
+ * names can hold is what kept every one of those sites safe while it was
+ * rewritten -- and keeps safe any that a future change writes the old way.
+ * This is the one place every request passes through.
  *
- * A value that fails is not repaired, it is discarded: an address or a digest
+ * A value that fails is not repaired, it is discarded: an address or a key
  * that is not one of those things is not a credential, and the page falls
  * through to its logged-out branch exactly as it does for an expired session.
  * checksignup.php and preferences.php apply the same rule at the point of
- * writing, so this only ever fires for a row that predates them.
+ * writing, so this only ever fires for a row that predates them -- or a
+ * session from before the accounts moved, which held a password hash as $pw
+ * and no account id.
  *
  * See include/credentials.php for the rule and what it costs.
  */
-if (!mb_valid_email($email) || !mb_valid_pw_hash($pw)) {
+if (!mb_valid_email($email) || !mb_valid_kingdom_key($pw) || $mb_account_id < 1) {
 	$login = $email = $pw = '';
+	$mb_account_id = 0;
 }
 
 /*
- * And against the account, once per request. A session whose address and hash
- * no longer name a row -- the password was changed from another session, the
- * account was deleted or destroyed -- is not a credential any more. It used to
- * stay "logged in" and render every page empty, because every query matched
- * nothing; it is logged out now, which is also what makes a password change
- * end the player's other sessions.
+ * And against the account and the kingdom, once per request.
+ *
+ * The account first, by id. A session whose account is gone, or whose password
+ * hash is no longer the one it logged in against, is not a credential any
+ * more. That last is what makes a password change end the account's other
+ * sessions: the session keeps a fingerprint of the hash (include/accounts.php),
+ * and the session that made the change is handed the new one.
+ *
+ * Then the kingdom, which must still be this account's and still answer to
+ * the session's address and key. A key that no longer names a row -- the
+ * kingdom was deleted by an administrator, by the tick for inactivity, or by
+ * a wipe, or its address moved from another session -- used to stay "logged
+ * in" and render every page empty, because every query matched nothing. It is
+ * logged out instead.
  */
 if ($email !== '' && empty($GLOBALS['mb_session_checked'])) {
 	$GLOBALS['mb_session_checked'] = true;
-	require_once __DIR__ . '/connect.php';
-	$mb_r = mb_query($db, "SELECT userid FROM user WHERE email=? AND pw=?", array($email, $pw));
-	if (!$mb_r || !mysqli_fetch_row($mb_r)) {
-		unset($_SESSION['login'], $_SESSION['email'], $_SESSION['pw']);
+	$mb_account = mb_account_get($mb_account_id);
+	$mb_fp = isset($_SESSION['mb_account_fp']) ? (string) $_SESSION['mb_account_fp'] : '';
+	$mb_ok = $mb_account
+		&& hash_equals(mb_account_fingerprint($mb_account['pw']), $mb_fp);
+	if ($mb_ok) {
+		require_once __DIR__ . '/connect.php';
+		$mb_r = mb_query($db, "SELECT userid FROM user WHERE account_id=? AND email=? AND pw=?", array($mb_account_id, $email, $pw));
+		$mb_ok = $mb_r && mysqli_fetch_row($mb_r);
+	}
+	if (!$mb_ok) {
+		unset($_SESSION['login'], $_SESSION['email'], $_SESSION['pw'], $_SESSION['mb_account'], $_SESSION['mb_account_fp']);
 		$GLOBALS['mb_session_revoked'] = true;
 	}
+	unset($mb_account, $mb_fp, $mb_ok, $mb_r);
 }
 if (!empty($GLOBALS['mb_session_revoked'])) {
 	$login = $email = $pw = '';
+	$mb_account_id = 0;
 }
