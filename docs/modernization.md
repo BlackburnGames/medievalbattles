@@ -94,9 +94,19 @@ In progress. The known work, in no committed order:
   is interpolated bare, so no amount of escaping closes it and the value has to
   be cast instead.
 
-  Prepared statements are the better answer and are not this change. Escaping
+  Prepared statements are the better answer and were not that change. Escaping
   every site can be checked by a suite that proves behaviour did not move;
-  rewriting 1300 interpolations into bind calls cannot.
+  rewriting 1300 interpolations into bind calls in one go cannot.
+
+  **They are under way now, a page at a time.** `mb_query($db, $sql, $params)`
+  in `app/include/db.php` prepares the statement and binds each value by its
+  PHP type, so the value never enters the SQL text. The audit reads its SQL
+  argument as a sink like `mysqli_query()`'s and its params array as safe, so
+  interpolating into a converted query is still caught. The pre-login pages
+  went first, because they are the ones a stranger reaches: `checksignup.php`
+  (every value, computed ones included), `checklogin.php`,
+  `activate_account.php`, `index.php`, and `mb_password_store()`, which the
+  login's MD5 upgrade runs. A converted page has no `mb_sql_str()` left in it.
 
   The last 36 were not a random 36, and none of the three groups was closed by
   escaping alone:

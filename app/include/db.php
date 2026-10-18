@@ -25,10 +25,11 @@ if (!function_exists('mb_sql_str')) {
      *
      *     "... WHERE ename=" . mb_sql_str($db, $name)
      *
-     * Prepared statements would be better and are not what this is. Rewriting
-     * 1300 interpolated queries into bind calls is a different change of a
-     * different size; this one closes the hole at every site without moving any
-     * behaviour, which is the property the characterization suite can check.
+     * Prepared statements are better, and mb_query() below is how new and
+     * converted queries bind their values. This closed the hole at every site
+     * of the ~1300 without moving any behaviour, which is the property the
+     * characterization suite can check; the sites move to mb_query() a page at
+     * a time.
      *
      * @param mysqli $db
      * @param mixed  $value cast to string, so null becomes '' as interpolation did
@@ -63,6 +64,75 @@ if (!function_exists('mb_sql_int')) {
     function mb_sql_int($value)
     {
         return (string) (int) $value;
+    }
+}
+
+if (!function_exists('mb_query')) {
+    /**
+     * Run a query with its values bound rather than interpolated.
+     *
+     *     mb_query($db, "SELECT userid FROM user WHERE email=? AND pw=?", array($email, $pw))
+     *
+     * This is what mb_sql_str() and mb_sql_int() were standing in for. They
+     * close the hole at a call site by escaping or casting the value into the
+     * SQL text; here the value never enters the text at all, so there is
+     * nothing to get wrong -- no quoting context to read, no escape to forget
+     * on a value read back from the database. The SQL argument should be a
+     * literal: tests/sql-injection-audit.php reads it as a query sink like
+     * mysqli_query(), and the params array as safe.
+     *
+     * Each value is bound by its PHP type: int as an integer, float as a
+     * double, anything else as a string -- null included, as '', which is
+     * what interpolating it produced and what mb_sql_str() produces.
+     *
+     * Failures report the way every other query in the app does: connect.php's
+     * MYSQLI_REPORT_ERROR turns a failed prepare or execute into a warning,
+     * which the crawl and the tick fail on, and the return value is false.
+     *
+     * @param mysqli $db
+     * @param string $sql    with a ? for each value
+     * @param array  $params the values, in order
+     * @return mysqli_result|bool a result for a statement that returns rows,
+     *                            true for one that does not, false on failure
+     */
+    function mb_query($db, $sql, array $params = array())
+    {
+        $stmt = mysqli_prepare($db, $sql);
+        if (!$stmt) {
+            return false;
+        }
+
+        if ($params) {
+            $types = '';
+            $values = array();
+            foreach ($params as $value) {
+                if (is_int($value)) {
+                    $types .= 'i';
+                } elseif (is_float($value)) {
+                    $types .= 'd';
+                } else {
+                    $types .= 's';
+                    $value = (string) $value;
+                }
+                $values[] = $value;
+            }
+            mysqli_stmt_bind_param($stmt, $types, ...$values);
+        }
+
+        if (!mysqli_stmt_execute($stmt)) {
+            mysqli_stmt_close($stmt);
+            return false;
+        }
+
+        $result = mysqli_stmt_get_result($stmt);
+        if ($result === false) {
+            // No result set: an INSERT, UPDATE or DELETE that succeeded.
+            $ok = mysqli_stmt_errno($stmt) === 0;
+            mysqli_stmt_close($stmt);
+            return $ok;
+        }
+        mysqli_stmt_close($stmt);
+        return $result;
     }
 }
 

@@ -70,7 +70,13 @@ require_once __DIR__ . '/taint-lib.php';
  * account activation -- because those were the last pages rewritten in 2003.
  * Matching only mysqli_query() reported zero while all sixty went unread.
  */
-$MB_QUERY_FUNCTIONS = array('mysqli_query', 'mysqli_real_query', 'mysqli_multi_query', 'mysqli_prepare');
+$MB_QUERY_FUNCTIONS = array('mysqli_query', 'mysqli_real_query', 'mysqli_multi_query', 'mysqli_prepare', 'mb_query');
+
+/*
+ * mb_query($db, $sql, $params) binds its params, so only its first two
+ * arguments are read: a variable in the params array is the fix, not a sink.
+ */
+$MB_BOUND_FUNCTIONS = array('mb_query');
 $MB_QUERY_METHODS   = array('query', 'real_query', 'multi_query', 'prepare');
 
 function mb_is_query_sink(array $t, $i)
@@ -112,12 +118,17 @@ function mb_scan_queries($src, array $tainted, array $sourceGlobals, array $sani
         if ($open < 0 || $t[$open] !== '(') {
             continue;
         }
-        // Argument list runs to the matching ')'.
+        // Argument list runs to the matching ')' -- or, for a call that binds
+        // its values, to the comma before the params array.
+        global $MB_BOUND_FUNCTIONS;
+        $bound = in_array(strtolower($t[$i][1]), $MB_BOUND_FUNCTIONS, true);
         $d = 0;
+        $commas = 0;
         $close = $open;
         for ($k = $open; $k < $n; $k++) {
-            if ($t[$k] === '(') { $d++; }
-            elseif ($t[$k] === ')') { $d--; if ($d === 0) { $close = $k; break; } }
+            if ($t[$k] === '(' || $t[$k] === '[') { $d++; }
+            elseif ($t[$k] === ')' || $t[$k] === ']') { $d--; if ($d === 0) { $close = $k; break; } }
+            elseif ($t[$k] === ',' && $d === 1 && $bound && ++$commas === 2) { $close = $k; break; }
         }
 
         // Quote depth inside the current double-quoted string. PHP tokenizes
@@ -173,7 +184,7 @@ $current = array();
 foreach (mb_app_files($appRoot) as $path) {
     $rel = ltrim(str_replace(str_replace('\\', '/', $repoRoot), '', $path), '/');
     $src = file_get_contents($path);
-    if (strpos($src, 'mysqli_') === false && strpos($src, '->') === false) {
+    if (strpos($src, 'mysqli_') === false && strpos($src, '->') === false && strpos($src, 'mb_query') === false) {
         continue;
     }
     $tainted = mb_tainted_names($src, $MB_SOURCE_GLOBALS, $MB_SANITIZERS, $stored ? $MB_STORED_CALLS : $MB_SOURCE_CALLS);
@@ -199,9 +210,11 @@ exit(mb_ratchet(array(
     'label'    => 'unescaped request input in queries',
     'pass'     => 'no new unescaped request input in queries.',
     'fail'     => 'new unescaped interpolation(s)',
-    'advice'   => "Quote it with mb_sql_str(), or cast it with mb_sql_int() when the
+    'advice'   => "Bind it: mb_query(\$db, \"... WHERE x=?\", array(\$x)). Where a query
 "
-                . "query interpolates it outside quotes. See app/include/db.php.
+                . "is not converted yet, quote it with mb_sql_str(), or cast it with
+"
+                . "mb_sql_int() outside quotes. See app/include/db.php.
 ",
     'format'   => 'mb_sql_entry',
 )));

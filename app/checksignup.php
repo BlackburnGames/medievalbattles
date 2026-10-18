@@ -35,7 +35,7 @@ if ($signup) {
   // insert ip address into db
   $ipaddress = $_SERVER["REMOTE_ADDR"];
   //  select number of players
-    $numberplayers = $db->query("SELECT count(userid) FROM user");
+    $numberplayers = mb_query($db, "SELECT count(userid) FROM user");
     $noplayers = mb_db_result($numberplayers, "noplayers");
   //  parse weird chars out of vars
     $ename = trim($ename);
@@ -43,17 +43,14 @@ if ($signup) {
     $msn = strip_tags($msn);
     $aim = strip_tags($aim);
     $email = strip_tags($email);
-  // Escaped once, here, for every query below. The address in particular is
-  // queried before mb_valid_email() has looked at it, so nothing can lean on
+  // Every value below is bound, never interpolated. The address in particular
+  // is queried before mb_valid_email() has looked at it, so nothing can lean on
   // the rule further down.
-    $q_email = mb_sql_str($db, $email);
-    $q_ename = mb_sql_str($db, $ename);
-    $q_ip    = mb_sql_str($db, $ipaddress);
   //  email already in the database?
-    $emresult = $db->query("SELECT email FROM user WHERE email=$q_email");
+    $emresult = mb_query($db, "SELECT email FROM user WHERE email=?", array($email));
     $emnamecheck = mysqli_fetch_array($emresult);
   // empire name already in the database?
-    $eresult = $db->query("SELECT ename FROM user WHERE ename=$q_ename");
+    $eresult = mb_query($db, "SELECT ename FROM user WHERE ename=?", array($ename));
     $enamecheck = mysqli_fetch_array($eresult);
   //  dropcase of empire name and email
     $ename1 = strtolower($ename);
@@ -61,7 +58,7 @@ if ($signup) {
     $email1 = strtolower($email);
     $emnamecheck1 = strtolower($emnamecheck[0]);
   //  are they a multi?
-    $ip_query = $db->query("SELECT count(userid) FROM user WHERE ip=$q_ip");
+    $ip_query = mb_query($db, "SELECT count(userid) FROM user WHERE ip=?", array($ipaddress));
     $check_ip = mb_db_result($ip_query, "check_ip");
 
   if($enamecheck1 == $ename1 AND $ename != "")  { echo mb_h($ename) . " is already being used!"; die();   }
@@ -92,20 +89,20 @@ if ($signup) {
   elseif($check_ip[0] >= 1)  {  echo "You are only allowed one account per computer!";   die(); }
 
   //  select minimum amount of members
-    $Sett_least = $db->query("SELECT min(members) FROM settlement");
+    $Sett_least = mb_query($db, "SELECT min(members) FROM settlement");
     $least_set = mb_db_result($Sett_least,"least_set");
   //  select a random settlement
     $maxset = mb_settlement_count($db);
     $sel_mem = rand(1,$maxset);
   //  extract members from settlement
-    $Random_mem = $db->query("SELECT members FROM settlement WHERE setid=" . mb_sql_int($sel_mem) . "");
+    $Random_mem = mb_query($db, "SELECT members FROM settlement WHERE setid=?", array((int) $sel_mem));
     $R_Mem = mb_db_result($Random_mem,"R_Mem");
 
   if($least_set != $R_Mem)  {
-     $Sett_least = $db->query("SELECT min(members) FROM settlement");
+     $Sett_least = mb_query($db, "SELECT min(members) FROM settlement");
      $least_set = mb_db_result($Sett_least,"least_set");
 
-     $Sel_members = $db->query("SELECT setid FROM settlement WHERE members=" . mb_sql_int($least_set) . "");
+     $Sel_members = mb_query($db, "SELECT setid FROM settlement WHERE members=?", array((int) $least_set));
      $sel_mem = mb_db_result($Sel_members,"sel_mem");
   }
 
@@ -114,12 +111,12 @@ if ($signup) {
   }
 
   $new_mem = $least_set + 1;
-  $db->query("UPDATE settlement SET members='$new_mem' WHERE setid=" . mb_sql_int($sel_mem) . "");
+  mb_query($db, "UPDATE settlement SET members=? WHERE setid=?", array((int) $new_mem, (int) $sel_mem));
 
   $snum = $sel_mem;
 
   // create the account
-  $buildingsuserid = $db->query("SELECT max(userid) FROM user");
+  $buildingsuserid = mb_query($db, "SELECT max(userid) FROM user");
   $buserid = mb_db_result($buildingsuserid,"buserid");
   $newbuserid = $buserid + 1;
 
@@ -131,20 +128,12 @@ if ($signup) {
   // and emailvalidate.code is varchar(50), which a bcrypt hash does not fit
   // into anyway.
   $act_code = md5(uniqid(rand(), true));
-  $db->query("INSERT INTO emailvalidate (userid, code, `check`) VALUES ('$newbuserid', '$act_code', '2') ");
+  mb_query($db, "INSERT INTO emailvalidate (userid, code, `check`) VALUES (?, ?, '2')", array((int) $newbuserid, $act_code));
 
   if (($email === $cemail) and ($pw === $cpw) and ($email != "") and ($cemail != "") and ($pw != "") and ($cpw != ""))  {
     // Hashed here, once, after every comparison that needed the plaintext. Six
     // INSERTs below write it, because `pw` is denormalized across six tables.
     $pw = mb_password_hash($pw);
-    // Bcrypt's alphabet carries no SQL meaning, so escaping the hash changes
-    // nothing it writes -- it is done so these queries read like every other
-    // one here, rather than asking the reader to know that.
-    $q_pw    = mb_sql_str($db, $pw);
-    $q_msn   = mb_sql_str($db, $msn);
-    $q_aim   = mb_sql_str($db, $aim);
-    $q_race  = mb_sql_str($db, $race);
-    $q_class = mb_sql_str($db, $class);
 
     $part1 = rand(250, 350);
     $part2 = rand(000, 999);
@@ -191,28 +180,30 @@ if ($signup) {
     if($class == 'Insurrectionist') { $suicide = rand(10, 20);  $r14pts = 125000; $wiz = 0; }
       else  { $suicide  = 0;  $r14pts = 0;  }
 
-    $db->query("INSERT INTO user (email,  pw, ename, msn, aim, gp, iron, exp, food, land, mts, setid, class, userid, race, safemode, signup_comp_id)
-      VALUES ($q_email, $q_pw, $q_ename, $q_msn, $q_aim, '$gp', '$iron', '0', '1500', '250', '200', " . mb_sql_int($snum) . ", $q_class, '$newbuserid', $q_race, '48', " . mb_sql_str($db, $computer_id) . ") ");
+    mb_query($db, "INSERT INTO user (email,  pw, ename, msn, aim, gp, iron, exp, food, land, mts, setid, class, userid, race, safemode, signup_comp_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?, '0', '1500', '250', '200', ?, ?, ?, ?, '48', ?)",
+      array($email, $pw, $ename, $msn, $aim, $gp, $iron, (int) $snum, $class, (int) $newbuserid, $race, $computer_id));
 
-    $db->query("INSERT INTO buildings (email, pw, home, barrack, farm, wp, gm, im, aland, amts, userid)
-      VALUES ($q_email, $q_pw,'50', '50', '50', '0', '50', '50', '100', '100', '$newbuserid') ");
+    mb_query($db, "INSERT INTO buildings (email, pw, home, barrack, farm, wp, gm, im, aland, amts, userid)
+      VALUES (?, ?, '50', '50', '50', '0', '50', '50', '100', '100', ?)", array($email, $pw, (int) $newbuserid));
 
-    $db->query("INSERT INTO military (email, pw, civ, recruits, warriors, wizards, priests, maxciv, userid, warpower, warspeedw, cweapon, wizpower, wizspeeds, cspell, pripower, prispeedw, cstaff, cbow, archspeedw, archpower, wararmor, wizarmor, priarmor, wardef, wizdef, pridef, warspeeda, wizspeeda, prispeeda, archers, suicide)
-      VALUES ($q_email, $q_pw,'$civ', '$recruits', '$war', '$wiz', '$pri', '$maxciv', '$newbuserid', '2', '6','Dagger', '3', '4', 'Magic Missile', '2', '4', 'Quarterstaff', 'Bow', '4', '2', 'Studded Leather', 'Robe', 'Leather', '1', '1', '2', '0', '0', '1', '$arch', '$suicide') ");
+    mb_query($db, "INSERT INTO military (email, pw, civ, recruits, warriors, wizards, priests, maxciv, userid, warpower, warspeedw, cweapon, wizpower, wizspeeds, cspell, pripower, prispeedw, cstaff, cbow, archspeedw, archpower, wararmor, wizarmor, priarmor, wardef, wizdef, pridef, warspeeda, wizspeeda, prispeeda, archers, suicide)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, '2', '6','Dagger', '3', '4', 'Magic Missile', '2', '4', 'Quarterstaff', 'Bow', '4', '2', 'Studded Leather', 'Robe', 'Leather', '1', '1', '2', '0', '0', '1', ?, ?)",
+      array($email, $pw, (int) $civ, (int) $recruits, (int) $war, (int) $wiz, (int) $pri, (int) $maxciv, (int) $newbuserid, (int) $arch, (int) $suicide));
 
-    $db->query("INSERT INTO research (email, pw, userid, r1pts, r13pts, r14pts)
-      VALUES ($q_email, $q_pw,'$newbuserid', '$r1pts', '$r13pts', '$r14pts') ");
+    mb_query($db, "INSERT INTO research (email, pw, userid, r1pts, r13pts, r14pts)
+      VALUES (?, ?, ?, ?, ?, ?)", array($email, $pw, (int) $newbuserid, (int) $r1pts, (int) $r13pts, (int) $r14pts));
 
-    $db->query("INSERT INTO explore (email, pw, userid)
-      VALUES ($q_email, $q_pw,'$newbuserid') ");
+    mb_query($db, "INSERT INTO explore (email, pw, userid)
+      VALUES (?, ?, ?)", array($email, $pw, (int) $newbuserid));
 
-    $selectempire = $db->query("SELECT setid FROM user WHERE email=$q_email AND pw=$q_pw");
+    $selectempire = mb_query($db, "SELECT setid FROM user WHERE email=? AND pw=?", array($email, $pw));
     $semp = mb_db_result($selectempire,"semp");
 
     include("include/clock.php");
 
     mb_news_set($db, "$clock", 'red', "$ename has joined the settlement", $snum, 0);
-    $db->query("INSERT INTO returntbl (email, pw, userid)   VALUES ($q_email, $q_pw,'$newbuserid') ");
+    mb_query($db, "INSERT INTO returntbl (email, pw, userid) VALUES (?, ?, ?)", array($email, $pw, (int) $newbuserid));
 
     echo "Thank you for signing up for Medieval Battles. You are in settlement " . mb_h($snum) . ".<br>Your login information and activation code has been emailed to you.<br><br><a href=index.php>You can login now here</a>";
 

@@ -90,16 +90,14 @@ $act_userid = mb_input('act_userid');
 		// The code is compared with hash_equals(), not !=, because it is an md5
 		// hex digest and != compares numeric-looking strings as numbers -- the
 		// same 0e... collision checklogin.php's digest comparison had.
-		$q_act_userid = mb_sql_int($act_userid);
-		$q_act_code   = mb_sql_str($db, $act_code);
-		$validate_result = $db->query("SELECT userid, code, `check` FROM emailvalidate WHERE userid=$q_act_userid");
+		$validate_result = mb_query($db, "SELECT userid, code, `check` FROM emailvalidate WHERE userid=?", array((int) $act_userid));
 		$validate = $validate_result ? mysqli_fetch_array($validate_result) : null;
 
 		if(!$validate || !is_string($act_code) || !hash_equals((string) $validate[1], $act_code))	{
 			echo "<center><b>Validation code is incorrect.</b></center><br>";
 		}
 		else	{
-			$db->query("UPDATE emailvalidate SET `check`='2' WHERE userid=$q_act_userid AND code=$q_act_code");
+			mb_query($db, "UPDATE emailvalidate SET `check`='2' WHERE userid=? AND code=?", array((int) $act_userid, (string) $act_code));
 			echo "<center><b>Your account has been activated!</b></center>";
 		}
 	}

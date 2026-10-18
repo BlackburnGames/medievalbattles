@@ -45,13 +45,11 @@ if (!mb_valid_email($email)) {
 	exit();
 }
 
-$q_email = mb_sql_str($db, $email);
-
 // One lookup, by address alone. It used to run this query and a second one
 // filtering on the digest as well, then compare the two results with ==, which
 // is a numeric comparison whenever both strings look numeric -- see
 // mb_password_verify().
-$result = $db->query("SELECT pw FROM user WHERE email=$q_email");
+$result = mb_query($db, "SELECT pw FROM user WHERE email=?", array($email));
 $pwcheck = mysqli_fetch_array($result);
 $stored = isset($pwcheck[0]) ? $pwcheck[0] : '';
 
@@ -73,28 +71,24 @@ if (mb_password_verify($plain_pw, $stored)) {
 		$pw = $upgraded;
 	}
 
-	$q_pw = mb_sql_str($db, $pw);
-
 	// insert ip address into db
 	$ipaddress = $_SERVER["REMOTE_ADDR"];
-	$uename = $db->query("SELECT ename FROM user WHERE email=$q_email AND pw=$q_pw");
+	$uename = mb_query($db, "SELECT ename FROM user WHERE email=? AND pw=?", array($email, $pw));
 	$ename = mb_db_result($uename, "ename");
-	// Read back out of the database, so mb_valid_ename() already holds it to a
-	// safe charset -- escaped anyway, because a page should not lean on a rule
-	// enforced at signup for a row that may predate it.
-	$q_ename = mb_sql_str($db, $ename);
-	$q_ip    = mb_sql_str($db, $ipaddress);
 
-	$db->query("UPDATE user SET ip=$q_ip WHERE ename=$q_ename");
-	$db->query("UPDATE user SET countdown='336' WHERE email=$q_email AND pw=$q_pw");
-	$db->query("UPDATE user SET lastlogin='$clock' WHERE ename=$q_ename");
-	$db->query("UPDATE user SET online='1' WHERE ename=$q_ename");
-	$db->query("UPDATE user SET current_comp_id=" . mb_sql_str($db, $computer_id) . " WHERE ename=$q_ename");
+	// Every value below is bound, so none of them -- the address, the empire
+	// name read back out of the database, the client's IP -- is ever part of
+	// the SQL text.
+	mb_query($db, "UPDATE user SET ip=? WHERE ename=?", array($ipaddress, $ename));
+	mb_query($db, "UPDATE user SET countdown='336' WHERE email=? AND pw=?", array($email, $pw));
+	mb_query($db, "UPDATE user SET lastlogin=? WHERE ename=?", array($clock, $ename));
+	mb_query($db, "UPDATE user SET online='1' WHERE ename=?", array($ename));
+	mb_query($db, "UPDATE user SET current_comp_id=? WHERE ename=?", array($computer_id, $ename));
 
-	$user_set_query = $db->query("SELECT setid FROM user WHERE email=$q_email AND pw=$q_pw");
+	$user_set_query = mb_query($db, "SELECT setid FROM user WHERE email=? AND pw=?", array($email, $pw));
 	$set = mb_db_result($user_set_query, "set");
 
-	$db->query("UPDATE user SET csnum=" . mb_sql_int($set) . " WHERE email=$q_email");
+	mb_query($db, "UPDATE user SET csnum=? WHERE email=?", array((int) $set, $email));
 	unset($_SESSION['bad']);
 	$login = 1;
 	// A fresh session id for the logged-in session; see include/session.php.

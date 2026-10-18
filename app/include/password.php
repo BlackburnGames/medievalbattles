@@ -124,9 +124,10 @@ if (!function_exists('mb_password_store')) {
      * and two copies of a list like this is how one of them ends up short.
      *
      * The old hash is part of the WHERE for the same reason it is part of every
-     * other query in the game: it is the credential. Both values are escaped
+     * other query in the game: it is the credential. Every value is bound
      * even so -- the caller has usually validated them, but a helper that is
-     * safe only when its caller was careful is not safe.
+     * safe only when its caller was careful is not safe. The table names cannot
+     * be bound and do not need to be: they are the literal list below.
      *
      * @param  mysqli $db
      * @param  mixed  $email
@@ -136,12 +137,8 @@ if (!function_exists('mb_password_store')) {
      */
     function mb_password_store($db, $email, $oldHash, $newHash)
     {
-        $where = " WHERE email=" . mb_sql_str($db, $email)
-               . " AND pw=" . mb_sql_str($db, $oldHash);
-        $set = " SET pw=" . mb_sql_str($db, $newHash);
-
         foreach (array('user', 'buildings', 'military', 'research', 'returntbl', 'explore') as $table) {
-            mysqli_query($db, "UPDATE $table" . $set . $where);
+            mb_query($db, "UPDATE $table SET pw=? WHERE email=? AND pw=?", array($newHash, $email, $oldHash));
         }
     }
 }
