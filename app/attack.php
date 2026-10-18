@@ -185,6 +185,7 @@ else	{
 		include("include/attack/calculations.php");
 		
 		$lgain = $landgain;						
+		$ltally = 0;
 		while($lgain > $ltally)	{
 		
 			if($evb['aland'] > 0 AND $lgain > $ltally)	 {

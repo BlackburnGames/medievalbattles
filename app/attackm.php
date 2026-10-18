@@ -186,6 +186,10 @@ else	{
 		include("include/connect.php");
 		include("include/attack/calculations.php");
 	
+		// $mgain is never assigned -- the gain is $mtgain -- so this loop never
+		// runs. That is a recorded quirk ($GAMEDATA['quirks']), a game change to
+		// retire rather than a read to restore, and it is left as it is.
+		$mtally = 0;
 		While($mgain > $mtally)	 {
 			if($evb['amts'] > 0 AND $mgain > $mtally)	{
 				$evb['amts'] = $evb['amts'] - 1;

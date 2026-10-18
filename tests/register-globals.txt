@@ -1,7 +1,5 @@
 # register_globals audit baseline -- see tests/register-globals-audit.php
 # Global-scope variables each file reads but never assigns. This list may
 # only ever SHRINK. Regenerate with: php tests/register-globals-audit.php --accept
-app/attack.php	ltally
 app/attackm.php	mgain
-app/attackm.php	mtally
 app/include/connect.php	db
