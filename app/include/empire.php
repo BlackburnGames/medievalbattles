@@ -35,38 +35,37 @@ if (!function_exists('mb_empire_remove')) {
 	 */
 	function mb_empire_remove($db, $userid)
 	{
-		$q_id = mb_sql_int($userid);
+		$userid = (int) $userid;
 
-		$result = mysqli_query($db, "SELECT ename, setid, votefor FROM user WHERE userid=$q_id");
+		$result = mb_query($db, "SELECT ename, setid, votefor FROM user WHERE userid=?", array($userid));
 		$row = $result ? mysqli_fetch_array($result) : null;
 		if (!$row) {
 			return false;
 		}
-		$q_ename = mb_sql_str($db, $row['ename']);
 
 		// The vote it was casting, and the votes cast for it. A vote for yourself
 		// leaves with the row.
 		if ($row['votefor'] != 'None' && $row['votefor'] != '' && $row['votefor'] != $row['ename']) {
-			mysqli_query($db, "UPDATE user SET vote = vote - 1 WHERE ename=" . mb_sql_str($db, $row['votefor']));
+			mb_query($db, "UPDATE user SET vote = vote - 1 WHERE ename=?", array($row['votefor']));
 		}
-		mysqli_query($db, "UPDATE user SET votefor='None' WHERE votefor=$q_ename");
+		mb_query($db, "UPDATE user SET votefor='None' WHERE votefor=?", array($row['ename']));
 
 		// A guild it leads goes with it, as guildconfig.php's own delete does:
 		// members back to None, then the row. `guild.owner` holds the userid.
-		$result = mysqli_query($db, "SELECT gname FROM guild WHERE owner='$q_id'");
+		$result = mb_query($db, "SELECT gname FROM guild WHERE owner=?", array((string) $userid));
 		$guild = $result ? mysqli_fetch_array($result) : null;
 		if ($guild) {
-			mysqli_query($db, "UPDATE user SET guild='None' WHERE guild=" . mb_sql_str($db, $guild['gname']));
-			mysqli_query($db, "DELETE FROM guild WHERE owner='$q_id'");
-			mysqli_query($db, "DELETE FROM guildrequests WHERE gl_userid='$q_id'");
+			mb_query($db, "UPDATE user SET guild='None' WHERE guild=?", array($guild['gname']));
+			mb_query($db, "DELETE FROM guild WHERE owner=?", array((string) $userid));
+			mb_query($db, "DELETE FROM guildrequests WHERE gl_userid=?", array((string) $userid));
 		}
 		// And any request it had filed with someone else's guild.
-		mysqli_query($db, "DELETE FROM guildrequests WHERE applicant='$q_id'");
+		mb_query($db, "DELETE FROM guildrequests WHERE applicant=?", array((string) $userid));
 
-		mysqli_query($db, "UPDATE settlement SET members = members - 1 WHERE setid=" . mb_sql_int($row['setid']) . " AND members > 0");
+		mb_query($db, "UPDATE settlement SET members = members - 1 WHERE setid=? AND members > 0", array((int) $row['setid']));
 
 		foreach (array('user', 'military', 'buildings', 'research', 'returntbl', 'explore', 'emailvalidate') as $table) {
-			mysqli_query($db, "DELETE FROM $table WHERE userid=$q_id");
+			mb_query($db, "DELETE FROM $table WHERE userid=?", array($userid));
 		}
 
 		// Its vote is gone and so are the votes cast for it, and it may have been

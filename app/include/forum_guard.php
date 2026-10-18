@@ -50,7 +50,7 @@ function mb_forum_require_sl($sl)
  */
 function mb_forum_require_gl($db, $userid, $empireguild)
 {
-	$gresult = mysqli_query($db, "SELECT owner FROM guild WHERE owner=" . mb_sql_int($userid));
+	$gresult = mb_query($db, "SELECT owner FROM guild WHERE owner=?", array((string) (int) $userid));
 	$gnamecheck = mysqli_fetch_array($gresult);
 
 	if (!$gnamecheck || $gnamecheck[0] != $userid) {
@@ -86,7 +86,7 @@ function mb_forum_require_guild($empireguild)
  */
 function mb_forum_require_guild_thread($db, $topicid, $empireguild)
 {
-	$owned = mysqli_query($db, "SELECT topicid FROM guildthreads WHERE topicid=" . mb_sql_int($topicid) . " AND guildname=" . mb_sql_str($db, $empireguild));
+	$owned = mb_query($db, "SELECT topicid FROM guildthreads WHERE topicid=? AND guildname=?", array((int) $topicid, $empireguild));
 
 	if (!$owned || !mysqli_num_rows($owned)) {
 		echo "<div align=center><font class=yellow>That thread is not in your guild.</font></div>";
@@ -99,7 +99,7 @@ function mb_forum_require_guild_thread($db, $topicid, $empireguild)
  */
 function mb_forum_require_set_thread($db, $topicid, $setid)
 {
-	$owned = mysqli_query($db, "SELECT topicid FROM setforums WHERE topicid=" . mb_sql_int($topicid) . " AND setid=" . mb_sql_int($setid));
+	$owned = mb_query($db, "SELECT topicid FROM setforums WHERE topicid=? AND setid=?", array((int) $topicid, (int) $setid));
 
 	if (!$owned || !mysqli_num_rows($owned)) {
 		echo "<div align=center><font class=yellow>That thread is not in your settlement.</font></div>";

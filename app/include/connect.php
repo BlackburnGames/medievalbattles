@@ -31,14 +31,14 @@ require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/html.php';
 
 /**
- * And the news writers, which need both -- mb_sql_str() to file a row and
+ * And the news writers, which need both -- mb_query() to file a row and
  * mb_rich() to render one. Every page that files news runs a query, so every
  * one of them is here already.
  */
 require_once __DIR__ . '/news.php';
 
 /**
- * And the password helpers, which need mb_sql_str() for the same reason.
+ * And the password helpers, which need mb_query() for the same reason.
  *
  * Only three files hash or verify a password, but one of them is
  * checklogin.php, which upgrades a legacy hash in place -- six UPDATEs that

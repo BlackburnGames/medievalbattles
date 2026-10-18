@@ -45,8 +45,7 @@ if (!function_exists('mb_admin_logged_in')) {
         // connection lands in the global rather than this function's scope.
         global $db;
         require_once __DIR__ . '/../../include/connect.php';
-        $r = mysqli_query($db, "SELECT admin FROM user WHERE email=" . mb_sql_str($db, $email)
-            . " AND pw=" . mb_sql_str($db, $pw));
+        $r = mb_query($db, "SELECT admin FROM user WHERE email=? AND pw=?", array($email, $pw));
         $row = $r ? mysqli_fetch_row($r) : null;
 
         return $row && (int) $row[0] === 1;

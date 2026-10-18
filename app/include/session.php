@@ -227,8 +227,7 @@ if (!mb_valid_email($email) || !mb_valid_pw_hash($pw)) {
 if ($email !== '' && empty($GLOBALS['mb_session_checked'])) {
 	$GLOBALS['mb_session_checked'] = true;
 	require_once __DIR__ . '/connect.php';
-	$mb_r = mysqli_query($db, "SELECT userid FROM user WHERE email=" . mb_sql_str($db, $email)
-		. " AND pw=" . mb_sql_str($db, $pw));
+	$mb_r = mb_query($db, "SELECT userid FROM user WHERE email=? AND pw=?", array($email, $pw));
 	if (!$mb_r || !mysqli_fetch_row($mb_r)) {
 		unset($_SESSION['login'], $_SESSION['email'], $_SESSION['pw']);
 		$GLOBALS['mb_session_revoked'] = true;

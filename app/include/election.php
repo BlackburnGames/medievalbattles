@@ -30,25 +30,25 @@ if (!function_exists('mb_settlement_elect')) {
 	 */
 	function mb_settlement_elect($db, $setid)
 	{
-		$q_set = mb_sql_int($setid);
+		$setid = (int) $setid;
 
-		$r = mysqli_query($db, "SELECT max(vote) FROM user WHERE setid=$q_set");
+		$r = mb_query($db, "SELECT max(vote) FROM user WHERE setid=?", array($setid));
 		$row = $r ? mysqli_fetch_row($r) : null;
 		$max = (int) ($row ? $row[0] : 0);
 
 		if ($max <= 0) {
-			mysqli_query($db, "UPDATE user SET sl='no' WHERE setid=$q_set");
+			mb_query($db, "UPDATE user SET sl='no' WHERE setid=?", array($setid));
 			return;
 		}
 
-		$r = mysqli_query($db, "SELECT userid FROM user WHERE setid=$q_set AND vote=" . mb_sql_int($max) . " ORDER BY (sl='yes') DESC, userid ASC LIMIT 1");
+		$r = mb_query($db, "SELECT userid FROM user WHERE setid=? AND vote=? ORDER BY (sl='yes') DESC, userid ASC LIMIT 1", array($setid, $max));
 		$row = $r ? mysqli_fetch_row($r) : null;
 		if (!$row) {
 			return;
 		}
-		$q_winner = mb_sql_int($row[0]);
+		$winner = (int) $row[0];
 
-		mysqli_query($db, "UPDATE user SET sl='no' WHERE setid=$q_set AND userid != $q_winner");
-		mysqli_query($db, "UPDATE user SET sl='yes' WHERE userid=$q_winner");
+		mb_query($db, "UPDATE user SET sl='no' WHERE setid=? AND userid != ?", array($setid, $winner));
+		mb_query($db, "UPDATE user SET sl='yes' WHERE userid=?", array($winner));
 	}
 }
