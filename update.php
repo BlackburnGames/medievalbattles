@@ -213,7 +213,7 @@ while($INC_ID < $max_UID + 1) {
       $max_land = round($user['land'] * $exp_num);
       $max_mts  = round($user['mts'] *  $exp_num);
       $per_land = floor($max_land / 20);
-      $per_mt   = floor($max_land / 20);
+      $per_mt   = floor($max_mts / 20);
 
       if($explore['expland'] != 0)  { $land_gain = $explore['expland'] / $per_land; }
       if($explore['expmt'] != 0)   {  $mt_gain = $explore['expmt'] / $per_mt; }

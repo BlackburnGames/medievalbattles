@@ -455,7 +455,6 @@ $GAMEDATA['exp_values'] = array(
  * ------------------------------------------------------------------ */
 $GAMEDATA['quirks'] = array(
     'The Scepter of Zakarum sets its speed on equip but never its power, so the listed power is not actually applied. (equip.php:199)',
-    'Mountains are explored at the land price: the tick works out explorers per mountain from your land, not your mountains, so with 1,000 land and 200 mountains a mountain costs as many explorers as a land does. (update.php:216)',
     'An empire under 23 land with explorers in the field stops the tick: explorers per land rounds down to 0 and the tick divides by it, which on PHP 8 is fatal -- for every empire, not just that one. (update.php:218)',
     'Night Elves are dealt 4-10 archers at signup, but the free Archery research is immediately overwritten unless they are also Rangers. (checksignup.php:130-134)',
     'Sage accounting disagrees with itself about how many research projects there are. Points accrue across all eighteen, the assigned-sage totals on the status and research screens count the first sixteen, and your score counts only the first fourteen -- so a sage on Animation or Advanced Animation is invisible to both totals, and one on Advanced Farming or Advanced Construction is invisible to your score. (update.php:203 vs functions.php:240 and cresearch.php:112 vs update.php:292)',

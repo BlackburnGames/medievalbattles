@@ -164,8 +164,8 @@ $exploring = function ($race) use ($T) {
 };
 foreach (array('Human', 'Angel', 'Demon', 'Giant') as $race) {
     $SCENARIOS[] = array(
-        'name'  => 'quirk-explore-' . strtolower($race),
-        'why'   => "QUIRK: an empire of race $race exploring, at its own rate -- the tick applied only the Human one, and gave the Angel, the Demon and the Giant 13. It still prices mountains on land.",
+        'name'  => 'explore-' . strtolower($race),
+        'why'   => "An empire of race $race exploring, at its own rate -- the tick applied only the Human one, and gave the Angel, the Demon and the Giant 13 land. Mountains are priced on its 200 mountains; they were priced on its 1,000 land, and 100 explorers found 2.",
         'setup' => $exploring($race),
         'show'  => $exploreShow,
         'requests' => array(array(TICK, array())),

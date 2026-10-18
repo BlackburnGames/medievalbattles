@@ -121,29 +121,29 @@
   says: You can't construct Lumber Mills, because you haven't researched Archery yet!
   (no change)
 
-### quirk-explore-human
-# QUIRK: an empire of race Human exploring, at its own rate -- the tick applied only the Human one, and gave the Angel, the Demon and the Giant 13. It still prices mountains on land.
+### explore-human
+# An empire of race Human exploring, at its own rate -- the tick applied only the Human one, and gave the Angel, the Demon and the Giant 13 land. Mountains are priced on its 200 mountains; they were priced on its 1,000 land, and 100 explorers found 2.
 
 > tick
-    buildings [1] amts 100 -> 102, aland 850 -> 865
+    buildings [1] amts 100 -> 112, aland 850 -> 865
 
-### quirk-explore-angel
-# QUIRK: an empire of race Angel exploring, at its own rate -- the tick applied only the Human one, and gave the Angel, the Demon and the Giant 13. It still prices mountains on land.
-
-> tick
-    buildings [1] amts 100 -> 102, aland 850 -> 864
-
-### quirk-explore-demon
-# QUIRK: an empire of race Demon exploring, at its own rate -- the tick applied only the Human one, and gave the Angel, the Demon and the Giant 13. It still prices mountains on land.
+### explore-angel
+# An empire of race Angel exploring, at its own rate -- the tick applied only the Human one, and gave the Angel, the Demon and the Giant 13 land. Mountains are priced on its 200 mountains; they were priced on its 1,000 land, and 100 explorers found 2.
 
 > tick
-    buildings [1] amts 100 -> 102, aland 850 -> 862
+    buildings [1] amts 100 -> 112, aland 850 -> 864
 
-### quirk-explore-giant
-# QUIRK: an empire of race Giant exploring, at its own rate -- the tick applied only the Human one, and gave the Angel, the Demon and the Giant 13. It still prices mountains on land.
+### explore-demon
+# An empire of race Demon exploring, at its own rate -- the tick applied only the Human one, and gave the Angel, the Demon and the Giant 13 land. Mountains are priced on its 200 mountains; they were priced on its 1,000 land, and 100 explorers found 2.
 
 > tick
-    buildings [1] amts 100 -> 102, aland 850 -> 863
+    buildings [1] amts 100 -> 111, aland 850 -> 862
+
+### explore-giant
+# An empire of race Giant exploring, at its own rate -- the tick applied only the Human one, and gave the Angel, the Demon and the Giant 13 land. Mountains are priced on its 200 mountains; they were priced on its 1,000 land, and 100 explorers found 2.
+
+> tick
+    buildings [1] amts 100 -> 111, aland 850 -> 863
 
 ### quirk-explore-small-empire
 # QUIRK: under 23 land a land costs no explorers at all -- round(land * 0.8) / 20 floors to 0 -- and the tick divides by it.
