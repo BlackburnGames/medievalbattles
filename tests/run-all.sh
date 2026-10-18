@@ -23,6 +23,13 @@ if ! bash tests/combat-golden.sh; then
   status=1
 fi
 
+# The orders an empire gives itself, on the same harness and the same terms.
+echo
+echo "=== actions golden master ==="
+if ! bash tests/actions-golden.sh; then
+  status=1
+fi
+
 # Deliberately after the tick test, which resets the database: the crawl reads
 # and writes game state, so running it first would poison the tick fixture.
 echo

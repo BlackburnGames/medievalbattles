@@ -448,7 +448,7 @@ $GAMEDATA['exp_values'] = array(
  * truth and so Phase 3 has a checklist.
  * ------------------------------------------------------------------ */
 $GAMEDATA['quirks'] = array(
-    'Advanced Construction divides the build timer by 0.5, which DOUBLES construction time instead of halving it. (buildings.php:81)',
+    'Advanced Construction divides the build timer by 0.5, which DOUBLES construction time instead of halving it. Worse, every build order applies the construction modifiers again to every queue already running, including the building types the order does not touch -- so a Night Elf, or anyone with Advanced Construction, doubles every timer they have each time they build anything. And the 20-tick cap is tested after the modifiers, so a Night Elf queue of 11 homes, 22 ticks, is pushed straight to 40. (buildings.php:81-121)',
     'The Scepter of Zakarum sets its speed on equip but never its power, so the listed power is not actually applied. (equip.php:199)',
     'The explore page shows special rates for Angels (fewer explorers needed) and Demons (more needed), but the tick only implements the Human rate; everyone else gets the default. (include/S_EXPLORE.php:33-36 vs update.php:88)',
     'Night Elves are dealt 4-10 archers at signup, but the free Archery research is immediately overwritten unless they are also Rangers. (checksignup.php:130-134)',
