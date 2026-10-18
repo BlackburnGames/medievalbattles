@@ -154,14 +154,14 @@ $equip = function (array $weapons) {
 };
 $scepterBuilt = set('military', $T, array('zakarum' => 1, 'pripower' => 2));
 $SCENARIOS[] = array(
-    'name'  => 'quirk-equip-scepter',
-    'why'   => 'QUIRK: the Scepter of Zakarum sets its speed, 8, and no power at all.',
+    'name'  => 'equip-scepter',
+    'why'   => 'The Scepter of Zakarum: speed 8 and power 6, as the 2003 manual listed it. It set no power at all, and the priests fought at 0.',
     'setup' => array($scepterBuilt),
     'requests' => array($equip(array('upriest' => 'Scepter of Zakarum'))),
 );
 $SCENARIOS[] = array(
-    'name'  => 'quirk-equip-scepter-with-spell',
-    'why'   => 'QUIRK: equipped in the same order as a wizard spell, the Scepter takes the spell\'s power.',
+    'name'  => 'equip-scepter-with-spell',
+    'why'   => 'The Scepter keeps its own power when a wizard spell is equipped in the same order. It took the spell\'s.',
     'setup' => array($scepterBuilt),
     'requests' => array($equip(array('uwizard' => 'Magic Missile', 'upriest' => 'Scepter of Zakarum'))),
 );

@@ -210,7 +210,7 @@ else	{
 			if($upriest == "Quarterstaff")	{	$wspeed = 4;	$wpower = 2;	$priwep_name = 1;}
 			if($upriest == "Mace")	{	$wspeed = 5;	$wpower = 4;	$priwep_name = $priweapon['mace'];}
 			if($upriest == "Flail")	{	$wspeed = 7;	$wpower = 5;	$priwep_name = $priweapon['flail'];}
-			if($upriest == "Scepter of Zakarum")	{	$wspeed = 8;	$priwep_name = $priweapon['zakarum'];}
+			if($upriest == "Scepter of Zakarum")	{	$wspeed = 8;	$wpower = 6;	$priwep_name = $priweapon['zakarum'];}
 			if($upriest == "Footman\'s Flail")	{	$wspeed = 9;	$wpower = 8;	$priwep_name = $priweapon['footmanflail'];}
 			if($upriest == "Morning Star")	{	$wspeed = 12;	 $wpower = 10;	$priwep_name = $priweapon['morningstar'];}
 			if($upriest == "Thyora\'s Tear")	{	$wspeed = 14;	 $wpower = 13;	$priwep_name = $priweapon['thyorastear'];}

@@ -121,19 +121,19 @@
   says: You can't construct Lumber Mills, because you haven't researched Archery yet!
   (no change)
 
-### quirk-equip-scepter
-# QUIRK: the Scepter of Zakarum sets its speed, 8, and no power at all.
+### equip-scepter
+# The Scepter of Zakarum: speed 8 and power 6, as the 2003 manual listed it. It set no power at all, and the priests fought at 0.
 
 > equip.php update=1 upriest=Scepter+of+Zakarum uwarrior=ns uwizard=ns
   says: Your troops have been equipped with what you specified.
-    military [1] cstaff Quarterstaff -> Scepter of Zakarum, prispeedw 4 -> 8, pripower 2 -> 0
+    military [1] cstaff Quarterstaff -> Scepter of Zakarum, prispeedw 4 -> 8, pripower 2 -> 6
 
-### quirk-equip-scepter-with-spell
-# QUIRK: equipped in the same order as a wizard spell, the Scepter takes the spell's power.
+### equip-scepter-with-spell
+# The Scepter keeps its own power when a wizard spell is equipped in the same order. It took the spell's.
 
 > equip.php update=1 uwizard=Magic+Missile upriest=Scepter+of+Zakarum uwarrior=ns
   says: Your troops have been equipped with what you specified.
-    military [1] cstaff Quarterstaff -> Scepter of Zakarum, prispeedw 4 -> 8, pripower 2 -> 3
+    military [1] cstaff Quarterstaff -> Scepter of Zakarum, prispeedw 4 -> 8, pripower 2 -> 6
 
 ### equip-flail
 # A priest weapon that sets both: the Flail, speed 7 and power 5.
