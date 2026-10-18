@@ -172,24 +172,6 @@ if (!function_exists('mb_account_delete')) {
     }
 }
 
-if (!function_exists('mb_account_admin_ids')) {
-    /**
-     * The ids of every administrator's account, for the round-side code that
-     * has to tell their kingdoms apart: the two world wipes keep and reset them.
-     *
-     * @return int[]
-     */
-    function mb_account_admin_ids()
-    {
-        $ids = array();
-        $r = mb_query(mb_db(), "SELECT account_id FROM account WHERE admin <> 0 ORDER BY account_id");
-        while ($r && ($row = mysqli_fetch_row($r))) {
-            $ids[] = (int) $row[0];
-        }
-        return $ids;
-    }
-}
-
 if (!function_exists('mb_account_fingerprint')) {
     /**
      * What the session remembers of the account's address and password hash.

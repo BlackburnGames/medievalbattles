@@ -15,8 +15,8 @@
  * tick from deletion for inactivity.
  *
  * Then, against the running round: the tick, a guild leader deleting their
- * guild, and every administrator action -- each of gameconfig.php's, its
- * delete-one-kingdom, and newgame.php. After each, round 2's rows must be
+ * guild, and every administrator action -- each of gameconfig.php's and its
+ * delete-one-kingdom. After each, round 2's rows must be
  * exactly as they were, and the action must have done something to round 1,
  * or the pass proves nothing.
  *
@@ -172,7 +172,6 @@ $ACTIONS = array(
     'forums'      => "SELECT count(*) FROM setforums WHERE round_id = 1",
     'guilds'      => "SELECT count(*) FROM guildthreads WHERE round_id = 1",
     'settlements' => "SELECT count(*) FROM settlement WHERE round_id = 1 AND setname <> 'None'",
-    'accounts'    => "SELECT count(*) FROM user WHERE round_id = 1 AND userid = 3",
 );
 foreach ($ACTIONS as $action => $left) {
     load_world($db);
@@ -187,12 +186,6 @@ load_world($db);
 $admin = login($BASE, 'tester@example.com', 'test1234');
 $admin->post('/admin/gameconfig.php', array('empre' => 'PoorSerf', 'daccount' => 'Delete'));
 after('deleting PoorSerf', count_of($db, "SELECT count(*) FROM user WHERE round_id = 1 AND ename = 'PoorSerf'") === 0);
-
-// A new game: every round-1 kingdom but the administrator's goes.
-load_world($db);
-$admin = login($BASE, 'tester@example.com', 'test1234');
-$admin->get('/admin/newgame.php');
-after('a new game', count_of($db, "SELECT count(*) FROM user WHERE round_id = 1") === 1);
 
 // A player aiming at the ended round. Every id in round 2 is a real row --
 // the audit passes a query that filters on one -- so it is the page that has

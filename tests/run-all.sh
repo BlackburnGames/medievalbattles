@@ -66,14 +66,6 @@ if ! docker compose exec -T web php /repo/tests/signup.php; then
   status=1
 fi
 
-# Both world wipes put the administrators' kingdoms back to what signup makes,
-# checked against a twin signed up after each. Reloads the schema likewise.
-echo
-echo "=== new game resets administrators ==="
-if ! docker compose exec -T web php /repo/tests/newgame.php; then
-  status=1
-fi
-
 # An ended round beside the running one, left byte-identical by the tick and
 # every administrator action (docs/rounds.md). Reloads the schema likewise.
 echo

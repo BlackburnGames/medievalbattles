@@ -239,10 +239,9 @@ fingerprint of the account's address and hash:
      inactivity deletions and the admin's "delete kingdom" remove the kingdom
      only. Only a player deleting their own account in `preferences.php`
      removes the account too.
-   - **Signup doubles as join until step 3.** An account with no kingdom that
-     signs up again with its own password gets a new kingdom; with any other
-     password the address is taken. Login tells such an account it has no
-     kingdom rather than logging it in.
+   - **Signup doubled as join until step 3.** An account with no kingdom that
+     signed up again with its own password got a new kingdom. Joining is its
+     own page now (step 3, slice 4), and an address in use is simply taken.
    - **Revocation**: a SHA-256 fingerprint of the account's address and hash
      in the session, compared with the account's on every request, plus the
      kingdom still being that account's. `tests/session.php` drives each.
@@ -331,8 +330,29 @@ fingerprint of the account's address and hash:
       started and advanced once it is, with round 1's rows unmoved
       throughout. The tick golden moved only by the empty `round_result`
       table appearing in its dump.
-   4. **The pages.** The round list, join and history. Retire `newgame.php`
-      and signup's doubling as join.
+   4. **The pages.** Under way.
+
+      ~~**The player's path.**~~ **Done.** Signup makes an account and
+      nothing else; its welcome mail no longer carries the password. Login
+      authenticates the account, and one with no kingdom in the current
+      round gets a session with no kingdom in it -- `$login` and `$userid`
+      empty, so no game page admits it, `$mb_account_id` set -- and goes to
+      `rounds.php`: the current round with a form to join it, the account's
+      own results, and each ended round's top ten kingdoms and top five
+      guilds, a guild's strength summed from its rows. `join.php` makes the
+      kingdom through `mb_kingdom_join()` (`app/include/kingdom.php`) --
+      signup's checks and settlement placement, unchanged but asked of one
+      round and one account -- and logs it in. Login and join share
+      `mb_kingdom_enter()`, what logging into a kingdom records.
+
+      ~~**Retire the wipes.**~~ **Done.** `admin/newgame.php` and
+      gameconfig.php's "delete every kingdom" are gone, with
+      `mb_kingdom_reset()` and the helpers only they used, and
+      `tests/newgame.php`. gameconfig.php's other bulk actions stay, on the
+      current round.
+
+      **Left:** an admin page for `bin/round.php`'s steps, and deleting an
+      account anonymizing its round results.
 4. **Concurrent rounds.** The session chooses among running rounds, and the
    tick runs once per round. This lands with, or after, the ruleset loader
    from [rulesets.md](rulesets.md), since two rounds at once is how classic

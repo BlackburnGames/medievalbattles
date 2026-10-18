@@ -68,36 +68,26 @@ if ($account && mb_password_verify($plain_pw, $stored)) {
 	 * userid is what the session carries, and what every page's
 	 * "WHERE userid=?" matches.
 	 *
-	 * There may be none. Accounts outlast kingdoms -- the tick deletes an
-	 * inactive one, an administrator can delete one, and a new game deletes
-	 * every player's -- and the way back is signing up again with the same
-	 * address and password, which makes this account a new kingdom.
+	 * There may be none. Accounts outlast kingdoms -- a round ends, the tick
+	 * deletes an inactive one, an administrator deletes one -- and an account
+	 * may never have joined this round. It is logged in all the same, with no
+	 * kingdom, and sent to the round list to join one or read its history
+	 * (docs/rounds.md, "The player's path").
 	 */
 	require_once __DIR__ . '/include/kingdom.php';
 	$kingdom = mb_kingdom_find($db, $account['account_id'], (int) mb_round_current($db));
 	if (!$kingdom) {
-		unset($_SESSION['login'], $_SESSION['userid'], $_SESSION['mb_account'], $_SESSION['mb_account_fp']);
-		echo "Your account has no kingdom in this round.<br>";
-		echo "<a href=index.php?page=signup>Sign up</a> with the same email and password to start one.";
+		unset($_SESSION['bad']);
+		mb_session_login($account, 0);
+		header("Location: rounds.php");
 		exit();
 	}
 	$userid = $kingdom['userid'];
 
-	// insert ip address into db
-	$ipaddress = $_SERVER["REMOTE_ADDR"];
+	// Every value is bound, so none of them -- the client's IP, the computer
+	// id it claims -- is ever part of the SQL text.
+	mb_kingdom_enter($db, $userid, $_SERVER["REMOTE_ADDR"], $computer_id);
 
-	// Every value below is bound, so none of them -- the client's IP, the
-	// computer id it claims -- is ever part of the SQL text.
-	mb_query($db, "UPDATE user SET ip=? WHERE userid=?", array($ipaddress, $userid));
-	mb_query($db, "UPDATE user SET countdown='336' WHERE userid=?", array($userid));
-	mb_query($db, "UPDATE user SET lastlogin=? WHERE userid=?", array($clock, $userid));
-	mb_query($db, "UPDATE user SET online='1' WHERE userid=?", array($userid));
-	mb_query($db, "UPDATE user SET current_comp_id=? WHERE userid=?", array($computer_id, $userid));
-
-	$user_set_query = mb_query($db, "SELECT setid FROM user WHERE userid=?", array($userid));
-	$set = mb_db_result($user_set_query, "set");
-
-	mb_query($db, "UPDATE user SET csnum=? WHERE userid=?", array((int) $set, $userid));
 	unset($_SESSION['bad']);
 	$login = 1;
 	// A fresh session id for the logged-in session; see include/session.php.

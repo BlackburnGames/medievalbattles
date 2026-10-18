@@ -550,5 +550,6 @@ $amrbutton = "<form type=get action=aconstruct.php><input class=button type=subm
 	mb_query($db, "UPDATE user SET countdown='336' WHERE userid=?", array($userid));
 
 } else {
-	header("Location: logout.php?pageid=timeout");
+	// An account logged in without a kingdom belongs on the round list.
+	header($mb_account_id ? "Location: rounds.php" : "Location: logout.php?pageid=timeout");
 }

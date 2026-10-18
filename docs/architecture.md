@@ -29,10 +29,11 @@ Its gate is `app/admin/include/auth.php`: an administrator is an account with
 reads the flag from the `account` table on every request, so a revocation or
 a session that `session.php` logs out takes the privilege with it. Being logged
 into the game is not being an admin, and the smoke crawl asserts both
-refusals. Flags are granted and revoked with `bin/admin.php`; the world-wipe
-actions delete every kingdom but the admins' and keep every account, and an
-admin's kingdom cannot be deleted from `gameconfig.php`. Pages inherit the call through `include/igtop.php`;
-`gameconfig.php` and `newgame.php` do not include it and call it themselves.
+refusals. Flags are granted and revoked with `bin/admin.php`, and an admin's
+kingdom cannot be deleted from `gameconfig.php`. There is no world wipe: a new
+start is a new round, from `bin/round.php` ([rounds.md](rounds.md)). Pages
+inherit the call through `include/igtop.php`; `gameconfig.php` does not
+include it and calls it itself.
 
 ## Page flow
 
@@ -79,9 +80,11 @@ included, starts there.
 The hash is **bcrypt** as of Phase 3 — `app/include/password.php`, pinned to
 `PASSWORD_BCRYPT`. Accounts still holding the old unsalted MD5 verify once and
 are rehashed in place by `checklogin.php`. Login verifies against the account,
-then looks the kingdom up by `account_id`; an account with no kingdom in the round
-is told so, and signing up again with the same address and password gives it
-a new one.
+then looks the kingdom up by `account_id` in the current round. An account
+with none there is logged in all the same, with no kingdom in its session, and
+sent to `rounds.php`: the round to join, its own history and past rounds'
+leaders. `join.php` makes the kingdom and logs it in. Signup makes only the
+account.
 
 A password change and an address change are each one `UPDATE` on the account.
 So is confirming the address: `account.verified_at`, set by the link

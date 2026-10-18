@@ -1,28 +1,20 @@
 <?php
 /**
- * What a kingdom starts with, and putting one back to it.
+ * A kingdom: finding an account's in a round, joining a round to make one,
+ * what it starts with, and entering it at login.
  *
- * checksignup.php used to roll the starting resources and troops inline, and
- * nothing else needed them -- until administrators became player accounts.
- * A new game (admin/newgame.php, and gameconfig.php's account wipe) deletes
- * every other account but keeps the administrators', and it used to keep their
- * kingdoms with them: every table is cleared only of rows whose userid is
- * gone, so an admin went into the next round with the last one's gold, land,
- * research, army and explorers still out, while everyone else started over.
+ * Signup made the account and its kingdom at once, and rolled the starting
+ * resources inline; joining a round makes the kingdom now (docs/rounds.md),
+ * through mb_kingdom_join(), and an account signs up once.
  *
- * So signup and the reset share one definition of a fresh kingdom. Signup
- * calls mb_kingdom_start() and mb_kingdom_seed(); mb_kingdom_reset() calls the
- * same two on a kingdom that already exists. A change to what an empire
- * starts with is made here, once, and both agree.
- *
- * This is the interim fix. docs/rounds.md is the real one: permanent accounts,
- * and a new round as a new world rather than a wipe of the old. The accounts
- * are permanent now -- include/accounts.php -- so a wipe deletes kingdoms
- * and leaves every login standing.
+ * mb_kingdom_reset() lived here too, for the two world wipes -- admin
+ * newgame.php and gameconfig.php's "delete every kingdom" -- which kept the
+ * administrators' kingdoms and put them back to a fresh roll. Both wipes are
+ * retired: a new start is a new round, from bin/round.php, and every kingdom
+ * in it is a new one.
  */
 
 require_once __DIR__ . '/db.php';
-// mb_account_admin_ids(): who an administrator is is the account's to say.
 require_once __DIR__ . '/accounts.php';
 
 if (!function_exists('mb_kingdom_find')) {
@@ -151,105 +143,94 @@ if (!function_exists('mb_kingdom_seed')) {
 	}
 }
 
-if (!function_exists('mb_kingdom_reset')) {
+if (!function_exists('mb_kingdom_join')) {
 	/**
-	 * Put an existing kingdom back to what signup would have given it.
+	 * Make an account a kingdom in a round: what joining a round does.
 	 *
-	 * Keeps who the kingdom is -- its account, empire name, race, class,
-	 * contact fields, computer ids -- and its settlement, which the caller
-	 * recounts. Everything the game changes is returned to its
-	 * column default and then to a fresh roll for the kingdom's race and
-	 * class. Its child rows are deleted and re-seeded rather than updated, so
-	 * a column signup never wrote cannot keep last round's value.
+	 * This was the second half of checksignup.php, when signing up made the
+	 * account and its kingdom at once (docs/rounds.md, "The player's path").
+	 * It is unchanged but for being asked of one round, by one account: the
+	 * checks, then the settlement with the fewest members (a random one,
+	 * unless it is fuller than the emptiest), then signup's starting rolls.
 	 *
-	 * @return bool  false if no kingdom has that userid
+	 * A kingdom's name is unique within its round, not across rounds, so a
+	 * player may keep theirs from one round to the next.
+	 *
+	 * @param array $k  ename, race, class, msn, aim, ip, computer_id
+	 * @return int|string  the new kingdom's userid, or why it was refused
 	 */
-	function mb_kingdom_reset($db, $userid)
+	function mb_kingdom_join($db, $round_id, $account_id, array $k)
 	{
-		$userid = (int) $userid;
-		$row = mysqli_fetch_assoc(mb_query($db,
-			"SELECT race, class FROM user WHERE userid=?", array($userid)));
-		if (!$row) {
-			return false;
+		global $GAMEDATA;
+		$round_id = (int) $round_id;
+		$ename = strip_tags(trim((string) $k['ename']));
+		$race  = (string) $k['race'];
+		$class = (string) $k['class'];
+		$msn   = strip_tags((string) $k['msn']);
+		$aim   = strip_tags((string) $k['aim']);
+
+		$taken = mysqli_fetch_row(mb_query($db, "SELECT ename FROM user WHERE round_id=? AND ename=?", array($round_id, $ename)));
+		$players = mysqli_fetch_row(mb_query($db, "SELECT count(userid) FROM user WHERE round_id=?", array($round_id)));
+		$same_ip = mysqli_fetch_row(mb_query($db, "SELECT count(userid) FROM user WHERE round_id=? AND ip=?", array($round_id, (string) $k['ip'])));
+
+		if ($taken && strtolower($taken[0]) === strtolower($ename) && $ename !== '') { return "$ename is already being used!"; }
+		if ($class === 'ns') { return "You must have a class to play the game!"; }
+		if ($race === 'ns') { return "You must have a race to play the game!"; }
+		if ($ename === '') { return "You must have an empire name to play the game!"; }
+		// include/credentials.php says why: the name is interpolated bare on
+		// every page once it is stored, and this is the only place it is written.
+		if (!mb_valid_ename($ename)) { return "Empire names may use letters, numbers, spaces and . _ - only, up to 25 characters!"; }
+		// The two drop-downs, held to what they offer: both are compared against
+		// literals all over the engine.
+		if (!isset($GAMEDATA['races'][$race])) { return "That race doesn't exist!"; }
+		if (!isset($GAMEDATA['classes'][$class])) { return "That class doesn't exist!"; }
+		if ((int) $players[0] >= 450) { return "Game is full! Try again later!"; }
+		if ((int) $same_ip[0] >= 1) { return "You are only allowed one account per computer!"; }
+		if (mb_kingdom_find($db, $account_id, $round_id)) { return "You already have a kingdom in this round!"; }
+
+		// The settlement: a random one of the round's, or the emptiest if that
+		// one is fuller.
+		$least_set = mb_db_result(mb_query($db, "SELECT min(members) FROM settlement WHERE round_id=?", array($round_id)), "least_set");
+		list($first, $last) = mb_settlement_range($db, $round_id);
+		$sel_mem = rand($first, $last);
+		$R_Mem = mb_db_result(mb_query($db, "SELECT members FROM settlement WHERE setid=?", array((int) $sel_mem)), "R_Mem");
+		if ($least_set != $R_Mem) {
+			$sel_mem = mb_db_result(mb_query($db, "SELECT setid FROM settlement WHERE round_id=? AND members=?", array($round_id, (int) $least_set)), "sel_mem");
 		}
+		mb_query($db, "UPDATE settlement SET members=? WHERE setid=?", array((int) $least_set + 1, (int) $sel_mem));
 
-		// Written out, not looped over: a table name cannot be bound, and the
-		// unbound-queries audit is right to count one interpolated.
-		mb_query($db, "DELETE FROM buildings WHERE userid=?", array($userid));
-		mb_query($db, "DELETE FROM military WHERE userid=?", array($userid));
-		mb_query($db, "DELETE FROM research WHERE userid=?", array($userid));
-		mb_query($db, "DELETE FROM explore WHERE userid=?", array($userid));
-		mb_query($db, "DELETE FROM returntbl WHERE userid=?", array($userid));
-		mb_query($db, "DELETE FROM barter WHERE userid=?", array($userid));
-		mb_query($db, "DELETE FROM empnews WHERE yourid=?", array($userid));
+		$max = mb_db_result(mb_query($db, "SELECT max(userid) FROM user"), "buserid"); // mb-round-ok: ids are issued once across rounds
+		$userid = (int) $max + 1;
 
-		// Every column the game writes during a round. Not setid or csnum: the
-		// kingdom stays where it is, and the caller recounts the settlements.
-		mb_query($db, "UPDATE user SET
-			gp=DEFAULT, iron=DEFAULT, lumber=DEFAULT, exp=DEFAULT, food=DEFAULT,
-			land=DEFAULT, mts=DEFAULT, online=DEFAULT, sl=DEFAULT, vote=DEFAULT,
-			votefor=DEFAULT, exp2=DEFAULT, mno=DEFAULT, nno=DEFAULT, fleets=DEFAULT,
-			safemode=DEFAULT, countdown=DEFAULT, guild=DEFAULT, barterclock=DEFAULT
-			WHERE userid=?", array($userid));
-
-		$start = mb_kingdom_start($row['race'], $row['class']);
+		// What the empire starts with, as signup always rolled it.
+		$start = mb_kingdom_start($race, $class);
 		$u = $start['user'];
-		mb_query($db, "UPDATE user SET gp=?, iron=?, exp=?, food=?, land=?, mts=?, safemode=? WHERE userid=?",
-			array($u['gp'], $u['iron'], $u['exp'], $u['food'], $u['land'], $u['mts'], $u['safemode'], $userid));
-
+		// The kingdom joins its settlement's round.
+		mb_query($db, "INSERT INTO user (ename, msn, aim, gp, iron, exp, food, land, mts, setid, class, userid, race, safemode, signup_comp_id, account_id, round_id)
+			SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, setid, ?, ?, ?, ?, ?, ?, round_id FROM settlement WHERE setid=?",
+			array($ename, $msn, $aim, $u['gp'], $u['iron'], $u['exp'], $u['food'], $u['land'], $u['mts'], $class, $userid, $race, $u['safemode'], (string) $k['computer_id'], (int) $account_id, (int) $sel_mem));
 		mb_kingdom_seed($db, $userid, $start);
-		return true;
+
+		include __DIR__ . '/clock.php';
+		mb_news_set($db, "$clock", 'red', "$ename has joined the settlement", $sel_mem, 0);
+		return $userid;
 	}
 }
 
-if (!function_exists('mb_kingdom_reset_admins')) {
+if (!function_exists('mb_kingdom_enter')) {
 	/**
-	 * Reset every administrator's kingdom in a round, for the two world wipes.
+	 * What logging into a kingdom records: where from, when, that it is
+	 * online and active, and that the settlement browser starts at home.
+	 * checklogin.php did it inline; joining a round logs the new kingdom in
+	 * too, so both call this.
 	 *
-	 * After a wipe the administrators' are the only kingdoms left in it, so
-	 * this is every kingdom the round has. It is still scoped to the flag, so
-	 * that running it on a world nobody has wiped cannot touch a player.
-	 *
-	 * @return int  how many were reset
+	 * The address is what the one-kingdom-per-computer check in
+	 * mb_kingdom_join() compares.
 	 */
-	function mb_kingdom_reset_admins($db, $round_id)
+	function mb_kingdom_enter($db, $userid, $ip, $computer_id)
 	{
-		$admins = mb_account_admin_ids();
-		if (!$admins) {
-			return 0;
-		}
-		$ids = array();
-		$marks = implode(',', array_fill(0, count($admins), '?'));
-		$r = mb_query($db, "SELECT userid FROM user WHERE round_id=? AND account_id IN ($marks)", array_merge(array((int) $round_id), $admins)); // mb-unbound-ok: one placeholder per account
-		while ($row = mysqli_fetch_row($r)) {
-			$ids[] = (int) $row[0];
-		}
-		foreach ($ids as $id) {
-			mb_kingdom_reset($db, $id);
-		}
-		return count($ids);
-	}
-}
-
-if (!function_exists('mb_kingdom_delete_players')) {
-	/**
-	 * Delete every kingdom in a round but the administrators', for the two\n	 * world wipes.
-	 *
-	 * Only the `user` rows; the wipes then clear every other table of rows
-	 * whose userid is gone. The accounts are kept -- they are not the round's
-	 * to delete -- so a player whose kingdom went comes back through signup
-	 * with the same address and password, and gets a new one.
-	 *
-	 * @return void
-	 */
-	function mb_kingdom_delete_players($db, $round_id)
-	{
-		$admins = mb_account_admin_ids();
-		if (!$admins) {
-			mb_query($db, "DELETE FROM user WHERE round_id=?", array((int) $round_id));
-			return;
-		}
-		$marks = implode(',', array_fill(0, count($admins), '?'));
-		mb_query($db, "DELETE FROM user WHERE round_id=? AND account_id NOT IN ($marks)", array_merge(array((int) $round_id), $admins)); // mb-unbound-ok: one placeholder per account
+		include __DIR__ . '/clock.php';
+		mb_query($db, "UPDATE user SET ip=?, countdown='336', lastlogin=?, online='1', current_comp_id=?, csnum=setid WHERE userid=?",
+			array((string) $ip, $clock, (string) $computer_id, (int) $userid));
 	}
 }

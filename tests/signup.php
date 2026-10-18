@@ -37,12 +37,16 @@ foreach ($CASES as $i => $case) {
     list($race, $class, $expect) = $case;
     $email = "signup$i@example.com";
 
-    $client = new MbClient($BASE);
-    $client->get('/index.php');
-    $body = $client->post('/checksignup.php', array(
-        'signup' => 1, 'email' => $email, 'cemail' => $email, 'pw' => 'pass1234', 'cpw' => 'pass1234',
-        'handle' => "Signup Player $i", 'ename' => "Signup $i", 'race' => $race, 'class' => $class, 'msn' => '', 'aim' => '',
-    ));
+    $body = signUp($BASE, $email, 'pass1234', "Signup Player $i");
+    if ($i === 0) {
+        // Signup makes the account and nothing else.
+        $made = mysqli_fetch_row(mysqli_query($db, "SELECT count(*) FROM account a JOIN user u ON u.account_id = a.account_id WHERE a.email = '$email'"));
+        echo ((int) $made[0] === 0 ? 'ok' : 'FAIL') . ": signup makes an account and no kingdom
+";
+        $failures += (int) $made[0] === 0 ? 0 : 1;
+    }
+    mysqli_query($db, "UPDATE user SET ip = ''");
+    list(, $body) = joinRound($BASE, $email, 'pass1234', "Signup $i", $race, $class);
 
     $label = "$race $class";
     // By empire name: the round holds no address.
@@ -73,12 +77,7 @@ foreach ($CASES as $i => $case) {
 // A player name is the account's across rounds, and unique ignoring case:
 // the fixture's tester@ is "Tester".
 mysqli_query($db, "UPDATE user SET ip = ''");
-$client = new MbClient($BASE);
-$client->get('/index.php');
-$body = $client->post('/checksignup.php', array(
-    'signup' => 1, 'email' => 'copycat@example.com', 'cemail' => 'copycat@example.com', 'pw' => 'pass1234', 'cpw' => 'pass1234',
-    'handle' => 'TESTER', 'ename' => 'Copycat', 'race' => 'Human', 'class' => 'Fighter', 'msn' => '', 'aim' => '',
-));
+$body = signUp($BASE, 'copycat@example.com', 'pass1234', 'TESTER');
 $made = (int) mysqli_fetch_row(mysqli_query($db, "SELECT count(*) FROM account WHERE email = 'copycat@example.com'"))[0];
 if ($made !== 0 || stripos($body, 'already being used') === false) {
     echo "FAIL: a signup took the player name TESTER, which Tester already has\n";
@@ -88,21 +87,15 @@ if ($made !== 0 || stripos($body, 'already being used') === false) {
 }
 
 // An address with an apostrophe, which is legal and which the game refused
-// while addresses were interpolated into its queries. It signs up, logs in,
+// while addresses were interpolated into its queries. It signs up, joins,
 // and comes back escaped in the preferences form's attribute.
 $obrien = "o'brien@example.com";
+$body = signUp($BASE, $obrien, 'pass1234', 'Obrien Player');
 mysqli_query($db, "UPDATE user SET ip = ''");
-$client = new MbClient($BASE);
-$client->get('/index.php');
-$body = $client->post('/checksignup.php', array(
-    'signup' => 1, 'email' => $obrien, 'cemail' => $obrien, 'pw' => 'pass1234', 'cpw' => 'pass1234',
-    'handle' => 'Obrien Player', 'ename' => 'Obrien', 'race' => 'Human', 'class' => 'Fighter', 'msn' => '', 'aim' => '',
-));
-$client = new MbClient($BASE);
-$client->get('/index.php');
-$client->post('/checklogin.php', array('email' => $obrien, 'pw' => 'pass1234', 'login' => 'Login'));
-if ($client->lastStatus !== 302) {
-    echo "FAIL: $obrien could not sign up and log in. Signup said: " . trim(substr(strip_tags($body), 0, 200)) . "\n";
+list($client, $joined) = joinRound($BASE, $obrien, 'pass1234', 'Obrien', 'Human', 'Fighter');
+if ($client->lastStatus !== 302 || strpos($client->lastLocation, 'main.php') === false) {
+    echo "FAIL: $obrien could not sign up, log in and join. Signup said: " . trim(substr(strip_tags($body), 0, 200))
+        . "; join said: " . trim(substr(strip_tags($joined), 0, 200)) . "\n";
     $failures++;
 } else {
     // A new account is unverified, and the game's pages say so until the
@@ -139,12 +132,9 @@ $lapsed = 'lapsed@example.com';
 $fresh  = 'fresh@example.com';
 foreach (array($lapsed => 'Lapsed', $fresh => 'Fresh') as $addr => $name) {
     mysqli_query($db, "UPDATE user SET ip = ''");
-    $c = new MbClient($BASE);
-    $c->get('/index.php');
-    $c->post('/checksignup.php', array(
-        'signup' => 1, 'email' => $addr, 'cemail' => $addr, 'pw' => 'pass1234', 'cpw' => 'pass1234',
-        'handle' => "$name Player", 'ename' => $name, 'race' => 'Human', 'class' => 'Fighter', 'msn' => '', 'aim' => '',
-    ));
+    signUp($BASE, $addr, 'pass1234', "$name Player");
+    mysqli_query($db, "UPDATE user SET ip = ''");
+    joinRound($BASE, $addr, 'pass1234', $name, 'Human', 'Fighter');
 }
 $hours = $GAMEDATA['timers']['activation_hours'] + 1;
 mysqli_query($db, "UPDATE account SET created = NOW() - INTERVAL $hours HOUR WHERE email = '$lapsed'");

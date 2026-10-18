@@ -9,12 +9,13 @@
  *   2. Ending round 1 writes a result for each kingdom, placed by exp, with
  *      its settlement's name, and marks the round ended.
  *   3. A session in round 1 is ended with it. Its account can still log in,
- *      and is told it has no kingdom; signup says no round is open; the tick
- *      does nothing.
+ *      and lands on the round list: no round open, its own result, and the
+ *      ended round's leading kingdoms and guilds. Joining is refused, and
+ *      the tick does nothing.
  *   4. Opening round 2 gives it settlements numbered on from round 1's. The
- *      account signs up again, with its own password, into round 2 -- under
- *      the same kingdom name it had, which round 2 has never seen -- and
- *      logging in reaches the new kingdom.
+ *      account joins it from the round list -- under the same kingdom name
+ *      it had, which round 2 has never seen -- and is logged into the new
+ *      kingdom, as a later login is.
  *   5. The tick leaves an open round alone, and advances it once started,
  *      while round 1's rows stay as they ended.
  *
@@ -112,14 +113,17 @@ check('the round 1 session is ended with its round', $poor->lastStatus !== 200);
 
 $back = new MbClient($BASE);
 $back->get('/index.php');
-$body = $back->post('/checklogin.php', array('email' => 'tester@example.com', 'pw' => 'test1234', 'login' => 'Login'));
-check('the account logs in and is told it has no kingdom', $back->lastStatus !== 302 && stripos($body, 'no kingdom in this round') !== false);
-
-$signup = array('signup' => 1, 'email' => 'tester@example.com', 'cemail' => 'tester@example.com',
-    'pw' => 'test1234', 'cpw' => 'test1234', 'handle' => 'Ignored On Rejoin', 'ename' => 'TestLord',
-    'race' => 'Human', 'class' => 'Fighter', 'msn' => '', 'aim' => '');
-$body = $back->post('/checksignup.php', $signup);
-check('signup says no round is open', stripos($body, 'No round is open') !== false);
+$back->post('/checklogin.php', array('email' => 'tester@example.com', 'pw' => 'test1234', 'login' => 'Login'));
+check('the account logs in, to the round list', $back->lastStatus === 302 && $back->lastLocation === 'rounds.php');
+$list = $back->get('/rounds.php');
+check('...which says no round is open', $back->lastStatus === 200 && stripos($list, 'No round is open') !== false);
+check('...and shows the account its result: TestLord, 1st of 3',
+    preg_match('#<td>Round 1</td><td>TestLord</td><td>Human Warrior</td><td>1 of 3</td>#', $list) === 1);
+check('...and the round\'s leading kingdoms and guilds',
+    strpos($list, '<td>1</td><td>TestLord</td><td>1,000</td>') !== false
+    && strpos($list, '<td>Testguild</td><td>2 members</td><td>1,400</td>') !== false);
+$body = $back->post('/join.php', array('join' => 1, 'ename' => 'TestLord', 'race' => 'Human', 'class' => 'Fighter', 'msn' => '', 'aim' => ''));
+check('joining says no round is open', stripos($body, 'No round is open') !== false);
 
 $out = tick();
 check('the tick runs nothing', strpos($out, 'No round is running') !== false, substr($out, 0, 200));
@@ -133,10 +137,11 @@ $r2 = row($db, "SELECT round_id, status, min(s.setid) AS first, max(s.setid) AS 
 check('round 2 is open, with ten settlements numbered on from round 1\'s',
     $r2 && $r2['status'] === 'open' && $r2['first'] === '11' && $r2['last'] === '20' && $r2['n'] === '10', json_encode($r2));
 
-$back->get('/index.php');
-$back->post('/checksignup.php', $signup);
+list($back, $joined) = joinRound($BASE, 'tester@example.com', 'test1234', 'TestLord', 'Human', 'Fighter');
+check('joining logs into the new kingdom', $back->lastStatus === 302 && $back->lastLocation === 'main.php?pageid=news',
+    trim(substr(strip_tags($joined), 0, 200)));
 $k = row($db, "SELECT userid, setid, round_id, ename FROM user WHERE account_id = 1 AND round_id = 2");
-check('the account signs up into round 2, under its old kingdom name', $k && $k['ename'] === 'TestLord');
+check('the account is in round 2, under its old kingdom name', $k && $k['ename'] === 'TestLord');
 check('...in one of round 2\'s settlements', $k && $k['setid'] >= 11 && $k['setid'] <= 20, json_encode($k));
 check('...and round 1 keeps its kingdom', row($db, "SELECT userid FROM user WHERE account_id = 1 AND round_id = 1") !== null);
 

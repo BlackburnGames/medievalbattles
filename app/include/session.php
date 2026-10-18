@@ -124,7 +124,8 @@ if (!function_exists('mb_session_login')) {
 	 * or simply observed -- is worth nothing after.
 	 *
 	 * @param array  $account  the account row, as it stands after any rehash
-	 * @param int    $userid   its kingdom in this round
+	 * @param int    $userid   its kingdom in this round, or 0 for none yet: the
+	 *                         account is logged in and sent to rounds.php
 	 */
 	function mb_session_login(array $account, $userid)
 	{
@@ -232,12 +233,15 @@ $round_id      = 0;
  * the guild-leader check compares it with === against a column read back as
  * a string.
  */
-if ($userid > 0 && $mb_account_id > 0 && empty($GLOBALS['mb_session_checked'])) {
+if ($mb_account_id > 0 && empty($GLOBALS['mb_session_checked'])) {
 	$GLOBALS['mb_session_checked'] = true;
 	$mb_account = mb_account_get($mb_account_id);
 	$mb_fp = isset($_SESSION['mb_account_fp']) ? (string) $_SESSION['mb_account_fp'] : '';
 	$mb_ok = $mb_account && hash_equals(mb_account_fingerprint($mb_account), $mb_fp);
-	if ($mb_ok) {
+	$mb_row = null;
+	// A session may hold an account and no kingdom: one logged in with no
+	// kingdom in play, on its way to rounds.php to join one.
+	if ($mb_ok && $userid > 0) {
 		require_once __DIR__ . '/connect.php';
 		$mb_r = mb_query($db, "SELECT u.round_id FROM user u JOIN `round` r ON r.round_id = u.round_id
 			WHERE u.userid=? AND u.account_id=? AND r.status <> 'ended'", array($userid, $mb_account_id));
@@ -247,7 +251,7 @@ if ($userid > 0 && $mb_account_id > 0 && empty($GLOBALS['mb_session_checked'])) 
 	if ($mb_ok) {
 		$GLOBALS['mb_session_email'] = $mb_account['email'];
 		$GLOBALS['mb_session_verified'] = $mb_account['verified_at'] !== null;
-		$GLOBALS['mb_session_round'] = (int) $mb_row[0];
+		$GLOBALS['mb_session_round'] = $mb_row ? (int) $mb_row[0] : 0;
 	} else {
 		unset($_SESSION['login'], $_SESSION['userid'], $_SESSION['mb_account'], $_SESSION['mb_account_fp']);
 		$GLOBALS['mb_session_revoked'] = true;
@@ -257,13 +261,20 @@ if ($userid > 0 && $mb_account_id > 0 && empty($GLOBALS['mb_session_checked'])) 
 // Whether the account has confirmed its address. include/igtop.php refuses
 // every game page until it has; see activate_account.php.
 $mb_account_verified = false;
-if ($userid < 1 || $mb_account_id < 1 || !empty($GLOBALS['mb_session_revoked'])) {
+if ($mb_account_id < 1 || !empty($GLOBALS['mb_session_revoked'])) {
 	$login = '';
 	$userid = '';
 	$mb_account_id = 0;
 } else {
-	$userid = (string) $userid;
 	$email = isset($GLOBALS['mb_session_email']) ? $GLOBALS['mb_session_email'] : '';
 	$mb_account_verified = !empty($GLOBALS['mb_session_verified']);
-	$round_id = isset($GLOBALS['mb_session_round']) ? $GLOBALS['mb_session_round'] : 0;
+	if ($userid > 0) {
+		$userid = (string) $userid;
+		$round_id = isset($GLOBALS['mb_session_round']) ? $GLOBALS['mb_session_round'] : 0;
+	} else {
+		// An account without a kingdom is not logged into the game: every
+		// game page tests $login and $userid, and finds neither.
+		$login = '';
+		$userid = '';
+	}
 }

@@ -22,15 +22,15 @@
  * and its forums in `setforums`/`setforumsmsgs`, for as long as db.sql goes
  * back -- and `DELETE FROM return` wants `returntbl`. So "delete all news",
  * "delete all forums" and "delete all accounts" have never done anything, on
- * any version of PHP. app/admin/newgame.php names the same tables correctly
- * and is where the working spellings came from.
+ * any version of PHP. app/admin/newgame.php, since retired, named the same
+ * tables correctly and is where the working spellings came from.
  *
  * Its "reset all accounts" section is gone rather than repaired. It wrote
  * about twenty columns -- `military.ssword`, `axe`, `club`, `icesword`,
  * `priout`, `buildings.lab` -- that this schema does not have either, and
  * deciding what a reset should now write to the columns that replaced them is
- * a game-design question, not a port. db/seed.sql and newgame.php are the two
- * things that build a world, and both are current.
+ * a game-design question, not a port. db/seed.sql and bin/round.php are the
+ * two things that build a world.
  *
  * The four hundred lines of copy-pasted table markup are one loop now, over
  * the action list below.
@@ -90,32 +90,9 @@ $MB_ADMIN_ACTIONS = array(
 			"UPDATE settlement SET setstrength='0' WHERE round_id=?",
 		),
 	),
-	// Administrators are player accounts, so deleting every account used to
-	// delete the admin running it, who was then locked out of this page.
-	// Accounts are not the round's to delete at all now -- they live in the
-	// `account` table and are kept, so a player whose kingdom went comes back
-	// through signup -- and 'first' deletes every kingdom but the admins'.
-	// The other tables are cleared of every row whose kingdom is gone rather
-	// than emptied. That keeps the admins' kingdoms too, mid-game, so 'then'
-	// puts them back to their starting state -- see include/kingdom.php -- and
-	// the settlements are recounted, since signup places new empires by their
-	// member counts. The action keeps its key, which the crawl and
-	// tests/newgame.php post.
-	'accounts' => array(
-		'label'      => "Delete every kingdom except administrators', and reset theirs",
-		'first'      => 'mb_kingdom_delete_players',
-		'then'       => 'mb_kingdom_reset_admins',
-		'statements' => array(
-			'DELETE FROM buildings WHERE round_id=? AND userid NOT IN (SELECT userid FROM user)',
-			'DELETE FROM military WHERE round_id=? AND userid NOT IN (SELECT userid FROM user)',
-			'DELETE FROM research WHERE round_id=? AND userid NOT IN (SELECT userid FROM user)',
-			'DELETE FROM explore WHERE round_id=? AND userid NOT IN (SELECT userid FROM user)',
-			'DELETE FROM returntbl WHERE round_id=? AND userid NOT IN (SELECT userid FROM user)',
-			'DELETE FROM barter WHERE round_id=? AND userid NOT IN (SELECT userid FROM user)',
-			'DELETE FROM empnews WHERE round_id=? AND yourid NOT IN (SELECT userid FROM user)',
-			'UPDATE settlement s SET members=(SELECT count(*) FROM user u WHERE u.setid=s.setid) WHERE s.round_id=?',
-		),
-	),
+	// "Delete every kingdom except administrators'" was here, with
+	// admin/newgame.php beside it. A new start is a new round now, from
+	// bin/round.php, which deletes nothing (docs/rounds.md).
 );
 
 echo "<center><br><b>Game configuration</b><br><br>";
@@ -128,16 +105,8 @@ if (IsSet($action)) {
 	if (!isset($MB_ADMIN_ACTIONS[$action])) {
 		echo "<b>No such action.</b><br><br>";
 	} else {
-		// Fixed function names from the list, never request input.
-		require_once __DIR__ . '/../include/kingdom.php';
-		if (isset($MB_ADMIN_ACTIONS[$action]['first'])) {
-			call_user_func($MB_ADMIN_ACTIONS[$action]['first'], $db, $mb_round);
-		}
 		foreach ($MB_ADMIN_ACTIONS[$action]['statements'] as $sql) {
 			mb_query($db, $sql, array($mb_round)) or die(mysqli_error($db)); // mb-unbound-ok: fixed statements from $MB_ADMIN_ACTIONS
-		}
-		if (isset($MB_ADMIN_ACTIONS[$action]['then'])) {
-			call_user_func($MB_ADMIN_ACTIONS[$action]['then'], $db, $mb_round);
 		}
 		echo "<b>" . htmlspecialchars($MB_ADMIN_ACTIONS[$action]['label']) . "</b>: done.<br><br>";
 	}

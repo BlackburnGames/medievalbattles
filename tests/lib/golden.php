@@ -218,6 +218,39 @@ function login($base, $email, $pass)
     return $client;
 }
 
+/**
+ * Sign up an account. Signup makes only the account (docs/rounds.md); a
+ * kingdom comes from joinRound(). Returns what the page said.
+ */
+function signUp($base, $email, $pass, $handle)
+{
+    $client = new MbClient($base);
+    $client->get('/index.php');
+    return $client->post('/checksignup.php', array(
+        'signup' => 1, 'email' => $email, 'cemail' => $email, 'pw' => $pass, 'cpw' => $pass, 'handle' => $handle,
+    ));
+}
+
+/**
+ * Log an account with no kingdom in play in -- it lands on rounds.php -- and
+ * join the current round with a kingdom. Returns the client, logged into the
+ * new kingdom if the join worked, and what join.php said.
+ *
+ * The round's one-kingdom-per-address check compares the address each
+ * kingdom last logged in from, and every test client comes from the same
+ * one, so the caller clears user.ip first where it joins more than once.
+ */
+function joinRound($base, $email, $pass, $ename, $race, $class)
+{
+    $client = new MbClient($base);
+    $client->get('/index.php');
+    $client->post('/checklogin.php', array('email' => $email, 'pw' => $pass, 'login' => 'Login'));
+    $body = $client->post('/join.php', array(
+        'join' => 1, 'ename' => $ename, 'race' => $race, 'class' => $class, 'msn' => '', 'aim' => '',
+    ));
+    return array($client, $body);
+}
+
 /* ------------------------------------------------------------------ *
  * Observing a request.
  * ------------------------------------------------------------------ */

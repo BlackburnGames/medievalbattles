@@ -63,7 +63,6 @@ $ADMIN_PAGES = array(
     'admin/index.php',
     'admin/main.php',
     'admin/gameconfig.php',
-    'admin/newgame.php',
     'admin/dempire.php',
     'admin/get_user_info.php',
     'admin/dusers.php',
@@ -74,7 +73,7 @@ $ADMIN_PAGES = array(
 );
 
 // gameconfig.php's bulk actions, by the key its form submits.
-$MB_ADMIN_ACTIONS = array('messages', 'news', 'forums', 'guilds', 'settlements', 'accounts');
+$MB_ADMIN_ACTIONS = array('messages', 'news', 'forums', 'guilds', 'settlements');
 
 /*
  * Baseline of warnings that already existed before the port began.
@@ -182,7 +181,11 @@ $UNREACHABLE = array(
     // Reached only by submitting a form. The four thread handlers are driven
     // by postForm() now; these two are not.
     'checklogin.php'       => 'POST handler: exercised by the login that starts this run',
-    'checksignup.php'      => 'POST handler: creates a user from rand(), see docs/testing.md',
+    'checksignup.php'      => 'POST handler: makes an account; driven by tests/signup.php',
+    // The way into a round, for an account with no kingdom in it. The crawl's
+    // accounts all have one, so both send it straight back into the game.
+    'rounds.php'           => 'round list: needs an account with no kingdom; driven by tests/rounds.php',
+    'join.php'             => 'POST handler: joins a round; driven by tests/signup.php and tests/rounds.php',
 
     // Deliberately skipped: destructive by plain GET. See $SKIP.
     'disband.php'          => 'skipped: destroys the fixture army',
@@ -1017,16 +1020,12 @@ function adminActions(MbClient $admin, array $actions)
         postForm($admin, 'admin/gameconfig.php', array('action' => $action));
     }
 
-    // newgame.php takes no parameters and wipes the world on a bare GET, so it
-    // is left until everything else has run.
-    postForm($admin, 'admin/newgame.php', array());
-
-    // Both world wipes keep administrators, so the admin who ran them is still
-    // one. They used to delete every account, the admin's own included.
+    // The admin who ran every action is still one: the bulk actions empty
+    // tables of the round, and none of them touches an account.
     $admin->get('/admin/main.php');
     if ($admin->lastStatus !== 200) {
-        $failures['admin/main.php | the admin was locked out by a world wipe'] =
-            'app/admin/gameconfig.php, newgame.php: administrators must survive deleting every account';
+        $failures['admin/main.php | the admin was locked out by a bulk action'] =
+            'app/admin/gameconfig.php: an administrator must survive every bulk action';
     }
 }
 

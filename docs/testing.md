@@ -131,30 +131,16 @@ for review.
 
 ### `tests/signup.php`
 
-What a new empire starts with. The crawl cannot sign up — `checksignup.php`
+What a new empire starts with. The crawl cannot make one — joining a round
 makes an empire out of `rand()`, so there is nothing to compare a golden
 against — and nothing else checked the race and class grants. This signs up
-one empire per combination that grants something and asserts each grant, as a
-range where signup rolls dice. It found the Night Elf's Archery being taken
-back by the Ranger check two lines below it. Reloads the schema before and
-after.
-
-### `tests/newgame.php`
-
-Both world wipes, `admin/newgame.php` and gameconfig's account wipe, keep
-administrator accounts, and this checks that they start the administrators'
-kingdoms over. It makes tester@ and idle@ admins, runs each wipe as tester@,
-then signs up a twin of each admin (same race and class) through
-`checksignup.php`. Every column of `user`, `buildings`, `military`,
-`research`, `explore` and `returntbl` must match the twin's, except who the
-account is and the columns signup rolls dice for, which are held to signup's
-ranges instead. Comparing against a real signup rather than a list of
-expected values means a column added later that the reset forgets fails here
-untouched. It also checks that the non-admin is gone, the admins' barter
-offers and empire news are gone, the settlements are recounted, and tester@
-can still log in. With the reset disabled it fails on lumber, research,
-returns in flight, safemode and barter, which is the bug it was written for.
-Reloads the schema before each wipe and after.
+an account and joins it to the round (`signUp()` and `joinRound()` in
+`tests/lib/golden.php`) once per combination that grants something, and
+asserts each grant, as a range where the join rolls dice. It found the Night
+Elf's Archery being taken back by the Ranger check two lines below it. It also
+holds signup to making an account and no kingdom, a taken player name to
+refusal, and the activation gate and the tick's deletion of an unconfirmed
+account's kingdom. Reloads the schema before and after.
 
 ### `tests/round-audit.php`
 
@@ -186,7 +172,7 @@ with a row in every round table, built to be hit: its kingdoms, guild and
 accounts have round 1's names and owners, and its values are ones each of the
 tick's whole-table statements would move. Then the tick, a guild leader
 deleting their guild, each of `gameconfig.php`'s actions, its delete-one
-kingdom and `newgame.php` each run against round 1, from a fresh world, and
+kingdom each run against round 1, from a fresh world, and
 round 2's rows must come out byte-identical — while round 1 must have changed,
 or the pass proves nothing. With one tick filter removed it fails on round 2's
 `online` flags. Last, the tester aims an attack of each kind, intel, a
@@ -703,9 +689,9 @@ the admin is `tester@`, logged in through the game, because an administrator is
 a flagged player account.
 
 After the bulk actions the phase asserts two things about that: deleting an
-admin account by name is refused, and the admin is still admitted after both
-world wipes — "delete every account" and `newgame.php` keep administrators
-rather than deleting the account running them.
+admin account by name is refused, and the admin is still admitted after every
+bulk action. The two world wipes that used to need that check most are
+retired ([rounds.md](rounds.md)).
 
 The crawl is confined to `admin/`. `extractLinks()` normalises every href to a
 path from the docroot, and the admin navbar's links are relative — so without
