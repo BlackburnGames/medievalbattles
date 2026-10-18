@@ -41,10 +41,11 @@ reason, and a reviewer can check a battle by hand from the numbers in it.
 
 **The scenarios are chosen by branch, and then by scale.** Every outcome of
 every page, the land-gain brackets, the order land is taken in, and the
-refusals that run after the target is fetched are covered. The quirks are too:
-every combat entry in `$GAMEDATA['quirks']` has a `quirk-` scenario that pins
-the bug as it is now. Fixing one should change that scenario and nothing else,
-and the commit removes the quirk entry. But small armies hide small changes in
+refusals that run after the target is fetched are covered. So are the quirks:
+a combat bug gets a `quirk-` scenario that pins it as it is, and the fix
+renames it and keeps it as the regression test, with a diff that touches only
+the scenarios the bug reached. Every combat quirk recorded so far has gone
+that way, and none is open. But small armies hide small changes in
 the rounding: three hundred warriors at 100 or 101 hit points both come home
 297 strong. So `land-win-large` fields every unit type on both sides in the
 hundreds of thousands, and the `modifier-` sweep attacks once as each class
