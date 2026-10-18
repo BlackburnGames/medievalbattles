@@ -51,7 +51,7 @@ $GAMEDATA['economy'] = array(
 
 /* ------------------------------------------------------------------ *
  * Buildings. Costs: functions.php:280-283, buildings.php:41-47.
- * Timing: buildings.php:79-100, update.php:458-478.
+ * Timing: buildings.php:79-100, update.php:441-461.
  * ------------------------------------------------------------------ */
 $GAMEDATA['buildings'] = array(
     'cost_base'        => 300,    // functions.php:280-283: 300 + 4 * count
@@ -88,7 +88,7 @@ $GAMEDATA['exploring'] = array(
 
 /* ------------------------------------------------------------------ *
  * Races. Deltas are applied on top of the economy base, mirroring the
- * engine's order (class first, then race). update.php:82-115.
+ * engine's order (class first, then race). update.php:103-160.
  * Off/def modifier: offdef_delta here and the classes' offdef_mult are read by
  * include/modifier.php -- each side of a battle, and the status screen.
  *
@@ -102,7 +102,7 @@ $GAMEDATA['exploring'] = array(
 $GAMEDATA['races'] = array(
     'Angel' => array(
         'flavor'   => 'Charged with guiding the younger races, the Angels wage a reluctant war to preserve the world.',
-        'civ_mod_delta'    => +0.10,  // update.php:84
+        'civ_mod_delta'    => +0.10,  // update.php:126
         'priest_cost_mult' => 0.75,   // functions.php:249
         'explore_exp_num'  => 0.85,   // read by mb_explore_rate() -- fewer explorers needed per land
         'bans'     => array('Golems and Iron Golems'),  // animate.php:4, trade.php:4
@@ -111,7 +111,7 @@ $GAMEDATA['races'] = array(
         'flavor'   => 'Cast out of the Angelic Order, the Demons enslave the weak and wage war on the strong.',
         'gpmod_delta'       => +0.5,   // read by update.php
         'ironmod_delta'     => +0.5,   // read by update.php
-        'civ_mod_delta'     => -0.10,  // update.php:99 -- masked by overcrowding in the fixture
+        'civ_mod_delta'     => -0.10,  // update.php:144 -- masked by overcrowding in the fixture
         'offdef_delta'      => +0.10,  // read by include/modifier.php
         'warrior_cost_mult' => 0.75,   // functions.php:248
         'explore_exp_num'   => 0.95,   // read by mb_explore_rate() -- more explorers needed per land
@@ -119,19 +119,19 @@ $GAMEDATA['races'] = array(
     ),
     'Dwarf' => array(
         'flavor'   => 'Proud miners and craftsmen of metal, hardy in battle and unmatched in fury.',
-        'gpmod_delta'   => +0.15,  // update.php:92
-        'ironmod_delta' => +0.15,  // update.php:93
+        'gpmod_delta'   => +0.15,  // update.php:130
+        'ironmod_delta' => +0.15,  // update.php:131
         'bans'     => array(),
     ),
     'Elf' => array(
         'flavor'   => 'Swift and long-lived, the Elves strike quickly and are home before the alarm is raised.',
-        'civ_mod_delta'    => -0.15,  // update.php:103
+        'civ_mod_delta'    => -0.15,  // update.php:148
         'return_time_mult' => 0.80,   // attack/calculations.php:98-101
         'bans'     => array(),
     ),
     'Giant' => array(
         'flavor'   => 'Enormous strength and appetite; no patience for the subtleties of magic or faith.',
-        'foodmod_delta' => +0.10,  // update.php:107
+        'foodmod_delta' => +0.10,  // update.php:152
         'offdef_delta'  => +0.25,  // read by include/modifier.php
         'bans'     => array('Wizards', 'Priests', 'Wizard spells (research)', 'Priest weapons', 'Golems and Iron Golems'),
         // military.php:116, cresearch.php:27-86, wconstruct.php:430+, animate.php:4
@@ -144,9 +144,9 @@ $GAMEDATA['races'] = array(
     ),
     'Night Elf' => array(
         'flavor'   => 'Secretive cousins of the Elves, masters of the wood by darkness.',
-        'foodmod_delta' => +0.25,  // update.php:111
-        'lumbmod_delta' => +0.10,  // update.php:112
-        'civ_mod_delta' => -0.25,  // update.php:113
+        'foodmod_delta' => +0.25,  // update.php:156
+        'lumbmod_delta' => +0.10,  // update.php:157
+        'civ_mod_delta' => -0.25,  // update.php:158
         'offdef_delta'  => -0.10,  // read by include/modifier.php
         'return_time_mult' => 0.75,   // attack/calculations.php:102-105
         'build_time_mult' => 2,    // buildings.php:87
@@ -156,7 +156,7 @@ $GAMEDATA['races'] = array(
 );
 
 /* ------------------------------------------------------------------ *
- * Classes. update.php:61-81 (economy), :199-203 (research speed),
+ * Classes. update.php:103-122 (economy), :243-245 (research speed),
  * offdef_mult read by include/modifier.php, functions.php:243-252 (unit costs),
  * checksignup.php:113-138 (signup bonuses).
  * ------------------------------------------------------------------ */
@@ -168,13 +168,13 @@ $GAMEDATA['classes'] = array(
     ),
     'Fighter' => array(
         'flavor'  => 'The warrior goes forth to bring destruction with fist and sword.',
-        'gpmod'        => 0.95,  // update.php:63
+        'gpmod'        => 0.95,  // update.php:105
         'offdef_mult'  => 1.05,  // read by include/modifier.php
         'exclusive_gear' => array("Toledo's Broad Sword", 'Sword of Gandalara', 'Medieval Armor'),
     ),
     'Insurrectionist' => array(
         'flavor'  => 'Fire and blasting powder answer questions steel cannot.',
-        'gpmod'        => 0.90,  // update.php:79
+        'gpmod'        => 0.90,  // update.php:121
         'offdef_mult'  => 1.05,  // read by include/modifier.php
         'suicide_cost_mult' => 0.50,  // functions.php:252
         'starts_with'  => array('Demolitions researched', '10-20 Suicide Civilians'),  // checksignup.php:137
@@ -182,29 +182,29 @@ $GAMEDATA['classes'] = array(
     ),
     'Mage' => array(
         'flavor'  => 'The power of your mind will bring your enemies to their knees.',
-        'gpmod'        => 1.10,  // update.php:67
+        'gpmod'        => 1.10,  // update.php:109
         'offdef_mult'  => 0.95,  // read by include/modifier.php
         'perks'   => array('Only class shown the top three spells: Cloud Kill, Lightning Bolt, Meteor Swarm'),  // S_RES.php:60
         'exclusive_gear' => array('Mythril Armor'),
     ),
     'Ranger' => array(
         'flavor'  => 'Wander the wilds and hunt your foes mercilessly.',
-        'lumbmod_delta' => +0.10,  // update.php:71
+        'lumbmod_delta' => +0.10,  // update.php:113
         'starts_with'  => array('Archery researched', '4-10 Archers'),  // checksignup.php:133
         'bans'    => array('Wizards', 'Golems and Iron Golems'),  // military.php:86, animate.php:4
         'exclusive_gear' => array('HeartSong', "Shyrscream's Bow"),
     ),
     'Savant' => array(
         'flavor'  => 'Gold flows to those who understand its currents.',
-        'gpmod'        => 1.50,  // update.php:75
+        'gpmod'        => 1.50,  // update.php:117
         'offdef_mult'  => 0.80,  // read by include/modifier.php
-        'research_mult' => 1.10, // update.php:199 -- research points accrue 10% FASTER
+        'research_mult' => 1.10, // update.php:243 -- research points accrue 10% FASTER
     ),
     'Warlock' => array(
         'flavor'  => 'Forbidden shortcuts to power, at a price paid later.',
         'offdef_mult'   => 0.95,  // read by include/modifier.php
         'wizard_cost_mult' => 0.75,  // functions.php:250
-        'research_mult' => 0.75,  // update.php:200 -- research points accrue 25% SLOWER
+        'research_mult' => 0.75,  // update.php:244 -- research points accrue 25% SLOWER
         'starts_with'  => array('Fireball researched'),  // checksignup.php:135
         'note' => 'A Demon Warlock pays 1.05x for warriors instead of the Demon 0.75x discount.',  // functions.php:251
     ),
@@ -212,7 +212,7 @@ $GAMEDATA['classes'] = array(
 
 /* ------------------------------------------------------------------ *
  * Units. Costs: functions.php:243-277, military.php:106,133.
- * Training times: update.php:457-459 queue depths.
+ * Training times: update.php:511 queue depths.
  * Barracks space: military.php:71-73,126-132.
  * ------------------------------------------------------------------ */
 $GAMEDATA['units'] = array(
@@ -350,7 +350,7 @@ $GAMEDATA['armor'] = array(
 
 /* ------------------------------------------------------------------ *
  * Research. Points: research_queries.php, research.php:26-80,
- * update.php:464-479. Effects: update.php:116-130, buildings.php:85,
+ * update.php:243-247. Effects: update.php:161-175, buildings.php:85,
  * military.php:76-85, animate.php:12.
  * ------------------------------------------------------------------ */
 $GAMEDATA['research'] = array(
@@ -434,16 +434,16 @@ $GAMEDATA['exp_values'] = array(
     'Mountain'         => 5,   // read by update.php: user.mts
     'Recruit'          => 5,   // read by update.php
     'Sage'             => 10,  // read by update.php -- assigned sages only, see docs/modernization.md
-    'Thief'            => 10,  // update.php:357
-    'Explorer'         => 10,  // update.php:356 -- held, and out exploring
+    'Thief'            => 10,  // update.php:347
+    'Explorer'         => 10,  // update.php:346 -- held, and out exploring
     'Warrior'          => 23,  // read by update.php: at home and in the field
     'Priest'           => 22,  // read by update.php: at home and in the field
     'Wizard'           => 20,  // read by update.php: at home and in the field
     'Archer'           => 26,  // read by update.php: at home and in the field
-    'Suicide Civilian' => 28,  // update.php:360
-    'Catapult'         => 33,  // update.php:361
-    'Golem'            => 30,  // update.php:363
-    'Iron Golem'       => 35,  // update.php:364
+    'Suicide Civilian' => 28,  // update.php:350
+    'Catapult'         => 33,  // update.php:351
+    'Golem'            => 30,  // update.php:353
+    'Iron Golem'       => 35,  // update.php:354
 );
 
 /* ------------------------------------------------------------------ *
@@ -454,5 +454,5 @@ $GAMEDATA['exp_values'] = array(
 $GAMEDATA['quirks'] = array(
     'The Scepter of Zakarum sets its speed on equip but never its power, so the listed power is not actually applied. (equip.php:199)',
     'Night Elves are dealt 4-10 archers at signup, but the free Archery research is immediately overwritten unless they are also Rangers. (checksignup.php:130-134)',
-    'Sage accounting disagrees with itself about how many research projects there are. Points accrue across all eighteen, the assigned-sage totals on the status and research screens count the first sixteen, and your score counts only the first fourteen -- so a sage on Animation or Advanced Animation is invisible to both totals, and one on Advanced Farming or Advanced Construction is invisible to your score. (update.php:203 vs functions.php:240 and cresearch.php:112 vs update.php:292)',
+    'Sage accounting disagrees with itself about how many research projects there are. Points accrue across all eighteen, the assigned-sage totals on the status and research screens count the first sixteen, and your score counts only the first fourteen -- so a sage on Animation or Advanced Animation is invisible to both totals, and one on Advanced Farming or Advanced Construction is invisible to your score. (update.php:247 vs functions.php:240 and cresearch.php:112 vs update.php:345)',
 );
