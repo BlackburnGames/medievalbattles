@@ -5,6 +5,8 @@ include("include/request.php");
 $attack   = mb_input('attack');
 $empvalue = mb_input('empvalue');
 $uarcher  = mb_input('uarcher');
+$ugolem     = mb_input('ugolem');
+$uirongolem = mb_input('uirongolem');
 $upriest  = mb_input('upriest');
 $uwarrior = mb_input('uwarrior');
 $uwizard  = mb_input('uwizard');
@@ -30,10 +32,16 @@ if(!IsSet($attack))	{
 else	{
 	include("include/nexplode.php");
 		
-	$uwarrior = implode("", explode(",", $uwarrior));
-	$uwizard = implode("", explode(",", $uwizard));
-	$upriest = implode("", explode(",", $upriest));
-	$uarcher = implode("", explode(",", $uarcher));
+	// Whole numbers from here on. These are the only unit counts the attack
+	// uses -- include/attack/defANDoff.php and calculations.php read no copy of
+	// their own -- so an absent field has to arrive as 0, not as the "" that
+	// implode() makes of it, which PHP 8 refuses to multiply.
+	$uwarrior = (int) implode("", explode(",", $uwarrior));
+	$uwizard = (int) implode("", explode(",", $uwizard));
+	$upriest = (int) implode("", explode(",", $upriest));
+	$uarcher = (int) implode("", explode(",", $uarcher));
+	$ugolem = (int) implode("", explode(",", $ugolem));
+	$uirongolem = (int) implode("", explode(",", $uirongolem));
 		
 	if($safemode > 0)	 {
 		echo"<div align=center><font class=yellow>You cannot attack while in safe mode.<br><br></font></div>";
@@ -56,6 +64,22 @@ else	{
 	elseif($uarcher > 0 AND $res['r13pts'] < 125000)	 {
 		echo"<div align=center><font class=yellow>You have to research archery.<br><br></font></div>";
 		include("include/attack/ldrop.php");
+		include("include/attack/table.php");
+		die();
+	}
+	// The form in include/attack/table.php offers both golem fields on all
+	// three attack pages, and attack.php checked them. This page never read
+	// them, so include/attack/defANDoff.php's own copy of the request counted
+	// any number of golems into the attack -- owned or not, researched or not.
+	elseif(($ugolem > 0) AND ($res['r17pts'] < 125000))	{
+		echo"<div align=center><font class=yellow>You have to research Animation.<br><br></font></div>";
+		include("include/attack/mdrop.php");
+		include("include/attack/table.php");
+		die();
+	}
+	elseif(($uirongolem > 0) AND ($res['r18pts'] < 125000))	{
+		echo"<div align=center><font class=yellow>You have to research Advanced Animation.<br><br></font></div>";
+		include("include/attack/mdrop.php");
 		include("include/attack/table.php");
 		die();
 	}
@@ -97,7 +121,9 @@ else	{
 		echo"<div align=center><font class=yellow>$evu[ename] has $evu[mts] so there is no sense in battle.</font></div>";
 		die();
 	}
-	elseif($uwarrior == "" AND $uwizard == "" AND $upriest == "" AND $uarcher == "")	 {
+	// Nothing above zero, not merely nothing typed: a field of "0" passed the
+	// old `== ""` test and calculations.php then divided by a tally of zero.
+	elseif(!($uwarrior > 0 OR $uwizard > 0 OR $upriest > 0 OR $uarcher > 0 OR $ugolem > 0 OR $uirongolem > 0))	 {
 		echo"<div align=center><font class=yellow>You did not send any troops into combat!</font></div><br><br>";
 		include("include/attack/ldrop.php");
 		include("include/attack/table.php");
@@ -115,13 +141,13 @@ else	{
 		include("include/attack/table.php");
 		die();
 	}
-	elseif($warriors < $uwarrior OR $wizards < $uwizard OR $priests < $upriest OR $archers < $uarcher)	{
+	elseif($warriors < $uwarrior OR $wizards < $uwizard OR $priests < $upriest OR $archers < $uarcher OR $golem < $ugolem OR $irongolem < $uirongolem)	{
 		echo"<div align=center><font class=yellow>You cannot send that many units into combat.</font></div><br><br>";
 		include("include/attack/mdrop.php");
 		include("include/attack/table.php");
 		die();
 	}
-	elseif($uwarrior < 0 OR $uwizard < 0 OR $upriest < 0 OR $uarcher < 0)	{
+	elseif($uwarrior < 0 OR $uwizard < 0 OR $upriest < 0 OR $uarcher < 0 OR $ugolem < 0 OR $uirongolem < 0)	{
 		echo"<div align=center><font class=yellow>You cannot send negative or 0 units.</font></div><br><br>";
 		include("include/attack/mdrop.php");
 		include("include/attack/table.php");

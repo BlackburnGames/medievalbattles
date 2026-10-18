@@ -32,10 +32,16 @@ if(!IsSet($attack))	{
 else	{  	
 	include("include/nexplode.php");
 		
-	$uwarrior = implode("", explode(",", $uwarrior));
-	$uwizard = implode("", explode(",", $uwizard));
-	$upriest = implode("", explode(",", $upriest));
-	$uarcher = implode("", explode(",", $uarcher));
+	// Whole numbers from here on. These are the only unit counts the attack
+	// uses -- include/attack/defANDoff.php and calculations.php read no copy of
+	// their own -- so an absent field has to arrive as 0, not as the "" that
+	// implode() makes of it, which PHP 8 refuses to multiply.
+	$uwarrior = (int) implode("", explode(",", $uwarrior));
+	$uwizard = (int) implode("", explode(",", $uwizard));
+	$upriest = (int) implode("", explode(",", $upriest));
+	$uarcher = (int) implode("", explode(",", $uarcher));
+	$ugolem = (int) implode("", explode(",", $ugolem));
+	$uirongolem = (int) implode("", explode(",", $uirongolem));
 		
 	if($safemode > 0)	 {
 		echo"<div align=center><font class=yellow>You cannot attack while in safe mode.<br><br></font></div>";
@@ -109,7 +115,9 @@ else	{
 	$EMPs_guild_query = mysqli_query($db, "SELECT guild FROM user WHERE userid='$evu[userid]'");
 		$EMPs_guild = mb_db_result($EMPs_guild_query,"EMPs_guild");
 
-	if($uwarrior == "" AND $uwizard == "" AND $upriest == "" AND $uarcher == "" AND $ugolem == "" AND $uirongolem == "")	{
+	// Nothing above zero, not merely nothing typed: a field of "0" passed the
+	// old `== ""` test and calculations.php then divided by a tally of zero.
+	if(!($uwarrior > 0 OR $uwizard > 0 OR $upriest > 0 OR $uarcher > 0 OR $ugolem > 0 OR $uirongolem > 0))	{
 		echo"<div align=center><font class=yellow>You did not send anything into combat!</font></div><br><br>";
 		include("include/attack/ldrop.php");
 		include("include/attack/table.php");

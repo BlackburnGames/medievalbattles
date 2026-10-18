@@ -3,12 +3,10 @@
 // Request input, formerly supplied by register_globals.
 include("include/request.php");
 $empvalue   = mb_input('empvalue');
-$uarcher    = mb_input('uarcher');
-$ugolem     = mb_input('ugolem');
-$uirongolem = mb_input('uirongolem');
-$upriest    = mb_input('upriest');
-$uwarrior   = mb_input('uwarrior');
-$uwizard    = mb_input('uwizard');
+
+// No unit counts from the request: these are the troops leaving, and the only
+// figures that may say how many are the ones the including page checked
+// against what you own. See include/attack/defANDoff.php.
 	
 		
 $tfleets = $fleets;

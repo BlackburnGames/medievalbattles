@@ -409,6 +409,22 @@ forumRefuses($tester, 'attack.php', array('attack' => 1, 'empvalue' => 3),
 forumRefuses($tester, 'scattack.php',
     array('suicideatk' => 1, 'empvalue' => 1, 'send' => 1, 'toatk' => 'civ'),
     'attack your ownself', 'app/scattack.php: no check that the target is not the attacker');
+// Golems the attacker does not own, on the two pages that never read the golem
+// fields. include/attack/defANDoff.php took its own copy of them off the request
+// and counted every one into the attack's power, and calculations.php took them
+// off a stock of zero -- so a raid could name 100,000 golems, own none, research
+// nothing and win. The tester has not researched Animation, which is the check
+// that answers first; a refusal that leaks spends a general, as above.
+foreach (array('attackr.php', 'attackm.php') as $page) {
+    forumRefuses($tester, $page,
+        array('attack' => 1, 'empvalue' => 3, 'uwarrior' => 1, 'ugolem' => 100000),
+        'research Animation', "app/$page: golems are not checked, and are counted into the attack anyway");
+}
+// Every field "0": not empty, so the old `== ""` test let it through, and
+// calculations.php divided by a tally of zero.
+forumRefuses($tester, 'attackr.php',
+    array('attack' => 1, 'empvalue' => 3, 'uwarrior' => 0, 'uwizard' => 0),
+    'did not send any troops', 'app/attackr.php: an army of zeroes is not refused');
 
 foreach (array(
     // The land attack, won: three warriors at power 2 and three wizards at

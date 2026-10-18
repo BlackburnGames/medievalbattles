@@ -3,12 +3,15 @@
 // Request input, formerly supplied by register_globals.
 include("include/request.php");
 $empvalue   = mb_input('empvalue');
-$uarcher    = mb_input('uarcher');
-$ugolem     = mb_input('ugolem');
-$uirongolem = mb_input('uirongolem');
-$upriest    = mb_input('upriest');
-$uwarrior   = mb_input('uwarrior');
-$uwizard    = mb_input('uwizard');
+
+// The six unit counts are NOT read here, and must not be. This file is only
+// ever included by attack.php, attackm.php and attackr.php, which read and
+// check them -- and the Phase 2 port gave this file its own mb_input() copies,
+// which threw the pages' checks away. attackm.php and attackr.php never read
+// the two golem counts at all, so a mountain or resource attack could name any
+// number of golems, own none and research nothing, and have every one counted
+// into $cdefense below; calculations.php then took them off a stock of zero.
+// The counts used here are the ones the page validated, in the page's scope.
 		
 // select user table for the empire being attacked
 $result = mysqli_query($db, "SELECT * FROM user WHERE userid=" . mb_sql_int($empvalue));

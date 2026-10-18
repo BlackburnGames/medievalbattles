@@ -520,6 +520,28 @@ attribute.
   they refuse, before the two attacks, so a guard that leaks a general also
   fails the news assertions behind it.
 
+  **And a raid could field golems it did not own.** The form in
+  `include/attack/table.php` offers both golem fields on all three attack
+  pages, but only `attack.php` read and checked them. That alone would have
+  meant golems were simply ignored on the other two — except that
+  `include/attack/defANDoff.php` and `calculations.php` each read all six unit
+  counts off the request themselves. So a resource raid could name 100,000
+  golems, own none and research nothing, have every one counted into its
+  attack power, and win; the stock they were taken from went to −100,000.
+  The same copies undid the pages' comma-stripping, so what was checked and
+  what was sent were not even the same number.
+
+  The copies were the Phase 2 port's, and they were added to satisfy
+  `register-globals-audit.php`, which could not see a page handing a value to
+  its own include and reported every such read as a request parameter. Both
+  are gone, the audit credits the includer now (see
+  [testing.md](testing.md)), and `attackm.php` and `attackr.php` check golems
+  as `attack.php` does. The counts are whole numbers from the moment they are
+  read, and "you sent nothing" means nothing above zero — an army of `"0"`
+  fields passed the old `== ""` test and divided by zero. The golems' own
+  survivor formula is still wrong in two places, and is a combat question
+  rather than this one: see `$GAMEDATA['quirks']`.
+
   **Every guard is driven from the arm it refuses.** That is what this needed
   and what the suite could not do before: the primary tester leads Testguild and
   settlement 1, so every request they make is allowed, and a gate that answers
