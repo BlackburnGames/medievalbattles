@@ -52,20 +52,18 @@ $gid = mysqli_fetch_array($G_id);
 $tG_id = mysqli_query($db, "SELECT gid FROM guild WHERE gname=" . mb_sql_str($db, $evu['guild']) . "");
 $tgid = mysqli_fetch_array($tG_id);
 				
-$modifier = 1;
+// Each side's own race and class: the attacker's on the attack, the
+// defender's on the defence. This was one table, read for the attacker and
+// applied to both totals, so the two cancelled and the modifiers never
+// decided a battle -- only how many fell on each side. The status screen's
+// defence figure and the manual both promised each empire its own.
+// include/modifier.php is the one table now, and it reads $GAMEDATA.
+require_once __DIR__ . '/../modifier.php';
 
-if($class == 'Fighter')	{	$modifier = 1.05;	}
-if($class == 'Cleric')	{	$modifier = 1.00;	}
-if($class == 'Ranger')	{	$modifier = 1.00;	}
-if($class == 'Mage')	{	$modifier = .95;		}
-if($class == 'Warlock')	{	$modifier = .95;		}
-if($class == 'Savant')	{	$modifier = .80;		}
-if($class == 'Insurrectionist')	{	$modifier = 1.05;		}
-if($race == 'Giant')		{	$modifier = $modifier + .25;	 }
-if($race == 'Demon')		{	$modifier = $modifier + .10;	 }
-if($race == 'Night Elf')		{	$modifier = $modifier - .10;	 }
+$modifier = mb_offdef_modifier($race, $class);
+$evmodifier = mb_offdef_modifier($evu['race'], $evu['class']);
 				
 $cdefense = round((($uwarrior * $warpower) + ($uwizard * $wizpower) + ($upriest * $pripower) + ($uarcher * $archpower) + ($ugolem * 38) + ($uirongolem * 50)) * $modifier);	
 				
-$evpower = round((($evm['warriors'] * $evm['warpower']) + ($evm['wizards'] * $evm['wizpower']) + ($evm['priests'] * $evm['pripower']) + ($evm['archers'] * $evm['archpower']) + ($evm['golem'] * 38) + ($evm['irongolem'] * 50) + ($evb['wp'] * 15) + ($evm['catapult'] * 30)) * $modifier);
+$evpower = round((($evm['warriors'] * $evm['warpower']) + ($evm['wizards'] * $evm['wizpower']) + ($evm['priests'] * $evm['pripower']) + ($evm['archers'] * $evm['archpower']) + ($evm['golem'] * 38) + ($evm['irongolem'] * 50) + ($evb['wp'] * 15) + ($evm['catapult'] * 30)) * $evmodifier);
 ?>

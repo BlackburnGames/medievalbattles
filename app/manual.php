@@ -498,8 +498,9 @@ they have at home, counted the same way, plus
 <b><?php echo $econ['wp_defense']; ?> per wooden platform</b> and
 <b><?php echo $econ['catapult_defense']; ?> per catapult</b>. Golems add
 <?php echo $econ['golem_power']; ?> and iron golems
-<?php echo $econ['irongolem_power']; ?>. Both totals are then adjusted by race and
-class modifiers. <b>If your attack power exceeds their defense, you win.</b></p>
+<?php echo $econ['irongolem_power']; ?>. Each total is then adjusted by its own
+empire's race and class modifiers: yours on your attack, theirs on their defense.
+<b>If your attack power exceeds their defense, you win.</b></p>
 
 <p>Both sides take losses in proportion to the power thrown at them, win or lose.
 Survivors are unavailable until they return home; return time is set by the slowest

@@ -191,8 +191,8 @@ prerequisite that matters. Any value still written as a literal in the engine
 is a classic value that modern can't override, and nothing reports it: the
 overlay sets the key, the engine never reads it, and modern quietly plays
 classic in that one respect. As of this writing the economy rates, timers,
-eight of the fourteen score weights and the Demon's two deltas are read from
-`$GAMEDATA`. The rest are still literals with citations. Many of them can't be
+eight of the fourteen score weights, the Demon's two deltas and every race and
+class off/def modifier are read from `$GAMEDATA`. The rest are still literals with citations. Many of them can't be
 moved safely yet, because the fixture can't see them (see "Invert the manual
 dependency" in [modernization.md](modernization.md)).
 

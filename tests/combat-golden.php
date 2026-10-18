@@ -56,7 +56,7 @@ $IGNORED_COLUMNS = array('pw', 'ip', 'lastlogin', 'lastlog', 'date', 'datestamp'
 // another settlement, so nothing refuses the attack before the formula runs.
 const ATTACKER = 1;   // TestLord, Human, settlement 1, Testguild
 const GUILDMATE = 2;  // IdleBaron, Demon, settlement 1, Testguild
-const DEFENDER = 3;   // PoorSerf, Giant, settlement 2, no guild
+const DEFENDER = 3;   // PoorSerf, Giant Ranger (defends at 1.25), settlement 2, no guild
 
 /* ------------------------------------------------------------------ *
  * Scenario helpers. Each returns SQL; a scenario's `setup` is a list.
@@ -313,8 +313,8 @@ $SCENARIOS = array(
         'requests' => array(array('attack.php', array('empvalue' => $D, 'uwarrior' => 300))),
     ),
     array(
-        'name'  => 'quirk-modifier-both-sides',
-        'why'   => 'QUIRK: a Giant Fighter\'s 1.30 modifier is applied to the defender\'s power too. Same armies as land-win; compare the losses.',
+        'name'  => 'modifier-each-side',
+        'why'   => 'A Giant Fighter (1.30) against a Giant Ranger (1.25), each on its own side. Same armies as land-win. The attacker\'s modifier used to scale both totals, so it cancelled.',
         'setup' => array($strong, set('user', $A, array('race' => 'Giant', 'class' => 'Fighter')),
             $defenders, $defenderStats, landLayout($D)),
         'requests' => array(array('attack.php', array('empvalue' => $D, 'uwarrior' => 300))),
@@ -390,7 +390,7 @@ foreach ($modifiers as $m) {
     list($race, $class) = $m;
     $SCENARIOS[] = array(
         'name'  => 'modifier-' . strtolower($race === 'Human' ? $class : $race),
-        'why'   => "A $race $class. The modifier scales both sides (see quirk-modifier-both-sides), so it shows in the losses, not the outcome.",
+        'why'   => "A $race $class. Its modifier scales the attack; the Giant Ranger defending scales its own defence at 1.25.",
         'setup' => array_merge($sweepSetup, array(set('user', $A, array('race' => $race, 'class' => $class)))),
         'requests' => array(array('attack.php', array('empvalue' => $D) + $send($sweepArmy))),
     );

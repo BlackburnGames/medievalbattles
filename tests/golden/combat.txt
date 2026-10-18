@@ -2,14 +2,14 @@
 # Land attack won against a 250-acre empire: 10% gain, taken from open land, then buildings under construction, then built ones.
 
 > attack.php attack=1 empvalue=3 uwarrior=300 uwizard=100 upriest=50
-  says: You have conquered 25 land from PoorSerf(2)! Your losses: 3 warriors 4 wizards 2 priests
+  says: You have conquered 25 land from PoorSerf(2)! Your losses: 4 warriors 6 wizards 3 priests
     buildings [1] aland 100 -> 125
     buildings [3] aland 10 -> 0, home 5 -> 3, barrack 5 -> 3, farm 5 -> 3, wp 3 -> 1, lmill 2 -> 0, dhome 3 -> 0, dfarm 2 -> 0
   + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
   + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
     military [1] warriors 300 -> 0, wizards 100 -> 0, priests 50 -> 0
     military [3] warriors 20 -> 19, wizards 10 -> 8, priests 10 -> 9, archers 5 -> 4
-    returntbl [1] war4 0 -> 297, wiz4 0 -> 96, pri4 0 -> 48, time4 0 -> 6
+    returntbl [1] war4 0 -> 296, wiz4 0 -> 94, pri4 0 -> 47, time4 0 -> 6
   + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
   + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
     user [1] land 250 -> 275, fleets 2 -> 1
@@ -19,14 +19,14 @@
 # Every unit type on both sides, in the hundreds of thousands. The other scenarios are small enough that a one-point change to a constant rounds away; here it cannot.
 
 > attack.php attack=1 empvalue=3 uwarrior=600000 uwizard=200000 upriest=100000 uarcher=50000 ugolem=900 uirongolem=900
-  says: You have conquered 25 land from PoorSerf(2)! Your losses: 10160 warriors 13547 wizards 6350 priests 8467 archers 508 golems 406 iron golems
+  says: You have conquered 25 land from PoorSerf(2)! Your losses: 12700 warriors 16933 wizards 7937 priests 10583 archers 635 golems 508 iron golems
     buildings [1] aland 100 -> 125
     buildings [3] aland 10 -> 0, home 5 -> 3, barrack 5 -> 3, farm 5 -> 3, wp 2000 -> 1998, lmill 2 -> 0, dhome 3 -> 0, dfarm 2 -> 0
   + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
   + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
     military [1] warriors 600000 -> 0, wizards 200000 -> 0, priests 100000 -> 0, archers 50000 -> 0, golem 900 -> 0, irongolem 900 -> 0
     military [3] warriors 200000 -> 198443, wizards 50000 -> 45849, priests 50000 -> 48054, archers 30000 -> 27406, catapult 5000 -> 4815, golem 2000 -> 1844, irongolem 1000 -> 875
-    returntbl [1] war4 0 -> 589840, wiz4 0 -> 186453, pri4 0 -> 93650, arch4 0 -> 41533, golem4 0 -> 392, irongolem4 0 -> 494, time4 0 -> 25
+    returntbl [1] war4 0 -> 587300, wiz4 0 -> 183067, pri4 0 -> 92063, arch4 0 -> 39417, golem4 0 -> 265, irongolem4 0 -> 392, time4 0 -> 25
   + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
   + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
     user [1] land 250 -> 275, fleets 2 -> 1
@@ -50,14 +50,14 @@
 # Under 200 acres the gain is a flat 10, not 10%.
 
 > attack.php attack=1 empvalue=3 uwarrior=300
-  says: You have conquered 10 land from PoorSerf(2)! Your losses: 3 warriors
+  says: You have conquered 10 land from PoorSerf(2)! Your losses: 4 warriors
     buildings [1] aland 100 -> 110
     buildings [3] aland 100 -> 90
   + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 10 land | class=yellow | yourid=3
   + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 10 land | class=yellow | gnid=1 | age=0 | gid=1
     military [1] warriors 300 -> 0
     military [3] wizards 10 -> 9, priests 10 -> 9, archers 5 -> 4
-    returntbl [1] war4 0 -> 297, time4 0 -> 6
+    returntbl [1] war4 0 -> 296, time4 0 -> 6
   + setnews news=PoorSerf (2) lost 10 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
   + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 10 land | class=yellow | setid=1 | sid=0 | age=0
     user [1] land 250 -> 260, fleets 2 -> 1
@@ -67,7 +67,7 @@
 # Under 10 acres the attacker takes it all and the defender is removed (include/empire.php).
 
 > attack.php attack=1 empvalue=3 uwarrior=300
-  says: You have gained 8 land and destroyed PoorSerf(2) Medieval Style! Your losses: 3 warriors
+  says: You have gained 8 land and destroyed PoorSerf(2) Medieval Style! Your losses: 4 warriors
     buildings [1] aland 100 -> 108
   - buildings [3]
   - emailvalidate [3]
@@ -76,7 +76,7 @@
     military [1] warriors 300 -> 0
   - military [3]
   - research [3]
-    returntbl [1] war4 0 -> 297, time4 0 -> 6
+    returntbl [1] war4 0 -> 296, time4 0 -> 6
   - returntbl [3]
   + setnews news=PoorSerf (2) was destroyed by TestLord (1) [i]Medieval style[/i] | class=lg | setid=2 | sid=2 | age=0
   + setnews news=TestLord (1) gained 8 land and destroyed PoorSerf (2) [i]Medieval style[/i] | class=yellow | setid=1 | sid=1 | age=0
@@ -89,14 +89,14 @@
 # A defender whose land outnumbers its plots -- 250 acres against 10, a gain of 25. The loop takes all ten and stops; it used to spin until the request timed out.
 
 > attack.php attack=1 empvalue=3 uwarrior=300
-  says: You have conquered 25 land from PoorSerf(2)! Your losses: 3 warriors
+  says: You have conquered 25 land from PoorSerf(2)! Your losses: 4 warriors
     buildings [1] aland 100 -> 125
     buildings [3] aland 4 -> 0, home 3 -> 0, barrack 3 -> 0
   + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
   + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
     military [1] warriors 300 -> 0
     military [3] wizards 10 -> 9, priests 10 -> 9, archers 5 -> 4
-    returntbl [1] war4 0 -> 297, time4 0 -> 6
+    returntbl [1] war4 0 -> 296, time4 0 -> 6
   + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
   + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
     user [1] land 250 -> 275, fleets 2 -> 1
@@ -106,7 +106,7 @@
 # Both sides in a guild, so the four guild news lines are filed as well as the settlement ones.
 
 > attack.php attack=1 empvalue=3 uwarrior=300
-  says: You have conquered 25 land from PoorSerf(2)! Your losses: 3 warriors
+  says: You have conquered 25 land from PoorSerf(2)! Your losses: 4 warriors
     buildings [1] aland 100 -> 125
     buildings [3] aland 100 -> 75
   + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
@@ -114,7 +114,7 @@
   + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
     military [1] warriors 300 -> 0
     military [3] wizards 10 -> 9, priests 10 -> 9, archers 5 -> 4
-    returntbl [1] war4 0 -> 297, time4 0 -> 6
+    returntbl [1] war4 0 -> 296, time4 0 -> 6
   + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
   + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
     user [1] land 250 -> 275, fleets 2 -> 1
@@ -124,22 +124,22 @@
 # Three attacks on two free generals: the army goes to the highest empty return slot, then the next, then the third is refused.
 
 > attack.php attack=1 empvalue=3 uwarrior=100
-  says: We have failed to attack PoorSerf(2)! Your losses: 3 warriors
+  says: We have failed to attack PoorSerf(2)! Your losses: 4 warriors
   + empnews news=We have successfully defended our empire against TestLord (1) | class=yellow | yourid=3
   + guildnews news=TestLord (1) failed to attack PoorSerf (2) for land | class=yellow | gnid=1 | age=0 | gid=1
     military [1] warriors 300 -> 200
-    returntbl [1] war4 0 -> 97, time4 0 -> 6
+    returntbl [1] war4 0 -> 96, time4 0 -> 6
   + setnews news=PoorSerf (2) successfully defended their land against TestLord (1) | class=orange | setid=2 | sid=1 | age=0
   + setnews news=TestLord (1) failed to attack PoorSerf (2) for land | class=yellow | setid=1 | sid=1 | age=0
     user [1] fleets 2 -> 1
     user [3] nno 0 -> 1
 
 > attack.php attack=1 empvalue=3 uwarrior=100
-  says: We have failed to attack PoorSerf(2)! Your losses: 3 warriors
+  says: We have failed to attack PoorSerf(2)! Your losses: 4 warriors
   + empnews news=We have successfully defended our empire against TestLord (1) | class=yellow | yourid=3
   + guildnews news=TestLord (1) failed to attack PoorSerf (2) for land | class=yellow | gnid=2 | age=0 | gid=1
     military [1] warriors 200 -> 100
-    returntbl [1] war3 0 -> 97, time3 0 -> 6
+    returntbl [1] war3 0 -> 96, time3 0 -> 6
   + setnews news=PoorSerf (2) successfully defended their land against TestLord (1) | class=orange | setid=2 | sid=2 | age=0
   + setnews news=TestLord (1) failed to attack PoorSerf (2) for land | class=yellow | setid=1 | sid=2 | age=0
     user [1] fleets 1 -> 0
@@ -169,12 +169,12 @@
 # Resource raid won: 8% of gold, iron, lumber and civilians, each rounded. Lumber was read off the military row, which has no lumber column, and so was always 0.
 
 > attackr.php attack=1 empvalue=3 uwarrior=300
-  says: Success! You have managed to gain 800 gold pieces, 400 iron, 267 lumber, and 80 civilians from PoorSerf(2)! Your losses: 3 warriors
+  says: Success! You have managed to gain 800 gold pieces, 400 iron, 267 lumber, and 80 civilians from PoorSerf(2)! Your losses: 4 warriors
   + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 800 gold pieces, 400 iron, 267 lumber, and 80 civilians. | class=yellow | yourid=3
   + guildnews news=TestLord (1) successfully attacked PoorSerf (2) for resources | class=yellow | gnid=0 | age=0 | gid=1
     military [1] warriors 300 -> 0, civ 1200 -> 1280
     military [3] wizards 10 -> 9, priests 10 -> 9, archers 5 -> 4, civ 1000 -> 920
-    returntbl [1] war4 0 -> 297, time4 0 -> 6
+    returntbl [1] war4 0 -> 296, time4 0 -> 6
   + setnews news=PoorSerf (2) lost resources to TestLord (1) | class=lg | setid=2 | sid=0 | age=0
   + setnews news=TestLord (1) successfully attacked PoorSerf (2) for resources | class=yellow | setid=1 | sid=0 | age=0
     user [1] gp 300000 -> 300800, iron 5000 -> 5400, lumber 4000 -> 4267, fleets 2 -> 1
@@ -184,12 +184,12 @@
 # A defender with negative gold yields none, rather than a negative gain.
 
 > attackr.php attack=1 empvalue=3 uwarrior=300
-  says: Success! You have managed to gain 0 gold pieces, 8 iron, 0 lumber, and 0 civilians from PoorSerf(2)! Your losses: 3 warriors
+  says: Success! You have managed to gain 0 gold pieces, 8 iron, 0 lumber, and 0 civilians from PoorSerf(2)! Your losses: 4 warriors
   + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 0 gold pieces, 8 iron, 0 lumber, and 0 civilians. | class=yellow | yourid=3
   + guildnews news=TestLord (1) successfully attacked PoorSerf (2) for resources | class=yellow | gnid=0 | age=0 | gid=1
     military [1] warriors 300 -> 0
     military [3] wizards 10 -> 9, priests 10 -> 9, archers 5 -> 4
-    returntbl [1] war4 0 -> 297, time4 0 -> 6
+    returntbl [1] war4 0 -> 296, time4 0 -> 6
   + setnews news=PoorSerf (2) lost resources to TestLord (1) | class=lg | setid=2 | sid=0 | age=0
   + setnews news=TestLord (1) successfully attacked PoorSerf (2) for resources | class=yellow | setid=1 | sid=0 | age=0
     user [1] iron 5000 -> 5008, fleets 2 -> 1
@@ -213,14 +213,14 @@
 # Mountain attack won: 10% of the defender's mountains and experience for each, taken from open mountains, then mines under construction, then built ones. The loop that takes them read $mgain, which nothing assigns, and never ran.
 
 > attackm.php attack=1 empvalue=3 uwarrior=300
-  says: You have conquered 20 mountains from PoorSerf (2)! Your losses: 3 warriors
+  says: You have conquered 20 mountains from PoorSerf (2)! Your losses: 4 warriors
     buildings [1] amts 100 -> 120
     buildings [3] amts 5 -> 0, gm 10 -> 4, im 10 -> 5, dgm 2 -> 0, dim 2 -> 0
   + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 20 mountains | class=yellow | yourid=3
   + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 20 mountains | class=yellow | gnid=0 | age=0 | gid=1
     military [1] warriors 300 -> 0
     military [3] wizards 10 -> 9, priests 10 -> 9, archers 5 -> 4
-    returntbl [1] war4 0 -> 297, time4 0 -> 6
+    returntbl [1] war4 0 -> 296, time4 0 -> 6
   + setnews news=PoorSerf (2) lost 20 mountains to TestLord (1) | class=lg | setid=2 | sid=0 | age=0
   + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 20 mountains | class=yellow | setid=1 | sid=0 | age=0
     user [1] mts 200 -> 220, exp2 0 -> 100, fleets 2 -> 1
@@ -230,14 +230,14 @@
 # A defender whose mountains outnumber its mountain buildings -- 200 against 10, a gain of 20. The loop takes all ten and stops; it used to spin until the request timed out.
 
 > attackm.php attack=1 empvalue=3 uwarrior=300
-  says: You have conquered 20 mountains from PoorSerf (2)! Your losses: 3 warriors
+  says: You have conquered 20 mountains from PoorSerf (2)! Your losses: 4 warriors
     buildings [1] amts 100 -> 120
     buildings [3] gm 5 -> 0, im 5 -> 0
   + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 20 mountains | class=yellow | yourid=3
   + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 20 mountains | class=yellow | gnid=0 | age=0 | gid=1
     military [1] warriors 300 -> 0
     military [3] wizards 10 -> 9, priests 10 -> 9, archers 5 -> 4
-    returntbl [1] war4 0 -> 297, time4 0 -> 6
+    returntbl [1] war4 0 -> 296, time4 0 -> 6
   + setnews news=PoorSerf (2) lost 20 mountains to TestLord (1) | class=lg | setid=2 | sid=0 | age=0
   + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 20 mountains | class=yellow | setid=1 | sid=0 | age=0
     user [1] mts 200 -> 220, exp2 0 -> 100, fleets 2 -> 1
@@ -268,14 +268,14 @@
 # Attacking golems have a golem's own hit points, 2,000, as defending ones do. They were wizdef x 100, and the survivor formula multiplied by archer hit points, so 40 sent could come home as 141; archdef 3 and wizdef 1 would show either coming back.
 
 > attack.php attack=1 empvalue=3 uwarrior=300 ugolem=40
-  says: You have conquered 25 land from PoorSerf(2)! Your losses: 3 warriors 0 golem
+  says: You have conquered 25 land from PoorSerf(2)! Your losses: 4 warriors 0 golem
     buildings [1] aland 100 -> 125
     buildings [3] aland 100 -> 75
   + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
   + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
     military [1] warriors 300 -> 0, golem 40 -> 0
     military [3] warriors 20 -> 18, wizards 10 -> 6, priests 10 -> 8, archers 5 -> 2
-    returntbl [1] war4 0 -> 297, golem4 0 -> 40, time4 0 -> 20
+    returntbl [1] war4 0 -> 296, golem4 0 -> 40, time4 0 -> 20
   + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
   + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
     user [1] land 250 -> 275, fleets 2 -> 1
@@ -285,14 +285,14 @@
 # Iron golems and archers come home in their own return slots. The iron golems used to be booked into the archer slot, replacing the archers that survived.
 
 > attack.php attack=1 empvalue=3 uwarrior=300 uarcher=30 uirongolem=20
-  says: You have conquered 25 land from PoorSerf(2)! Your losses: 3 warriors 2 archers 0 iron golem
+  says: You have conquered 25 land from PoorSerf(2)! Your losses: 4 warriors 3 archers 0 iron golem
     buildings [1] aland 100 -> 125
     buildings [3] aland 100 -> 75
   + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
   + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
     military [1] warriors 300 -> 0, archers 30 -> 0, irongolem 20 -> 0
     military [3] warriors 20 -> 19, wizards 10 -> 7, priests 10 -> 9, archers 5 -> 3
-    returntbl [1] war4 0 -> 297, arch4 0 -> 28, irongolem4 0 -> 20, time4 0 -> 25
+    returntbl [1] war4 0 -> 296, arch4 0 -> 27, irongolem4 0 -> 20, time4 0 -> 25
   + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
   + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
     user [1] land 250 -> 275, fleets 2 -> 1
@@ -302,14 +302,14 @@
 # Signup leaves archdef 0 until archer armour is bought, and archer hit points are archdef x 120. Unarmoured archers now defend at 1, as a defender's do; the division by zero was fatal on PHP 8, part-way through sending the army.
 
 > attack.php attack=1 empvalue=3 uwarrior=300 uarcher=30
-  says: You have conquered 25 land from PoorSerf(2)! Your losses: 3 warriors 2 archers
+  says: You have conquered 25 land from PoorSerf(2)! Your losses: 4 warriors 3 archers
     buildings [1] aland 100 -> 125
     buildings [3] aland 100 -> 75
   + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
   + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
     military [1] warriors 300 -> 0, archers 30 -> 0
     military [3] wizards 10 -> 9, priests 10 -> 9, archers 5 -> 4
-    returntbl [1] war4 0 -> 297, arch4 0 -> 28, time4 0 -> 6
+    returntbl [1] war4 0 -> 296, arch4 0 -> 27, time4 0 -> 6
   + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
   + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
     user [1] land 250 -> 275, fleets 2 -> 1
@@ -319,14 +319,14 @@
 # Iron golems without archers. Booked into the archer slot, which nothing had named, the return UPDATE named no column, failed, and the golems were lost.
 
 > attack.php attack=1 empvalue=3 uwarrior=300 uirongolem=20
-  says: You have conquered 25 land from PoorSerf(2)! Your losses: 3 warriors 0 iron golem
+  says: You have conquered 25 land from PoorSerf(2)! Your losses: 4 warriors 0 iron golem
     buildings [1] aland 100 -> 125
     buildings [3] aland 100 -> 75
   + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
   + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
     military [1] warriors 300 -> 0, irongolem 20 -> 0
     military [3] warriors 20 -> 19, wizards 10 -> 7, priests 10 -> 9, archers 5 -> 3
-    returntbl [1] war4 0 -> 297, irongolem4 0 -> 20, time4 0 -> 25
+    returntbl [1] war4 0 -> 296, irongolem4 0 -> 20, time4 0 -> 25
   + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
   + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
     user [1] land 250 -> 275, fleets 2 -> 1
@@ -340,14 +340,14 @@
   (no change)
 
 > attack.php attack=1 empvalue=3 uwarrior=300 ugolem=500
-  says: You have conquered 25 land from PoorSerf(2)! Your losses: 3 warriors 0 golem
+  says: You have conquered 25 land from PoorSerf(2)! Your losses: 4 warriors 0 golem
     buildings [1] aland 100 -> 125
     buildings [3] aland 100 -> 75
   + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
   + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
     military [1] warriors 300 -> 0, golem 2000 -> 1500
     military [3] warriors 20 -> 6, wizards 10 -> 0, priests 10 -> 0, archers 5 -> 0, catapult 2 -> 0, golem 2 -> 1, irongolem 1 -> 0
-    returntbl [1] war4 0 -> 297, golem4 0 -> 500, time4 0 -> 20
+    returntbl [1] war4 0 -> 296, golem4 0 -> 500, time4 0 -> 20
   + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
   + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
     user [1] land 250 -> 275, fleets 2 -> 1
@@ -370,8 +370,8 @@
     user [1] land 250 -> 275, fleets 2 -> 1
     user [3] land 250 -> 225, nno 0 -> 1
 
-### quirk-modifier-both-sides
-# QUIRK: a Giant Fighter's 1.30 modifier is applied to the defender's power too. Same armies as land-win; compare the losses.
+### modifier-each-side
+# A Giant Fighter (1.30) against a Giant Ranger (1.25), each on its own side. Same armies as land-win. The attacker's modifier used to scale both totals, so it cancelled.
 
 > attack.php attack=1 empvalue=3 uwarrior=300
   says: You have conquered 25 land from PoorSerf(2)! Your losses: 4 warriors
@@ -391,14 +391,14 @@
 # Elves come home in 80% of the time, floored.
 
 > attack.php attack=1 empvalue=3 uwarrior=300 uwizard=100
-  says: You have conquered 25 land from PoorSerf(2)! Your losses: 3 warriors 4 wizards
+  says: You have conquered 25 land from PoorSerf(2)! Your losses: 4 warriors 5 wizards
     buildings [1] aland 100 -> 125
     buildings [3] aland 100 -> 75
   + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
   + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
     military [1] warriors 300 -> 0, wizards 100 -> 0
     military [3] warriors 20 -> 19, wizards 10 -> 8, priests 10 -> 9, archers 5 -> 4
-    returntbl [1] war4 0 -> 297, wiz4 0 -> 96, time4 0 -> 4
+    returntbl [1] war4 0 -> 296, wiz4 0 -> 95, time4 0 -> 4
   + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
   + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
     user [1] land 250 -> 275, fleets 2 -> 1
@@ -408,14 +408,14 @@
 # Night Elves come home in 75% of the time, floored -- a bonus that never fired while the race was compared against " Night Elf". Same army as return-time-elf.
 
 > attack.php attack=1 empvalue=3 uwarrior=300 uwizard=100
-  says: You have conquered 25 land from PoorSerf(2)! Your losses: 3 warriors 3 wizards
+  says: You have conquered 25 land from PoorSerf(2)! Your losses: 4 warriors 5 wizards
     buildings [1] aland 100 -> 125
     buildings [3] aland 100 -> 75
   + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
   + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
     military [1] warriors 300 -> 0, wizards 100 -> 0
     military [3] warriors 20 -> 19, wizards 10 -> 8, priests 10 -> 9, archers 5 -> 4
-    returntbl [1] war4 0 -> 297, wiz4 0 -> 97, time4 0 -> 4
+    returntbl [1] war4 0 -> 296, wiz4 0 -> 95, time4 0 -> 4
   + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
   + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
     user [1] land 250 -> 275, fleets 2 -> 1
@@ -463,126 +463,120 @@
     user [3] nno 0 -> 1
 
 ### modifier-fighter
-# A Human Fighter. The modifier scales both sides (see quirk-modifier-both-sides), so it shows in the losses, not the outcome.
+# A Human Fighter. Its modifier scales the attack; the Giant Ranger defending scales its own defence at 1.25.
 
 > attack.php attack=1 empvalue=3 uwarrior=600000 uarcher=50000
-  says: You have conquered 25 land from PoorSerf(2)! Your losses: 10668 warriors 8890 archers
+  says: You have conquered 25 land from PoorSerf(2)! Your losses: 12700 warriors 10583 archers
     buildings [1] aland 100 -> 125
     buildings [3] aland 10 -> 0, home 5 -> 3, barrack 5 -> 3, farm 5 -> 3, wp 2000 -> 1998, lmill 2 -> 0, dhome 3 -> 0, dfarm 2 -> 0
   + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
   + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
     military [1] warriors 600000 -> 0, archers 50000 -> 0
     military [3] warriors 200000 -> 199025, wizards 50000 -> 47400, priests 50000 -> 48781, archers 30000 -> 28375, catapult 5000 -> 4884, golem 2000 -> 1903, irongolem 1000 -> 922
-    returntbl [1] war4 0 -> 589332, arch4 0 -> 41110, time4 0 -> 6
+    returntbl [1] war4 0 -> 587300, arch4 0 -> 39417, time4 0 -> 6
   + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
   + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
     user [1] land 250 -> 275, fleets 2 -> 1
     user [3] land 250 -> 225, nno 0 -> 1
 
 ### modifier-cleric
-# A Human Cleric. The modifier scales both sides (see quirk-modifier-both-sides), so it shows in the losses, not the outcome.
+# A Human Cleric. Its modifier scales the attack; the Giant Ranger defending scales its own defence at 1.25.
 
 > attack.php attack=1 empvalue=3 uwarrior=600000 uarcher=50000
-  says: You have conquered 25 land from PoorSerf(2)! Your losses: 10160 warriors 8467 archers
+  says: You have conquered 25 land from PoorSerf(2)! Your losses: 12700 warriors 10583 archers
     buildings [1] aland 100 -> 125
     buildings [3] aland 10 -> 0, home 5 -> 3, barrack 5 -> 3, farm 5 -> 3, wp 2000 -> 1998, lmill 2 -> 0, dhome 3 -> 0, dfarm 2 -> 0
   + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
   + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
     military [1] warriors 600000 -> 0, archers 50000 -> 0
     military [3] warriors 200000 -> 199071, wizards 50000 -> 47524, priests 50000 -> 48839, archers 30000 -> 28452, catapult 5000 -> 4889, golem 2000 -> 1907, irongolem 1000 -> 926
-    returntbl [1] war4 0 -> 589840, arch4 0 -> 41533, time4 0 -> 6
+    returntbl [1] war4 0 -> 587300, arch4 0 -> 39417, time4 0 -> 6
   + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
   + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
     user [1] land 250 -> 275, fleets 2 -> 1
     user [3] land 250 -> 225, nno 0 -> 1
 
 ### modifier-ranger
-# A Human Ranger. The modifier scales both sides (see quirk-modifier-both-sides), so it shows in the losses, not the outcome.
+# A Human Ranger. Its modifier scales the attack; the Giant Ranger defending scales its own defence at 1.25.
 
 > attack.php attack=1 empvalue=3 uwarrior=600000 uarcher=50000
-  says: You have conquered 25 land from PoorSerf(2)! Your losses: 10160 warriors 8467 archers
+  says: You have conquered 25 land from PoorSerf(2)! Your losses: 12700 warriors 10583 archers
     buildings [1] aland 100 -> 125
     buildings [3] aland 10 -> 0, home 5 -> 3, barrack 5 -> 3, farm 5 -> 3, wp 2000 -> 1998, lmill 2 -> 0, dhome 3 -> 0, dfarm 2 -> 0
   + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
   + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
     military [1] warriors 600000 -> 0, archers 50000 -> 0
     military [3] warriors 200000 -> 199071, wizards 50000 -> 47524, priests 50000 -> 48839, archers 30000 -> 28452, catapult 5000 -> 4889, golem 2000 -> 1907, irongolem 1000 -> 926
-    returntbl [1] war4 0 -> 589840, arch4 0 -> 41533, time4 0 -> 6
+    returntbl [1] war4 0 -> 587300, arch4 0 -> 39417, time4 0 -> 6
   + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
   + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
     user [1] land 250 -> 275, fleets 2 -> 1
     user [3] land 250 -> 225, nno 0 -> 1
 
 ### modifier-mage
-# A Human Mage. The modifier scales both sides (see quirk-modifier-both-sides), so it shows in the losses, not the outcome.
+# A Human Mage. Its modifier scales the attack; the Giant Ranger defending scales its own defence at 1.25.
 
 > attack.php attack=1 empvalue=3 uwarrior=600000 uarcher=50000
-  says: You have conquered 25 land from PoorSerf(2)! Your losses: 9652 warriors 8043 archers
-    buildings [1] aland 100 -> 125
-    buildings [3] aland 10 -> 0, home 5 -> 3, barrack 5 -> 3, farm 5 -> 3, wp 2000 -> 1998, lmill 2 -> 0, dhome 3 -> 0, dfarm 2 -> 0
-  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
-  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
+  says: We have failed to attack PoorSerf(2)! Your losses: 12700 warriors 10583 archers
+  + empnews news=We have successfully defended our empire against TestLord (1) | class=yellow | yourid=3
+  + guildnews news=TestLord (1) failed to attack PoorSerf (2) for land | class=yellow | gnid=1 | age=0 | gid=1
     military [1] warriors 600000 -> 0, archers 50000 -> 0
     military [3] warriors 200000 -> 199118, wizards 50000 -> 47648, priests 50000 -> 48897, archers 30000 -> 28530, catapult 5000 -> 4895, golem 2000 -> 1912, irongolem 1000 -> 929
-    returntbl [1] war4 0 -> 590348, arch4 0 -> 41957, time4 0 -> 6
-  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
-  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
-    user [1] land 250 -> 275, fleets 2 -> 1
-    user [3] land 250 -> 225, nno 0 -> 1
+    returntbl [1] war4 0 -> 587300, arch4 0 -> 39417, time4 0 -> 6
+  + setnews news=PoorSerf (2) successfully defended their land against TestLord (1) | class=orange | setid=2 | sid=1 | age=0
+  + setnews news=TestLord (1) failed to attack PoorSerf (2) for land | class=yellow | setid=1 | sid=1 | age=0
+    user [1] fleets 2 -> 1
+    user [3] nno 0 -> 1
 
 ### modifier-warlock
-# A Human Warlock. The modifier scales both sides (see quirk-modifier-both-sides), so it shows in the losses, not the outcome.
+# A Human Warlock. Its modifier scales the attack; the Giant Ranger defending scales its own defence at 1.25.
 
 > attack.php attack=1 empvalue=3 uwarrior=600000 uarcher=50000
-  says: You have conquered 25 land from PoorSerf(2)! Your losses: 9652 warriors 8043 archers
-    buildings [1] aland 100 -> 125
-    buildings [3] aland 10 -> 0, home 5 -> 3, barrack 5 -> 3, farm 5 -> 3, wp 2000 -> 1998, lmill 2 -> 0, dhome 3 -> 0, dfarm 2 -> 0
-  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
-  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
+  says: We have failed to attack PoorSerf(2)! Your losses: 12700 warriors 10583 archers
+  + empnews news=We have successfully defended our empire against TestLord (1) | class=yellow | yourid=3
+  + guildnews news=TestLord (1) failed to attack PoorSerf (2) for land | class=yellow | gnid=1 | age=0 | gid=1
     military [1] warriors 600000 -> 0, archers 50000 -> 0
     military [3] warriors 200000 -> 199118, wizards 50000 -> 47648, priests 50000 -> 48897, archers 30000 -> 28530, catapult 5000 -> 4895, golem 2000 -> 1912, irongolem 1000 -> 929
-    returntbl [1] war4 0 -> 590348, arch4 0 -> 41957, time4 0 -> 6
-  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
-  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
-    user [1] land 250 -> 275, fleets 2 -> 1
-    user [3] land 250 -> 225, nno 0 -> 1
+    returntbl [1] war4 0 -> 587300, arch4 0 -> 39417, time4 0 -> 6
+  + setnews news=PoorSerf (2) successfully defended their land against TestLord (1) | class=orange | setid=2 | sid=1 | age=0
+  + setnews news=TestLord (1) failed to attack PoorSerf (2) for land | class=yellow | setid=1 | sid=1 | age=0
+    user [1] fleets 2 -> 1
+    user [3] nno 0 -> 1
 
 ### modifier-savant
-# A Human Savant. The modifier scales both sides (see quirk-modifier-both-sides), so it shows in the losses, not the outcome.
+# A Human Savant. Its modifier scales the attack; the Giant Ranger defending scales its own defence at 1.25.
 
 > attack.php attack=1 empvalue=3 uwarrior=600000 uarcher=50000
-  says: You have conquered 25 land from PoorSerf(2)! Your losses: 8128 warriors 6773 archers
-    buildings [1] aland 100 -> 125
-    buildings [3] aland 10 -> 0, home 5 -> 3, barrack 5 -> 3, farm 5 -> 3, wp 2000 -> 1998, lmill 2 -> 0, dhome 3 -> 0, dfarm 2 -> 0
-  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
-  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
+  says: We have failed to attack PoorSerf(2)! Your losses: 12700 warriors 10583 archers
+  + empnews news=We have successfully defended our empire against TestLord (1) | class=yellow | yourid=3
+  + guildnews news=TestLord (1) failed to attack PoorSerf (2) for land | class=yellow | gnid=1 | age=0 | gid=1
     military [1] warriors 600000 -> 0, archers 50000 -> 0
     military [3] warriors 200000 -> 199257, wizards 50000 -> 48019, priests 50000 -> 49071, archers 30000 -> 28762, catapult 5000 -> 4912, golem 2000 -> 1926, irongolem 1000 -> 941
-    returntbl [1] war4 0 -> 591872, arch4 0 -> 43227, time4 0 -> 6
-  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
-  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
-    user [1] land 250 -> 275, fleets 2 -> 1
-    user [3] land 250 -> 225, nno 0 -> 1
+    returntbl [1] war4 0 -> 587300, arch4 0 -> 39417, time4 0 -> 6
+  + setnews news=PoorSerf (2) successfully defended their land against TestLord (1) | class=orange | setid=2 | sid=1 | age=0
+  + setnews news=TestLord (1) failed to attack PoorSerf (2) for land | class=yellow | setid=1 | sid=1 | age=0
+    user [1] fleets 2 -> 1
+    user [3] nno 0 -> 1
 
 ### modifier-insurrectionist
-# A Human Insurrectionist. The modifier scales both sides (see quirk-modifier-both-sides), so it shows in the losses, not the outcome.
+# A Human Insurrectionist. Its modifier scales the attack; the Giant Ranger defending scales its own defence at 1.25.
 
 > attack.php attack=1 empvalue=3 uwarrior=600000 uarcher=50000
-  says: You have conquered 25 land from PoorSerf(2)! Your losses: 10668 warriors 8890 archers
+  says: You have conquered 25 land from PoorSerf(2)! Your losses: 12700 warriors 10583 archers
     buildings [1] aland 100 -> 125
     buildings [3] aland 10 -> 0, home 5 -> 3, barrack 5 -> 3, farm 5 -> 3, wp 2000 -> 1998, lmill 2 -> 0, dhome 3 -> 0, dfarm 2 -> 0
   + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
   + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
     military [1] warriors 600000 -> 0, archers 50000 -> 0
     military [3] warriors 200000 -> 199025, wizards 50000 -> 47400, priests 50000 -> 48781, archers 30000 -> 28375, catapult 5000 -> 4884, golem 2000 -> 1903, irongolem 1000 -> 922
-    returntbl [1] war4 0 -> 589332, arch4 0 -> 41110, time4 0 -> 6
+    returntbl [1] war4 0 -> 587300, arch4 0 -> 39417, time4 0 -> 6
   + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
   + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
     user [1] land 250 -> 275, fleets 2 -> 1
     user [3] land 250 -> 225, nno 0 -> 1
 
 ### modifier-giant
-# A Giant Warrior. The modifier scales both sides (see quirk-modifier-both-sides), so it shows in the losses, not the outcome.
+# A Giant Warrior. Its modifier scales the attack; the Giant Ranger defending scales its own defence at 1.25.
 
 > attack.php attack=1 empvalue=3 uwarrior=600000 uarcher=50000
   says: You have conquered 25 land from PoorSerf(2)! Your losses: 12700 warriors 10583 archers
@@ -599,17 +593,17 @@
     user [3] land 250 -> 225, nno 0 -> 1
 
 ### modifier-demon
-# A Demon Warrior. The modifier scales both sides (see quirk-modifier-both-sides), so it shows in the losses, not the outcome.
+# A Demon Warrior. Its modifier scales the attack; the Giant Ranger defending scales its own defence at 1.25.
 
 > attack.php attack=1 empvalue=3 uwarrior=600000 uarcher=50000
-  says: You have conquered 25 land from PoorSerf(2)! Your losses: 11176 warriors 9313 archers
+  says: You have conquered 25 land from PoorSerf(2)! Your losses: 12700 warriors 10583 archers
     buildings [1] aland 100 -> 125
     buildings [3] aland 10 -> 0, home 5 -> 3, barrack 5 -> 3, farm 5 -> 3, wp 2000 -> 1998, lmill 2 -> 0, dhome 3 -> 0, dfarm 2 -> 0
   + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
   + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
     military [1] warriors 600000 -> 0, archers 50000 -> 0
     military [3] warriors 200000 -> 198979, wizards 50000 -> 47276, priests 50000 -> 48723, archers 30000 -> 28298, catapult 5000 -> 4878, golem 2000 -> 1898, irongolem 1000 -> 918
-    returntbl [1] war4 0 -> 588824, arch4 0 -> 40687, time4 0 -> 6
+    returntbl [1] war4 0 -> 587300, arch4 0 -> 39417, time4 0 -> 6
   + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
   + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
     user [1] land 250 -> 275, fleets 2 -> 1

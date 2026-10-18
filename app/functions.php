@@ -295,17 +295,12 @@ $atrbutton = "<form type=get action=aconstruct.php><input class=button type=subm
 $amrbutton = "<form type=get action=aconstruct.php><input class=button type=submit name=updaet11 value=Construct><input type=hidden name=update11 value=11></form>";
 
 // empire defense modifiers
-	$empmodifier = 1;
-	if($class == 'Fighter')	{	$empmodifier = 1.05;	}
-	if($class == 'Cleric')	{	$empmodifier = 1.00;	}
-	if($class == 'Ranger')	{	$empmodifier = 1.00;	}
-	if($class == 'Mage')	{	$empmodifier = .95;		}
-	if($class == 'Warlock')	{	$empmodifier = .95;		}
-	if($class == 'Savant')	{	$empmodifier = .80;		}
-	if($class == 'Insurrectionist')	{	$empmodifier = 1.05;		}
-	if($race == 'Giant')		{	$empmodifier = $empmodifier + .25;	 }
-	if($race == 'Demon')		{	$empmodifier = $empmodifier + .10;	 }
-	if($race == 'Night Elf')		{	$empmodifier = $empmodifier - .10;	 }
+	// The same modifier a battle applies to this empire's own side, from the
+	// one table in include/modifier.php. This was a second copy of it, and a
+	// copy can drift from the battle it describes -- under a ruleset overlay,
+	// for one.
+	require_once __DIR__ . '/include/modifier.php';
+	$empmodifier = mb_offdef_modifier($race, $class);
 
 // defense calculation
 	$tdefense = (($warriors * $warpower) + ($wizards * $wizpower) + ($priests * $pripower) + ($archers * $archpower) + ($golem * 38) + ($irongolem * 50) + ($catapult * 30) + ($wp * 15)) * $empmodifier;
