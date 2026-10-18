@@ -13,7 +13,7 @@ original will want the original, so there are two rulesets:
 - **Classic** is v6 as designed: its races, classes, units, buildings and
   balance as of 2003.
 - **Modern** is the relaunch's game: balance changes and new features, such as
-  ages, new-player protection and whatever is taken from
+  new-player protection and whatever is taken from
   [v7-design-notes.md](v7-design-notes.md).
 
 Both run from one codebase, and each world is fixed to one of them.
@@ -80,7 +80,7 @@ return array(
         'gold_per_mine' => 350,   // v6's late game is gold-starved; see #NN
     ),
     'features' => array(
-        'ages' => true,
+        'protection' => true,
     ),
 );
 ```
@@ -103,9 +103,9 @@ complete key set.
 
 ### Feature flags
 
-Not every difference is a number. Ages, new-player protection and anything
+Not every difference is a number. New-player protection and anything
 from the v7 design change behaviour, so they're flags in
-`$GAMEDATA['features']`, read through `mb_feature('ages')`.
+`$GAMEDATA['features']`, read through `mb_feature('protection')`.
 
 - **Classic has every flag off.** It's the baseline, so a feature's off branch
   must be the code that ran before the feature existed, unchanged. The classic
@@ -142,15 +142,16 @@ A fallback would turn a misconfigured modern world into a classic one with no
 error. The tick in particular has to fail loudly, because a tick that runs
 under the wrong rules can't be undone.
 
-**A world's ruleset is fixed for the length of an age.** Changing it mid-age
-changes the rules under players who planned for the old ones. Moving a world to
-another ruleset means starting a new age, and this belongs to the ages feature
-rather than to an admin toggle.
+**A world's ruleset is fixed for the length of a round.** Changing it
+mid-round changes the rules under players who planned for the old ones.
+Running another ruleset means opening a new round, which creates a new world
+database. It is not an admin toggle.
 
-**Accounts belong to a world.** `user` lives in the world's database, so
-playing on both rulesets takes two signups. That's acceptable for a relaunch.
-A shared account across worlds would be a separate project with its own
-database, and nothing here prevents it later.
+**Accounts are shared across worlds.** This was going to be "accounts belong
+to a world", with one signup per ruleset. [rounds.md](rounds.md) replaces
+that: an account lives in a shared `mb_accounts` database, and each world
+database holds that account's kingdom for one round. That design is what lets
+a reset stop deleting players.
 
 ## Testing
 
@@ -210,9 +211,12 @@ quirks can now be fixed one at a time, each as its own reviewable diff.
 per-ruleset golden and crawl. Up to this point classic is the only ruleset and
 nothing observable changes. The classic golden master proves that.
 
-**4. Modern's first feature: ages.** Ages come first because they change the
-schema and the tick. Everything else in modern — protection, balance, the
-mobile UI — is easier to build once a world can end and start again.
+**4. Rounds.** These were going to be "ages", modern's first feature. They
+aren't a ruleset feature: classic needs to end and start again too, and today
+it can only do that by deleting its players. [rounds.md](rounds.md) has the
+design. Running two rulesets side by side is two rounds open at once, so
+step 3's loader and rounds' concurrent step land together. Everything else in
+modern (protection, balance, the mobile UI) comes after.
 
 Steps 1 and 2 are Phase 3 work anyway, and step 3 is small once they're done.
 
