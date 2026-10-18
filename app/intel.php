@@ -41,7 +41,7 @@ else	{
 	// thief checks had passed, and nothing asked whether the row existed: an id
 	// that named nobody "succeeded", spent the thieves and rendered a report on
 	// an empty empire.
-	$result = mb_query($db, "SELECT * FROM user WHERE userid=?", array((int) $empvalue));
+	$result = mb_query($db, "SELECT * FROM user WHERE round_id=? AND userid=?", array((int) $round_id, (int) $empvalue));
 	$evu = mysqli_fetch_array($result);
 
 	$result1 = mb_query($db, "SELECT * FROM military WHERE userid=?", array((int) $empvalue));

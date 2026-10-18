@@ -45,7 +45,7 @@ elseif ($addreply) {
 	// on the topicid alone, so a reply could be posted into another guild's
 	// private thread -- and topicg.php renders guildmsgs by topicid unscoped,
 	// which is where it appeared.
-	mb_forum_require_guild_thread($db, $topicid, $empireguild);
+	mb_forum_require_guild_thread($db, $topicid, $empireguild, $round_id);
 
 	// See input.posts.php: the INSERT was being run twice, the second time with
 	// its own return value as the query string.

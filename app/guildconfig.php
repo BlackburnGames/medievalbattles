@@ -162,10 +162,10 @@ else	{
 	$guild_info_query = mb_query($db, "SELECT * FROM guild WHERE owner=?", array($userid));
 		$guild_info = mysqli_fetch_array($guild_info_query);
 	// get their empire name
-	$empire_info_query = mb_query($db, "SELECT ename FROM user WHERE userid=?", array((int) $remp));
+	$empire_info_query = mb_query($db, "SELECT ename FROM user WHERE round_id=? AND userid=?", array((int) $round_id, (int) $remp));
 		$empire_info = mysqli_fetch_array($empire_info_query);
 	// get their current guild
-	$current_guild_query = mb_query($db, "SELECT guild FROM user WHERE userid=?", array((int) $remp));
+	$current_guild_query = mb_query($db, "SELECT guild FROM user WHERE round_id=? AND userid=?", array((int) $round_id, (int) $remp));
 		$current_guild = mysqli_fetch_array($current_guild_query);
 
 	if($remp == 'ns')		{

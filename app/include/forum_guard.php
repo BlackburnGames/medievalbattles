@@ -83,10 +83,13 @@ function mb_forum_require_guild($empireguild)
  * used to strip the spaces out of $empireguild first, so guilds whose names
  * differed only by spaces shared one board and passed this check for each
  * other's threads.
+ *
+ * And by round: a guild's name can recur in a later round, and the name is all
+ * a thread records of its guild.
  */
-function mb_forum_require_guild_thread($db, $topicid, $empireguild)
+function mb_forum_require_guild_thread($db, $topicid, $empireguild, $round_id)
 {
-	$owned = mb_query($db, "SELECT topicid FROM guildthreads WHERE topicid=? AND guildname=?", array((int) $topicid, $empireguild));
+	$owned = mb_query($db, "SELECT topicid FROM guildthreads WHERE topicid=? AND guildname=? AND round_id=?", array((int) $topicid, $empireguild, (int) $round_id));
 
 	if (!$owned || !mysqli_num_rows($owned)) {
 		echo "<div align=center><font class=yellow>That thread is not in your guild.</font></div>";

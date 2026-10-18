@@ -194,6 +194,37 @@ $admin = login($BASE, 'tester@example.com', 'test1234');
 $admin->get('/admin/newgame.php');
 after('a new game', count_of($db, "SELECT count(*) FROM user WHERE round_id = 1") === 1);
 
+// A player aiming at the ended round. Every id in round 2 is a real row --
+// the audit passes a query that filters on one -- so it is the page that has
+// to see the target is not in the player's round. Round 2's kingdom 101 has
+// no safe mode, its guild has the tester's guild's name, and its guild
+// listing is on a board the tester can trade on by that name.
+load_world($db);
+q($db, "UPDATE user SET safemode = 0 WHERE userid = 101");
+$ENDED = ended_round($db);
+$player = login($BASE, 'tester@example.com', 'test1234');
+$AIMED = array(
+    array('post', 'attack.php',   array('attack' => 1, 'empvalue' => 101, 'uwarrior' => 1), 'That empire does not exist'),
+    array('post', 'attackr.php',  array('attack' => 1, 'empvalue' => 101, 'uwarrior' => 1), 'That empire does not exist'),
+    array('post', 'attackm.php',  array('attack' => 1, 'empvalue' => 101, 'uwarrior' => 1), 'That empire does not exist'),
+    array('post', 'scattack.php', array('suicideatk' => 1, 'empvalue' => 101, 'send' => 1, 'toatk' => 'civ'), 'That empire does not exist'),
+    array('post', 'intel.php',    array('gather' => 1, 'empvalue' => 101, 'send' => 1), 'That empire does not exist'),
+    array('post', 'messaging.php', array('sendmessage' => 1, 'empvalue' => 101, 'umessage' => 'hello'), 'That empire does not exist'),
+    array('get',  'guildbarter.php?barter=1&bid=101', null, 'There is no such barter'),
+    array('get',  'topicg.php?topicid=101', null, 'You cannot view forum posts in other guilds'),
+    array('get',  'gl-topic.php?topicid=101', null, 'That thread is not in your guild'),
+    array('post', 'gl-inputposts.php', array('addreply' => 1, 'topicid' => 101, 'topic' => 'x', 'message' => 'y'), 'That thread is not in your guild'),
+);
+foreach ($AIMED as $a) {
+    list($how, $page, $fields, $refusal) = $a;
+    $body = $how === 'get' ? $player->get('/' . $page) : $player->post('/' . $page, $fields);
+    check("$page refuses a target in the ended round", strpos($body, $refusal) !== false);
+}
+$now = ended_round($db);
+$changed = array_merge(array_diff($ENDED, $now), array_diff($now, $ENDED));
+check('aiming at it leaves the ended round alone'
+    . ($changed ? ":\n      " . implode("\n      ", array_slice($changed, 0, 6)) : ''), !$changed);
+
 loadFixture($db);
 
 echo "\n";

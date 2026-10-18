@@ -194,7 +194,7 @@ else	{
 	$bid = (int) $bid;
 	$mb_on_guild_board = $mb_guild_board ? 1 : 0;
 
-	$barter_query = mb_query($db, "SELECT * FROM barter WHERE barterid=? AND (page='guild') = ?", array($bid, $mb_on_guild_board));
+	$barter_query = mb_query($db, "SELECT * FROM barter WHERE round_id=? AND barterid=? AND (page='guild') = ?", array((int) $round_id, $bid, $mb_on_guild_board));
 	$barter_row   = mysqli_fetch_array($barter_query);
 
 	if(!$barter_row)	 {

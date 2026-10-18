@@ -300,11 +300,15 @@ fingerprint of the account's address and hash:
       row in every table and round 1's names, which the tick and every admin
       action must leave byte-identical. Every golden passed untouched.
 
-      **Still open: ids from the request.** A page that takes a target —
-      an attack's or a message's userid, a forum topic, a barter listing, a
-      guild — filters on that id and passes the audit, but nothing yet
-      checks the id is in the player's round. The settlement range checks
-      are the only ones in place. That is the next commit.
+      **Ids from the request.** A page that takes a target filters on that
+      id and passes the audit, so each checks the target is in the
+      player's round where it takes it: the attack, intel and settlement
+      attack lookups, the message recipient, the guild leader's kick, the
+      guild-leader message, the barter purchase, and the guild forum guards
+      — which matched a thread by its guild's name. Settlement forums and
+      votes were safe already, being held to the player's settlement, and a
+      guild request is held to its applicant and leader. The isolation test
+      aims each at the ended round and requires a refusal.
    3. **Ending one.** `round_result`, and `bin/round.php open` and `end`.
    4. **The pages.** The round list, join and history. Retire `newgame.php`
       and signup's doubling as join.

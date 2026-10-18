@@ -32,9 +32,9 @@ else	{
 		// scope by session_start(), which is where $gid used to come from here.
 		$gid = isset($_SESSION['gid']) ? $_SESSION['gid'] : '';
 
-		$guild_name = mb_query($db, "SELECT gname FROM guild WHERE gid=?", array((int) $gid));
+		$guild_name = mb_query($db, "SELECT gname FROM guild WHERE round_id=? AND gid=?", array((int) $round_id, (int) $gid));
 			$g_name = mb_db_result($guild_name,"g_name");
-		$owner_g = mb_query($db, "SELECT owner FROM guild WHERE gid=?", array((int) $gid));	
+		$owner_g = mb_query($db, "SELECT owner FROM guild WHERE round_id=? AND gid=?", array((int) $round_id, (int) $gid));	
 			$owner = mb_db_result($owner_g,"owner");
 		$THE_MNO = mb_query($db, "SELECT mno FROM user WHERE userid=?", array((int) $owner));	
 			$T_MNO = mb_db_result($THE_MNO,"T_MNO");

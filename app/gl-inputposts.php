@@ -56,7 +56,7 @@ elseif ($addreply) {
 	// Whose thread is $topicid? Nothing asked, and guildmsgs carries no guild of
 	// its own, so the reply below is bound to a guild only by the thread it
 	// names. Every statement in this branch matched on the id alone.
-	mb_forum_require_guild_thread($db, $topicid, $empireguild);
+	mb_forum_require_guild_thread($db, $topicid, $empireguild, $round_id);
 
 	$result1 = mb_query($db, "INSERT INTO guildmsgs (name, topic, topicid, message, datestamp, round_id) SELECT ?, ?, ?, ?, ?, round_id FROM user WHERE userid=?", array($ename, $topic, (int) $topicid, $message, $clock, $userid));
 	$lastid = mysqli_insert_id($db);

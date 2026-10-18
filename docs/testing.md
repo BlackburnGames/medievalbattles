@@ -176,7 +176,8 @@ shrink, and is **empty**. It scans `app/`, `update.php` and `bin/`.
 
 What it cannot see is a target id that comes from the request: an attack, a
 message or a forum post aimed at a userid, setid or topic of another round
-filters on that id and passes. Those are checked where the page takes them.
+filters on that id and passes. Those are checked where the page takes them,
+and `tests/round-isolation.php` aims each at an ended round.
 
 ### `tests/round-isolation.php`
 
@@ -188,7 +189,9 @@ deleting their guild, each of `gameconfig.php`'s actions, its delete-one
 kingdom and `newgame.php` each run against round 1, from a fresh world, and
 round 2's rows must come out byte-identical — while round 1 must have changed,
 or the pass proves nothing. With one tick filter removed it fails on round 2's
-`online` flags. Reloads the schema.
+`online` flags. Last, the tester aims an attack of each kind, intel, a
+message, a barter purchase and the guild forum at round 2's kingdom, listing
+and thread, and each page must refuse. Reloads the schema.
 
 ### `tests/smoke.php`
 

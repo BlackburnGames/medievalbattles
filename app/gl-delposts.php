@@ -62,7 +62,7 @@ else	{
 	// settlement equivalent had at least been scoping by setid all along.
 	// guildmsgs carries no guildname of its own, so the thread is confirmed
 	// first and both deletes hang off that.
-	mb_forum_require_guild_thread($db, $tid, $empireguild);
+	mb_forum_require_guild_thread($db, $tid, $empireguild, $round_id);
 
 	mb_query($db, "DELETE FROM guildthreads WHERE topicid=?", array((int) $tid));
 	mb_query($db, "DELETE FROM guildmsgs WHERE topicid=?", array((int) $tid));
@@ -86,7 +86,7 @@ else	{
 	//
 	// The message's thread has to be in the caller's guild, which takes a join:
 	// guildmsgs has a topicid but no guildname.
-	$owned = mb_query($db, "SELECT m.messageid FROM guildmsgs m JOIN guildthreads t ON t.topicid = m.topicid WHERE m.messageid=? AND t.guildname=?", array((int) $mid, $empireguild));
+	$owned = mb_query($db, "SELECT m.messageid FROM guildmsgs m JOIN guildthreads t ON t.topicid = m.topicid WHERE m.messageid=? AND t.guildname=? AND t.round_id=?", array((int) $mid, $empireguild, (int) $round_id));
 
 	if (!$owned || !mysqli_num_rows($owned)) {
 		echo "<div align=center><font class=yellow>That post is not in your guild.</font></div>";

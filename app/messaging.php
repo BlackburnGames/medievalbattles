@@ -35,8 +35,16 @@ else	{
 	else	{
 
 
-		$empattacked = mb_query($db, "SELECT ename FROM user WHERE userid=?", array((int) $empvalue));
+		$empattacked = mb_query($db, "SELECT ename FROM user WHERE round_id=? AND userid=?", array((int) $round_id, (int) $empvalue));
 		$empireattacked = mb_db_result($empattacked,"empireattacked");
+
+		// An empire of this round. One of another round -- or none -- would
+		// otherwise be sent the message, into whichever round it is in.
+		if ($empireattacked === null)	{
+			echo"<div align=center><font class=yellow>That empire does not exist.</font></div>";
+			include("include/S_MESS.php");
+			die();
+		}
 
 		$THE_MNO = mb_query($db, "SELECT mno FROM user WHERE userid=?", array((int) $empvalue));
 		$T_MNO = mb_db_result($THE_MNO,"T_MNO");

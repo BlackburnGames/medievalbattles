@@ -18,7 +18,7 @@ include("commong.php");
 // was an error -- and it asked only that the caller be in the guild, not lead it.
 include("include/forum_guard.php");
 mb_forum_require_gl($db, $userid, $empireguild);
-mb_forum_require_guild_thread($db, $topicid, $empireguild);
+mb_forum_require_guild_thread($db, $topicid, $empireguild, $round_id);
 
 // The reply form below prefills its Topic field from $topic, which until now
 // meant two things at once: the request parameter read above, and whatever the

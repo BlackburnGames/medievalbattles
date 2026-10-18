@@ -14,7 +14,7 @@ $empvalue   = mb_input('empvalue');
 // The counts used here are the ones the page validated, in the page's scope.
 		
 // select user table for the empire being attacked
-$result = mb_query($db, "SELECT * FROM user WHERE userid=?", array((int) $empvalue));
+$result = mb_query($db, "SELECT * FROM user WHERE round_id=? AND userid=?", array((int) $round_id, (int) $empvalue));
 $evu = mysqli_fetch_array($result);
 
 // An id that names nobody. Every page that includes this has already passed

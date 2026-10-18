@@ -43,7 +43,7 @@ else	{
 	include("include/connect.php");
 
 	// select user values
-		$result = mb_query($db, "SELECT * FROM user WHERE userid=?", array((int) $empvalue));
+		$result = mb_query($db, "SELECT * FROM user WHERE round_id=? AND userid=?", array((int) $round_id, (int) $empvalue));
 		$evu = mysqli_fetch_array($result);
 	// select military values
 		$result1 = mb_query($db, "SELECT * FROM military WHERE userid=?", array((int) $empvalue));
