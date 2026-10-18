@@ -85,6 +85,23 @@
     user [1] land 250 -> 258, fleets 2 -> 1
   - user [3]
 
+### land-win-short-of-buildings
+# A defender whose land outnumbers its plots -- 250 acres against 10, a gain of 25. The loop takes all ten and stops; it used to spin until the request timed out.
+
+> attack.php attack=1 empvalue=3 uwarrior=300
+  says: You have conquered 25 land from PoorSerf(2)! Your losses: 3 warriors
+    buildings [1] aland 100 -> 125
+    buildings [3] aland 4 -> 0, home 3 -> 0, barrack 3 -> 0
+  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
+  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
+    military [1] warriors 300 -> 0
+    military [3] wizards 10 -> 9, priests 10 -> 9, archers 5 -> 4
+    returntbl [1] war4 0 -> 297, time4 0 -> 6
+  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
+  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
+    user [1] land 250 -> 275, fleets 2 -> 1
+    user [3] land 250 -> 225, nno 0 -> 1
+
 ### land-win-guild-news
 # Both sides in a guild, so the four guild news lines are filed as well as the settlement ones.
 

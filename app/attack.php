@@ -187,7 +187,7 @@ else	{
 		$lgain = $landgain;						
 		$ltally = 0;
 		while($lgain > $ltally)	{
-		
+			$ltaken = $ltally;	// a pass that takes nothing would loop forever
 			if($evb['aland'] > 0 AND $lgain > $ltally)	 {
 				$evb['aland'] = $evb['aland'] - 1;
 				$ltally = $ltally + 1;
@@ -234,6 +234,7 @@ else	{
 				$evb['lmill'] = $evb['lmill'] - 1;
 				$ltally = $ltally + 1;
 			}
+			if($ltally == $ltaken)	{	break;	}
 	}
 	
 	mysqli_query($db, "UPDATE user SET land = land + $landgain WHERE email='$email' AND pw='$pw'");

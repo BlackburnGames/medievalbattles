@@ -97,7 +97,7 @@ function researched($userid, array $projects)
  * The defender's land, laid out so taking it walks every step of
  * attack.php's order: open land first, then every building under
  * construction, then built ones. 35 plots, more than the 25 a 250-acre
- * empire loses -- the loop has no exit if the plots run out.
+ * empire loses; land-win-short-of-buildings is the case where they run out.
  */
 function landLayout($userid)
 {
@@ -180,6 +180,13 @@ $SCENARIOS = array(
         'name'  => 'land-win-destroys',
         'why'   => 'Under 10 acres the attacker takes it all and the defender is removed (include/empire.php).',
         'setup' => array($strong, $defenders, $defenderStats, set('user', $D, array('land' => 8))),
+        'requests' => array(array('attack.php', array('empvalue' => $D, 'uwarrior' => 300))),
+    ),
+    array(
+        'name'  => 'land-win-short-of-buildings',
+        'why'   => 'A defender whose land outnumbers its plots -- 250 acres against 10, a gain of 25. The loop takes all ten and stops; it used to spin until the request timed out.',
+        'setup' => array($strong, $defenders, $defenderStats,
+            set('buildings', $D, array('aland' => 4, 'home' => 3, 'barrack' => 3, 'farm' => 0, 'wp' => 0, 'lmill' => 0))),
         'requests' => array(array('attack.php', array('empvalue' => $D, 'uwarrior' => 300))),
     ),
     array(
