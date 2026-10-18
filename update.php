@@ -267,12 +267,10 @@ while($INC_ID < $max_UID + 1) {
     $email = $mb_acct['email'];
     $subject = "Your Medieval Battles Account Deleted";
     $body = "
-Since you did not activate your account within two days of signing up, your kingdom was deleted. Activate your account with the link you were sent, and you can sign up again with the same email and password. Just go to:
-www.medievalbattles.com/index?signup=yes. If you have any questions reguarding this, just email us at: support@medievalbattles.com
+Since you did not activate your account within two days of signing up, your kingdom was deleted. Activate your account with the link you were sent, then log in at " . mb_site_url() . " and join the round again.
 
 This email is automated. Your reply will not be recieved.";
-    $from = "From: account_deleted@medievalbattles.com\r\nbcc: phb@sendhost\r\nContent-type: text/plain\r\nX-mailer: PHP/" . phpversion();
-    $mailsend = mail("$email", "$subject", "$body", "$from");
+    $mailsend = mb_mail($email, $subject, $body);
 
     mb_query($db, "DELETE FROM user WHERE userid=?", array((int) $user['userid']));
     mb_query($db, "DELETE FROM military WHERE userid=?", array((int) $user['userid']));
@@ -298,12 +296,10 @@ This email is automated. Your reply will not be recieved.";
     $email = $mb_acct ? $mb_acct['email'] : '';
     $subject = "Your Medieval Battles Account Deleted";
     $body = "
-Since you have not logged into your account after one week upon signing up, your account was deleted. You are welcome to create another account though. Just go to:
-www.medievalbattles.com/index?signup=yes. If you have any questions reguarding this, just email us at: support@medievalbattles.com
+Since you have not logged in for a week, your kingdom was deleted for inactivity. Your account is kept: log in at " . mb_site_url() . " to join the round again.
 
 This email is automated. Your reply will not be recieved.";
-    $from = "From: account_deleted@medievalbattles.com\r\nbcc: phb@sendhost\r\nContent-type: text/plain\r\nX-mailer: PHP/" . phpversion();
-    $mailsend = mail("$email", "$subject", "$body", "$from");
+    $mailsend = mb_mail($email, $subject, $body);
 
     mb_query($db, "DELETE FROM user WHERE userid=?", array((int) $user['userid']));
     mb_query($db, "DELETE FROM military WHERE userid=?", array((int) $user['userid']));

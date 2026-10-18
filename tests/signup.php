@@ -158,6 +158,17 @@ foreach ($checks as $what => $ok) {
     $failures += $ok ? 0 : 1;
 }
 
+// The activation link is the install's own address, not the 2003 game's
+// domain, which no install serves.
+require_once __DIR__ . '/../app/include/accounts.php';
+putenv('MB_SITE_URL=https://example.test/');
+$link = mb_account_verify_link(array('account_id' => 7, 'verify_code' => 'abc'));
+putenv('MB_SITE_URL');
+$ok = $link === 'https://example.test/activate_account.php?activate=true&act_account=7&act_code=abc';
+echo ($ok ? 'ok' : 'FAIL') . ": the activation link is built from MB_SITE_URL ($link)
+";
+$failures += $ok ? 0 : 1;
+
 loadFixture($db);
 
 if ($failures) {

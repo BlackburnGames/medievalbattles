@@ -107,7 +107,8 @@ if (!function_exists('mb_account_verify_link')) {
      */
     function mb_account_verify_link(array $account)
     {
-        return 'http://www.medievalbattles.com/activate_account.php?activate=true'
+        require_once __DIR__ . '/mail.php';
+        return mb_site_url() . '/activate_account.php?activate=true'
             . '&act_account=' . (int) $account['account_id']
             . '&act_code=' . rawurlencode($account['verify_code']);
     }

@@ -131,7 +131,7 @@ protect=(
 # Migrations first, from the staged copy, so a failure stops here with the
 # live files untouched. ~/.mb-env holds the settings the tick uses too.
 set -a; . "$HOME/.mb-env"; set +a
-PHP="${MB_PHP:-/usr/local/php83/bin/php}"
+PHP="${MB_PHP:-/usr/local/php83/bin/php-cli}"
 echo "== migrations"
 if [ "$GO" = 1 ]; then
     "$PHP" "$STAGE/bin/migrate.php" migrate || { echo "migrations failed: no files were deployed" >&2; exit 1; }

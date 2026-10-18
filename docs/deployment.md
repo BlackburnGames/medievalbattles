@@ -2,7 +2,7 @@
 
 Where the game runs outside Docker, how code gets there, and what has to be
 true before it can. **Nothing is deployed yet.** The host is provisioned and
-the scripts exist; the blockers below come first.
+the scripts exist; what is left is in "First deploy, in order".
 
 ## Blockers
 
@@ -35,21 +35,23 @@ the one that could quietly break the game, and is resolved.
    The full suite passes on 8.4 with every golden master untouched (see
    modernization.md).
 
-2. ~~**The tick mailed a hardcoded address**~~ on every run — the original
-   author's. The line is gone. Signup, preferences and `attack.php` still
-   mail whatever address a player gives, and on the host those deliver for
-   real. Locally `sendmail_path` is `/bin/true`, and `deploy/tick.sh` sets
-   the same for cron.
+2. ~~**Mail.**~~ **Resolved.** The tick mailed the original author on every
+   run, and every mail the game sent claimed to be from medievalbattles.com
+   and linked there — the activation link every new account needs included.
+   All of it goes through `mb_mail()` (`app/include/mail.php`) now, from
+   `MB_MAIL_FROM`, with links to `MB_SITE_URL`; both are set in the two
+   config files. On the host mail delivers for real; locally
+   `sendmail_path` is `/bin/true`. `MB_TICK_MAIL=0` in `~/.mb-env` silences
+   the tick's.
 
 3. **Exposure.** CLAUDE.md: do not expose this app to a network. Until that
    decision is made the whole site sits behind Site Tools > Security >
    Protected URLs (HTTP basic auth on `/`), and `deploy.sh` refuses to ship
    to a site that does not answer 401.
 
-4. **Error display.** The repo's `app/.htaccess` turns `display_errors` on.
-   It is not shipped; the server's own `.htaccess` replaces it. Whether
-   `php_flag` works there at all is a `probe.sh` question — under FastCGI it
-   does not, and the setting moves to Site Tools' PHP variables.
+4. ~~**Error display.**~~ **Resolved.** The repo's `app/.htaccess` turns
+   `display_errors` on and is never shipped; the probe found `php_flag`
+   honoured on the host, and the `.htaccess` template turns it off.
 
 ## The host
 
@@ -59,7 +61,7 @@ SiteGround shared hosting, site `jacobp259.sg-host.com`.
 | --- | --- |
 | SSH | `ssh siteground-mb` (`~/.ssh/config`; key `~/.ssh/siteground-medievalbattles`) — host `ssh.jacobp259.sg-host.com`, port 18765 |
 | PHP (web) | 8.3, set in Site Tools > Devs > PHP Manager (which writes `public_html/.htaccess`) |
-| PHP (cli) | `/usr/local/php83/bin/php`. Bare `php` is 8.2; 7.3 – 8.6 are all installed |
+| PHP (cli) | `/usr/local/php83/bin/php-cli`. Not `.../bin/php`, which is the CGI binary and refuses `-r`. Bare `php` is 8.3 too (checked 2026-10-18) |
 | MySQL | 8.4.10. Databases and users are made in Site Tools > Site > MySQL, which prefixes their names |
 | Cron | No `crontab` command; Site Tools > Devs > Cron Jobs |
 | Tools | `git`, `rsync`, `composer`, `mysql`, `mysqldump` |
@@ -126,18 +128,43 @@ All in `deploy/`, run from the repo root in Git Bash.
 ## First deploy, in order
 
 1. ~~Blocker 1: the suite green on MySQL 8.4.~~ Done.
-2. Site Tools > Security > Protected URLs: protect `/`.
+2. Site Tools > Security > Protected URLs: protect `/`. `deploy.sh` refuses
+   a site that does not answer 401 unless it is given `--public`, which is
+   the decision to open the game to players.
 3. ~~Site Tools > Site > MySQL: one database and one user with all
    privileges on it.~~ Done 2026-10-18, both labelled `medievalbattles`
    (Site Tools generates their names; they go in `MB_DB_NAME` and
    `MB_DB_USER`).
-4. Install `public_html/.htaccess` and `~/.mb-env` from the templates.
-5. `bash deploy/probe.sh` — check every answer, especially `getenv`,
-   `short_open_tag`, `pdo_mysql` and `sql_mode`.
+4. Install `public_html/.htaccess` and `~/.mb-env` from the templates, with
+   the database's names and password, and `MB_SITE_URL` / `MB_MAIL_FROM`.
+   The `.htaccess` replaces the one PHP Manager wrote; the template carries
+   the same `AddHandler` line.
+5. ~~`bash deploy/probe.sh`~~ Web and CLI answered 2026-10-18: PHP 8.3.35,
+   `SetEnv` reaches `getenv()`, `php_flag`/`php_value` are honoured,
+   `short_open_tag` on, mysqli and pdo_mysql loaded. The CLI is
+   `/usr/local/php83/bin/php-cli` — the scripts had `.../bin/php`, the CGI
+   binary, which would have failed every migration and tick. Run it again
+   once `~/.mb-env` exists, for the MySQL half.
 6. ~~Load the schema by hand.~~ Nothing to do: the deploy runs the
-   migrations, and on empty databases the baselines build the schema.
+   migrations, and on an empty database they build the schema — the
+   baseline, then rounds, round results and login failures. The world they
+   build is round 1, running, with ten settlements and no kingdoms.
 7. `bash deploy/deploy.sh`, read the dry run (its migrations section should
-   list both baselines as down), then `--go`.
+   list all four as down), then `--go`.
 8. Run `bash ~/www/jacobp259.sg-host.com/mb/tick.sh` by hand once and read
    `~/logs/tick.log`.
-9. Site Tools > Devs > Cron Jobs: the same command, at the tick interval.
+9. Site Tools > Devs > Cron Jobs: the same command, every 30 minutes
+   (`*/30 * * * *`). The game's clocks are counted in ticks at that rate:
+   inactivity deletion is 336 ticks, which the mail calls a week, and safe
+   mode is 48, a day.
+10. The first administrator: sign up on the site, then from the repo
+    root —
+
+    ```bash
+    ssh siteground-mb 'cd ~/www/jacobp259.sg-host.com/mb && set -a && . ~/.mb-env && set +a \
+      && /usr/local/php83/bin/php-cli bin/admin.php verify YOU@EXAMPLE.COM \
+      && /usr/local/php83/bin/php-cli bin/admin.php grant YOU@EXAMPLE.COM'
+    ```
+
+    `verify` only if the activation mail has not arrived. Rounds are then
+    run from `admin/rounds.php` or `bin/round.php` the same way.

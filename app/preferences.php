@@ -180,8 +180,7 @@ else	{
 		$subject = "Account deleted";
 		$body = "Your account at Medieval Battles has been succesfully deleted.";
 
-		$from = "From: support@medievalbattles.com\r\nbcc: phb@sendhost\r\nContent-type: text/plain\r\nX-mailer: PHP/" . phpversion();
-		$mailsend = mail("$email","$subject","$body","$from");
+		$mailsend = mb_mail($email, $subject, $body);
 		// mail() returns a bool, so this prints "1" or nothing -- leftover
 		// debugging from 2003. It goes through the escaper anyway, because the
 		// rule is that everything reaching output does and the audit checks it,

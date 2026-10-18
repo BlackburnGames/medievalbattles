@@ -10,5 +10,11 @@ MB_DB_USER=CHANGEME_user
 MB_DB_PASS=CHANGEME_password
 MB_REPORT_QUERIES=1
 
-# Leave at 0 while update.php still mails a hardcoded address every tick.
-MB_TICK_MAIL=0
+# As in public_html/.htaccess: the tick mails players whose kingdom it deletes,
+# with a link back to the site.
+MB_SITE_URL=https://jacobp259.sg-host.com
+MB_MAIL_FROM=noreply@jacobp259.sg-host.com
+
+# Whether the tick sends those mails. It used to mail a hardcoded address on
+# every run as well, which is gone.
+MB_TICK_MAIL=1

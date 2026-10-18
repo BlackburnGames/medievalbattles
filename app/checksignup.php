@@ -74,7 +74,7 @@ Email: [$email]
 You will need your email and password to login. But before you can play, you must activate your account. To activate your account, click here:
 $verify_link
 
-If you have any questions you can email us at support@medievalbattles.com";
+";
 
-$from = "From: support@medievalbattles.com\r\nbcc: phb@sendhost\r\nContent-type: text/plain\r\nX-mailer: PHP/" . phpversion();
-mail("$email", "$subject", "$body", "$from");
+// include/mail.php: the sender and the link are the install's.
+mb_mail($email, $subject, $body);

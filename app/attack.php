@@ -293,9 +293,11 @@ else	{
 		include("include/connect.php");
 		
 		$subject = "Account destroyed";
-		$body = "You have been destroyed by $ename.  If there is any spots open, you are welcome to signup again.";
-		$from = "From: support@medievalbattles.com\r\nbcc: phb@sendhost\r\nContent-type: text/plain\r\nX-mailer: PHP/" . phpversion();
-		$mailsend = mail("$evu[email]","$subject","$body","$from");
+		$body = "You have been destroyed by $ename. Log in at " . mb_site_url() . " to read your history, or to join the next round.";
+		// To the account's address: the kingdom holds none, and $evu['email'] was
+		// empty since it moved, so this mail had gone nowhere.
+		$mb_target = mb_account_get($evu['account_id']);
+		$mailsend = $mb_target ? mb_mail($mb_target['email'], $subject, $body) : false;
 		
 		// The same removal an account deletion does, which this branch was the
 		// original of. Its own copy withdrew the vote with an array in the

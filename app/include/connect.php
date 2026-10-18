@@ -64,6 +64,8 @@ require_once __DIR__ . '/credentials.php';
  */
 require_once __DIR__ . '/settlements.php';
 require_once __DIR__ . '/rounds.php';
+// mb_mail() and mb_site_url(): the install's sender and address.
+require_once __DIR__ . '/mail.php';
 
 /**
  * And gamedata.php, now that the engine reads it rather than being transcribed

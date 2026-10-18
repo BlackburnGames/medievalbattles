@@ -22,6 +22,19 @@ SetEnv MB_DB_USER CHANGEME_user
 SetEnv MB_DB_PASS CHANGEME_password
 SetEnv MB_REPORT_QUERIES 1
 
+# Where the game is served and who its mail is from (app/include/mail.php).
+# The activation link every new account is mailed is built from MB_SITE_URL.
+# The sender's domain should be one this host may send for, or receiving
+# servers checking SPF will refuse it.
+SetEnv MB_SITE_URL https://jacobp259.sg-host.com
+SetEnv MB_MAIL_FROM noreply@jacobp259.sg-host.com
+
+# PHP's messages go to the log, never to players. deploy/probe.sh found
+# php_flag honoured on this host (2026-10-18). The repo's app/.htaccess turns
+# them on for local work and is never shipped.
+php_flag display_errors off
+php_flag log_errors on
+
 # The include directories are only ever require'd, never requested. Serving
 # them runs each one standalone, out of the context it was written for.
 RedirectMatch 404 ^/(admin/)?include/

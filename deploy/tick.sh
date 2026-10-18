@@ -11,9 +11,8 @@
 #
 # The -d flags are the parts of docker/php/php.ini the code depends on. The
 # docker image sets them globally; the host's CLI PHP does not, so they go here.
-# sendmail_path=/bin/true matches local: update.php mails a hardcoded address
-# on every tick (update.php, "Sending email to Mako"). Set MB_TICK_MAIL=1 in
-# ~/.mb-env only once that is gone.
+# The tick mails the players whose kingdoms it deletes. MB_TICK_MAIL=0 in
+# ~/.mb-env stops it (sendmail_path=/bin/true, as locally).
 set -euo pipefail
 
 cd "$(dirname "$(readlink -f "$0")")"
@@ -22,12 +21,12 @@ ENV_FILE="$HOME/.mb-env"
 [ -r "$ENV_FILE" ] || { echo "tick: $ENV_FILE missing" >&2; exit 1; }
 set -a; . "$ENV_FILE"; set +a
 
-PHP="${MB_PHP:-/usr/local/php83/bin/php}"
+PHP="${MB_PHP:-/usr/local/php83/bin/php-cli}"
 LOG_DIR="$HOME/logs"
 mkdir -p "$LOG_DIR"
 
-mail_flag=(-d sendmail_path=/bin/true)
-[ "${MB_TICK_MAIL:-0}" = 1 ] && mail_flag=()
+mail_flag=()
+[ "${MB_TICK_MAIL:-1}" = 0 ] && mail_flag=(-d sendmail_path=/bin/true)
 
 # One tick at a time: a slow tick must not overlap the next cron firing.
 exec 9>"$LOG_DIR/tick.lock"
@@ -47,7 +46,7 @@ status=0
         -d memory_limit=256M \
         -d display_errors=stderr \
         -d error_reporting=E_ALL \
-        "${mail_flag[@]}" \
+        ${mail_flag[@]+"${mail_flag[@]}"} \
         update.php || status=$?
     echo "== $(date -u '+%F %T') tick end (exit $status)"
 } >> "$LOG_DIR/tick.log" 2>&1

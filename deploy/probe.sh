@@ -60,7 +60,7 @@ curl -s -m 20 "${auth[@]}" -w '(HTTP %{http_code})\n' "$URL/$DIR/probe.php"
 echo
 echo "== cli"
 ssh "$HOST_ALIAS" bash -s -- "$INI_KEYS" <<'REMOTE'
-PHP=/usr/local/php83/bin/php
+PHP=/usr/local/php83/bin/php-cli
 "$PHP" -r 'echo "php            ", PHP_VERSION, " (", PHP_SAPI, ")\n";
   foreach (explode(" ", $argv[1]) as $k) printf("%-14s %s\n", $k, var_export(ini_get($k), true));
   echo "mysqli         ", extension_loaded("mysqli") ? "loaded" : "MISSING", "\n";
