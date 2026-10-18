@@ -383,7 +383,7 @@ else	{
 		die();
 	}
 
-	$themaxbarterid = mysqli_query($db, "SELECT max(barterid) FROM barter");
+	$themaxbarterid = mysqli_query($db, "SELECT max(barterid) FROM barter"); // mb-round-ok: ids are issued once across rounds
 	$maxbid = mb_db_result($themaxbarterid,"maxbid");
 	$maxbid = $maxbid + 1;
 

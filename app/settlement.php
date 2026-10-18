@@ -8,13 +8,13 @@
 <form method="post" action="settlement.php">
 <center>
 <?php
-$maxset = mb_settlement_count($db);
+list($mb_first, $mb_last) = mb_settlement_range($db, $round_id);
 
 if($snum != "")	 {	$csnum = $snum - 1;	}
 
 echo"<a href=settlement.php?change=1&snum=$csnum><-- &nbsp; </a>";
 echo"<font class=red>|</font> <a href=settlement.php?change=1&snum=$setid>Home</a> <font class=red>|</font>";
-$nnum = rand(1,$maxset);
+$nnum = rand($mb_first, $mb_last);
 echo" <a href=settlement.php?change=1&snum=$nnum>Random</a> <font class=red>|</font>";
 
 if($snum != "")	 {	$csnum=$snum+1;	}
@@ -34,7 +34,7 @@ if (!IsSet($change))	{
 }
 else	{
 
-	if($snum < 1 || $snum > $maxset)	 {
+	if(!mb_settlement_in_round($db, $round_id, $snum))	 {
 		echo"<center>Settlement " . mb_h($snum) . " does not exist.</center>";
 		die();
 	}

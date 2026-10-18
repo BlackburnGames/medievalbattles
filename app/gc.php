@@ -38,7 +38,7 @@ else	{
 			$owner = mb_db_result($owner_g,"owner");
 		$THE_MNO = mb_query($db, "SELECT mno FROM user WHERE userid=?", array((int) $owner));	
 			$T_MNO = mb_db_result($THE_MNO,"T_MNO");
-		$yourmid = mysqli_query($db, "SELECT max(mid) FROM messages");	
+		$yourmid = mysqli_query($db, "SELECT max(mid) FROM messages"); // mb-round-ok: ids are issued once across rounds
 			$ymid = mb_db_result($yourmid,"ymid");
 
 		$ymid = $ymid + 1;
@@ -83,7 +83,7 @@ unset($_SESSION['gid']);
 
 if($request == 'yes')	{
 
-	$guild_info_query = mb_query($db, "SELECT * FROM guild WHERE gname=?", array($req_guild));
+	$guild_info_query = mb_query($db, "SELECT * FROM guild WHERE round_id=? AND gname=?", array((int) $round_id, $req_guild));
 		$guild_info = mysqli_fetch_array($guild_info_query);
 	$gl_check_query = mb_query($db, "SELECT * FROM guild WHERE owner=?", array($userid));
 		$gl_check = mysqli_fetch_array($gl_check_query);
@@ -117,7 +117,7 @@ echo "  <br><br>
 // mysqli_fetch_array() was a fatal TypeError. Phase 1 selected an empty
 // placeholder to keep the query running; the column exists now, so this reads
 // the real one again.
-$result_id = mb_query($db, "SELECT g.gname, g.info, g.datemade, g.gid, g.flag, count(u.ename) AS guildmem FROM guild g LEFT JOIN user u ON g.gname = u.guild GROUP BY u.guild ORDER BY guildmem DESC LIMIT 0, 60");
+$result_id = mb_query($db, "SELECT g.gname, g.info, g.datemade, g.gid, g.flag, count(u.ename) AS guildmem FROM guild g LEFT JOIN user u ON g.gname = u.guild AND u.round_id = g.round_id WHERE g.round_id=? GROUP BY u.guild ORDER BY guildmem DESC LIMIT 0, 60", array((int) $round_id));
 while ($row = mysqli_fetch_array($result_id))	{
 	$row[0] = htmlspecialchars($row[0]);
 	$row[1] = htmlspecialchars($row[1]);
@@ -151,7 +151,7 @@ else	{
 	// parse whitespace out
 		$creating_guild_name = trim($gname);
 	// check to see if guild name is being used
-		$result = mb_query($db, "SELECT gname FROM guild WHERE gname=?", array($creating_guild_name));
+		$result = mb_query($db, "SELECT gname FROM guild WHERE round_id=? AND gname=?", array((int) $round_id, $creating_guild_name));
 		$namecheck = mysqli_fetch_array($result);
  	// check to see if they are a GL
 		$check_owner_result = mb_query($db, "SELECT owner FROM guild WHERE owner=?", array($ename));
@@ -211,7 +211,7 @@ else	{
 	else	{
 		
 		//	select max guild id
-		$M_gid = mysqli_query($db, "SELECT max(gid) FROM guild");	
+		$M_gid = mysqli_query($db, "SELECT max(gid) FROM guild"); // mb-round-ok: ids are issued once across rounds
 			$mgid = mb_db_result($M_gid, "mgid");	
 		
 		// The name and the info are stored as typed. They used to be

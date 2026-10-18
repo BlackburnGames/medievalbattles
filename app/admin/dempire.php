@@ -31,10 +31,10 @@ else	{
 	// sign up again for a new kingdom with the same address and password.
 
 	//SELECTING SETID
-		$empreset = mb_query($db, "SELECT setid FROM user WHERE ename=?", array($empre));
+		$empreset = mb_query($db, "SELECT setid FROM user WHERE round_id=? AND ename=?", array((int) mb_round_current($db), $empre));
 		$esetid = mb_db_result($empreset,"esetid");
 	//SELECTING THE KINGDOM
-		$theirid = mb_query($db, "SELECT userid FROM user WHERE ename=?", array($empre));
+		$theirid = mb_query($db, "SELECT userid FROM user WHERE round_id=? AND ename=?", array((int) mb_round_current($db), $empre));
 		$tuid = mb_db_result($theirid,"tuid");
 
 	// No such empire: say so rather than running six DELETEs on nothing. When

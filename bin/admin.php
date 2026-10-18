@@ -23,10 +23,10 @@ require __DIR__ . '/../app/include/connect.php';
 $usage = "usage: php bin/admin.php list | grant <email> | revoke <email> | verify <email>\n";
 $command = isset($argv[1]) ? $argv[1] : '';
 
-/** The empire this account plays in the round, for the listing, or "-". */
+/** The empire this account plays in the current round, for the listing, or "-". */
 function mb_admin_cli_ename($db, $account_id)
 {
-    $r = mb_query($db, "SELECT ename FROM user WHERE account_id=?", array((int) $account_id));
+    $r = mb_query($db, "SELECT ename FROM user WHERE round_id=? AND account_id=?", array((int) mb_round_current($db), (int) $account_id));
     $row = $r ? mysqli_fetch_row($r) : null;
     return $row ? $row[0] : '-';
 }

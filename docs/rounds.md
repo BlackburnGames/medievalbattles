@@ -2,9 +2,10 @@
 
 **Status: partly built.** Steps 1, 2 and 5 under "Order of work" are done:
 permanent accounts beside the round's tables, and a round that holds neither the
-address nor the password. Step 3 is under way: the `round` table exists and
-every round table carries a `round_id`, but nothing filters on it yet and there
-is only ever round 1. The rest of rounds is design only. This
+address nor the password. Step 3 is under way: the `round` table exists, every
+round table carries a `round_id`, and every query on one is confined to a
+round — but there is only ever round 1, and no way yet to end it or open
+another. The rest of rounds is design only. This
 records how the game is meant to end a round and start the next one without
 deleting its players, and the decisions that shape it.
 
@@ -279,12 +280,31 @@ fingerprint of the account's address and hash:
       no page passes a round along, and a row whose owner is gone is not
       written at all. A new kingdom joins its settlement's round. `round_id`
       has no default, so a forgotten one fails under a strict session.
-   2. **The filter.** An audit that fails any query on a round table that
-      filters on none of those ids or on `round_id`, and the queries it
-      finds: the tick's whole-table updates, the rankings and listings,
-      lookups by kingdom or guild name (a name can recur in a later round),
-      signup's settlement choice and the admin pages. A second, ended round
-      in the fixture that the tick and every admin action must leave alone.
+   2. ~~**The filter.**~~ **Done.** `tests/round-audit.php` fails any query
+      on a round table that filters on none of those ids or on `round_id`,
+      and any insert that names no round; it found 229, and is at zero. A
+      game page filters on `$round_id`, which the session sets from the
+      kingdom (so a page never shows one round's kingdom beside another's
+      world); signup and login use `mb_round_current()`, the newest round not
+      ended; the tick advances `mb_round_running()` alone, walking its
+      userids, its settlement range and its guild ids. Lookups by kingdom or
+      guild name are by round, since a name can recur. `mb_kingdom_find()`
+      takes the round, so an account with a kingdom in an ended round can
+      sign up for the next. A round's settlements are a range of setids
+      (`mb_settlement_range()`), and every range check that used to stop at
+      the count now stops at the round's edges — which is also what keeps a
+      player from viewing or targeting another round's settlement. The admin
+      wipes act on the current round only, until they are retired.
+
+      `tests/round-isolation.php` holds it to account: an ended round with a
+      row in every table and round 1's names, which the tick and every admin
+      action must leave byte-identical. Every golden passed untouched.
+
+      **Still open: ids from the request.** A page that takes a target —
+      an attack's or a message's userid, a forum topic, a barter listing, a
+      guild — filters on that id and passes the audit, but nothing yet
+      checks the id is in the player's round. The settlement range checks
+      are the only ones in place. That is the next commit.
    3. **Ending one.** `round_result`, and `bin/round.php open` and `end`.
    4. **The pages.** The round list, join and history. Retire `newgame.php`
       and signup's doubling as join.

@@ -56,10 +56,14 @@ require_once __DIR__ . '/password.php';
 require_once __DIR__ . '/credentials.php';
 
 /**
- * And the settlement count, which nine readers across the tick, the range
- * checks, the drop-downs, signup and the manual used to answer two ways.
+ * And the settlement range, which nine readers across the tick, the range
+ * checks, the drop-downs, signup and the manual used to answer two ways --
+ * and the round it is the range of. A page with a session has its kingdom's
+ * round as $round_id; the tick, signup and the pages without one ask for the
+ * current round.
  */
 require_once __DIR__ . '/settlements.php';
+require_once __DIR__ . '/rounds.php';
 
 /**
  * And gamedata.php, now that the engine reads it rather than being transcribed

@@ -9,7 +9,7 @@ $snum   = mb_input('snum');
 
 if($setchg == 1)	{
 
-	if($snum > mb_settlement_count($db) OR $snum <= 0)	{
+	if(!mb_settlement_in_round($db, $round_id, $snum))	{
 		echo "<font class=yellow><div align=center>Settlement " . mb_h($snum) . " does not exist.</font></div><br><br>";
 		die();
 	}

@@ -37,7 +37,7 @@ if (!function_exists('mb_empire_remove')) {
 	{
 		$userid = (int) $userid;
 
-		$result = mb_query($db, "SELECT ename, setid, votefor FROM user WHERE userid=?", array($userid));
+		$result = mb_query($db, "SELECT ename, setid, votefor, round_id FROM user WHERE userid=?", array($userid));
 		$row = $result ? mysqli_fetch_array($result) : null;
 		if (!$row) {
 			return false;
@@ -46,16 +46,16 @@ if (!function_exists('mb_empire_remove')) {
 		// The vote it was casting, and the votes cast for it. A vote for yourself
 		// leaves with the row.
 		if ($row['votefor'] != 'None' && $row['votefor'] != '' && $row['votefor'] != $row['ename']) {
-			mb_query($db, "UPDATE user SET vote = vote - 1 WHERE ename=?", array($row['votefor']));
+			mb_query($db, "UPDATE user SET vote = vote - 1 WHERE round_id=? AND ename=?", array((int) $row['round_id'], $row['votefor']));
 		}
-		mb_query($db, "UPDATE user SET votefor='None' WHERE votefor=?", array($row['ename']));
+		mb_query($db, "UPDATE user SET votefor='None' WHERE round_id=? AND votefor=?", array((int) $row['round_id'], $row['ename']));
 
 		// A guild it leads goes with it, as guildconfig.php's own delete does:
 		// members back to None, then the row. `guild.owner` holds the userid.
 		$result = mb_query($db, "SELECT gname FROM guild WHERE owner=?", array((string) $userid));
 		$guild = $result ? mysqli_fetch_array($result) : null;
 		if ($guild) {
-			mb_query($db, "UPDATE user SET guild='None' WHERE guild=?", array($guild['gname']));
+			mb_query($db, "UPDATE user SET guild='None' WHERE round_id=? AND guild=?", array((int) $row['round_id'], $guild['gname']));
 			mb_query($db, "DELETE FROM guild WHERE owner=?", array((string) $userid));
 			mb_query($db, "DELETE FROM guildrequests WHERE gl_userid=?", array((string) $userid));
 		}

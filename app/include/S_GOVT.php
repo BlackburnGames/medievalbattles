@@ -14,17 +14,17 @@ echo "
 $result_id = mb_query($db, "SELECT ename, aim, msn, lastlogin, vote, votefor, sl, userid FROM user WHERE setid=? ORDER BY userid ASC", array($setid));
 while ($row = mysqli_fetch_row($result_id))	{
 	//	Check to see if AIM is not blank
-		$A_result = mb_query($db, "SELECT aim FROM user WHERE aim=?", array($row['aim']));
+		$A_result = mb_query($db, "SELECT aim FROM user WHERE round_id=? AND aim=?", array((int) $round_id, $row['aim']));
 		$AIMcheck = mysqli_fetch_array($A_result);
 			if($AIMcheck[0] != "")	{
-				$AIM_SELECT = mb_query($db, "SELECT aim FROM user WHERE ename=?", array($row[0]));	
+				$AIM_SELECT = mb_query($db, "SELECT aim FROM user WHERE round_id=? AND ename=?", array((int) $round_id, $row[0]));	
 	   			$AIM_S = mb_db_result($AIM_SELECT, "AIM_S");
 				$row[1] = urlencode($row[1]);
 				$AIM_VAR = "<a href=" . mb_attr("aim:goim?screenname=$row[1]&message=Hey+its+$ename")
 				         . "><img src=\"images/aim.gif\" border=\"0\"></a>";
 			}
 	//	Check to see if SL is there
-		$SL_result = mb_query($db, "SELECT sl FROM user WHERE ename=?", array($row[0]));
+		$SL_result = mb_query($db, "SELECT sl FROM user WHERE round_id=? AND ename=?", array((int) $round_id, $row[0]));
 		$SLcheck = @mysqli_fetch_array($SL_result);
 			if($SLcheck[0] == 'yes')	 {
 				$color = "#632910";

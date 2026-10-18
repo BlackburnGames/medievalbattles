@@ -47,42 +47,47 @@ $daccount = mb_input('daccount');
 
 include("include/igtop.php");
 
+// The round every action below is confined to.
+$mb_round = (int) mb_round_current($db);
+
 /**
  * The bulk actions, as label => list of statements.
  *
- * Deliberately not parameterised: every one of these is a fixed statement with
- * nothing interpolated into it, which is the property that makes a page that
- * can empty the database reviewable at a glance. The one action that does take
- * input -- deleting a named account -- is handled separately below.
+ * Every one is a fixed statement with nothing interpolated into it, which is
+ * the property that makes a page that can empty the database reviewable at a
+ * glance. Each takes one value, bound: the round it acts on, which is the
+ * current one (docs/rounds.md) -- an ended round is history and none of these
+ * reach it. The one action that takes input -- deleting a named account -- is
+ * handled separately below.
  */
 $MB_ADMIN_ACTIONS = array(
 	'messages' => array(
 		'label'      => 'Delete every private message',
-		'statements' => array('DELETE FROM messages'),
+		'statements' => array('DELETE FROM messages WHERE round_id=?'),
 	),
 	'news' => array(
 		'label'      => 'Delete every settlement news entry',
-		'statements' => array('DELETE FROM setnews'),
+		'statements' => array('DELETE FROM setnews WHERE round_id=?'),
 	),
 	'forums' => array(
 		'label'      => 'Delete every settlement forum thread and reply',
-		'statements' => array('DELETE FROM setforums', 'DELETE FROM setforumsmsgs'),
+		'statements' => array('DELETE FROM setforums WHERE round_id=?', 'DELETE FROM setforumsmsgs WHERE round_id=?'),
 	),
 	'guilds' => array(
 		'label'      => 'Delete every guild, and its threads, news and requests',
 		'statements' => array(
-			'DELETE FROM guild', 'DELETE FROM guildthreads', 'DELETE FROM guildmsgs',
-			'DELETE FROM guildnews', 'DELETE FROM guildrequests',
+			'DELETE FROM guild WHERE round_id=?', 'DELETE FROM guildthreads WHERE round_id=?', 'DELETE FROM guildmsgs WHERE round_id=?',
+			'DELETE FROM guildnews WHERE round_id=?', 'DELETE FROM guildrequests WHERE round_id=?',
 		),
 	),
 	'settlements' => array(
 		'label'      => 'Return every settlement to its starting state',
 		'statements' => array(
-			"UPDATE settlement SET setname='None'",
-			"UPDATE settlement SET setpic=''",
-			"UPDATE settlement SET members='0'",
-			"UPDATE settlement SET setnotice='Welcome to Medieval Battles'",
-			"UPDATE settlement SET setstrength='0'",
+			"UPDATE settlement SET setname='None' WHERE round_id=?",
+			"UPDATE settlement SET setpic='' WHERE round_id=?",
+			"UPDATE settlement SET members='0' WHERE round_id=?",
+			"UPDATE settlement SET setnotice='Welcome to Medieval Battles' WHERE round_id=?",
+			"UPDATE settlement SET setstrength='0' WHERE round_id=?",
 		),
 	),
 	// Administrators are player accounts, so deleting every account used to
@@ -101,14 +106,14 @@ $MB_ADMIN_ACTIONS = array(
 		'first'      => 'mb_kingdom_delete_players',
 		'then'       => 'mb_kingdom_reset_admins',
 		'statements' => array(
-			'DELETE FROM buildings WHERE userid NOT IN (SELECT userid FROM user)',
-			'DELETE FROM military WHERE userid NOT IN (SELECT userid FROM user)',
-			'DELETE FROM research WHERE userid NOT IN (SELECT userid FROM user)',
-			'DELETE FROM explore WHERE userid NOT IN (SELECT userid FROM user)',
-			'DELETE FROM returntbl WHERE userid NOT IN (SELECT userid FROM user)',
-			'DELETE FROM barter WHERE userid NOT IN (SELECT userid FROM user)',
-			'DELETE FROM empnews WHERE yourid NOT IN (SELECT userid FROM user)',
-			'UPDATE settlement s SET members=(SELECT count(*) FROM user u WHERE u.setid=s.setid)',
+			'DELETE FROM buildings WHERE round_id=? AND userid NOT IN (SELECT userid FROM user)',
+			'DELETE FROM military WHERE round_id=? AND userid NOT IN (SELECT userid FROM user)',
+			'DELETE FROM research WHERE round_id=? AND userid NOT IN (SELECT userid FROM user)',
+			'DELETE FROM explore WHERE round_id=? AND userid NOT IN (SELECT userid FROM user)',
+			'DELETE FROM returntbl WHERE round_id=? AND userid NOT IN (SELECT userid FROM user)',
+			'DELETE FROM barter WHERE round_id=? AND userid NOT IN (SELECT userid FROM user)',
+			'DELETE FROM empnews WHERE round_id=? AND yourid NOT IN (SELECT userid FROM user)',
+			'UPDATE settlement s SET members=(SELECT count(*) FROM user u WHERE u.setid=s.setid) WHERE s.round_id=?',
 		),
 	),
 );
@@ -126,13 +131,13 @@ if (IsSet($action)) {
 		// Fixed function names from the list, never request input.
 		require_once __DIR__ . '/../include/kingdom.php';
 		if (isset($MB_ADMIN_ACTIONS[$action]['first'])) {
-			call_user_func($MB_ADMIN_ACTIONS[$action]['first'], $db);
+			call_user_func($MB_ADMIN_ACTIONS[$action]['first'], $db, $mb_round);
 		}
 		foreach ($MB_ADMIN_ACTIONS[$action]['statements'] as $sql) {
-			mysqli_query($db, $sql) or die(mysqli_error($db)); // mb-unbound-ok: fixed statements from $MB_ADMIN_ACTIONS
+			mb_query($db, $sql, array($mb_round)) or die(mysqli_error($db)); // mb-unbound-ok: fixed statements from $MB_ADMIN_ACTIONS
 		}
 		if (isset($MB_ADMIN_ACTIONS[$action]['then'])) {
-			call_user_func($MB_ADMIN_ACTIONS[$action]['then'], $db);
+			call_user_func($MB_ADMIN_ACTIONS[$action]['then'], $db, $mb_round);
 		}
 		echo "<b>" . htmlspecialchars($MB_ADMIN_ACTIONS[$action]['label']) . "</b>: done.<br><br>";
 	}
@@ -145,7 +150,7 @@ if (IsSet($action)) {
 if (IsSet($daccount)) {
 	$clock   = date("m/d/y, H:ia");
 
-	$theirid = mb_query($db, "SELECT userid FROM user WHERE ename=?", array($empre));
+	$theirid = mb_query($db, "SELECT userid FROM user WHERE round_id=? AND ename=?", array($mb_round, $empre));
 	$tuid    = mb_db_result($theirid, "tuid");
 
 	// No such empire: stop. With the old address-keyed DELETEs an unset value
@@ -159,7 +164,7 @@ if (IsSet($daccount)) {
 	// An administrator's kingdom is not deleted from here, the admin running
 	// this page's own included. Revoke the flag first: bin/admin.php. The
 	// flag is the account's, and user.account_id is what links the two.
-	$empreacct = mb_query($db, "SELECT account_id FROM user WHERE ename=?", array($empre));
+	$empreacct = mb_query($db, "SELECT account_id FROM user WHERE round_id=? AND ename=?", array($mb_round, $empre));
 	$empreaccount = mb_account_get(mb_db_result($empreacct, "empreacct"));
 	if ($empreaccount && (int) $empreaccount['admin'] === 1) {
 		echo "<b>" . htmlspecialchars($empre) . " is an administrator. Revoke that first, with bin/admin.php.</b><br><br>";
@@ -167,7 +172,7 @@ if (IsSet($daccount)) {
 		die();
 	}
 
-	$empreset = mb_query($db, "SELECT setid FROM user WHERE ename=?", array($empre));
+	$empreset = mb_query($db, "SELECT setid FROM user WHERE round_id=? AND ename=?", array($mb_round, $empre));
 	$esetid   = mb_db_result($empreset, "esetid");
 
 	// The old spelling built a table name -- "setnews" . $esetid -- and

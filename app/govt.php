@@ -63,7 +63,7 @@ if (!IsSet($change)) {
     } else {
 
       //  take the vote back from the old empire and set votefor to none
-      mb_query($db, "UPDATE user SET vote = vote - 1 WHERE ename=? AND vote > 0", array($votefor));
+      mb_query($db, "UPDATE user SET vote = vote - 1 WHERE round_id=? AND ename=? AND vote > 0", array((int) $round_id, $votefor));
       mb_query($db, "UPDATE user SET votefor='None' WHERE userid=?", array($userid));
 
       mb_settlement_elect($db, $setid);
@@ -88,7 +88,7 @@ if (!IsSet($change)) {
 
     //  move the vote: off the old empire, if there was one, and onto this one
     if($votefor != 'None')  {
-      mb_query($db, "UPDATE user SET vote = vote - 1 WHERE ename=? AND vote > 0", array($votefor));
+      mb_query($db, "UPDATE user SET vote = vote - 1 WHERE round_id=? AND ename=? AND vote > 0", array((int) $round_id, $votefor));
     }
     mb_query($db, "UPDATE user SET votefor=? WHERE userid=?", array($fename, $userid));
     mb_query($db, "UPDATE user SET vote = vote + 1 WHERE userid=?", array((int) $empvalue));

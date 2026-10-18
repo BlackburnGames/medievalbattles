@@ -2,9 +2,9 @@
 
 include("include/igtop.php");
 
-$num_players_query = mysqli_query($db, "SELECT count(ename) FROM user");
+$num_players_query = mb_query($db, "SELECT count(ename) FROM user WHERE round_id=?", array((int) mb_round_current($db)));
 	$num_players = mb_db_result($num_players_query, "num_players");
-$online_query = mysqli_query($db, "SELECT count(online) FROM user WHERE online='1'");
+$online_query = mb_query($db, "SELECT count(online) FROM user WHERE round_id=? AND online='1'", array((int) mb_round_current($db)));
 	$users_online = mb_db_result($online_query, "users_online");
 $spots_left = 450 - $num_players;
 

@@ -1,0 +1,3 @@
+# Queries on a round's tables that are not confined to one round --
+# see tests/round-audit.php. May only SHRINK; regenerate with --accept.
+

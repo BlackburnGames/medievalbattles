@@ -16,7 +16,7 @@ echo  "
 </div>";
 
 //	determine guild id
-$guild_id_query = mb_query($db, "SELECT gid FROM guild WHERE gname=?", array($empireguild));
+$guild_id_query = mb_query($db, "SELECT gid FROM guild WHERE round_id=? AND gname=?", array((int) $round_id, $empireguild));
 	$guild_id = mysqli_fetch_array($guild_id_query);
 
 // display all news in said guild

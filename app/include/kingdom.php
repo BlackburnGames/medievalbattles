@@ -27,16 +27,17 @@ require_once __DIR__ . '/accounts.php';
 
 if (!function_exists('mb_kingdom_find')) {
 	/**
-	 * The kingdom this account plays in this round, or null.
+	 * The kingdom this account plays in a round, or null.
 	 *
 	 * By account id: the round holds no address, and a round that has ended
-	 * would otherwise keep whichever one the account had then.
+	 * would otherwise keep whichever one the account had then. And by round,
+	 * because an account has a kingdom in every round it played.
 	 *
 	 * @return array|null  userid
 	 */
-	function mb_kingdom_find($db, $account_id)
+	function mb_kingdom_find($db, $account_id, $round_id)
 	{
-		$r = mb_query($db, "SELECT userid FROM user WHERE account_id=?", array((int) $account_id));
+		$r = mb_query($db, "SELECT userid FROM user WHERE account_id=? AND round_id=?", array((int) $account_id, (int) $round_id));
 		$row = $r ? mysqli_fetch_assoc($r) : null;
 		return $row ? $row : null;
 	}
@@ -203,15 +204,15 @@ if (!function_exists('mb_kingdom_reset')) {
 
 if (!function_exists('mb_kingdom_reset_admins')) {
 	/**
-	 * Reset every administrator's kingdom, for the two world wipes.
+	 * Reset every administrator's kingdom in a round, for the two world wipes.
 	 *
-	 * After a wipe the administrators' are the only kingdoms left, so this is
-	 * every kingdom there is. It is still scoped to the flag, so that running
-	 * it on a world nobody has wiped cannot touch a player.
+	 * After a wipe the administrators' are the only kingdoms left in it, so
+	 * this is every kingdom the round has. It is still scoped to the flag, so
+	 * that running it on a world nobody has wiped cannot touch a player.
 	 *
 	 * @return int  how many were reset
 	 */
-	function mb_kingdom_reset_admins($db)
+	function mb_kingdom_reset_admins($db, $round_id)
 	{
 		$admins = mb_account_admin_ids();
 		if (!$admins) {
@@ -219,7 +220,7 @@ if (!function_exists('mb_kingdom_reset_admins')) {
 		}
 		$ids = array();
 		$marks = implode(',', array_fill(0, count($admins), '?'));
-		$r = mb_query($db, "SELECT userid FROM user WHERE account_id IN ($marks)", $admins); // mb-unbound-ok: one placeholder per account
+		$r = mb_query($db, "SELECT userid FROM user WHERE round_id=? AND account_id IN ($marks)", array_merge(array((int) $round_id), $admins)); // mb-unbound-ok: one placeholder per account
 		while ($row = mysqli_fetch_row($r)) {
 			$ids[] = (int) $row[0];
 		}
@@ -232,7 +233,7 @@ if (!function_exists('mb_kingdom_reset_admins')) {
 
 if (!function_exists('mb_kingdom_delete_players')) {
 	/**
-	 * Delete every kingdom but the administrators', for the two world wipes.
+	 * Delete every kingdom in a round but the administrators', for the two\n	 * world wipes.
 	 *
 	 * Only the `user` rows; the wipes then clear every other table of rows
 	 * whose userid is gone. The accounts are kept -- they are not the round's
@@ -241,14 +242,14 @@ if (!function_exists('mb_kingdom_delete_players')) {
 	 *
 	 * @return void
 	 */
-	function mb_kingdom_delete_players($db)
+	function mb_kingdom_delete_players($db, $round_id)
 	{
 		$admins = mb_account_admin_ids();
 		if (!$admins) {
-			mb_query($db, "DELETE FROM user");
+			mb_query($db, "DELETE FROM user WHERE round_id=?", array((int) $round_id));
 			return;
 		}
 		$marks = implode(',', array_fill(0, count($admins), '?'));
-		mb_query($db, "DELETE FROM user WHERE account_id NOT IN ($marks)", $admins); // mb-unbound-ok: one placeholder per account
+		mb_query($db, "DELETE FROM user WHERE round_id=? AND account_id NOT IN ($marks)", array_merge(array((int) $round_id), $admins)); // mb-unbound-ok: one placeholder per account
 	}
 }

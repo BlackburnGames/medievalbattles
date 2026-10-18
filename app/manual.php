@@ -560,7 +560,7 @@ and their total defense.</p>
 
 <h3>Settlements</h3>
 
-<p>The world is divided into <b><?php echo mb_settlement_count($db); ?> settlements</b>,
+<p>The world is divided into <b><?php list($mb_first, $mb_last) = mb_settlement_range($db, mb_round_current($db)); echo $mb_last - $mb_first + ($mb_first ? 1 : 0); ?> settlements</b>,
 and you are placed in one at signup permanently. The Settlement Browser lets you look
 through every settlement in the game; your own is where you find most of your targets
 and neighbours. Each settlement elects a <b>Settlement Leader</b> &mdash; one vote per

@@ -203,6 +203,7 @@ $login         = isset($_SESSION['login']) ? $_SESSION['login'] : '';
 $userid        = isset($_SESSION['userid']) ? (int) $_SESSION['userid'] : 0;
 $mb_account_id = isset($_SESSION['mb_account']) ? (int) $_SESSION['mb_account'] : 0;
 $email         = '';
+$round_id      = 0;
 
 /*
  * Checked against the account and the kingdom, once per request.
@@ -219,6 +220,11 @@ $email         = '';
  * wipe used to leave its session "logged in" and render every page empty,
  * because every query matched nothing. It is logged out instead.
  *
+ * The kingdom's round comes back with it, as $round_id: the round every page
+ * that lists, ranks or looks a name up confines itself to (docs/rounds.md).
+ * It is the kingdom's, not the newest round's, so a page never shows a
+ * player one round's kingdom beside another round's world.
+ *
  * $userid is a string afterwards, as functions.php has always produced it --
  * the guild-leader check compares it with === against a column read back as
  * a string.
@@ -230,17 +236,19 @@ if ($userid > 0 && $mb_account_id > 0 && empty($GLOBALS['mb_session_checked'])) 
 	$mb_ok = $mb_account && hash_equals(mb_account_fingerprint($mb_account), $mb_fp);
 	if ($mb_ok) {
 		require_once __DIR__ . '/connect.php';
-		$mb_r = mb_query($db, "SELECT userid FROM user WHERE userid=? AND account_id=?", array($userid, $mb_account_id));
-		$mb_ok = $mb_r && mysqli_fetch_row($mb_r);
+		$mb_r = mb_query($db, "SELECT round_id FROM user WHERE userid=? AND account_id=?", array($userid, $mb_account_id));
+		$mb_row = $mb_r ? mysqli_fetch_row($mb_r) : null;
+		$mb_ok = (bool) $mb_row;
 	}
 	if ($mb_ok) {
 		$GLOBALS['mb_session_email'] = $mb_account['email'];
 		$GLOBALS['mb_session_verified'] = $mb_account['verified_at'] !== null;
+		$GLOBALS['mb_session_round'] = (int) $mb_row[0];
 	} else {
 		unset($_SESSION['login'], $_SESSION['userid'], $_SESSION['mb_account'], $_SESSION['mb_account_fp']);
 		$GLOBALS['mb_session_revoked'] = true;
 	}
-	unset($mb_account, $mb_fp, $mb_ok, $mb_r);
+	unset($mb_account, $mb_fp, $mb_ok, $mb_r, $mb_row);
 }
 // Whether the account has confirmed its address. include/igtop.php refuses
 // every game page until it has; see activate_account.php.
@@ -253,4 +261,5 @@ if ($userid < 1 || $mb_account_id < 1 || !empty($GLOBALS['mb_session_revoked']))
 	$userid = (string) $userid;
 	$email = isset($GLOBALS['mb_session_email']) ? $GLOBALS['mb_session_email'] : '';
 	$mb_account_verified = !empty($GLOBALS['mb_session_verified']);
+	$round_id = isset($GLOBALS['mb_session_round']) ? $GLOBALS['mb_session_round'] : 0;
 }

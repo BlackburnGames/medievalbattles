@@ -16,7 +16,7 @@ echo "
 
 // The guild name is the player's own, but it reaches the WHERE clause from the
 // `user` row rather than from a literal, so it is escaped like any other value.
-$result_id = mb_query($db, "SELECT seller, type, amount, method, cost, barterid, userid FROM barter WHERE page='guild' AND guild=? ORDER BY type ASC", array($empireguild));
+$result_id = mb_query($db, "SELECT seller, type, amount, method, cost, barterid, userid FROM barter WHERE round_id=? AND page='guild' AND guild=? ORDER BY type ASC", array((int) $round_id, $empireguild));
 $row_num = 0;
 while ($row = mysqli_fetch_row($result_id))	{
 

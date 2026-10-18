@@ -74,7 +74,7 @@ if ($account && mb_password_verify($plain_pw, $stored)) {
 	 * address and password, which makes this account a new kingdom.
 	 */
 	require_once __DIR__ . '/include/kingdom.php';
-	$kingdom = mb_kingdom_find($db, $account['account_id']);
+	$kingdom = mb_kingdom_find($db, $account['account_id'], (int) mb_round_current($db));
 	if (!$kingdom) {
 		unset($_SESSION['login'], $_SESSION['userid'], $_SESSION['mb_account'], $_SESSION['mb_account_fp']);
 		echo "Your account has no kingdom in this round.<br>";

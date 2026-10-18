@@ -151,9 +151,9 @@ else	{
 	
 		include("include/attack/calculations.php");
 					
-		$Setid_maxid = mysqli_query($db, "SELECT max(sid) FROM setnews");
+		$Setid_maxid = mysqli_query($db, "SELECT max(sid) FROM setnews"); // mb-round-ok: ids are issued once across rounds
 			$msid = mb_db_result($Setid_maxid,"msid");
-		$Guild_MaxID = mysqli_query($db, "SELECT max(gnid) FROM guildnews");
+		$Guild_MaxID = mysqli_query($db, "SELECT max(gnid) FROM guildnews"); // mb-round-ok: ids are issued once across rounds
 			$mgnid = mb_db_result($Guild_MaxID,"mgnid");
 					
 		$sid = $msid + 1;

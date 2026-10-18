@@ -48,7 +48,7 @@ else	{
 	$guild_info_query = mb_query($db, "SELECT * FROM guild WHERE owner=?", array($userid));
 		$guild_info = mysqli_fetch_array($guild_info_query);
 	// get number of members
-	$guild_members_query = mb_query($db, "SELECT count(ename) FROM user WHERE guild=?", array($guild_info['gname']));
+	$guild_members_query = mb_query($db, "SELECT count(ename) FROM user WHERE round_id=? AND guild=?", array((int) $round_id, $guild_info['gname']));
 		$guild_members = mb_db_result($guild_members_query, "guild_members");
 	// get their empire name
 	$applicant_ename_query = mb_query($db, "SELECT ename FROM user WHERE userid=?", array((int) $auserid));
@@ -83,7 +83,7 @@ else	{
 		mb_query($db, "UPDATE user SET guild=? WHERE userid=?", array($guild_info['gname'], (int) $auserid));
 		mb_news_emp($db, "$clock", 'blue', "You were accepted into $guild_info[gname].", (int) $auserid);
 
-		$Guild_MaxID = mysqli_query($db, "SELECT max(gnid) FROM guildnews");
+		$Guild_MaxID = mysqli_query($db, "SELECT max(gnid) FROM guildnews"); // mb-round-ok: ids are issued once across rounds
 			$mgnid = mb_db_result($Guild_MaxID, "mgnid");
 			$gnid = $mgnid + 1;
 	
@@ -190,7 +190,7 @@ else	{
 		$new_mem = $guild_info['mem'] - 1;
 		mb_query($db, "UPDATE user SET guild='None' WHERE userid=?", array((int) $remp));
 		mb_query($db, "UPDATE guild SET mem=? WHERE owner=?", array((int) $new_mem, $userid));	
-		mb_query($db, "DELETE FROM barter WHERE seller=? AND guild=?", array($empire_info[0], $empireguild));
+		mb_query($db, "DELETE FROM barter WHERE round_id=? AND seller=? AND guild=?", array((int) $round_id, $empire_info[0], $empireguild));
 		mb_news_emp($db, "$clock", 'blue', "You were removed from $guild_info[gname].", (int) $remp);
 		mb_news_guild($db, "$clock", 'blue', "$empire_info[0] has been removed from the guild.", $guild_info['gid'], 0);
 
@@ -216,7 +216,7 @@ else	{
 		$GuildID = mb_query($db, "SELECT gid FROM guild WHERE owner=?", array($userid));
 			$GIDD = mb_db_result($GuildID,"GIDD");
 
-		mb_query($db, "UPDATE user SET guild='None' WHERE guild=?", array($GN));
+		mb_query($db, "UPDATE user SET guild='None' WHERE round_id=? AND guild=?", array((int) $round_id, $GN));
 		mb_query($db, "DELETE FROM guild WHERE owner=?", array($userid));
 			
 		echo "<div align=center><font class=yellow>Your guild has been deleted.</font></div>";

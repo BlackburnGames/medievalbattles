@@ -19,14 +19,14 @@ echo "
 		<td class='main2'><b class='reg' width='15%'>Empires</b></td>
 		<td class='main2'><b class='reg' width='15%'>Strength</b></td>";
 
-	$result_id = mb_query($db, "SELECT gname, mem, strength FROM guild ORDER BY strength DESC LIMIT 0,10");
+	$result_id = mb_query($db, "SELECT gname, mem, strength FROM guild WHERE round_id=? ORDER BY strength DESC LIMIT 0,10", array((int) $round_id));
 	$placeno = 0;
 	while ($row = mysqli_fetch_row($result_id))	{
 
 		$placeno = $placeno + 1;
 		$row[2] = number_format($row[2]);
 		
-		$guild_mem_query = mb_query($db, "SELECT count(ename) FROM user WHERE guild=?", array($row[0]));
+		$guild_mem_query = mb_query($db, "SELECT count(ename) FROM user WHERE round_id=? AND guild=?", array((int) $round_id, $row[0]));
 			$guildmem = mb_db_result($guild_mem_query, "guildmem");
 
 echo "

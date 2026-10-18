@@ -1,7 +1,8 @@
 <?php
 /**
- * Every kingdom in the round, for the admin area's listings, with its owner's
- * address in place of the account id.
+ * Every kingdom in the current round, for the admin area's listings, with its
+ * owner's address in place of the account id. An ended round's are history,
+ * and in round_result (docs/rounds.md).
  *
  * The listings used to select `user.email` and let MySQL sort by it. The round
  * holds no address now -- it is the account's, in the `account` table -- so
@@ -27,7 +28,7 @@ if (!function_exists('mb_admin_kingdoms')) {
             }
             $select[] = $c === 'email' ? 'account_id' : $c;
         }
-        $r = mysqli_query($db, 'SELECT ' . implode(', ', $select) . ' FROM user'); // mb-unbound-ok: column names from the caller's literal list
+        $r = mb_query($db, 'SELECT ' . implode(', ', $select) . ' FROM user WHERE round_id=?', array((int) mb_round_current($db))); // mb-unbound-ok: column names from the caller's literal list
 
         $rows = array();
         $ids = array();

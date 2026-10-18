@@ -74,6 +74,14 @@ if ! docker compose exec -T web php /repo/tests/newgame.php; then
   status=1
 fi
 
+# An ended round beside the running one, left byte-identical by the tick and
+# every administrator action (docs/rounds.md). Reloads the schema likewise.
+echo
+echo "=== round isolation ==="
+if ! docker compose exec -T web php /repo/tests/round-isolation.php; then
+  status=1
+fi
+
 # Concurrent requests against one barter listing. Needs the fixture's listings,
 # which the crawl consumes, so it gets a fresh database of its own.
 echo
@@ -142,6 +150,13 @@ fi
 echo
 echo "=== unescaped output audit (stored) ==="
 if ! docker compose exec -T web php /repo/tests/xss-audit.php --stored; then
+  status=1
+fi
+
+# Every query on a round's tables confined to one round (docs/rounds.md).
+echo
+echo "=== round audit ==="
+if ! docker compose exec -T web php /repo/tests/round-audit.php; then
   status=1
 fi
 

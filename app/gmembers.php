@@ -18,10 +18,10 @@ if(!IsSet($leave))	{
 else	{	
 	
 	//	insert leaving msg into guild news
-	$guild_id_query = mb_query($db, "SELECT gid, owner FROM guild WHERE gname=?", array($empireguild));
+	$guild_id_query = mb_query($db, "SELECT gid, owner FROM guild WHERE round_id=? AND gname=?", array((int) $round_id, $empireguild));
 		$guild_id = mysqli_fetch_array($guild_id_query);
 
-	$Guild_MaxID = mysqli_query($db, "SELECT max(gnid) FROM guildnews");
+	$Guild_MaxID = mysqli_query($db, "SELECT max(gnid) FROM guildnews"); // mb-round-ok: ids are issued once across rounds
 		$mgnid = mb_db_result($Guild_MaxID, "mgnid");
 		$gnid = $mgnid + 1;
 
@@ -50,11 +50,11 @@ echo "
 		<td class='main2'><b class='reg'>Experience</b></td>
 		<td class='main2'><b class='reg'>Last Login</b></td>";
 
-$result_id = mb_query($db, "SELECT ename, aim, msn, exp, userid, lastlogin FROM user WHERE guild=? ORDER BY exp DESC", array($empireguild));
+$result_id = mb_query($db, "SELECT ename, aim, msn, exp, userid, lastlogin FROM user WHERE round_id=? AND guild=? ORDER BY exp DESC", array((int) $round_id, $empireguild));
 $num = 0;
 while ($row = mysqli_fetch_row($result_id))	{
 		
-	$SETID_SELECT = mb_query($db, "SELECT setid FROM user WHERE ename=?", array($row[0]));	
+	$SETID_SELECT = mb_query($db, "SELECT setid FROM user WHERE round_id=? AND ename=?", array((int) $round_id, $row[0]));	
 		$t_setid = mb_db_result($SETID_SELECT, "t_setid");
 	$ONLINE_NO = mb_query($db, "SELECT online FROM user WHERE userid=?", array((int) $row[4]));	
 		$OLINE = mb_db_result($ONLINE_NO, "OLINE");
@@ -76,7 +76,7 @@ while ($row = mysqli_fetch_row($result_id))	{
 		<td class='inner2'>" . mb_h($row[5]) . "</td>\n";
 }
 
-$guild_strength_query = mb_query($db, "SELECT sum(exp) FROM user WHERE guild=?", array($empireguild));
+$guild_strength_query = mb_query($db, "SELECT sum(exp) FROM user WHERE round_id=? AND guild=?", array((int) $round_id, $empireguild));
 	$guild_strength_total = mb_db_result($guild_strength_query, "guild_strength_total");
 	$guild_strength_total = number_format($guild_strength_total);
 

@@ -198,16 +198,16 @@ $return = mysqli_fetch_array($return_query);
 		$_FLEETS = mb_db_result($FLEETS_, "_FLEETS");
 
 //	total all units together
-	$warresult = mb_query($db, "SELECT sum(amount) FROM barter WHERE seller=? AND type='Warrior'", array($ename)) or die("Error: " . mysqli_error($db));
+	$warresult = mb_query($db, "SELECT sum(amount) FROM barter WHERE round_id=? AND seller=? AND type='Warrior'", array((int) $round_id, $ename)) or die("Error: " . mysqli_error($db));
 	$warcheck = mysqli_fetch_array($warresult);
 
-	$wizresult = mb_query($db, "SELECT sum(amount) FROM barter WHERE seller=? AND type='Wizard'", array($ename)) or die("Error: " . mysqli_error($db));
+	$wizresult = mb_query($db, "SELECT sum(amount) FROM barter WHERE round_id=? AND seller=? AND type='Wizard'", array((int) $round_id, $ename)) or die("Error: " . mysqli_error($db));
 	$wizcheck = mysqli_fetch_array($wizresult);
 
-	$priresult = mb_query($db, "SELECT sum(amount) FROM barter WHERE seller=? AND type='Priest'", array($ename)) or die("Error: " . mysqli_error($db));
+	$priresult = mb_query($db, "SELECT sum(amount) FROM barter WHERE round_id=? AND seller=? AND type='Priest'", array((int) $round_id, $ename)) or die("Error: " . mysqli_error($db));
 	$pricheck = mysqli_fetch_array($priresult);
 
-	$archresult = mb_query($db, "SELECT sum(amount) FROM barter WHERE seller=? AND type='Archer'", array($ename)) or die("Error: " . mysqli_error($db));
+	$archresult = mb_query($db, "SELECT sum(amount) FROM barter WHERE round_id=? AND seller=? AND type='Archer'", array((int) $round_id, $ename)) or die("Error: " . mysqli_error($db));
 	$archcheck = mysqli_fetch_array($archresult);
 
 	$asages = $sages;
@@ -397,7 +397,7 @@ $amrbutton = "<form type=get action=aconstruct.php><input class=button type=subm
 	$rechourly = $civ * .007;
 	$rechourly = round($rechourly);
 //	max guild id
-	$maxgid = $db->query("SELECT max(gid) FROM guild");
+	$maxgid = $db->query("SELECT max(gid) FROM guild"); // mb-round-ok: ids are issued once across rounds
 	$mgid = mb_db_result($maxgid,"mgid");
 //	some military values
 	$twarriors = $warriors + $war1 + $war2 + $war3 + $war4;

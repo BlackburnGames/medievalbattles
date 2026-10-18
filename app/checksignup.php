@@ -37,10 +37,16 @@ if ($signup) {
 
   include("include/connect.php");
 
+  // The round a new kingdom joins (docs/rounds.md). Every check below -- the
+  // name, the address's kingdom, the settlement -- is asked of it alone, so a
+  // name or an account that played an earlier round is free to play this one.
+  $mb_round = mb_round_current($db);
+  if (!$mb_round) { echo "No round is open for signup."; die(); }
+
   // insert ip address into db
   $ipaddress = $_SERVER["REMOTE_ADDR"];
   //  select number of players
-    $numberplayers = mb_query($db, "SELECT count(userid) FROM user");
+    $numberplayers = mb_query($db, "SELECT count(userid) FROM user WHERE round_id=?", array($mb_round));
     $noplayers = mb_db_result($numberplayers, "noplayers");
   //  parse weird chars out of vars
     $ename = trim($ename);
@@ -52,13 +58,13 @@ if ($signup) {
   // is queried before mb_valid_email() has looked at it, so nothing can lean on
   // the rule further down.
   // empire name already in the database?
-    $eresult = mb_query($db, "SELECT ename FROM user WHERE ename=?", array($ename));
+    $eresult = mb_query($db, "SELECT ename FROM user WHERE round_id=? AND ename=?", array($mb_round, $ename));
     $enamecheck = mysqli_fetch_array($eresult);
   //  dropcase of empire name and email
     $ename1 = strtolower($ename);
     $enamecheck1 = strtolower($enamecheck[0]);
   //  are they a multi?
-    $ip_query = mb_query($db, "SELECT count(userid) FROM user WHERE ip=?", array($ipaddress));
+    $ip_query = mb_query($db, "SELECT count(userid) FROM user WHERE round_id=? AND ip=?", array($mb_round, $ipaddress));
     $check_ip = mb_db_result($ip_query, "check_ip");
 
   if($enamecheck1 == $ename1 AND $ename != "")  { echo mb_h($ename) . " is already being used!"; die();   }
@@ -97,26 +103,26 @@ if ($signup) {
   // the round holds no address.
   $account = mb_account_find($email);
   if ($account && !mb_password_verify($pw, $account['pw'])) { echo mb_h($email) . " is already being used!";  die(); }
-  if ($account && mb_kingdom_find($db, $account['account_id'])) { echo mb_h($email) . " is already being used!";  die(); }
+  if ($account && mb_kingdom_find($db, $account['account_id'], $mb_round)) { echo mb_h($email) . " is already being used!";  die(); }
   // A new account names its player. An existing one already has a name.
   if (!$account && !mb_valid_handle($handle)) { echo "Player names may use letters, numbers, spaces and . _ - only, up to 25 characters!";  die(); }
   if (!$account && mb_account_handle_taken($handle)) { echo mb_h($handle) . " is already being used!";  die(); }
 
   //  select minimum amount of members
-    $Sett_least = mb_query($db, "SELECT min(members) FROM settlement");
+    $Sett_least = mb_query($db, "SELECT min(members) FROM settlement WHERE round_id=?", array($mb_round));
     $least_set = mb_db_result($Sett_least,"least_set");
   //  select a random settlement
-    $maxset = mb_settlement_count($db);
-    $sel_mem = rand(1,$maxset);
+    list($mb_first, $mb_last) = mb_settlement_range($db, $mb_round);
+    $sel_mem = rand($mb_first, $mb_last);
   //  extract members from settlement
     $Random_mem = mb_query($db, "SELECT members FROM settlement WHERE setid=?", array((int) $sel_mem));
     $R_Mem = mb_db_result($Random_mem,"R_Mem");
 
   if($least_set != $R_Mem)  {
-     $Sett_least = mb_query($db, "SELECT min(members) FROM settlement");
+     $Sett_least = mb_query($db, "SELECT min(members) FROM settlement WHERE round_id=?", array($mb_round));
      $least_set = mb_db_result($Sett_least,"least_set");
 
-     $Sel_members = mb_query($db, "SELECT setid FROM settlement WHERE members=?", array((int) $least_set));
+     $Sel_members = mb_query($db, "SELECT setid FROM settlement WHERE round_id=? AND members=?", array($mb_round, (int) $least_set));
      $sel_mem = mb_db_result($Sel_members,"sel_mem");
   }
 
@@ -130,7 +136,7 @@ if ($signup) {
   $snum = $sel_mem;
 
   // create the account
-  $buildingsuserid = mb_query($db, "SELECT max(userid) FROM user");
+  $buildingsuserid = mb_query($db, "SELECT max(userid) FROM user"); // mb-round-ok: ids are issued once across rounds
   $buserid = mb_db_result($buildingsuserid,"buserid");
   $newbuserid = $buserid + 1;
 

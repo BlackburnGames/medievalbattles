@@ -156,6 +156,40 @@ can still log in. With the reset disabled it fails on lumber, research,
 returns in flight, safemode and barter, which is the bug it was written for.
 Reloads the schema before each wipe and after.
 
+### `tests/round-audit.php`
+
+Every query on a table a round owns must be confined to one round
+([rounds.md](rounds.md)): filtered on `round_id`, or on an id issued once
+across all rounds — a userid, a setid, a guild's gid or owner, a message,
+listing or forum id. An `INSERT` must name `round_id`. `account_id` is not such
+an id, since an account has a kingdom in each round it played, and neither is
+a name — `ename`, `gname`, `guild`, `seller` — since a later round may reuse
+one. A query meant to span rounds, such as the `max()` that issues the next
+id, carries `// mb-round-ok: <why>` on its line or the line above.
+
+It reads every string literal that starts like a statement, or with the
+`FROM` of one built by concatenation, and reassembles a double-quoted string
+around an interpolated column name first, so the `WHERE` after it is seen. It
+reads loosely — a filter anywhere in the statement counts, a subquery's
+included — so it is a floor. The baseline, `tests/round-scope.txt`, may only
+shrink, and is **empty**. It scans `app/`, `update.php` and `bin/`.
+
+What it cannot see is a target id that comes from the request: an attack, a
+message or a forum post aimed at a userid, setid or topic of another round
+filters on that id and passes. Those are checked where the page takes them.
+
+### `tests/round-isolation.php`
+
+The audit's claim, run. It adds an ended round 2 beside the fixture's round 1,
+with a row in every round table, built to be hit: its kingdoms, guild and
+accounts have round 1's names and owners, and its values are ones each of the
+tick's whole-table statements would move. Then the tick, a guild leader
+deleting their guild, each of `gameconfig.php`'s actions, its delete-one
+kingdom and `newgame.php` each run against round 1, from a fresh world, and
+round 2's rows must come out byte-identical — while round 1 must have changed,
+or the pass proves nothing. With one tick filter removed it fails on round 2's
+`online` flags. Reloads the schema.
+
 ### `tests/smoke.php`
 
 Crawls every reachable page, failing on any PHP fatal, parse error or warning

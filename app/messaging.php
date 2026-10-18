@@ -41,7 +41,7 @@ else	{
 		$THE_MNO = mb_query($db, "SELECT mno FROM user WHERE userid=?", array((int) $empvalue));
 		$T_MNO = mb_db_result($THE_MNO,"T_MNO");
 
-		$yourmid = mysqli_query($db, "SELECT max(mid) FROM messages");	
+		$yourmid = mysqli_query($db, "SELECT max(mid) FROM messages"); // mb-round-ok: ids are issued once across rounds
 		$ymid = mb_db_result($yourmid,"ymid");
 
 		$ymid = $ymid + 1;

@@ -10,9 +10,10 @@ echo "
 <div align=center>";
 
 if($setchg == 1)	{
-	$maxset = mb_settlement_count($db);
+	// The round's settlements only: a setid is never reused, so another
+	// round's is a number outside this range.
 
-	if($snum > $maxset OR $snum <= 0)	{
+	if(!mb_settlement_in_round($db, $round_id, $snum))	{
 		echo"<font class=yellow><div align=center>Settlement " . mb_h($snum) . " does not exist.</font></div><br><br>";
 		die();
 	}

@@ -33,8 +33,8 @@ if ($addtopic) {
 
 	$result = mb_query($db, "INSERT INTO guildthreads (name, topic, message, datestamp, guildname, round_id) SELECT ?, ?, ?, ?, ?, round_id FROM user WHERE userid=?", array($ename, $topic, $message, $clock, $empireguild, $userid));
 
-	$result4 = mb_query($db, "UPDATE guildthreads SET lastpost=? WHERE topic=? AND guildname = ?", array($clock, $topic, $empireguild));
-	$result6 = mb_query($db, "UPDATE guildthreads SET lastposter=? WHERE topic=? AND guildname = ?", array($ename, $topic, $empireguild));
+	$result4 = mb_query($db, "UPDATE guildthreads SET lastpost=? WHERE round_id=? AND topic=? AND guildname = ?", array($clock, (int) $round_id, $topic, $empireguild));
+	$result6 = mb_query($db, "UPDATE guildthreads SET lastposter=? WHERE round_id=? AND topic=? AND guildname = ?", array($ename, (int) $round_id, $topic, $empireguild));
 
 	header ("Location: gforums.php");
 }

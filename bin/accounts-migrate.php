@@ -70,9 +70,10 @@ if (!mb_migrate_has_column($db, 'user', 'account_id')) {
 
 $hasAdmin = mb_migrate_has_column($db, 'user', 'admin');
 $hasValidate = (bool) mysqli_fetch_row(mysqli_query($db, "SHOW TABLES LIKE 'emailvalidate'"));
+// A world from before accounts is a single round, every kingdom of it read.
 $select = $hasAdmin
-    ? "SELECT userid, email, pw, signup_comp_id, ename, admin FROM user ORDER BY userid"
-    : "SELECT userid, email, pw, signup_comp_id, ename, 0 AS admin FROM user ORDER BY userid";
+    ? "SELECT userid, email, pw, signup_comp_id, ename, admin FROM user ORDER BY userid" // mb-round-ok: a world from before accounts
+    : "SELECT userid, email, pw, signup_comp_id, ename, 0 AS admin FROM user ORDER BY userid"; // mb-round-ok: likewise
 $rows = array();
 $r = mysqli_query($db, $select); // mb-unbound-ok: one of two literal statements
 while ($row = mysqli_fetch_assoc($r)) {

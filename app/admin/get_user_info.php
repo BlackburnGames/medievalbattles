@@ -29,7 +29,7 @@ else	{
 
 	$clock = date("m/d/y, H:ia");
 
-	$result = mb_query($db, "SELECT * FROM user WHERE ename=?", array($empre));
+	$result = mb_query($db, "SELECT * FROM user WHERE round_id=? AND ename=?", array((int) mb_round_current($db), $empre));
 		$evu = mysqli_fetch_array($result);
 
 	// The five queries below all filter on $evu[userid]. With no such empire

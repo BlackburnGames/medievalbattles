@@ -19,7 +19,7 @@ echo "
 		<td class='main2'><b class='reg' width='15%'>Settlement</b></td>
 		<td class='main2'><b class='reg' width='20%'>Experience</b></td>";
 
-	$result_id = mb_query($db, "SELECT setname, setid, setstrength FROM settlement ORDER BY setstrength DESC LIMIT 0,20");
+	$result_id = mb_query($db, "SELECT setname, setid, setstrength FROM settlement WHERE round_id=? ORDER BY setstrength DESC LIMIT 0,20", array((int) $round_id));
 	$placeno = 0;
 	while ($row = mysqli_fetch_row($result_id))	{
 

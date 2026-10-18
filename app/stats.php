@@ -4,12 +4,12 @@ include("include/igtop.php");
 echo "<div align=center><font class=yellow><b>Statistics page is still being worked on.</b></font></div>";
 die();
 
-$avg_players_query = mysqli_query($db, "SELECT count(ename) FROM user");
+$avg_players_query = mb_query($db, "SELECT count(ename) FROM user WHERE round_id=?", array((int) $round_id));
 	$avg_players = mysqli_fetch_array($avg_players_query);
 
-$avg_users_query = mysqli_query($db, "SELECT count(ename) FROM user");
+$avg_users_query = mb_query($db, "SELECT count(ename) FROM user WHERE round_id=?", array((int) $round_id));
 	$avg_users = mysqli_fetch_array($avg_users_query);
-$avg_units_query = mysqli_query($db, "SELECT * FROM military");
+$avg_units_query = mb_query($db, "SELECT * FROM military WHERE round_id=?", array((int) $round_id));
 	$avg_units = mysqli_fetch_array($avg_units_query);
 
 $avg_units['thieves'] = $avg_units['thieves'] / $avg_players[0];

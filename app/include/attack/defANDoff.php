@@ -45,11 +45,11 @@ if($evu['safemode'] > 0)	{
 }
 	
 // Your guild id
-$G_id = mb_query($db, "SELECT gid FROM guild WHERE gname=?", array($empireguild));
+$G_id = mb_query($db, "SELECT gid FROM guild WHERE round_id=? AND gname=?", array((int) $round_id, $empireguild));
 $gid = mysqli_fetch_array($G_id);
 
 // Empire being attacked guild id
-$tG_id = mb_query($db, "SELECT gid FROM guild WHERE gname=?", array($evu['guild']));
+$tG_id = mb_query($db, "SELECT gid FROM guild WHERE round_id=? AND gname=?", array((int) $round_id, $evu['guild']));
 $tgid = mysqli_fetch_array($tG_id);
 				
 // Each side's own race and class: the attacker's on the attack, the

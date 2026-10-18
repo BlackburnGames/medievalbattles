@@ -25,13 +25,25 @@ $XP   = $GAMEDATA['exp_values'];
 
 echo "<p>Starting update process</p>";
 
+/*
+ * One round at a time: the running one. Every statement below is confined to
+ * it -- by a userid, a setid or a gid of its own, or by round_id -- so an
+ * ended round is never advanced (docs/rounds.md). With none running there is
+ * nothing to do.
+ */
+$round_id = mb_round_running($db);
+if (!$round_id) {
+  echo "<p>No round is running.</p>";
+  return;
+}
+
   mysqli_query($db, "UPDATE game_info SET tick='yes'");
-  $max_userid = mysqli_query($db, "SELECT max(userid) FROM user");
-  $max_UID = mb_db_result($max_userid, 0, 0);
+  $mb_ids = mysqli_fetch_row(mb_query($db, "SELECT min(userid), max(userid) FROM user WHERE round_id=?", array($round_id)));
+  $max_UID = (int) $mb_ids[1];
 
 /*
- * Walks userids rather than rows, so it visits every id from the first to the
- * highest that exists -- including ids that never existed and ids whose owner
+ * Walks userids rather than rows, so it visits every id from the round's
+ * first to its highest -- including ids that never existed and ids whose owner
  * was deleted. $INC_ID was not initialised, so the first pass was always for
  * userid 0, which no player has ever had.
  *
@@ -45,10 +57,10 @@ echo "<p>Starting update process</p>";
  * scoped by userid are inside the two deletion branches, and both are guarded
  * on a column value that is null when there is no row.
  */
-$INC_ID = 1;
+$INC_ID = max(1, (int) $mb_ids[0]);
 
 while($INC_ID < $max_UID + 1) {
-      $result1 = mb_query($db, "SELECT * FROM user WHERE userid=?", array($INC_ID)) or die("Error in query! " . mysqli_error($db));
+      $result1 = mb_query($db, "SELECT * FROM user WHERE userid=? AND round_id=?", array($INC_ID, $round_id)) or die("Error in query! " . mysqli_error($db));
       $user = mysqli_fetch_array($result1);
 
       // A gap in the id sequence -- a deleted player, or an id never issued.
@@ -268,7 +280,7 @@ This email is automated. Your reply will not be recieved.";
     mb_query($db, "DELETE FROM research WHERE userid=?", array((int) $user['userid']));
     mb_query($db, "DELETE FROM returntbl WHERE userid=?", array((int) $user['userid']));
     mb_query($db, "DELETE FROM explore WHERE userid=?", array((int) $user['userid']));
-    mb_query($db, "UPDATE user SET votefor='None' WHERE votefor=?", array($user['ename']));
+    mb_query($db, "UPDATE user SET votefor='None' WHERE round_id=? AND votefor=?", array($round_id, $user['ename']));
   }
 
 ##################
@@ -299,7 +311,7 @@ This email is automated. Your reply will not be recieved.";
     mb_query($db, "DELETE FROM research WHERE userid=?", array((int) $user['userid']));
     mb_query($db, "DELETE FROM returntbl WHERE userid=?", array((int) $user['userid']));
     mb_query($db, "DELETE FROM explore WHERE userid=?", array((int) $user['userid']));
-    mb_query($db, "UPDATE user SET votefor='None' WHERE votefor=?", array($user['ename']));
+    mb_query($db, "UPDATE user SET votefor='None' WHERE round_id=? AND votefor=?", array($round_id, $user['ename']));
   }
 
 ##################
@@ -412,143 +424,143 @@ This email is automated. Your reply will not be recieved.";
 ##################
 
   echo "<p>Updating Misc...</p>";
-  mysqli_query($db, "UPDATE user SET barterclock= barterclock - 1 WHERE barterclock > 0");
-  mysqli_query($db, "UPDATE user SET online = 0");
-  mysqli_query($db, "UPDATE user SET safemode = safemode - 1 WHERE safemode > 0");
+  mb_query($db, "UPDATE user SET barterclock= barterclock - 1 WHERE round_id=? AND barterclock > 0", array($round_id));
+  mb_query($db, "UPDATE user SET online = 0 WHERE round_id=?", array($round_id));
+  mb_query($db, "UPDATE user SET safemode = safemode - 1 WHERE round_id=? AND safemode > 0", array($round_id));
 
 ##################
 ### Update Return Times
 ##################
 
   echo "<p>Updating Return Times...</p>";
-  mysqli_query($db, "UPDATE returntbl SET war1 =0, wiz1=0, pri1=0, arch1=0, golem1=0, irongolem1=0 WHERE time1 = 1");
-  mysqli_query($db, "UPDATE returntbl SET war2 =0, wiz2=0, pri2=0, arch2=0, golem2=0, irongolem2=0 WHERE time2 = 1");
-  mysqli_query($db, "UPDATE returntbl SET war3 =0, wiz3=0, pri3=0, arch3=0, golem3=0, irongolem3=0 WHERE time3 = 1");
-  mysqli_query($db, "UPDATE returntbl SET war4 =0, wiz4=0, pri4=0, arch4=0, golem4=0, irongolem4=0 WHERE time4 = 1");
-  mysqli_query($db, "UPDATE returntbl SET time1 = time1 - 1 WHERE time1 > 0");
-  mysqli_query($db, "UPDATE returntbl SET time2 = time2 - 1 WHERE time2 > 0");
-  mysqli_query($db, "UPDATE returntbl SET time3 = time3 - 1 WHERE time3 > 0");
-  mysqli_query($db, "UPDATE returntbl SET time4 = time4 - 1 WHERE time4 > 0");
+  mb_query($db, "UPDATE returntbl SET war1 =0, wiz1=0, pri1=0, arch1=0, golem1=0, irongolem1=0 WHERE round_id=? AND time1 = 1", array($round_id));
+  mb_query($db, "UPDATE returntbl SET war2 =0, wiz2=0, pri2=0, arch2=0, golem2=0, irongolem2=0 WHERE round_id=? AND time2 = 1", array($round_id));
+  mb_query($db, "UPDATE returntbl SET war3 =0, wiz3=0, pri3=0, arch3=0, golem3=0, irongolem3=0 WHERE round_id=? AND time3 = 1", array($round_id));
+  mb_query($db, "UPDATE returntbl SET war4 =0, wiz4=0, pri4=0, arch4=0, golem4=0, irongolem4=0 WHERE round_id=? AND time4 = 1", array($round_id));
+  mb_query($db, "UPDATE returntbl SET time1 = time1 - 1 WHERE round_id=? AND time1 > 0", array($round_id));
+  mb_query($db, "UPDATE returntbl SET time2 = time2 - 1 WHERE round_id=? AND time2 > 0", array($round_id));
+  mb_query($db, "UPDATE returntbl SET time3 = time3 - 1 WHERE round_id=? AND time3 > 0", array($round_id));
+  mb_query($db, "UPDATE returntbl SET time4 = time4 - 1 WHERE round_id=? AND time4 > 0", array($round_id));
 
 ##################
 ### Update Building Construction
 ##################
   echo "<p>Updating Building Construction...</p>";
-  mysqli_query($db, "UPDATE buildings SET home    = home      + round(dhome / Hhrs)    WHERE Hhrs > 0");
-  mysqli_query($db, "UPDATE buildings SET barrack = barrack   + round(dbarrack / Bhrs) WHERE Bhrs > 0");
-  mysqli_query($db, "UPDATE buildings SET farm    = farm      + round(dfarm / Fhrs)    WHERE Fhrs > 0");
-  mysqli_query($db, "UPDATE buildings SET wp      = wp        + round(dwp / Whrs)      WHERE Whrs > 0");
-  mysqli_query($db, "UPDATE buildings SET lmill   = lmill     + round(dlmill / Lhrs)   WHERE Lhrs > 0");
-  mysqli_query($db, "UPDATE buildings SET gm      = gm        + round(dgm / Ghrs)      WHERE Ghrs > 0");
-  mysqli_query($db, "UPDATE buildings SET im      = im        + round(dim / Ihrs)      WHERE Ihrs > 0");
-  mysqli_query($db, "UPDATE buildings SET dhome    = dhome    - round(dhome / Hhrs)    WHERE Hhrs > 0");
-  mysqli_query($db, "UPDATE buildings SET dbarrack = dbarrack - round(dbarrack / Bhrs) WHERE Bhrs > 0");
-  mysqli_query($db, "UPDATE buildings SET dfarm    = dfarm    - round(dfarm / Fhrs)    WHERE Fhrs > 0");
-  mysqli_query($db, "UPDATE buildings SET dwp      = dwp      - round(dwp / Whrs)      WHERE Whrs > 0");
-  mysqli_query($db, "UPDATE buildings SET dlmill   = dlmill   - round(dlmill / Lhrs)   WHERE Lhrs > 0");
-  mysqli_query($db, "UPDATE buildings SET dgm      = dgm      - round(dgm / Ghrs)      WHERE Ghrs > 0");
-  mysqli_query($db, "UPDATE buildings SET dim      = dim      - round(dim / Ihrs)      WHERE Ihrs > 0");
-  mysqli_query($db, "UPDATE buildings SET Hhrs = Hhrs - 1 WHERE Hhrs > 0");
-  mysqli_query($db, "UPDATE buildings SET Bhrs = Bhrs - 1 WHERE Bhrs > 0");
-  mysqli_query($db, "UPDATE buildings SET Fhrs = Fhrs - 1 WHERE Fhrs > 0");
-  mysqli_query($db, "UPDATE buildings SET Whrs = Whrs - 1 WHERE Whrs > 0");
-  mysqli_query($db, "UPDATE buildings SET Lhrs = Lhrs - 1 WHERE Lhrs > 0");
-  mysqli_query($db, "UPDATE buildings SET Ghrs = Ghrs - 1 WHERE Ghrs > 0");
-  mysqli_query($db, "UPDATE buildings SET Ihrs = Ihrs - 1 WHERE Ihrs > 0");
+  mb_query($db, "UPDATE buildings SET home    = home      + round(dhome / Hhrs)    WHERE round_id=? AND Hhrs > 0", array($round_id));
+  mb_query($db, "UPDATE buildings SET barrack = barrack   + round(dbarrack / Bhrs) WHERE round_id=? AND Bhrs > 0", array($round_id));
+  mb_query($db, "UPDATE buildings SET farm    = farm      + round(dfarm / Fhrs)    WHERE round_id=? AND Fhrs > 0", array($round_id));
+  mb_query($db, "UPDATE buildings SET wp      = wp        + round(dwp / Whrs)      WHERE round_id=? AND Whrs > 0", array($round_id));
+  mb_query($db, "UPDATE buildings SET lmill   = lmill     + round(dlmill / Lhrs)   WHERE round_id=? AND Lhrs > 0", array($round_id));
+  mb_query($db, "UPDATE buildings SET gm      = gm        + round(dgm / Ghrs)      WHERE round_id=? AND Ghrs > 0", array($round_id));
+  mb_query($db, "UPDATE buildings SET im      = im        + round(dim / Ihrs)      WHERE round_id=? AND Ihrs > 0", array($round_id));
+  mb_query($db, "UPDATE buildings SET dhome    = dhome    - round(dhome / Hhrs)    WHERE round_id=? AND Hhrs > 0", array($round_id));
+  mb_query($db, "UPDATE buildings SET dbarrack = dbarrack - round(dbarrack / Bhrs) WHERE round_id=? AND Bhrs > 0", array($round_id));
+  mb_query($db, "UPDATE buildings SET dfarm    = dfarm    - round(dfarm / Fhrs)    WHERE round_id=? AND Fhrs > 0", array($round_id));
+  mb_query($db, "UPDATE buildings SET dwp      = dwp      - round(dwp / Whrs)      WHERE round_id=? AND Whrs > 0", array($round_id));
+  mb_query($db, "UPDATE buildings SET dlmill   = dlmill   - round(dlmill / Lhrs)   WHERE round_id=? AND Lhrs > 0", array($round_id));
+  mb_query($db, "UPDATE buildings SET dgm      = dgm      - round(dgm / Ghrs)      WHERE round_id=? AND Ghrs > 0", array($round_id));
+  mb_query($db, "UPDATE buildings SET dim      = dim      - round(dim / Ihrs)      WHERE round_id=? AND Ihrs > 0", array($round_id));
+  mb_query($db, "UPDATE buildings SET Hhrs = Hhrs - 1 WHERE round_id=? AND Hhrs > 0", array($round_id));
+  mb_query($db, "UPDATE buildings SET Bhrs = Bhrs - 1 WHERE round_id=? AND Bhrs > 0", array($round_id));
+  mb_query($db, "UPDATE buildings SET Fhrs = Fhrs - 1 WHERE round_id=? AND Fhrs > 0", array($round_id));
+  mb_query($db, "UPDATE buildings SET Whrs = Whrs - 1 WHERE round_id=? AND Whrs > 0", array($round_id));
+  mb_query($db, "UPDATE buildings SET Lhrs = Lhrs - 1 WHERE round_id=? AND Lhrs > 0", array($round_id));
+  mb_query($db, "UPDATE buildings SET Ghrs = Ghrs - 1 WHERE round_id=? AND Ghrs > 0", array($round_id));
+  mb_query($db, "UPDATE buildings SET Ihrs = Ihrs - 1 WHERE round_id=? AND Ihrs > 0", array($round_id));
 
 ##################
 ### Update Weapon Construction
 ##################
   echo "<p>Updating Weapon Construction...</p>";
 // warrior weapons
-  mysqli_query($db, "UPDATE military SET shortsword = shortsword - 1 WHERE  shortsword > 1");
-  mysqli_query($db, "UPDATE military SET longsword = longsword - 1 WHERE  longsword > 1");
-  mysqli_query($db, "UPDATE military SET bastardsword = bastardsword - 1 WHERE bastardsword > 1");
-  mysqli_query($db, "UPDATE military SET scourge = scourge - 1 WHERE  scourge > 1");
-  mysqli_query($db, "UPDATE military SET scimitar = scimitar - 1 WHERE  scimitar > 1");
-  mysqli_query($db, "UPDATE military SET romsfury = romsfury - 1 WHERE romsfury > 1");
-  mysqli_query($db, "UPDATE military SET broadsword = broadsword - 1 WHERE broadsword > 1");
-  mysqli_query($db, "UPDATE military SET gandalara = gandalara - 1 WHERE gandalara > 1");
+  mb_query($db, "UPDATE military SET shortsword = shortsword - 1 WHERE round_id=? AND  shortsword > 1", array($round_id));
+  mb_query($db, "UPDATE military SET longsword = longsword - 1 WHERE round_id=? AND  longsword > 1", array($round_id));
+  mb_query($db, "UPDATE military SET bastardsword = bastardsword - 1 WHERE round_id=? AND bastardsword > 1", array($round_id));
+  mb_query($db, "UPDATE military SET scourge = scourge - 1 WHERE round_id=? AND  scourge > 1", array($round_id));
+  mb_query($db, "UPDATE military SET scimitar = scimitar - 1 WHERE round_id=? AND  scimitar > 1", array($round_id));
+  mb_query($db, "UPDATE military SET romsfury = romsfury - 1 WHERE round_id=? AND romsfury > 1", array($round_id));
+  mb_query($db, "UPDATE military SET broadsword = broadsword - 1 WHERE round_id=? AND broadsword > 1", array($round_id));
+  mb_query($db, "UPDATE military SET gandalara = gandalara - 1 WHERE round_id=? AND gandalara > 1", array($round_id));
 // priest weapons
-  mysqli_query($db, "UPDATE military SET mace = mace - 1 WHERE mace > 1");
-  mysqli_query($db, "UPDATE military SET flail = flail - 1 WHERE flail > 1");
-  mysqli_query($db, "UPDATE military SET zakarum = zakarum - 1 WHERE zakarum > 1");
-  mysqli_query($db, "UPDATE military SET footmanflail = footmanflail - 1 WHERE footmanflail > 1");
-  mysqli_query($db, "UPDATE military SET morningstar = morningstar - 1 WHERE morningstar > 1");
-  mysqli_query($db, "UPDATE military SET thyorastear = thyorastear - 1 WHERE thyorastear > 1");
-  mysqli_query($db, "UPDATE military SET isidole = isidole - 1 WHERE isidole> 1");
-  mysqli_query($db, "UPDATE military SET eldamarstar = eldamarstar - 1 WHERE eldamarstar > 1");
+  mb_query($db, "UPDATE military SET mace = mace - 1 WHERE round_id=? AND mace > 1", array($round_id));
+  mb_query($db, "UPDATE military SET flail = flail - 1 WHERE round_id=? AND flail > 1", array($round_id));
+  mb_query($db, "UPDATE military SET zakarum = zakarum - 1 WHERE round_id=? AND zakarum > 1", array($round_id));
+  mb_query($db, "UPDATE military SET footmanflail = footmanflail - 1 WHERE round_id=? AND footmanflail > 1", array($round_id));
+  mb_query($db, "UPDATE military SET morningstar = morningstar - 1 WHERE round_id=? AND morningstar > 1", array($round_id));
+  mb_query($db, "UPDATE military SET thyorastear = thyorastear - 1 WHERE round_id=? AND thyorastear > 1", array($round_id));
+  mb_query($db, "UPDATE military SET isidole = isidole - 1 WHERE round_id=? AND isidole> 1", array($round_id));
+  mb_query($db, "UPDATE military SET eldamarstar = eldamarstar - 1 WHERE round_id=? AND eldamarstar > 1", array($round_id));
 // archer weapons
-  mysqli_query($db, "UPDATE military SET shortbow = shortbow - 1 WHERE shortbow > 1");
-  mysqli_query($db, "UPDATE military SET ferricbow = ferricbow - 1 WHERE ferricbow > 1");
-  mysqli_query($db, "UPDATE military SET keldarsarms = keldarsarms - 1 WHERE keldarsarms > 1");
-  mysqli_query($db, "UPDATE military SET splensight = splensight - 1 WHERE splensight > 1");
-  mysqli_query($db, "UPDATE military SET bowoftion = bowoftion - 1 WHERE bowoftion > 1");
-  mysqli_query($db, "UPDATE military SET dynefian = dynefian - 1 WHERE dynefian > 1");
-  mysqli_query($db, "UPDATE military SET heartsong = heartsong - 1 WHERE heartsong > 1");
-  mysqli_query($db, "UPDATE military SET shyrscreamsbow = shyrscreamsbow - 1 WHERE shyrscreamsbow > 1");
+  mb_query($db, "UPDATE military SET shortbow = shortbow - 1 WHERE round_id=? AND shortbow > 1", array($round_id));
+  mb_query($db, "UPDATE military SET ferricbow = ferricbow - 1 WHERE round_id=? AND ferricbow > 1", array($round_id));
+  mb_query($db, "UPDATE military SET keldarsarms = keldarsarms - 1 WHERE round_id=? AND keldarsarms > 1", array($round_id));
+  mb_query($db, "UPDATE military SET splensight = splensight - 1 WHERE round_id=? AND splensight > 1", array($round_id));
+  mb_query($db, "UPDATE military SET bowoftion = bowoftion - 1 WHERE round_id=? AND bowoftion > 1", array($round_id));
+  mb_query($db, "UPDATE military SET dynefian = dynefian - 1 WHERE round_id=? AND dynefian > 1", array($round_id));
+  mb_query($db, "UPDATE military SET heartsong = heartsong - 1 WHERE round_id=? AND heartsong > 1", array($round_id));
+  mb_query($db, "UPDATE military SET shyrscreamsbow = shyrscreamsbow - 1 WHERE round_id=? AND shyrscreamsbow > 1", array($round_id));
 ##################
 ### Update Armor Construction
 ##################
   echo "<p>Updating Armor Construction...</p>";
-  mysqli_query($db, "UPDATE military SET cs = cs - 1 WHERE cs > 1");
-  mysqli_query($db, "UPDATE military SET cm = cm - 1 WHERE cm > 1");
-  mysqli_query($db, "UPDATE military SET bp = bp - 1 WHERE bp > 1");
-  mysqli_query($db, "UPDATE military SET fp = fp - 1 WHERE fp > 1");
-  mysqli_query($db, "UPDATE military SET ma = ma - 1 WHERE ma > 1");
-  mysqli_query($db, "UPDATE military SET ga = ga - 1 WHERE ga > 1");
-  mysqli_query($db, "UPDATE military SET ba = ba - 1 WHERE ba > 1");
-  mysqli_query($db, "UPDATE military SET tr = tr - 1 WHERE tr > 1");
-  mysqli_query($db, "UPDATE military SET mr = mr - 1 WHERE mr > 1");
+  mb_query($db, "UPDATE military SET cs = cs - 1 WHERE round_id=? AND cs > 1", array($round_id));
+  mb_query($db, "UPDATE military SET cm = cm - 1 WHERE round_id=? AND cm > 1", array($round_id));
+  mb_query($db, "UPDATE military SET bp = bp - 1 WHERE round_id=? AND bp > 1", array($round_id));
+  mb_query($db, "UPDATE military SET fp = fp - 1 WHERE round_id=? AND fp > 1", array($round_id));
+  mb_query($db, "UPDATE military SET ma = ma - 1 WHERE round_id=? AND ma > 1", array($round_id));
+  mb_query($db, "UPDATE military SET ga = ga - 1 WHERE round_id=? AND ga > 1", array($round_id));
+  mb_query($db, "UPDATE military SET ba = ba - 1 WHERE round_id=? AND ba > 1", array($round_id));
+  mb_query($db, "UPDATE military SET tr = tr - 1 WHERE round_id=? AND tr > 1", array($round_id));
+  mb_query($db, "UPDATE military SET mr = mr - 1 WHERE round_id=? AND mr > 1", array($round_id));
 ##################
 ### Create Units
 ##################
   echo "<p>Updating Units...</p>";
-  mysqli_query($db, "UPDATE military SET thieves = thieves + dbthief, explorers = explorers + dbexplorer, sages = sages + dbsage, dbthief = 0, dbexplorer = 0, dbsage = 0, warriors = warriors + dbwar, wizards = wizards + dbwiz, priests = priests + dbpri, archers = archers + dbarch, dbwar = 0, dbwiz = 0, dbarch = 0, dbwar = dbwar2, dbwiz = dbwiz2, dbpri = dbpri2, dbarch = dbarch2, dbwar2 = 0, dbwiz2 = 0, dbpri2 = 0, dbarch2 = 0, catapult = catapult + dbcatapult, dbcatapult = dbcatapult2, dbcatapult2 = dbcatapult3, dbcatapult3 = 0, suicide = suicide + dbsuicide, dbsuicide = dbsuicide2, dbsuicide2 = dbsuicide3, dbsuicide3 = 0") or die("Error in query! " . mysqli_error($db));
-  mysqli_query($db, "UPDATE military SET golem = golem + dbgolem, irongolem = irongolem + dbirongolem, dbgolem = 0, dbirongolem = 0") or die("Error in query! " . mysqli_error($db));
+  mb_query($db, "UPDATE military SET thieves = thieves + dbthief, explorers = explorers + dbexplorer, sages = sages + dbsage, dbthief = 0, dbexplorer = 0, dbsage = 0, warriors = warriors + dbwar, wizards = wizards + dbwiz, priests = priests + dbpri, archers = archers + dbarch, dbwar = 0, dbwiz = 0, dbarch = 0, dbwar = dbwar2, dbwiz = dbwiz2, dbpri = dbpri2, dbarch = dbarch2, dbwar2 = 0, dbwiz2 = 0, dbpri2 = 0, dbarch2 = 0, catapult = catapult + dbcatapult, dbcatapult = dbcatapult2, dbcatapult2 = dbcatapult3, dbcatapult3 = 0, suicide = suicide + dbsuicide, dbsuicide = dbsuicide2, dbsuicide2 = dbsuicide3, dbsuicide3 = 0 WHERE round_id=?", array($round_id)) or die("Error in query! " . mysqli_error($db));
+  mb_query($db, "UPDATE military SET golem = golem + dbgolem, irongolem = irongolem + dbirongolem, dbgolem = 0, dbirongolem = 0 WHERE round_id=?", array($round_id)) or die("Error in query! " . mysqli_error($db));
 ##################
 ### Update Research
 ##################
   echo "<p>Updating Research...</p>";
-  mysqli_query($db, "UPDATE research SET r1pts = 50000 WHERE r1pts > 50000"); // fireball
-  mysqli_query($db, "UPDATE research SET r2pts = 100000 WHERE r2pts > 100000"); // ice storm
-  mysqli_query($db, "UPDATE research SET r3pts = 200000 WHERE r3pts > 200000"); // wall of fire
-  mysqli_query($db, "UPDATE research SET r4pts = 300000 WHERE r4pts > 300000"); // wall of ice
-  mysqli_query($db, "UPDATE research SET r5pts = 400000 WHERE r5pts > 400000"); // chain lightning
-  mysqli_query($db, "UPDATE research SET r6pts = 500000 WHERE r6pts > 500000"); // gust of wind
-  mysqli_query($db, "UPDATE research SET r7pts = 600000 WHERE r7pts > 600000"); // flaming sphere
-  mysqli_query($db, "UPDATE research SET r8pts = 700000 WHERE r8pts > 700000"); // cloud kill
-  mysqli_query($db, "UPDATE research SET r9pts = 800000 WHERE r9pts > 800000"); // lighting bolt
-  mysqli_query($db, "UPDATE research SET r10pts = 900000 WHERE r10pts > 900000"); // meteor swarm
-  mysqli_query($db, "UPDATE research SET r11pts = 100000 WHERE r11pts > 100000"); // adv gold mining
-  mysqli_query($db, "UPDATE research SET r12pts = 100000 WHERE r12pts > 100000"); // adv iron mining
-  mysqli_query($db, "UPDATE research SET r13pts = 125000 WHERE r13pts > 125000"); // archery
-  mysqli_query($db, "UPDATE research SET r14pts = 125000 WHERE r14pts > 125000"); // pyrotechnics
-  mysqli_query($db, "UPDATE research SET r15pts = 100000 WHERE r15pts > 100000"); // adv farming
-  mysqli_query($db, "UPDATE research SET r16pts = 100000 WHERE r16pts > 100000"); // adv construction
+  mb_query($db, "UPDATE research SET r1pts = 50000 WHERE round_id=? AND r1pts > 50000", array($round_id)); // fireball
+  mb_query($db, "UPDATE research SET r2pts = 100000 WHERE round_id=? AND r2pts > 100000", array($round_id)); // ice storm
+  mb_query($db, "UPDATE research SET r3pts = 200000 WHERE round_id=? AND r3pts > 200000", array($round_id)); // wall of fire
+  mb_query($db, "UPDATE research SET r4pts = 300000 WHERE round_id=? AND r4pts > 300000", array($round_id)); // wall of ice
+  mb_query($db, "UPDATE research SET r5pts = 400000 WHERE round_id=? AND r5pts > 400000", array($round_id)); // chain lightning
+  mb_query($db, "UPDATE research SET r6pts = 500000 WHERE round_id=? AND r6pts > 500000", array($round_id)); // gust of wind
+  mb_query($db, "UPDATE research SET r7pts = 600000 WHERE round_id=? AND r7pts > 600000", array($round_id)); // flaming sphere
+  mb_query($db, "UPDATE research SET r8pts = 700000 WHERE round_id=? AND r8pts > 700000", array($round_id)); // cloud kill
+  mb_query($db, "UPDATE research SET r9pts = 800000 WHERE round_id=? AND r9pts > 800000", array($round_id)); // lighting bolt
+  mb_query($db, "UPDATE research SET r10pts = 900000 WHERE round_id=? AND r10pts > 900000", array($round_id)); // meteor swarm
+  mb_query($db, "UPDATE research SET r11pts = 100000 WHERE round_id=? AND r11pts > 100000", array($round_id)); // adv gold mining
+  mb_query($db, "UPDATE research SET r12pts = 100000 WHERE round_id=? AND r12pts > 100000", array($round_id)); // adv iron mining
+  mb_query($db, "UPDATE research SET r13pts = 125000 WHERE round_id=? AND r13pts > 125000", array($round_id)); // archery
+  mb_query($db, "UPDATE research SET r14pts = 125000 WHERE round_id=? AND r14pts > 125000", array($round_id)); // pyrotechnics
+  mb_query($db, "UPDATE research SET r15pts = 100000 WHERE round_id=? AND r15pts > 100000", array($round_id)); // adv farming
+  mb_query($db, "UPDATE research SET r16pts = 100000 WHERE round_id=? AND r16pts > 100000", array($round_id)); // adv construction
 ##################
 ### Update Messages
 ##################
   echo "<p>Updating Messages...</p>";
-  mysqli_query($db, "UPDATE messages SET age = age + 1");
-  mysqli_query($db, "UPDATE setnews SET age = age + 1");
-  mysqli_query($db, "UPDATE guildnews SET age = age + 1");
+  mb_query($db, "UPDATE messages SET age = age + 1 WHERE round_id=?", array($round_id));
+  mb_query($db, "UPDATE setnews SET age = age + 1 WHERE round_id=?", array($round_id));
+  mb_query($db, "UPDATE guildnews SET age = age + 1 WHERE round_id=?", array($round_id));
   // Housekeeping constants, read rather than repeated. The message and news
   // tables share one lifetime, which is why it is one value.
   $msg_ttl   = $GAMEDATA['timers']['message_ttl_ticks'];
   $exp_floor = $GAMEDATA['timers']['exp_floor'];
 
-  mb_query($db, "DELETE FROM messages WHERE age=?", array($msg_ttl));
-  mb_query($db, "DELETE FROM setnews WHERE age=?", array($msg_ttl));
-  mb_query($db, "DELETE FROM guildnews WHERE age=?", array($msg_ttl));
+  mb_query($db, "DELETE FROM messages WHERE round_id=? AND age=?", array($round_id, $msg_ttl));
+  mb_query($db, "DELETE FROM setnews WHERE round_id=? AND age=?", array($round_id, $msg_ttl));
+  mb_query($db, "DELETE FROM guildnews WHERE round_id=? AND age=?", array($round_id, $msg_ttl));
 
-  mb_query($db, "UPDATE user SET exp = ? WHERE exp < ?", array(mb_num($exp_floor), $exp_floor));
+  mb_query($db, "UPDATE user SET exp = ? WHERE round_id=? AND exp < ?", array(mb_num($exp_floor), $round_id, $exp_floor));
   mysqli_query($db, "UPDATE game_info SET tick = 'no'");
 
   // The strength recalculation walks settlement ids rather than rows, so it is
-  // bounded by the count -- the table's, see include/settlements.php. It used
-  // to walk to 30 over a table of ten.
-  $SET_MAX = mb_settlement_count($db);
+  // bounded by the round's range -- the table's, see include/settlements.php.
+  // It used to walk to 30 over a table of ten.
+  list($SET_INC, $SET_MAX) = mb_settlement_range($db, $round_id);
   while($SET_INC < $SET_MAX + 1)  {
     $SET_STRENGTH = mb_query($db, "SELECT sum(exp) FROM user WHERE setid = ?", array($SET_INC));
       $S_STRENGTH = mb_db_result($SET_STRENGTH, 0, 0);
@@ -556,13 +568,14 @@ This email is automated. Your reply will not be recieved.";
     $SET_INC = $SET_INC + 1;
   }
 
-  $MAX_GUILDID = mysqli_query($db, "SELECT max(gid) FROM guild");
-    $MAX_GID = mb_db_result($MAX_GUILDID, 0, 0);
+  $MAX_GUILDID = mysqli_fetch_row(mb_query($db, "SELECT min(gid), max(gid) FROM guild WHERE round_id=?", array($round_id)));
+    $GUILD_INC = (int) $MAX_GUILDID[0];
+    $MAX_GID = (int) $MAX_GUILDID[1];
 
   while($GUILD_INC < $MAX_GID + 1)  {
     $guild_name_query = mb_query($db, "SELECT gname FROM guild WHERE gid=?", array($GUILD_INC));
       $guild_name = mysqli_fetch_array($guild_name_query);
-    $guild_user_exp = mb_query($db, "SELECT sum(exp) FROM user WHERE guild=?", array($guild_name['gname']));
+    $guild_user_exp = mb_query($db, "SELECT sum(exp) FROM user WHERE round_id=? AND guild=?", array($round_id, $guild_name['gname']));
       $user_exp = mb_db_result($guild_user_exp, 0, 0);
     mb_query($db, "UPDATE guild SET strength=? WHERE gid=?", array($user_exp, $GUILD_INC));
 

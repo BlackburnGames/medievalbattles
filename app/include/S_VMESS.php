@@ -19,11 +19,11 @@ while ($row = mysqli_fetch_array($result_id))	{
 	$link = mb_h($origin);
 
 	// check to see if he/shes allready a GL
-	$sresult = mb_query($db, "SELECT setid FROM user WHERE ename=?", array($origin));
+	$sresult = mb_query($db, "SELECT setid FROM user WHERE round_id=? AND ename=?", array((int) $round_id, $origin));
 	$setcheck = mysqli_fetch_array($sresult);
 
 	if($setcheck[0] != "")	{
-		$their_set = mb_query($db, "SELECT setid FROM user WHERE ename=?", array($origin));
+		$their_set = mb_query($db, "SELECT setid FROM user WHERE round_id=? AND ename=?", array((int) $round_id, $origin));
 			$snum = mb_db_result($their_set,"snum");
 		$sender = urlencode($origin);
 		$link = "<a href=" . mb_attr("messaging.php?value=$sender&snum=$snum&setchg=1") . ">"

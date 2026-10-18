@@ -20,11 +20,11 @@ echo "
 		<td class='main2'><b class='reg' width='15%'>Land</b></td>
 		<td class='main2'><b class='reg' width='20%'>Experience</b></td>";
 
-	$result_id = mb_query($db, "SELECT ename, mts, land, exp, userid FROM user ORDER BY mts DESC LIMIT 0,40");
+	$result_id = mb_query($db, "SELECT ename, mts, land, exp, userid FROM user WHERE round_id=? ORDER BY mts DESC LIMIT 0,40", array((int) $round_id));
 	$placeno = 0;
 	while ($row = mysqli_fetch_row($result_id))	{
 
-		$SETID_SELECT = mb_query($db, "SELECT setid FROM user WHERE ename=?", array($row[0]));	
+		$SETID_SELECT = mb_query($db, "SELECT setid FROM user WHERE round_id=? AND ename=?", array((int) $round_id, $row[0]));	
 	   		$SID_S = mb_db_result($SETID_SELECT,"SID_S");
 		$EMPS_SET_GUILD = mb_query($db, "SELECT guild FROM user WHERE userid=?", array((int) $row[4]));	
 	   		$E_S_G = mb_db_result($EMPS_SET_GUILD,"E_S_G");
