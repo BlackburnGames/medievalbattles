@@ -172,6 +172,13 @@ if ($signup) {
       $maxciv = rand(250,350);
     }
 
+  // No archers and no Archery unless the race or the class grants them. The
+  // Ranger check used to reset Archery with an else, after the Night Elf had
+  // been granted it, so a Night Elf of any other class got archers it could
+  // not field.
+    $arch = 0;
+    $r13pts = 0;
+
   // race advantages and disadvantages
     if($race == 'Giant')   {  $wiz = 0; $pri = 0;  }
     if($race == 'Demon')   {  $pri = 0;  }
@@ -179,7 +186,6 @@ if ($signup) {
 
   // class advantages and disadvantages
     if($class == 'Ranger')  { $arch = rand(4, 10);  $r13pts = 125000; $wiz = 0; }
-      else  { $r13pts = 0;  }
     if($class == 'Warlock') { $r1pts = 50000; }
       else  { $r1pts = 0; }
     if($class == 'Insurrectionist') { $suicide = rand(10, 20);  $r14pts = 125000; $wiz = 0; }

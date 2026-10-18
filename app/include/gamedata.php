@@ -150,7 +150,7 @@ $GAMEDATA['races'] = array(
         'offdef_delta'  => -0.10,  // read by include/modifier.php
         'return_time_mult' => 0.75,   // attack/calculations.php:102-105
         'build_time_mult' => 2,    // buildings.php:87
-        'starts_with'   => array('4-10 Archers'),  // checksignup.php:130
+        'starts_with'   => array('Archery researched', '4-10 Archers'),  // checksignup.php:185
         'bans'     => array(),
     ),
 );
@@ -158,12 +158,12 @@ $GAMEDATA['races'] = array(
 /* ------------------------------------------------------------------ *
  * Classes. update.php:103-122 (economy), :243-245 (research speed),
  * offdef_mult read by include/modifier.php, functions.php:243-252 (unit costs),
- * checksignup.php:113-138 (signup bonuses).
+ * checksignup.php:149-191 (signup bonuses).
  * ------------------------------------------------------------------ */
 $GAMEDATA['classes'] = array(
     'Cleric' => array(
         'flavor'  => 'Great faith leads to a path of holiness.',
-        'perks'   => array('Noticeably better starting resources and troops at signup'),  // checksignup.php:113-125
+        'perks'   => array('Noticeably better starting resources and troops at signup'),  // checksignup.php:161-173
         'exclusive_gear' => array('Flail of Isidole', "Eldamar's Star", 'Blessed Armor'),
     ),
     'Fighter' => array(
@@ -177,7 +177,7 @@ $GAMEDATA['classes'] = array(
         'gpmod'        => 0.90,  // update.php:121
         'offdef_mult'  => 1.05,  // read by include/modifier.php
         'suicide_cost_mult' => 0.50,  // functions.php:252
-        'starts_with'  => array('Demolitions researched', '10-20 Suicide Civilians'),  // checksignup.php:137
+        'starts_with'  => array('Demolitions researched', '10-20 Suicide Civilians'),  // checksignup.php:191
         'bans'    => array('Wizards', 'Golems and Iron Golems'),  // military.php:91, animate.php:4
     ),
     'Mage' => array(
@@ -190,7 +190,7 @@ $GAMEDATA['classes'] = array(
     'Ranger' => array(
         'flavor'  => 'Wander the wilds and hunt your foes mercilessly.',
         'lumbmod_delta' => +0.10,  // update.php:113
-        'starts_with'  => array('Archery researched', '4-10 Archers'),  // checksignup.php:133
+        'starts_with'  => array('Archery researched', '4-10 Archers'),  // checksignup.php:188
         'bans'    => array('Wizards', 'Golems and Iron Golems'),  // military.php:86, animate.php:4
         'exclusive_gear' => array('HeartSong', "Shyrscream's Bow"),
     ),
@@ -205,7 +205,7 @@ $GAMEDATA['classes'] = array(
         'offdef_mult'   => 0.95,  // read by include/modifier.php
         'wizard_cost_mult' => 0.75,  // functions.php:250
         'research_mult' => 0.75,  // update.php:244 -- research points accrue 25% SLOWER
-        'starts_with'  => array('Fireball researched'),  // checksignup.php:135
+        'starts_with'  => array('Fireball researched'),  // checksignup.php:189
         'note' => 'A Demon Warlock pays 1.05x for warriors instead of the Demon 0.75x discount.',  // functions.php:251
     ),
 );
@@ -402,7 +402,7 @@ $GAMEDATA['intel'] = array(
 $GAMEDATA['timers'] = array(
     // Still transcribed: both are schema column defaults, and the tick only
     // counts them down -- there is no literal in the engine to invert.
-    'safemode_ticks'     => 48,   // checksignup.php:140-141
+    'safemode_ticks'     => 48,   // checksignup.php:194-195
     'activation_ticks'   => 48,   // db.sql emailvalidate.clock
     'inactivity_ticks'   => 336,  // db.sql user.countdown
     // Inverted.
@@ -452,6 +452,5 @@ $GAMEDATA['exp_values'] = array(
  * truth and so Phase 3 has a checklist.
  * ------------------------------------------------------------------ */
 $GAMEDATA['quirks'] = array(
-    'Night Elves are dealt 4-10 archers at signup, but the free Archery research is immediately overwritten unless they are also Rangers. (checksignup.php:130-134)',
     'Sage accounting disagrees with itself about how many research projects there are. Points accrue across all eighteen, the assigned-sage totals on the status and research screens count the first sixteen, and your score counts only the first fourteen -- so a sage on Animation or Advanced Animation is invisible to both totals, and one on Advanced Farming or Advanced Construction is invisible to your score. (update.php:247 vs functions.php:240 and cresearch.php:112 vs update.php:345)',
 );

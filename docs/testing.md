@@ -94,6 +94,16 @@ build anything without filling in all seven boxes. The crawl could not see it
 because it follows links and never fills a form in. `mb_count()` is the fix;
 see `app/include/request.php`.
 
+### `tests/signup.php`
+
+What a new empire starts with. The crawl cannot sign up — `checksignup.php`
+makes an empire out of `rand()`, so there is nothing to compare a golden
+against — and nothing else checked the race and class grants. This signs up
+one empire per combination that grants something and asserts each grant, as a
+range where signup rolls dice. It found the Night Elf's Archery being taken
+back by the Ranger check two lines below it. Reloads the schema before and
+after.
+
 ### `tests/smoke.php`
 
 Crawls every reachable page, failing on any PHP fatal, parse error or warning

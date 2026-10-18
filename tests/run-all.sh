@@ -58,6 +58,14 @@ if ! docker compose exec -T web php /repo/tests/empire-remove.php; then
   status=1
 fi
 
+# What a new empire starts with, by race and class. The crawl cannot sign up,
+# because signup rolls dice. Reloads the schema before and after.
+echo
+echo "=== signup grants ==="
+if ! docker compose exec -T web php /repo/tests/signup.php; then
+  status=1
+fi
+
 # Concurrent requests against one barter listing. Needs the fixture's listings,
 # which the crawl consumes, so it gets a fresh database of its own.
 echo
