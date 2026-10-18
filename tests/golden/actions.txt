@@ -158,6 +158,29 @@
     military [1] sages 8 -> 10
     research [1] r17 3 -> 1
 
+### quirk-guild-with-space-reads-thread
+# QUIRK: a member of a guild with a space in its name opens one of its threads. commong.php strips the spaces out of $empireguild, and the page then looks the thread up under a guild that does not exist.
+
+> topicg.php topicid=1
+  says: You cannot view forum posts in other guilds!
+  (no change)
+
+### quirk-guild-with-space-replies
+# QUIRK: and replies to it.
+
+> inputpostsg.php addreply=1 topicid=1 topic=Re message=Aye
+  says: <no game page: Warning:  Undefined variable $goldpro in /var/www/html/functions.php on line 405
+
+Deprecated:  number_format(): Passing>
+  (no change)
+
+### quirk-guild-leader-thread-view
+# QUIRK: the guild leader thread view, where deleting a post or replying on the leader board lands. It reads <guild>main<gid>, a per-guild table from an older schema that db.sql has never had.
+
+> gl-topic.php topicid=1
+  php:  Warning: mysqli_query(): (42S02/1146): Table 'mbv6.Testguildmain1' doesn't exist (gl-topic.php)
+  (no change)
+
 ### explore-human
 # An empire of race Human exploring, at its own rate -- the tick applied only the Human one, and gave the Angel, the Demon and the Giant 13 land. Mountains are priced on its 200 mountains; they were priced on its 1,000 land, and 100 explorers found 2.
 

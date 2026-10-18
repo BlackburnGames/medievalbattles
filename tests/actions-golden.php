@@ -190,6 +190,35 @@ $SCENARIOS[] = array(
 );
 
 /*
+ * A guild whose name has a space in it, which mb_valid_gname() allows. The
+ * fixture's is renamed everywhere it is stored; thread 1 is the guild's.
+ */
+$spacedGuild = array(
+    "UPDATE guild SET gname='Test guild' WHERE gid=1",
+    "UPDATE user SET guild='Test guild' WHERE guild='Testguild'",
+    "UPDATE guildthreads SET guildname='Test guild' WHERE guildname='Testguild'",
+);
+$SCENARIOS[] = array(
+    'name'  => 'quirk-guild-with-space-reads-thread',
+    'why'   => 'QUIRK: a member of a guild with a space in its name opens one of its threads. commong.php strips the spaces out of $empireguild, and the page then looks the thread up under a guild that does not exist.',
+    'setup' => $spacedGuild,
+    'requests' => array(array('topicg.php', array('topicid' => 1))),
+);
+$SCENARIOS[] = array(
+    'name'  => 'quirk-guild-with-space-replies',
+    'why'   => 'QUIRK: and replies to it.',
+    'setup' => $spacedGuild,
+    'requests' => array(array('inputpostsg.php', array('addreply' => 1, 'topicid' => 1, 'topic' => 'Re', 'message' => 'Aye'))),
+);
+
+$SCENARIOS[] = array(
+    'name'  => 'quirk-guild-leader-thread-view',
+    'why'   => 'QUIRK: the guild leader thread view, where deleting a post or replying on the leader board lands. It reads <guild>main<gid>, a per-guild table from an older schema that db.sql has never had.',
+    'setup' => array(),
+    'requests' => array(array('gl-topic.php', array('topicid' => 1))),
+);
+
+/*
  * Explorers in the field, and one tick. At 1,000 land every exploring rate
  * needs a different number of explorers per land -- 40 for a Human at 0.8, 42
  * at 0.85, 45 at the default 0.9, 47 at 0.95 -- so 600 out gains a different
