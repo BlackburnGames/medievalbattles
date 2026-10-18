@@ -501,9 +501,14 @@ attribute.
   to be three defects in one: the timer was divided by 0.5, every order
   reapplied both construction modifiers to every timer running, and the cap
   was tested after them. Each modifier now scales only what an order adds.
-- **Authorization.** **The forums are done — both the moderation pages and the
-  four post handlers. The rest is not.** Nothing outside the forums checks that
-  you own what you are acting on beyond the queries' own `WHERE` clauses.
+- ~~**Authorization.**~~ **Done, as far as a survey can say.** The forums went
+  first, both the moderation pages and the four post handlers; the rest of the
+  game was then surveyed from the other end. Every write whose `WHERE` is not
+  keyed on the caller, and every read of a thread or message by an id off the
+  request, was checked against what should be allowed. Most were scoped
+  already: attacks, spying and messages name another empire by design, voting
+  checks the target's settlement, guild kicks and accepts check the guild.
+  What the survey found is at the end of this item.
 
   `gl-delposts.php` and `sl-delposts.php` were the clearest cases and went
   first: neither checked that the caller led anything, and `gl-delposts.php`
@@ -700,6 +705,26 @@ attribute.
 
   This does not make the area safe to expose. What is behind the gate still
   interpolates, still echoes raw, and still deletes the world from one link.
+
+  **What the survey found.** One leak and two pages that could not work:
+
+  - **Guilds whose names differed only by a space shared one forum.**
+    `commong.php` stripped the spaces out of `$empireguild` before every guild
+    forum page looked threads up by it, a leftover from per-guild table names,
+    while `mb_valid_gname()` allows a space and `gc.php`'s uniqueness check
+    compares names as typed. So founding "Ale Axe" gave read and write access
+    to the private forum of "AleAxe". The stripping is gone, and the actions
+    golden drives the lookalike guild against the other's thread.
+  - **`gl-topic.php` read tables `db.sql` has never had**, so the page leaders
+    land on after deleting a post or replying showed only an error, and it
+    asked for membership rather than leadership. It is `sl-topic.php`'s guild
+    counterpart now, with the per-reply Delete links nothing had ever drawn.
+  - **`sl-topic.php` asked for membership too.** Nothing leaked — members read
+    the same thread on `topic.php` — but it is leader only now, as its forum
+    is.
+
+  The golden harness can log a scenario in as another fixture account for
+  this, so each refusal is driven from the empire it refuses.
 
 - ~~**Two blind spots in `register-globals-audit.php`,**~~ **both fixed.** Each
   hid a read the Phase 2 port then missed:
