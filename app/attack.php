@@ -109,7 +109,7 @@ else	{
 	$EMPs_guild_query = mysqli_query($db, "SELECT guild FROM user WHERE userid='$evu[userid]'");
 		$EMPs_guild = mb_db_result($EMPs_guild_query,"EMPs_guild");
 
-	if($uwarrior == "" AND $uwizard == "" AND $upriest == "" AND $uarcher == "" AND $ugolem == "" AND $uirongolem = "")	{
+	if($uwarrior == "" AND $uwizard == "" AND $upriest == "" AND $uarcher == "" AND $ugolem == "" AND $uirongolem == "")	{
 		echo"<div align=center><font class=yellow>You did not send anything into combat!</font></div><br><br>";
 		include("include/attack/ldrop.php");
 		include("include/attack/table.php");

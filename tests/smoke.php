@@ -398,6 +398,11 @@ foreach (array(
     forumRefuses($tester, $page, $fields, 'That empire does not exist',
         "app/$page: an empvalue that names no empire was fought as an empty row");
 }
+// "You sent nothing", which attack.php wrote as `$uirongolem = ""` -- an
+// assignment, so the check could never be true. On 8.3 an empty attack then
+// died dividing by zero in calculations.php; on 5.6 it spent a general.
+forumRefuses($tester, 'attack.php', array('attack' => 1, 'empvalue' => 3),
+    'did not send anything', 'app/attack.php: the empty-army check is not a comparison');
 
 foreach (array(
     // The land attack, won: three warriors at power 2 and three wizards at
