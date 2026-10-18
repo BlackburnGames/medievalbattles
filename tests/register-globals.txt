@@ -5,8 +5,6 @@ app/attack.php	ltally
 app/attackm.php	mgain
 app/attackm.php	mtally
 app/buildings.php	adv_const
-app/include/attack/calculations.php	evtally
-app/include/attack/calculations.php	u_tally
 app/include/connect.php	db
 app/index.php	data
 app/research.php	assages
