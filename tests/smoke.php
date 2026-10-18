@@ -253,11 +253,11 @@ foreach (array('gl-inputposts.php', 'sl-input.posts.php', 'input.posts.php') as 
  *
  * They destroy forum content, so $SKIP keeps the crawler from following a
  * Delete link mid-crawl -- but they have to be called BEFORE the crawl anyway,
- * because both now check that the caller leads the guild or the settlement and
- * the crawl takes that away. govt.php:20 clears sl for every member of the
- * settlement on each visit and then re-elects whoever holds the most votes;
- * the fixture has nobody voting for anybody, so simply opening the page in
- * passing deposes the tester and every later request is refused.
+ * because both delete what the crawl would otherwise render. (They also used
+ * to have to come first because govt.php re-ran the election on every view and
+ * deposed the tester, whom nobody votes for; it recounts only when a vote
+ * changes now, and accountDeletion() checks that the crawl left the tester
+ * leading.)
  *
  * Seeded ids rather than the ones posted above, so this does not depend on how
  * many threads the run happened to create.
@@ -784,6 +784,14 @@ function accountDeletion($base, $email, $pass, MbClient $observer)
 {
     global $failures;
 
+    // The crawl has opened govt.php by now, as the tester, and nobody has
+    // voted. That used to depose the tester; viewing the page changes nothing
+    // now, so they still lead.
+    if (!leadsSettlement($observer)) {
+        $failures['govt.php | viewing the page deposed the settlement leader'] =
+            'app/govt.php: the election still runs on view rather than on a vote';
+    }
+
     $client = login($base, $email, $pass);
     $body = postForm($client, 'govt.php', array('change' => '1', 'empvalue' => '1'));
     if (stripos($body, 'You have voted for TestLord') === false) {
@@ -813,6 +821,24 @@ function accountDeletion($base, $email, $pass, MbClient $observer)
         $failures['preferences.php | a deleted account\'s vote was not withdrawn'] =
             'app/preferences.php: the deletion does not decrement the vote of whoever the caller voted for';
     }
+    // That was the settlement's only vote, so the recount leaves nobody leading:
+    // a leader is someone a member chose. Last, because it costs the tester the
+    // settlement and only the admin phase follows.
+    if (leadsSettlement($observer)) {
+        $failures['preferences.php | the settlement was not recounted after the deletion'] =
+            'app/include/empire.php: mb_empire_remove() does not call mb_settlement_elect()';
+    }
+}
+
+/** Whether $client may open the settlement-leader page. */
+function leadsSettlement(MbClient $client)
+{
+    global $visited;
+
+    $body = $client->get('/sl.php');
+    $visited++;
+    inspect('sl.php', $body, $client->lastStatus);
+    return stripos($body, 'not Settlement Leader') === false;
 }
 
 /**

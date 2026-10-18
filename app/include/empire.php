@@ -69,6 +69,11 @@ if (!function_exists('mb_empire_remove')) {
 			mysqli_query($db, "DELETE FROM $table WHERE userid=$q_id");
 		}
 
+		// Its vote is gone and so are the votes cast for it, and it may have been
+		// the leader: the settlement's count has changed, so recount it.
+		require_once __DIR__ . '/election.php';
+		mb_settlement_elect($db, $row['setid']);
+
 		return true;
 	}
 }

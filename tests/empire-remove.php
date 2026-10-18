@@ -93,11 +93,14 @@ cleanup($db);
 
 // --- The world around it. ---
 foreach (array(
-    $GONE    => array('Gone Empire',   $GNAME,  'Votee Empire', 0),
-    $MEMBER  => array('Member Empire', $GNAME,  'None',         0),
-    $VOTEE   => array('Votee Empire',  'None',  'None',         1),
+    // Votes are honest: Gone holds 2 (Member, Voter) and leads on the tie with
+    // Votee, which holds 2 (Gone, Other). Once Gone is removed Votee has 1 and
+    // nobody else has any, so the recount must crown Votee.
+    $GONE    => array('Gone Empire',   $GNAME,  'Votee Empire', 2),
+    $MEMBER  => array('Member Empire', $GNAME,  'Gone Empire',  0),
+    $VOTEE   => array('Votee Empire',  'None',  'None',         2),
     $VOTER   => array('Voter Empire',  'None',  'Gone Empire',  0),
-    $OTHERGL => array('Other Leader',  "$GNAME-other", 'None',  0),
+    $OTHERGL => array('Other Leader',  "$GNAME-other", 'Votee Empire', 0),
 ) as $id => $r) {
     q($db, "INSERT INTO user (email, pw, ename, userid, setid, guild, votefor, vote)
             VALUES ('rm$id@example.com', 'x', '$r[0]', $id, $SETID, '$r[1]', '$r[2]', $r[3])");
@@ -109,6 +112,7 @@ q($db, "INSERT INTO emailvalidate (userid, code, `check`) VALUES ($GONE, 'x', '2
 q($db, "INSERT INTO guild (gname, owner, mem) VALUES ('$GNAME', '$GONE', 2), ('$GNAME-other', '$OTHERGL', 1)");
 q($db, "INSERT INTO guildrequests (applicant, gl_userid) VALUES ('$GONE', '$OTHERGL'), ('$MEMBER', '$GONE')");
 q($db, "INSERT INTO settlement (setid, setname, members) VALUES ($SETID, 'Removal Test', 5)");
+q($db, "UPDATE user SET sl = IF(userid=$GONE, 'yes', 'no') WHERE setid=$SETID");
 
 // --- Removing nobody first: it must touch nothing. ---
 check('a userid that names nobody is reported as such', mb_empire_remove($db, 999299) === false);
@@ -120,7 +124,7 @@ check('the empire is removed', mb_empire_remove($db, $GONE) === true);
 foreach ($TABLES as $t) {
     check("its $t row is gone", (int) one($db, "SELECT count(*) FROM $t WHERE userid=$GONE") === 0);
 }
-check('the vote it cast is withdrawn', (int) one($db, "SELECT vote FROM user WHERE userid=$VOTEE") === 0);
+check('the vote it cast is withdrawn', (int) one($db, "SELECT vote FROM user WHERE userid=$VOTEE") === 1);
 check('a vote cast for it is reset', one($db, "SELECT votefor FROM user WHERE userid=$VOTER") === 'None');
 check('the guild it led is gone', (int) one($db, "SELECT count(*) FROM guild WHERE gname='$GNAME'") === 0);
 check('that guild\'s member is guildless', one($db, "SELECT guild FROM user WHERE userid=$MEMBER") === 'None');
@@ -128,6 +132,9 @@ check('requests to its guild are gone', (int) one($db, "SELECT count(*) FROM gui
 check('its own request elsewhere is gone', (int) one($db, "SELECT count(*) FROM guildrequests WHERE applicant='$GONE'") === 0);
 check('another guild is untouched', (int) one($db, "SELECT count(*) FROM guild WHERE gname='$GNAME-other'") === 1);
 check('its settlement has one member fewer', (int) one($db, "SELECT members FROM settlement WHERE setid=$SETID") === 4);
+check('the settlement is recounted and the top vote-holder leads',
+    one($db, "SELECT sl FROM user WHERE userid=$VOTEE") === 'yes'
+    && (int) one($db, "SELECT count(*) FROM user WHERE setid=$SETID AND sl='yes'") === 1);
 
 cleanup($db);
 

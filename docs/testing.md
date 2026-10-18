@@ -361,12 +361,15 @@ hand into the fixture proves nothing about the code that was supposed to write
 it — the first run of this found a double-executed query, a `VALUES` clause
 missing a quote since 2003, and a debug `echo` of raw SQL.
 
-**Destructive requests run before the crawl, not after.** `govt.php:20` clears
-`sl` for every member of a settlement on each visit and then re-elects whoever
-holds the most votes; nobody in the fixture votes, so the crawler merely
-opening that page deposes the tester. Anything afterwards that needs settlement
-leadership is refused, silently, because a refusal renders a message rather
-than a warning.
+**Destructive requests run before the crawl, not after.** This was learned on
+`govt.php`, which used to re-run the settlement election on every view and so
+deposed the tester — whom nobody in the fixture votes for — the moment the
+crawler passed through; anything afterwards that needed settlement leadership
+was refused, silently, because a refusal renders a message rather than a
+warning. The election only runs when a vote changes now (see
+`app/include/election.php`), and `accountDeletion()` asserts the tester still
+leads after the crawl, but the rule stands for every request that consumes
+fixture state.
 
 The same reasoning covers the barter boards. Listing is a form, and buying and
 cancelling are GET links that consume the row they point at, so `$SKIP` keeps

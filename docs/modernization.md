@@ -537,6 +537,21 @@ attribute.
   the attack branch was also driven by hand, and on the old code it left the
   military row and the vote behind.
 
+  **Looking at the government page could depose the settlement leader.**
+  `govt.php` ran the election at the top of the page, on every view: it
+  cleared every member's `sl`, then crowned the top vote-holder only if
+  someone had a vote. In a settlement where nobody had voted — which is most
+  of them, and the fixture — the first member to open the page deposed the
+  leader, and a tie went to whichever row MySQL returned first. The vote
+  counts themselves were read, adjusted and written back. The election is
+  `mb_settlement_elect()` in `app/include/election.php` now and runs only when
+  a count changes: in `govt.php`'s vote branches and in `mb_empire_remove()`.
+  A tie keeps the sitting leader, and no votes at all means no leader. The
+  counts move relative to what is stored. `accountDeletion()` asserts the
+  tester still leads after the crawl has been through `govt.php`, which failed
+  on the old code, and `tests/empire-remove.php` asserts the recount after a
+  removal.
+
   **And a raid could field golems it did not own.** The form in
   `include/attack/table.php` offers both golem fields on all three attack
   pages, but only `attack.php` read and checked them. That alone would have

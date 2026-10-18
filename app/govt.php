@@ -5,23 +5,16 @@ include("include/request.php");
 $empvalue = mb_input('empvalue');
 
 include("include/igtop.php");
+require_once __DIR__ . '/include/election.php';
 
 $change = $_POST['change'];
 
 echo "<br><br><br><br>";
 
-//  select max amount of votes in your settlement
-$_themaxvote = mysqli_query($db, "SELECT max(vote) FROM user WHERE setid='$setid'");
-  $_maxvoteno = mb_db_result($_themaxvote, "_maxvoteno", 0);
-//  select empire wtih most votes
-$MV_empire = mysqli_query($db, "SELECT ename FROM user WHERE setid='$setid' AND vote='$_maxvoteno'");
-  $MV_emp = mb_db_result($MV_empire, "MV_emp", 0);
-
-mysqli_query($db, "UPDATE user SET sl='no' WHERE setid='$setid'");
-if($_maxvoteno != 0)  {
-  mysqli_query($db, "UPDATE user SET sl='no' WHERE setid='$setid'");
-  mysqli_query($db, "UPDATE user SET sl='yes' WHERE ename='$MV_emp' AND setid='$setid'");
-}
+// The election used to run here, on every view of the page: it cleared every
+// member's sl flag and then crowned the top vote-holder only if somebody had a
+// vote -- so in a settlement where nobody had voted, looking at this page
+// deposed the leader. It runs when a vote changes now; see include/election.php.
 
 echo "
 <table border=1 bordercolor=#000000 align=center width=80%>
@@ -54,10 +47,11 @@ if (!IsSet($change)) {
 
   include("include/connect.php");
 
-  //  select max amount of votes in your settlement
-  $themaxvote = mysqli_query($db, "SELECT max(vote) FROM user WHERE setid='$setid'");
-    $maxvoteno = mb_db_result($themaxvote, "maxvoteno", 0);
+  $q_cred = "email=" . mb_sql_str($db, $email) . " AND pw=" . mb_sql_str($db, $pw);
 
+  // The counts move relative to what is stored -- vote = vote - 1 -- where they
+  // used to be read, adjusted and written back, which loses a vote whenever two
+  // members change theirs at once.
   if($empvalue == 'ns') {
     echo"<div align=center><font class=yellow>You did not specify anyone to vote for.</font></div><br>";
     include("include/S_GOVT.php");
@@ -71,129 +65,44 @@ if (!IsSet($change)) {
       die();
     } else {
 
-      //  select votes from old empire
-      $theoldempv = mysqli_query($db, "SELECT vote FROM user WHERE ename='$votefor'");
-        $oldempv = mb_db_result($theoldempv, "oldempv");
+      //  take the vote back from the old empire and set votefor to none
+      mysqli_query($db, "UPDATE user SET vote = vote - 1 WHERE ename=" . mb_sql_str($db, $votefor) . " AND vote > 0");
+      mysqli_query($db, "UPDATE user SET votefor='None' WHERE $q_cred");
 
-      //  subtract a vote form old empire and set votefor to none
-      $oldempirevotes = $oldempv - 1;
-      mysqli_query($db, "UPDATE user SET vote='$oldempirevotes' WHERE ename='$votefor'");
-      mysqli_query($db, "UPDATE user SET votefor='None' WHERE ename='$ename'");
-
-      //  select max amount of votes in your set
-      $_themaxvote = mysqli_query($db, "SELECT max(vote) FROM user WHERE setid='$setid'");
-        $_maxvoteno = mb_db_result($_themaxvote, "_maxvoteno");
-
-      //  select empire with most votes
-      $MV_empire = mysqli_query($db, "SELECT ename FROM user WHERE setid='$setid' AND vote='_$maxvoteno'");
-          $MV_emp = mb_db_result($MV_empire, "MV_emp");
-
-      mysqli_query($db, "UPDATE user SET sl='no' WHERE setid='$setid'");
-      if($_maxvoteno != 0)  {
-        mysqli_query($db, "UPDATE user SET sl='no' WHERE setid='$setid'");
-        mysqli_query($db, "UPDATE user SET sl='yes' WHERE ename='$MV_emp' AND setid='$setid'");
-      }
+      mb_settlement_elect($db, $setid);
 
       echo"<div align=center><font class=yellow>You are now voting for no one.</font></div><br>";
       include ("include/S_GOVT.php");
       die();
     }
   }
-  elseif($votefor == 'None')  {
+  else {
 
-    //  ename just voted for
-    $selename = mysqli_query($db, "SELECT ename FROM user WHERE userid=" . mb_sql_int($empvalue));
-      $fename = mb_db_result($selename, "fename", 0);
+    //  the empire voted for, which has to be in your settlement
+    $selected = mysqli_query($db, "SELECT ename, setid FROM user WHERE userid=" . mb_sql_int($empvalue));
+      $target = $selected ? mysqli_fetch_array($selected) : null;
 
-    //  select setid
-    $SELECT_SETID = mysqli_query($db, "SELECT setid FROM user WHERE userid=" . mb_sql_int($empvalue));
-      $SEL_SID = mb_db_result($SELECT_SETID, "SEL_SID", 0);
-
-    if($SEL_SID != $setid)  {
-      echo"<div align=center><font class=yellow>This empire is not in your settlement.</font></div>";
-      include("include/S_GOVT.php");
-      die();
-    }
-
-    //  set your votefor to empire voted for
-    mysqli_query($db, "UPDATE user SET votefor='$fename' WHERE email='$email' AND pw='$pw'");
-
-    //  select vote count for empire you voted for
-    $selectedempvotes = mysqli_query($db, "SELECT vote FROM user WHERE userid=" . mb_sql_int($empvalue));
-      $selempvotes = mb_db_result($selectedempvotes, "selempvotes");
-
-    //  new vote count for empire voted for
-    $newvotecount = $selempvotes + 1;
-
-    //  set  number of votes for empire you voted for
-    mysqli_query($db, "UPDATE user SET vote='$newvotecount' WHERE userid=" . mb_sql_int($empvalue));
-
-    //  select max amount of votes in your settlement
-    $themaxvote = mysqli_query($db, "SELECT max(vote) FROM user WHERE setid='$setid'");
-      $maxvoteno = mb_db_result($themaxvote, "maxvoteno");
-
-    //  select empire with most votes
-    $MV_empire = mysqli_query($db, "SELECT ename FROM user WHERE setid='$setid' AND vote='$maxvoteno'");
-      $MV_emp = mb_db_result($MV_empire, "MV_emp");
-
-    if($maxvoteno != 0) {
-      mysqli_query($db, "UPDATE user SET sl='no' WHERE setid='$setid'");
-      mysqli_query($db, "UPDATE user SET sl='yes' WHERE ename = '$MV_emp' AND setid='$setid'");
-    }
-
-    echo"<div align=center><font class=yellow>You have voted for " . mb_h($fename) . ".</font></div><br>";
-    include ("include/S_GOVT.php");
-    die();
-  }
-  else  {
-
-    //  ename voted for
-    $selename = mysqli_query($db, "SELECT ename FROM user WHERE userid=" . mb_sql_int($empvalue));
-      $fename = mb_db_result($selename, "fename", 0);
-
-    //  select setid
-    $SELECT_SETID = mysqli_query($db, "SELECT setid FROM user WHERE userid=" . mb_sql_int($empvalue));
-      $SEL_SID = mb_db_result($SELECT_SETID, "SEL_SID", 0);
-
-    if($SEL_SID != $setid)  {
+    if(!$target OR $target['setid'] != $setid)  {
       echo"<div align=center><font class=yellow>This empire is not in your settlement.</font></div><br>";
       include("include/S_GOVT.php");
       die();
     }
+    $fename = $target['ename'];
 
-    //  subtract old votes from old empire
-    $theoldempv = mysqli_query($db, "SELECT vote FROM user WHERE ename='$votefor'");
-      $oldempv = mb_db_result($theoldempv, "oldempv");
-
-    //  add to new empires votes
-    $oldempirevotes = $oldempv - 1;
-    mysqli_query($db, "UPDATE user SET vote='$oldempirevotes' WHERE ename='$votefor'");
-
-    //  set votefor
-    mysqli_query($db, "UPDATE user SET votefor='$fename' WHERE email='$email' AND pw='$pw'");
-
-    //  select vote where empire selected
-    $selectedempvotes = mysqli_query($db, "SELECT vote FROM user WHERE ename='$fename'");
-      $selempvotes = mb_db_result($selectedempvotes,"selempvotes");
-
-    //  set vote+1 where empire selected
-    $newvotecount = $selempvotes + 1;
-    mysqli_query($db, "UPDATE user SET vote='$newvotecount' WHERE ename='$fename'");
-
-    //  select max amount of votes in your set
-    $themaxvote = mysqli_query($db, "SELECT max(vote) FROM user WHERE setid='$setid'");
-      $maxvoteno = mb_db_result($themaxvote, "maxvoteno");
-
-    //  select empire with most votes
-    $MV_empire = mysqli_query($db, "SELECT ename FROM user WHERE setid='$setid' AND vote='$maxvoteno'");
-      $MV_emp = mb_db_result($MV_empire, "MV_emp");
-
-    if($maxvoteno != 0) {
-      mysqli_query($db, "UPDATE user SET sl='no' WHERE setid='$setid'");
-      mysqli_query($db, "UPDATE user SET sl='yes' WHERE ename='$MV_emp' AND setid='$setid'");
+    //  move the vote: off the old empire, if there was one, and onto this one
+    if($votefor != 'None')  {
+      mysqli_query($db, "UPDATE user SET vote = vote - 1 WHERE ename=" . mb_sql_str($db, $votefor) . " AND vote > 0");
     }
+    mysqli_query($db, "UPDATE user SET votefor=" . mb_sql_str($db, $fename) . " WHERE $q_cred");
+    mysqli_query($db, "UPDATE user SET vote = vote + 1 WHERE userid=" . mb_sql_int($empvalue));
+
+    mb_settlement_elect($db, $setid);
 
     echo"<div align=center><font class=yellow>You have voted for " . mb_h($fename) . ".</font></div><br>";
+    if($votefor == 'None')  {
+      include ("include/S_GOVT.php");
+      die();
+    }
   }
 }
 
