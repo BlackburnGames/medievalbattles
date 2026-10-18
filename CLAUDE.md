@@ -40,8 +40,12 @@ bash tests/run-all.sh            # full suite (tick golden master + smoke crawl 
 bash tests/reset-db.sh           # restore the fixture world
 ```
 
-To rebuild on the 5.6 reference image — worth doing when a change might have
-altered behaviour, since both versions share one golden master:
+PHP 5.6 is **no longer a per-change gate**. It was the Phase 2 port's proof
+that behaviour did not move, and the shared golden master now does that on
+8.3 alone. The image stays buildable for one question — was this bug there in
+2003, or did the port introduce it? — and is to be frozen at a tagged commit
+the first time Phase 3 needs syntax 5.6 cannot parse. Until then new code need
+not avoid it, but say so in the commit when it does:
 
 ```bash
 docker compose build --build-arg PHP_VERSION=5.6-apache web && docker compose up -d web

@@ -78,7 +78,10 @@ after that the prepend is nothing but the `display_errors` switch, which stays.
 ## Environment and language
 
 - The image defaults to PHP 8.3 and takes a `PHP_VERSION` build arg so 5.6 stays
-  buildable as the behavioural reference. The 5.6 images are archived and their
+  buildable as the behavioural reference. It is an on-demand tool now, not a
+  gate: build it to ask whether a bug predates the port, and freeze it at a
+  tagged commit the first time Phase 3 code needs newer syntax — at which
+  point the build arg and this paragraph can go. The 5.6 images are archived and their
   Debian jessie apt repos are dead, so the Dockerfile installs nothing via apt —
   **do not add an `apt-get` line**, it breaks that build only.
 - **`connect.php` reports query errors as warnings, not exceptions, and the

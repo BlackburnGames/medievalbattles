@@ -78,7 +78,9 @@ The revival is staged:
 - **Phase 3 — in progress.** Structural and security rewrite; see
   [docs/modernization.md](docs/modernization.md).
 
-The 5.6 image is kept buildable as the behavioural reference:
+The 5.6 image is kept buildable as a behavioural reference for bisecting a
+suspected porting regression. It is not run on every change, and will be
+frozen at a tagged commit once Phase 3 needs newer syntax:
 
 ```bash
 docker compose build --build-arg PHP_VERSION=5.6-apache web
