@@ -407,6 +407,12 @@ It refuses a wrong current password, changes the password, and then logs in on
 a **new client** — nothing but the database decides that one — checks a page
 that reads past `user`, and confirms the old password has stopped working.
 
+`accountDeletion()` then spends `idle2@` for good: it votes for TestLord through
+`govt.php`, deletes the account through `preferences.php`, and reads TestLord's
+vote count back off `govt.php` as the tester. It is the last step before the
+admin phase because the account does not exist afterwards — nothing after it
+may log in as `idle@` or `idle2@`.
+
 The email change in `preferences.php` is driven on the *member*, not the
 primary tester: it rewrites six tables and the session, and every fixture the
 primary pass depends on is keyed on that address. Both arms are asserted — an

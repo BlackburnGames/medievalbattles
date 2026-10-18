@@ -481,6 +481,23 @@ attribute.
   news page while no request exists, then a request filed through `gc.php` is
   genuinely rejected and its news line asserted.
 
+  **Deleting an account left its vote behind.** `preferences.php` carried a
+  copy of `attack.php`'s destroyed-empire cleanup, where `$empvalue` and
+  `$empireattacked` name the empire being destroyed. Here the empire being
+  destroyed is the caller, so neither name meant anything: the `votefor` was
+  read off whatever userid the request supplied, and the `UPDATE` filtered on
+  an `$empireattacked` nothing assigns, so it matched `ename=''`. The form sends
+  no `empvalue`, so in practice the branch never ran, and whoever the deleted
+  account voted for kept the vote — and possibly the settlement leadership —
+  forever. The suite did not see it because nothing drove the deletion: it
+  destroys the account. It decrements the caller's own `$votefor` now and reads
+  nothing from the request, and the crawl spends `idle2@` on it as its last
+  player step, after a vote cast through `govt.php`, with a hostile `empvalue`
+  on the request. The same branch redirected with `header()` after `igtop.php`
+  had rendered the page, which on a page with no output buffer could only warn
+  and then fall through into the forms of an account that no longer exists; it
+  stops with a link instead.
+
   **Every guard is driven from the arm it refuses.** That is what this needed
   and what the suite could not do before: the primary tester leads Testguild and
   settlement 1, so every request they make is allowed, and a gate that answers

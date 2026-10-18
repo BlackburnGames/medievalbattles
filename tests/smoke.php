@@ -639,6 +639,24 @@ prefsEmailChange($member);
  */
 passwordChange($BASE, 'idle2@example.com', $MEMBER_PASS, 'newpass4');
 
+/*
+ * Deleting an account, and the vote it was casting.
+ *
+ * preferences.php's deletion read votefor off a request-supplied userid and
+ * then wrote "WHERE ename='$empireattacked'" -- a name nothing in the file
+ * assigns, from a copy of attack.php's destroyed-empire cleanup -- so the
+ * empire the deleted account had voted for kept the vote, and with it possibly
+ * the settlement leadership, forever. The form sends no empvalue at all; one is
+ * sent here, naming TestLord, because the request must not steer whose vote is
+ * read.
+ *
+ * On idle2@, the account the two steps above have already moved and re-keyed,
+ * and after every other use of it -- it does not exist afterwards. Before the
+ * admin phase, which spends the fixture. The vote count is read off
+ * govt.php's table as TestLord sees it.
+ */
+accountDeletion($BASE, 'idle2@example.com', 'newpass4', $tester);
+
 /**
  * Change a password through preferences.php, then log in with it.
  *
@@ -703,6 +721,64 @@ function passwordChange($base, $email, $oldPass, $newPass)
         $failures['checklogin.php | the old password still authenticates'] =
             'the change did not replace the stored hash';
     }
+}
+
+/**
+ * Vote for TestLord as $email, delete the account, and check the vote went with it.
+ */
+function accountDeletion($base, $email, $pass, MbClient $observer)
+{
+    global $failures;
+
+    $client = login($base, $email, $pass);
+    $body = postForm($client, 'govt.php', array('change' => '1', 'empvalue' => '1'));
+    if (stripos($body, 'You have voted for TestLord') === false) {
+        $failures['govt.php | the vote before the deletion was not cast'] = 'app/govt.php: the votefor == None branch';
+        return;
+    }
+    if (govtVotes($observer, 'TestLord') !== '1') {
+        $failures['govt.php | TestLord does not show the vote just cast'] = 'app/include/S_GOVT.php';
+        return;
+    }
+
+    $body = postForm($client, 'preferences.php', array(
+        'delete'   => '2',
+        'dpw'      => $pass,
+        'empvalue' => '1',
+    ));
+
+    $after = new MbClient($base);
+    $after->get('/index.php');
+    $after->post('/checklogin.php', array('email' => $email, 'pw' => $pass, 'login' => 'Login'));
+    if ($after->lastStatus === 302) {
+        $failures['preferences.php | the account deletion did not delete the account'] = 'app/preferences.php';
+        return;
+    }
+
+    if (govtVotes($observer, 'TestLord') !== '0') {
+        $failures['preferences.php | a deleted account\'s vote was not withdrawn'] =
+            'app/preferences.php: the deletion does not decrement the vote of whoever the caller voted for';
+    }
+}
+
+/**
+ * The "Votes Received" cell of one empire's row on govt.php, or null.
+ */
+function govtVotes(MbClient $client, $ename)
+{
+    global $scriptsHit, $visited;
+
+    $body = $client->get('/govt.php');
+    $visited++;
+    $scriptsHit['govt.php'] = true;
+    inspect('govt.php', $body, $client->lastStatus);
+
+    // Name, AIM, MSN, last login, then the votes.
+    $cell = '\s*<td[^>]*>(.*?)<\/td>';
+    if (!preg_match('/<td[^>]*>' . preg_quote($ename, '/') . '<\/td>' . str_repeat($cell, 4) . '/s', $body, $m)) {
+        return null;
+    }
+    return trim($m[4]);
 }
 
 /**

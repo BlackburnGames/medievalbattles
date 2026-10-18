@@ -8,7 +8,6 @@ $currentpw = mb_input('currentpw');
 $delete    = mb_input('delete');
 $dpw       = mb_input('dpw');
 $empnews   = mb_input('empnews');
-$empvalue  = mb_input('empvalue');
 $newaim    = mb_input('newaim');
 $newemail  = mb_input('newemail');
 $newmsn    = mb_input('newmsn');
@@ -201,17 +200,17 @@ else	{
 		
 		mb_news_set($db, "$clock", 'red', "$ename has deleted their account", $setid, 0);
 	  
-		// check who they are voting for
-		$V_result = mysqli_query($db, "SELECT votefor FROM user WHERE userid=" . mb_sql_int($empvalue));
-		$V_check = mysqli_fetch_array($V_result);
-		
-		if($V_check[0] != 'None' AND $V_check[0] != $empireattacked)	 {
-			$Votedfor_emp = mysqli_query($db, "SELECT vote FROM user WHERE ename='$VF_emp'");
-			$VF_emp = mb_db_result($Votedfor_emp,"VF_emp");
-				
-			$newvote = $VF_emp - 1;
-			mysqli_query($db, "UPDATE user SET vote='$newvote' WHERE ename='$empireattacked'");
-			}
+		// Withdraw the vote this account was casting. Copied from attack.php's
+		// destroyed-empire cleanup, where $empvalue and $empireattacked name the
+		// empire being destroyed; here the empire being destroyed is the caller,
+		// so neither name meant anything -- $empvalue was whatever the request
+		// said, and the UPDATE filtered on an $empireattacked nothing assigns,
+		// so it matched ename='' and the vote stayed where it was. $votefor is
+		// the caller's own, from functions.php. A vote for yourself goes with
+		// the row.
+		if($votefor != 'None' AND $votefor != $ename)	 {
+			mysqli_query($db, "UPDATE user SET vote=vote-1 WHERE ename=" . mb_sql_str($db, $votefor));
+		}
 
 	  	echo "<div align=center><font class=yellow>Your account has been deleted.</font></div>";
 
@@ -258,8 +257,14 @@ else	{
 		unset($_SESSION['login'], $_SESSION['email'], $_SESSION['pw']);
 		$login = $email = $pw = '';
 
-		header("Location: index.php");
-	}	 
+		// Not a redirect. This page has no output buffer and igtop.php has
+		// rendered the whole frame by now, so header("Location: index.php")
+		// could only ever warn -- and then fall through into the preference
+		// forms of an account that no longer exists. Stop here instead, with
+		// the way out the redirect was meant to be.
+		echo "<div align=center><a href=index.php>Return to the front page</a></div>";
+		die();
+	}
 }
 include("include/chngpw_table.php");
 include("include/S_PREF.php");

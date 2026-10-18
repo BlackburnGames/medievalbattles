@@ -151,8 +151,6 @@ app/input.posts.php	replies
 app/intel.php	empireattacked
 app/preferences.php	GIDD
 app/preferences.php	GN
-app/preferences.php	VF_emp
-app/preferences.php	empireattacked
 app/research.php	assages
 app/setstrength.php	placeno
 app/sforum.php	offset
