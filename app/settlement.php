@@ -8,8 +8,7 @@
 <form method="post" action="settlement.php">
 <center>
 <?php
-$maxset0 = mysqli_query($db, "SELECT max(setid) AS maxset FROM settlement");
-$maxset = mb_db_result($maxset0, "maxset", 0);
+$maxset = mb_settlement_count($db);
 
 if($snum != "")	 {	$csnum = $snum - 1;	}
 

@@ -408,13 +408,8 @@ $GAMEDATA['guilds'] = array(
     'max_name_length'  => 15,   // gc.php:133
 );
 
-$GAMEDATA['settlements'] = array(
-    // Read by update.php's strength loop and by the three settlement range
-    // checks that carried the literal: include/S_INTEL.php, include/S_MESS.php
-    // and include/attack/scattack.php. See the quirk below -- the number and
-    // the schema do not agree, and this file records what the code does.
-    'count' => 30,
-);
+// The settlement count lived here as 'count' => 30, disagreeing with the ten
+// rows db.sql ships. It is the schema's now: see include/settlements.php.
 
 /* ------------------------------------------------------------------ *
  * Experience values -- your score is recomputed from scratch every tick
@@ -460,6 +455,5 @@ $GAMEDATA['quirks'] = array(
     'An attacking golem\'s hit points are computed from your wizards\' defence, and the golem survivor formula multiplies by the archer\'s hit points rather than the golem\'s -- so how many golems come home depends on two unrelated units. (attack/calculations.php:22-23, attack/calculations.php:71)',
     'Surviving iron golems are booked into the archer return slot, not the iron golem one, so they come home as archers, replacing the archers that survived. Without archers in the same attack the slot name is never set, the statement is a syntax error, and the iron golems are lost. (attack/calculations.php:84)',
     'A defender\'s wizard losses are never floored at zero: the clamp after the wizard calculation tests the warrior loss instead. (attack/calculations.php:141)',
-    'The game does not agree with itself about how many settlements there are. db.sql ships ten, and settlement.php and the three attack drop-downs ask the schema -- max(setid) -- so they offer ten. The intel, messaging and settlement-attack range checks carried a hardcoded 30 instead, and the tick recalculates strength for ids 0 to 30, so twenty of those passes match no row. Settlements 11-30 are therefore selectable on three screens and empty on all of them. ($GAMEDATA[settlements][count] vs db.sql:672)',
     'Sage accounting disagrees with itself about how many research projects there are. Points accrue across all eighteen, the assigned-sage totals on the status and research screens count the first sixteen, and your score counts only the first fourteen -- so a sage on Animation or Advanced Animation is invisible to both totals, and one on Advanced Farming or Advanced Construction is invisible to your score. (update.php:203 vs functions.php:244 and cresearch.php:112 vs update.php:292)',
 );

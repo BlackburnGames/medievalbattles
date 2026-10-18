@@ -11,7 +11,9 @@
  * include igtop.php or touch the session.
  */
 
-include 'include/gamedata.php';
+// connect.php rather than gamedata.php alone: it brings gamedata with it, and
+// the settlement count is the one figure here that lives in the schema.
+include 'include/connect.php';
 
 /** Number with thousands separators, or an em dash for nothing. */
 function mb_man_num($n)
@@ -549,7 +551,7 @@ and their total defense.</p>
 
 <h3>Settlements</h3>
 
-<p>The world is divided into <b><?php echo $GAMEDATA['settlements']['count']; ?> settlements</b>,
+<p>The world is divided into <b><?php echo mb_settlement_count($db); ?> settlements</b>,
 and you are placed in one at signup permanently. The Settlement Browser lets you look
 through every settlement in the game; your own is where you find most of your targets
 and neighbours. Each settlement elects a <b>Settlement Leader</b> &mdash; one vote per

@@ -47,6 +47,12 @@ require_once __DIR__ . '/news.php';
 require_once __DIR__ . '/password.php';
 
 /**
+ * And the settlement count, which nine readers across the tick, the range
+ * checks, the drop-downs, signup and the manual used to answer two ways.
+ */
+require_once __DIR__ . '/settlements.php';
+
+/**
  * And gamedata.php, now that the engine reads it rather than being transcribed
  * into it.
  *

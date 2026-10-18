@@ -567,9 +567,10 @@ This email is automated. Your reply will not be recieved.";
   mysqli_query($db, "UPDATE game_info SET tick = 'no'");
 
   // The strength recalculation walks settlement ids rather than rows, so it is
-  // bounded by the count rather than by the table. See the quirk in
-  // gamedata.php: this number and the schema disagree.
-  while($SET_INC < $GAMEDATA['settlements']['count'] + 1)  {
+  // bounded by the count -- the table's, see include/settlements.php. It used
+  // to walk to 30 over a table of ten.
+  $SET_MAX = mb_settlement_count($db);
+  while($SET_INC < $SET_MAX + 1)  {
     $SET_STRENGTH = mysqli_query($db, "SELECT sum(exp) FROM user WHERE setid = '$SET_INC'");
       $S_STRENGTH = mb_db_result($SET_STRENGTH, 0, 0);
     mysqli_query($db, "UPDATE settlement SET setstrength = '$S_STRENGTH' WHERE setid='$SET_INC'");

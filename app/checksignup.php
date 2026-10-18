@@ -92,8 +92,7 @@ if ($signup) {
     $Sett_least = $db->query("SELECT min(members) FROM settlement");
     $least_set = mb_db_result($Sett_least,"least_set");
   //  select a random settlement
-    $maxset0 = $db->query("SELECT max(setid) AS maxset FROM settlement");
-    $maxset = mb_db_result($maxset0,"maxset");
+    $maxset = mb_settlement_count($db);
     $sel_mem = rand(1,$maxset);
   //  extract members from settlement
     $Random_mem = $db->query("SELECT members FROM settlement WHERE setid='$sel_mem'");

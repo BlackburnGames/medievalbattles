@@ -278,11 +278,14 @@ foreach (array(
  * The settlement range check, on the three screens that carry it.
  *
  * Driven by hand because the crawler follows links and these are forms. That
- * matters more than it looks: the bound is $GAMEDATA['settlements']['count']
- * now, and all three files read it out of a global their includer supplies. If
- * it ever fails to arrive the comparison becomes "$snum > null", which refuses
- * every settlement in the game -- and the crawl would not notice, because the
- * pages still render.
+ * matters more than it looks: the bound is mb_settlement_count(), the schema's
+ * max(setid), and if it ever came back empty the comparison would refuse every
+ * settlement in the game -- and the crawl would not notice, because the pages
+ * still render.
+ *
+ * snum=11 for the refusal: the first id past the ten settlements db.sql ships.
+ * These three screens used to be bounded by a hardcoded 30, so 11 to 30 were
+ * accepted and showed an empty settlement; 31 was refused either way.
  *
  * snum=1 rather than the tester's neighbour: the accepted arm writes csnum, and
  * 1 is what it already holds, so which settlement the crawl below sees does not
@@ -294,15 +297,15 @@ foreach (array('intel.php', 'messaging.php', 'scattack.php') as $page) {
     inspect($page . '?snum=1', $body, $tester->lastStatus);
     if (stripos($body, 'does not exist') !== false) {
         $failures[$page . ' | refused a settlement that exists'] =
-            'the range check bound is missing or zero -- is $GAMEDATA in scope?';
+            'the range check bound is missing or zero -- see include/settlements.php';
     }
 
-    $body = $tester->get('/' . $page . '?setchg=1&snum=31');
+    $body = $tester->get('/' . $page . '?setchg=1&snum=11');
     $visited++;
-    inspect($page . '?snum=31', $body, $tester->lastStatus);
+    inspect($page . '?snum=11', $body, $tester->lastStatus);
     if (stripos($body, 'does not exist') === false) {
         $failures[$page . ' | accepted a settlement past the end'] =
-            'the range check is not bounded by $GAMEDATA[settlements][count]';
+            'the range check is not bounded by the schema\'s settlement count';
     }
 }
 

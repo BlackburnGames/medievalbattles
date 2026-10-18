@@ -701,11 +701,19 @@ attribute.
   on all of them. Nothing here changed that; the number moved into one place and
   the contradiction became visible instead of being spread across four files.
 
-  The three range checks are driven from the crawl now, both arms. They are
-  forms, so the crawler never reached them — and the failure mode the inversion
-  introduces is silent: a `$GAMEDATA` that fails to arrive turns the bound into
-  `$snum > null`, which refuses every settlement in the game on a page that
-  still renders.
+  **It is resolved now, in the schema's favour**, because the schema is the
+  only thing that can hold a settlement. The count is not a game constant and
+  has left `$GAMEDATA`: `mb_settlement_count()` in
+  `app/include/settlements.php` asks `max(setid)`, and all nine readers — the
+  tick's strength loop, the three range checks, the three drop-downs, signup,
+  `settlement.php` and the manual — ask it. The quirk is gone with the
+  disagreement.
+
+  The three range checks are driven from the crawl, both arms. They are forms,
+  so the crawler never reached them, and the bound failing silent — refusing
+  every settlement on a page that still renders — is the case worth a test.
+  The refusal arm asks for settlement 11, the first past the schema's ten,
+  which the old bound of 30 accepted on all three.
 
   **The score weights are next, and only eight of the fourteen.** The
   experience recalculator reads Land, Mountain, Recruit, Sage, Warrior, Priest,

@@ -10,8 +10,7 @@ echo "
 <div align=center>";
 	
 if($setchg == 1)	{
-	$maxset0 = mysqli_query($db, "SELECT max(setid) AS maxset FROM settlement");
-		$maxset = mb_db_result($maxset0,"maxset");
+	$maxset = mb_settlement_count($db);
 
 	if($snum > $maxset OR $snum <= 0)	{
 		echo"<font class=yellow><div align=center>Settlement " . mb_h($snum) . " does not exist.</font></div><br><br>";
