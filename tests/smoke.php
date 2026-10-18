@@ -456,6 +456,27 @@ forumRefuses($target, 'input.posts.php', array(
 ), 'not in your settlement', 'app/input.posts.php: the reply is not scoped to the caller\'s own board');
 
 /*
+ * The settlement-leader role, from the arm idle@ cannot cover. idle@ is seeded
+ * sl='no', which is what govt.php writes; PoorSerf carries the column default,
+ * '', which is what signup leaves. sl.php and sl-forum.php both tested
+ * `$sl == 'no'`, so '' walked through, and the first of them is a write: any
+ * member of a settlement nobody had held an election in could rename it.
+ */
+forumRefuses($target, 'sl.php', array(
+    'update'       => 'Update',
+    'thesetname'   => 'Renamed by a member',
+    'theseturl'    => '',
+    'thesetnotice' => 'Rewritten by a member.',
+), 'not Settlement Leader', 'app/sl.php: the settlement-leader check passes the default sl value');
+$body = $target->get('/sl-forum.php');
+$visited++;
+inspect('sl-forum.php', $body, $target->lastStatus);
+if (stripos($body, 'not Settlement Leader') === false) {
+    $failures['sl-forum.php | served the leader board to a non-leader'] =
+        'app/sl-forum.php: the settlement-leader check passes the default sl value';
+}
+
+/*
  * Joining a guild, end to end, and the arm where nobody asked.
  *
  * guildconfig.php's accept branch wrote the membership from the auserid in the

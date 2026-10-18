@@ -123,8 +123,13 @@ UPDATE `user` SET guild = 'Testguild' WHERE userid IN (1, 2);
 -- The primary tester leads settlement 1, which is what gates sl.php and the
 -- sl-* settlement forum moderation pages. govt.php elects a leader by setting
 -- this column; there is no separate leader column on `settlement`.
+--
+-- PoorSerf keeps the column default, '', because that is what signup leaves and
+-- nobody in settlement 2 has ever opened govt.php to turn it into 'no'. A guard
+-- written as `== 'no'` passes '' -- sl.php's did -- and an account seeded 'no'
+-- can never show it.
 UPDATE `user` SET sl = 'yes' WHERE userid = 1;
-UPDATE `user` SET sl = 'no'  WHERE userid IN (2, 3);
+UPDATE `user` SET sl = 'no'  WHERE userid = 2;
 
 -- Seeded forum threads. Both forums are empty until someone posts, and an
 -- empty forum renders no topic links at all -- so topic.php, topicg.php and

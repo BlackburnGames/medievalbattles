@@ -4,10 +4,9 @@ include("include/igtop.php");
 
 echo "<br><br>";
 
-if($sl == 'no') {
-	echo"<center><b class=yellow>You are not Settlement Leader.</b>";
-	die();
-}
+// The same fail-open test sl.php had: '' is what signup leaves, not 'no'.
+include("include/forum_guard.php");
+mb_forum_require_sl($sl);
 
 include("common.php");
 include("include/connect.php");

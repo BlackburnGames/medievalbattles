@@ -9,12 +9,12 @@ $update       = mb_input('update');
 
 include("include/igtop.php");
 
-if($sl == 'no')	{
-	echo"<center><b class=yellow>You are not a SL!</b>";
-	die();
-}
-else	{
-}
+// `== 'no'` failed open. user.sl defaults to '' and signup never sets it, so
+// only govt.php ever writes 'no' -- and until somebody in the settlement had
+// opened that page, any member could rename the settlement and replace its
+// picture and notice. The forum pages already ask the right question.
+include("include/forum_guard.php");
+mb_forum_require_sl($sl);
 
 if(!IsSet($update))	{
 	include("include/S_SINFO.php");

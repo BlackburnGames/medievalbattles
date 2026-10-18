@@ -446,6 +446,14 @@ attribute.
   can ever display it. It went nowhere rather than somewhere it should not,
   which is luck and not a check. It is refused now.
 
+  **`sl.php` failed open, and so did `sl-forum.php`.** Both tested
+  `$sl == 'no'`, but `user.sl` defaults to `''`, signup never sets it, and the
+  only writer of `'no'` is `govt.php`'s election. So until somebody in a
+  settlement opened that page, any member could rename the settlement and
+  replace its picture and notice. The suite could not see it because the
+  fixture seeded every non-leader `'no'`; PoorSerf carries the default now,
+  and both pages call `mb_forum_require_sl()`, which asks `!= 'yes'`.
+
   All five rules live in `app/include/forum_guard.php`. Two of them were already
   written inline in the two moderation pages, which is one copy too many for a
   rule six pages share.
