@@ -138,7 +138,7 @@ if($evm['warriors'] > 0)	{
 }
 if($evm['wizards'] > 0)	{
 	$ev_wizloss = (($evm['wizards'] * $evwizhp) - $evpts) / $evwizhp;
-	if($ev_warloss < 0)	{	$ev_warloss = 0;	}
+	if($ev_wizloss < 0)	{	$ev_wizloss = 0;	}
 	mysqli_query($db, "UPDATE military SET wizards = round($ev_wizloss) WHERE userid=" . mb_sql_int($empvalue));
 }
 if($evm['priests'] > 0)	 {

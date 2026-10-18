@@ -307,8 +307,8 @@ $SCENARIOS = array(
         ),
     ),
     array(
-        'name'  => 'quirk-defender-wizards-unclamped',
-        'why'   => 'QUIRK: a defender\'s wizard losses are never floored at zero -- the clamp tests the warrior loss. The column is unsigned and sql_mode is not strict, so MySQL floors it instead.',
+        'name'  => 'defender-wizards-clamped',
+        'why'   => 'More damage than a defender\'s wizards can take. The clamp after the wizard loss used to test the warrior loss; the column is unsigned and sql_mode not strict, so MySQL floored it at 0 either way.',
         'setup' => array($strong, army($D, array('warriors' => 5, 'wizards' => 2)), $defenderStats),
         'requests' => array(array('attack.php', array('empvalue' => $D, 'uwarrior' => 300))),
     ),

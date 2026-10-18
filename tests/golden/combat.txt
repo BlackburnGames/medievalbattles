@@ -353,8 +353,8 @@
     user [1] land 250 -> 275, fleets 2 -> 1
     user [3] land 250 -> 225, nno 0 -> 1
 
-### quirk-defender-wizards-unclamped
-# QUIRK: a defender's wizard losses are never floored at zero -- the clamp tests the warrior loss. The column is unsigned and sql_mode is not strict, so MySQL floors it instead.
+### defender-wizards-clamped
+# More damage than a defender's wizards can take. The clamp after the wizard loss used to test the warrior loss; the column is unsigned and sql_mode not strict, so MySQL floored it at 0 either way.
 
 > attack.php attack=1 empvalue=3 uwarrior=300
   says: You have conquered 25 land from PoorSerf(2)! Your losses: 0 warrior
