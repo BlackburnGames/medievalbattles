@@ -498,6 +498,22 @@ foreach ($files as $path) {
         if (mb_supplied_by_every_entry($name, $self, $closure, $writes, $includedBy)) {
             continue;
         }
+        // And the other direction: a name one of this file's own includes
+        // assigns. attack.php includes include/attack/defANDoff.php, which
+        // computes $cdefense and $evu, and then reads them -- a value handed
+        // back up, as the rule above credits one handed down. Restricted to
+        // this file's closure, so a file is never credited with an include it
+        // does not pull in.
+        $fromOwn = false;
+        foreach ($closure[$self] as $f => $_) {
+            if ($f !== $self && isset($writes[$f][$name])) {
+                $fromOwn = true;
+                break;
+            }
+        }
+        if ($fromOwn) {
+            continue;
+        }
         $names[] = $name;
     }
     sort($names);

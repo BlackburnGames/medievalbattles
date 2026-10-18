@@ -690,13 +690,14 @@ attribute.
     of nowhere.
 
     The ratchet grew by three, the only time it has: `attack.php`,
-    `attackm.php` and `attackr.php` read `$gid` to file guild news, and only
-    `commong.php` assigns it. None of the three includes it, so the attacker's
-    guild has never heard about an attack — and `$tgid`, the defender's, was
-    already on the list because nothing anywhere assigns it. Both sides of the
-    feature are dead, both are guarded by `if($x[0] != "")` so nothing is
-    written wrong, and repairing them means deciding what the feature should do
-    rather than restoring a read.
+    `attackm.php` and `attackr.php` read `$gid` to file guild news, and the
+    audit found it assigned only in `commong.php`, which none of them includes
+    — and `$tgid`, the defender's, nowhere at all. This was recorded as both
+    sides of the feature being dead. **It was wrong.**
+    `include/attack/defANDoff.php`, which all three include, fetches both, and
+    a raid driven by hand files the attacker's guild its news line. The audit
+    could not see a value an include hands back to its page; it can now, and
+    the six entries came off with it.
 
     One entry came off instead of on. `input.posts.php` stamped a new
     settlement forum topic with `$datestamp`, which is `commong.php`'s — the
