@@ -262,8 +262,8 @@ $SCENARIOS = array(
         'requests' => array(array('attack.php', array('empvalue' => $D, 'uwarrior' => 300, 'ugolem' => 40))),
     ),
     array(
-        'name'  => 'quirk-iron-golems-with-archers',
-        'why'   => 'QUIRK: surviving iron golems are booked into the archer return slot, overwriting the archers that survived.',
+        'name'  => 'iron-golems-with-archers',
+        'why'   => 'Iron golems and archers come home in their own return slots. The iron golems used to be booked into the archer slot, replacing the archers that survived.',
         'setup' => array(army($A, array('warriors' => 300, 'archers' => 30, 'irongolem' => 20)),
             researched($A, array(13, 17, 18)), set('military', $A, array('archdef' => 1)), $defenders, $defenderStats),
         'requests' => array(array('attack.php', array('empvalue' => $D, 'uwarrior' => 300, 'uarcher' => 30, 'uirongolem' => 20))),
@@ -276,8 +276,8 @@ $SCENARIOS = array(
         'requests' => array(array('attack.php', array('empvalue' => $D, 'uwarrior' => 300, 'uarcher' => 30))),
     ),
     array(
-        'name'  => 'quirk-iron-golems-alone',
-        'why'   => 'QUIRK: with no archers in the attack the iron golems\' return UPDATE names no column, fails, and the golems are lost.',
+        'name'  => 'iron-golems-alone',
+        'why'   => 'Iron golems without archers. Booked into the archer slot, which nothing had named, the return UPDATE named no column, failed, and the golems were lost.',
         'setup' => array(army($A, array('warriors' => 300, 'irongolem' => 20)),
             researched($A, array(17, 18)), $defenders, $defenderStats),
         'requests' => array(array('attack.php', array('empvalue' => $D, 'uwarrior' => 300, 'uirongolem' => 20))),

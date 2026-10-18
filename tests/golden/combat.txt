@@ -26,7 +26,7 @@
   + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
     military [1] warriors 600000 -> 0, wizards 200000 -> 0, priests 100000 -> 0, archers 50000 -> 0, golem 900 -> 0, irongolem 900 -> 0
     military [3] warriors 200000 -> 198443, wizards 50000 -> 45849, priests 50000 -> 48054, archers 30000 -> 27406, catapult 5000 -> 4815, golem 2000 -> 1844, irongolem 1000 -> 875
-    returntbl [1] war4 0 -> 589840, wiz4 0 -> 186453, pri4 0 -> 93650, time4 0 -> 25
+    returntbl [1] war4 0 -> 589840, wiz4 0 -> 186453, pri4 0 -> 93650, arch4 0 -> 41533, time4 0 -> 25
   + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
   + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
     user [1] land 250 -> 275, fleets 2 -> 1
@@ -246,8 +246,8 @@
     user [1] land 250 -> 275, fleets 2 -> 1
     user [3] land 250 -> 225, nno 0 -> 1
 
-### quirk-iron-golems-with-archers
-# QUIRK: surviving iron golems are booked into the archer return slot, overwriting the archers that survived.
+### iron-golems-with-archers
+# Iron golems and archers come home in their own return slots. The iron golems used to be booked into the archer slot, replacing the archers that survived.
 
 > attack.php attack=1 empvalue=3 uwarrior=300 uarcher=30 uirongolem=20
   says: You have conquered 25 land from PoorSerf(2)! Your losses: 3 warriors 2 archers 3 iron golems
@@ -257,7 +257,7 @@
   + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
     military [1] warriors 300 -> 0, archers 30 -> 0, irongolem 20 -> 0
     military [3] warriors 20 -> 19, wizards 10 -> 7, priests 10 -> 9, archers 5 -> 3
-    returntbl [1] war4 0 -> 297, arch4 0 -> 17, time4 0 -> 25
+    returntbl [1] war4 0 -> 297, arch4 0 -> 28, irongolem4 0 -> 17, time4 0 -> 25
   + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
   + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
     user [1] land 250 -> 275, fleets 2 -> 1
@@ -280,19 +280,18 @@
     user [1] land 250 -> 275, fleets 2 -> 1
     user [3] land 250 -> 225, nno 0 -> 1
 
-### quirk-iron-golems-alone
-# QUIRK: with no archers in the attack the iron golems' return UPDATE names no column, fails, and the golems are lost.
+### iron-golems-alone
+# Iron golems without archers. Booked into the archer slot, which nothing had named, the return UPDATE named no column, failed, and the golems were lost.
 
 > attack.php attack=1 empvalue=3 uwarrior=300 uirongolem=20
   says: You have conquered 25 land from PoorSerf(2)! Your losses: 3 warriors 3 iron golems
-  php:  Warning: mysqli_query(): (42000/1064): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '='17' WHERE email='tester@example.com' AND pw='<HASH>' at line 1 (include/attack/calculations.php)
     buildings [1] aland 100 -> 125
     buildings [3] aland 100 -> 75
   + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
   + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
     military [1] warriors 300 -> 0, irongolem 20 -> 0
     military [3] warriors 20 -> 19, wizards 10 -> 7, priests 10 -> 9, archers 5 -> 3
-    returntbl [1] war4 0 -> 297, time4 0 -> 25
+    returntbl [1] war4 0 -> 297, irongolem4 0 -> 17, time4 0 -> 25
   + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
   + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
     user [1] land 250 -> 275, fleets 2 -> 1

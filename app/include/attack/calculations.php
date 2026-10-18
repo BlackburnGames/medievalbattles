@@ -81,7 +81,7 @@ if($uirongolem > 0)	{
 	if($subirongolem < 0)	{	$subirongolem = 0;	}
 		$subirongolem = round($subirongolem);
 		$irongolemcol = "irongolem" . "$tfleets";
-	mysqli_query($db, "UPDATE returntbl SET $archcol='$subirongolem' WHERE email='$email' AND pw='$pw'");
+	mysqli_query($db, "UPDATE returntbl SET $irongolemcol='$subirongolem' WHERE email='$email' AND pw='$pw'");
 	$irongolem = $irongolem - $uirongolem;
 	mysqli_query($db, "UPDATE military SET irongolem='$irongolem' WHERE email='$email' AND pw='$pw'");
 }
