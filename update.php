@@ -84,7 +84,7 @@ while($INC_ID < $max_UID + 1) {
 
         $land_gain = 0;
         $mt_gain = 0;
-        $exp_num = .9;
+        $exp_num = mb_explore_rate($user['race']);
         // The per-tick base rates. The switches below adjust these copies for
         // race, class and research; the values themselves are gamedata's.
         $foodmod = $ECON['food_per_farm'];
@@ -127,10 +127,6 @@ while($INC_ID < $max_UID + 1) {
       switch($user['race']) {
         case"Angel";
         $civmod = $civmod + .10;
-        break;
-
-        case"Human";
-        $exp_num = .8;
         break;
 
         case"Dwarf";

@@ -68,6 +68,8 @@ require_once __DIR__ . '/settlements.php';
  */
 require_once __DIR__ . '/gamedata.php';
 
+require_once __DIR__ . '/exploring.php';
+
 /**
  * Query errors are reported again, as of Phase 3.
  *

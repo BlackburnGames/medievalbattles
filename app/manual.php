@@ -99,7 +99,8 @@ function mb_man_race_effects($r, $econ)
         $out[] = 'Armies return <b>' . $pct . '% faster</b> from attacks';
     }
     if (isset($r['explore_exp_num'])) {
-        $out[] = 'Needs <b>fewer explorers</b> per land gained (rate '
+        $fewer = $r['explore_exp_num'] < $GLOBALS['GAMEDATA']['exploring']['exp_num_default'] ? 'fewer' : 'more';
+        $out[] = 'Needs <b>' . $fewer . ' explorers</b> per land gained (rate '
                . $r['explore_exp_num'] . ' instead of ' . $GLOBALS['GAMEDATA']['exploring']['exp_num_default'] . ')';
     }
     if (isset($r['troops_per_barrack'])) {
@@ -375,7 +376,9 @@ more explorers each new tile costs.</p>
 
 <p>The number of explorers needed for <b>one land per tick</b> is your land multiplied
 by your race's exploring rate (<?php echo $GAMEDATA['exploring']['exp_num_default']; ?>
-for most races, <?php echo $GAMEDATA['exploring']['exp_num_human']; ?> for Humans),
+for most races, <?php echo $GAMEDATA['races']['Human']['explore_exp_num']; ?> for Humans,
+<?php echo $GAMEDATA['races']['Angel']['explore_exp_num']; ?> for Angels and
+<?php echo $GAMEDATA['races']['Demon']['explore_exp_num']; ?> for Demons),
 divided by <?php echo $GAMEDATA['exploring']['divisor']; ?>. At 250 land that is
 <?php echo (int) floor(round(250 * $GAMEDATA['exploring']['exp_num_default']) / $GAMEDATA['exploring']['divisor']); ?>
 explorers for the first land per tick, and the same again for each additional one.

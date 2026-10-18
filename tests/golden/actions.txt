@@ -122,25 +122,25 @@
   (no change)
 
 ### quirk-explore-human
-# QUIRK: an empire of race Human exploring. The tick applies only the Human rate, whatever the explore page says, and prices mountains on land.
+# QUIRK: an empire of race Human exploring, at its own rate -- the tick applied only the Human one, and gave the Angel, the Demon and the Giant 13. It still prices mountains on land.
 
 > tick
     buildings [1] amts 100 -> 102, aland 850 -> 865
 
 ### quirk-explore-angel
-# QUIRK: an empire of race Angel exploring. The tick applies only the Human rate, whatever the explore page says, and prices mountains on land.
+# QUIRK: an empire of race Angel exploring, at its own rate -- the tick applied only the Human one, and gave the Angel, the Demon and the Giant 13. It still prices mountains on land.
 
 > tick
-    buildings [1] amts 100 -> 102, aland 850 -> 863
+    buildings [1] amts 100 -> 102, aland 850 -> 864
 
 ### quirk-explore-demon
-# QUIRK: an empire of race Demon exploring. The tick applies only the Human rate, whatever the explore page says, and prices mountains on land.
+# QUIRK: an empire of race Demon exploring, at its own rate -- the tick applied only the Human one, and gave the Angel, the Demon and the Giant 13. It still prices mountains on land.
 
 > tick
-    buildings [1] amts 100 -> 102, aland 850 -> 863
+    buildings [1] amts 100 -> 102, aland 850 -> 862
 
 ### quirk-explore-giant
-# QUIRK: an empire of race Giant exploring. The tick applies only the Human rate, whatever the explore page says, and prices mountains on land.
+# QUIRK: an empire of race Giant exploring, at its own rate -- the tick applied only the Human one, and gave the Angel, the Demon and the Giant 13. It still prices mountains on land.
 
 > tick
     buildings [1] amts 100 -> 102, aland 850 -> 863

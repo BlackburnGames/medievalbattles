@@ -37,11 +37,8 @@ $cexploremt = implode("", explode(",", $cexploremt));
 $exploreland = implode("", explode(",", $exploreland));
 $exploremt = implode("", explode(",", $exploremt));
 
-// what is the races exploring advantage/disadvantage (lower number is better)
-$exp_num = .9;
-if($race == 'Angel')  { $exp_num = .85; }
-if($race == 'Human')  { $exp_num = .8;  }
-if($race == 'Demon')  { $exp_num = .95; }
+// the race's exploring rate, as the tick applies it (lower number is better)
+$exp_num = mb_explore_rate($race);
 
 //  explorers needed for land or mountian max
 $max_land = $land * $exp_num;

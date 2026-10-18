@@ -74,14 +74,18 @@ $GAMEDATA['buildings'] = array(
 );
 
 /* ------------------------------------------------------------------ *
- * Exploring. update.php:156-171 (the tick is authoritative; the explore
- * page's Angel/Demon rates are display-only and never applied).
+ * Exploring. update.php:213-228.
+ *
+ * The exploring rate is a definition: the default here and each race's
+ * explore_exp_num below are read through mb_explore_rate() in
+ * include/exploring.php, by the tick and by the explore page alike. The page
+ * used to carry its own copy with the Angel and Demon rates in it, which the
+ * tick never applied; the page's numbers were taken as the design.
  * ------------------------------------------------------------------ */
 $GAMEDATA['exploring'] = array(
-    'exp_num_default' => 0.9,   // update.php:44
-    'exp_num_human'   => 0.8,   // update.php:88 -- the only race rate the tick applies
-    'divisor'         => 20,    // update.php:158: explorers per land = floor(round(land * exp_num) / 20)
-    'max_gain_per_tick' => 20,  // update.php:167-168
+    'exp_num_default' => 0.9,   // read by mb_explore_rate(): races without their own
+    'divisor'         => 20,    // update.php:215: explorers per land = floor(round(land * exp_num) / 20)
+    'max_gain_per_tick' => 20,  // update.php:224-225
 );
 
 /* ------------------------------------------------------------------ *
@@ -102,6 +106,7 @@ $GAMEDATA['races'] = array(
         'flavor'   => 'Charged with guiding the younger races, the Angels wage a reluctant war to preserve the world.',
         'civ_mod_delta'    => +0.10,  // update.php:84
         'priest_cost_mult' => 0.75,   // functions.php:249
+        'explore_exp_num'  => 0.85,   // read by mb_explore_rate() -- fewer explorers needed per land
         'bans'     => array('Golems and Iron Golems'),  // animate.php:4, trade.php:4
     ),
     'Demon' => array(
@@ -111,6 +116,7 @@ $GAMEDATA['races'] = array(
         'civ_mod_delta'     => -0.10,  // update.php:99 -- masked by overcrowding in the fixture
         'offdef_delta'      => +0.10,  // read by include/modifier.php
         'warrior_cost_mult' => 0.75,   // functions.php:248
+        'explore_exp_num'   => 0.95,   // read by mb_explore_rate() -- more explorers needed per land
         'bans'     => array('Priests', 'Priest weapons'),  // military.php:121, wconstruct.php:433+
     ),
     'Dwarf' => array(
@@ -134,7 +140,7 @@ $GAMEDATA['races'] = array(
     ),
     'Human' => array(
         'flavor'   => 'Greatly varied and curious; they learn fast and spread faster.',
-        'explore_exp_num'  => 0.8,  // update.php:88 -- fewer explorers needed per land
+        'explore_exp_num'  => 0.8,  // read by mb_explore_rate() -- fewer explorers needed per land
         'troops_per_barrack' => 35, // military.php:73, status.php:24
         'bans'     => array(),
     ),
@@ -449,9 +455,8 @@ $GAMEDATA['exp_values'] = array(
  * ------------------------------------------------------------------ */
 $GAMEDATA['quirks'] = array(
     'The Scepter of Zakarum sets its speed on equip but never its power, so the listed power is not actually applied. (equip.php:199)',
-    'The explore page shows special rates for Angels (fewer explorers needed) and Demons (more needed), but the tick only implements the Human rate; everyone else gets the default. (include/S_EXPLORE.php:33-36 vs update.php:88)',
-    'Mountains are explored at the land price: the tick works out explorers per mountain from your land, not your mountains, so with 1,000 land and 200 mountains a mountain costs as many explorers as a land does. (update.php:220)',
-    'An empire under 23 land with explorers in the field stops the tick: explorers per land rounds down to 0 and the tick divides by it, which on PHP 8 is fatal -- for every empire, not just that one. (update.php:222)',
+    'Mountains are explored at the land price: the tick works out explorers per mountain from your land, not your mountains, so with 1,000 land and 200 mountains a mountain costs as many explorers as a land does. (update.php:216)',
+    'An empire under 23 land with explorers in the field stops the tick: explorers per land rounds down to 0 and the tick divides by it, which on PHP 8 is fatal -- for every empire, not just that one. (update.php:218)',
     'Night Elves are dealt 4-10 archers at signup, but the free Archery research is immediately overwritten unless they are also Rangers. (checksignup.php:130-134)',
     'Sage accounting disagrees with itself about how many research projects there are. Points accrue across all eighteen, the assigned-sage totals on the status and research screens count the first sixteen, and your score counts only the first fourteen -- so a sage on Animation or Advanced Animation is invisible to both totals, and one on Advanced Farming or Advanced Construction is invisible to your score. (update.php:203 vs functions.php:240 and cresearch.php:112 vs update.php:292)',
 );
