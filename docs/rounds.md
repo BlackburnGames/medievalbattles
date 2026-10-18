@@ -54,57 +54,101 @@ Split the two:
 A reset becomes "end this round, open the next one". Nothing is deleted, nobody
 loses their login, and an admin is an account with no kingdom it must keep.
 
-## A round is a database
+## Where a round lives — undecided
 
-**Each round is its own database. Accounts live in one shared database beside
-the rounds.**
+**Two designs, and the choice is open.** This section first settled on one
+database per round. The host changed the trade: SiteGround creates databases
+in Site Tools, with a prefix, and neither the app nor a script can make one
+([deployment.md](deployment.md)). So in that design opening a round starts
+with a manual step, where the other design is a script end to end. Both are
+written out here; the decision should be made before step 3.
+
+### One database per round
 
 ```
-mb_accounts          account, round, round_result
-mb_round_1           today's schema: user, military, research, ... game_info
-mb_round_2           the same schema, a fresh world
+mb_accounts          account, round, kingdom, round_result
+u123_mb_round1       the game schema: user, military, research, ... game_info
+u123_mb_round2       the same schema, a fresh world
 ```
 
-[rulesets.md](rulesets.md) already settled that *a world is a database*:
-`MB_DB_NAME` chooses it, so a second world never needs `world_id` added to
-every query. A round is a world with a start and an end, so it follows the
-same rule. A second open round, such as a classic round running beside a
-modern one, is just a second round database.
+**How a request knows its round.** `mb_accounts.round` lists each round with
+the database it lives in (`db_name`, as created in Site Tools), its status
+and its ruleset. `mb_accounts.kingdom` maps an account to its kingdom in
+each round — `(account_id, round_id, userid)` — because a userid is only
+unique inside one round's database. Login finds the account's kingdoms in
+running rounds: one, and that round is chosen; several, and a page asks; none,
+and the player goes to the round list. The session keeps `round_id` beside
+`userid`, and `connect.php` looks the round up, refuses one that is not
+running, and opens `$db` on its database. Every page after that is
+unchanged. The tick runs once per running round (`update.php --round=N`, or
+a wrapper over the running rows), and the admin area keeps a round of its
+own in the admin's session.
 
-The alternative is one database with a `round_id` column on every per-round
-table. It was rejected for three reasons:
+For it:
 
-- **The tick touches every kingdom ever created.** `update.php` walks
-  `userid` from 1 to `max(userid)` and runs whole-table updates with no
-  `WHERE` clause at all, such as `UPDATE user SET online = 0`
-  (`update.php:420`) and the military training shift (`update.php:511`). With
-  a `round_id` column, each one needs a round filter. A missed filter doesn't
-  fail. It silently changes the kingdoms of finished rounds. In a separate
-  database, it can't happen.
-- **Round-wide queries are everywhere.** The five ranking pages, settlement
-  and guild listings, the tick, and the admin pages all read "every kingdom", and each
-  would need the filter added and checked. Per-kingdom queries would be fine,
-  because `userid` would be unique across rounds. The round-wide ones are the
-  dangerous half.
-- **An ended round can be archived as a unit.** Dump it, take it offline, and
-  drop it when it's no longer wanted. The round results in `mb_accounts` keep
-  the history either way.
+- **A missed filter cannot touch another round.** `update.php` runs
+  whole-table statements with no `WHERE` at all — `UPDATE user SET online = 0`,
+  the military training shift — and the rankings, listings and admin pages
+  all read "every kingdom". In a database of its own, a round is the only
+  thing those can reach.
+- **An ended round archives as a unit**: dump it, drop it. Its results are
+  already in `mb_accounts.round_result`.
 
-What it costs:
+Against it:
 
-- **Schema changes have to reach every live round database.** Ended rounds
-  are frozen and are read only through their round results, so they don't
-  need migrating.
-- **Creating a round creates a database.** The web application's MySQL user
-  should not hold `CREATE DATABASE`, so rounds are opened from the command
-  line (`bin/round.php`, below) with credentials the web server doesn't have.
-  This is the same reasoning that made `bin/admin.php` the only way to grant
-  the first admin.
-- **A request has to know its round.** `connect.php` opens the round
-  database the session names, not a fixed `MB_DB_NAME`, plus a connection to
-  `mb_accounts` for the pages that need it: login, signup, the round list,
-  history and admin. The tick takes the round as an argument and runs once
-  per running round.
+- **Each round is a manual step.** Create the database in Site Tools, add the
+  MySQL user to it, then `bin/round.php open <db_name>` loads the schema and
+  records the round. Shared plans often cap the number of databases, so old
+  rounds are dropped once their results are written.
+- **Every schema change reaches every live round.** By hand that is a missed
+  round waiting to happen; a migration runner that loops over
+  `mb_accounts.round` makes it one command
+  ([modernization.md](modernization.md), "Schema migrations").
+
+### One database, with a `round_id`
+
+```
+mb                   account, round, round_result,
+                     user, military, research, ... — each with round_id
+```
+
+**How a request knows its round.** The same way, without the connection
+step: login chooses the round, the session keeps `round_id`, and it becomes
+a value round-wide queries filter on. No `kingdom` mapping table, because a
+userid stays unique across rounds — so the ~390 queries that already say
+`WHERE userid=?` are round-safe as they stand. Whether the accounts fold into
+the same database is part of this choice; in this design there is little
+reason to keep them apart.
+
+For it:
+
+- **Opening a round is a script**, start to finish: `bin/round.php open`
+  inserts a row and seeds its settlements. Nothing to do in Site Tools, and
+  nothing to cap.
+- **One schema to migrate.**
+
+Against it:
+
+- **Every round-wide statement needs `AND round_id=?`**, and a missed one does
+  not fail: it silently changes finished rounds. That is the tick's
+  unfiltered updates, the rankings, the listings and the admin pages — a
+  smaller set than every query, and a findable one.
+
+  The guard is the one that closed injection: an audit in the suite that
+  fails any query on a per-round table unless it filters on `userid` or
+  `round_id`, or carries `// mb-round-ok: <why>`. Longer term it is the
+  data-access layer ([modernization.md](modernization.md)), which applies
+  the filter in one place rather than at each site, and makes the audit a
+  backstop.
+
+### What decides it
+
+The session plumbing is identical either way — the round is chosen at login
+and carried in the session — so most of steps 2 to 4 do not depend on the
+choice. It comes down to a manual Site Tools step per round against a
+`round_id` filter guarded by an audit, plus two facts about the host: how
+many databases the plan allows, and whether classic and modern run side by
+side from launch.
 
 ## The credential
 
@@ -150,6 +194,10 @@ fingerprint of the account's address and hash:
   and guilds.
 
 ## Administration
+
+These two sections are written for one database per round. In the
+`round_id` design the same commands insert and update rows instead, and the
+fixture is one database with a round in it ("Where a round lives").
 
 - **`account.admin` replaces `user.admin`.** `mb_admin_require()` reads it
   from `mb_accounts` on every request, as it reads `user.admin` now, so
@@ -258,6 +306,8 @@ fingerprint of the account's address and hash:
 
 ## Open questions
 
+- **Where does a round live?** One database per round, or one database with
+  a `round_id` — see "Where a round lives". To decide before step 3.
 - **One round at a time at launch, or concurrent from the start?** The design
   allows either. Step 4 can wait until a second ruleset gives a reason for it.
 - **Does a round end on a date or when an admin ends it?** A scheduled end

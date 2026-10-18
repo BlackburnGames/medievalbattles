@@ -121,10 +121,13 @@ from the v7 design change behaviour, so they're flags in
 
 ## Which ruleset a world runs
 
-**A world is a database.** `MB_DB_NAME` already chooses it, and every query in
-the codebase already goes through the one connection `connect.php` opens. A
-second world is a second database, and `world_id` never has to be added to
-~1300 queries.
+**A world is a database** — or was; [rounds.md](rounds.md), "Where a round
+lives", reopens it, because the host cannot create a database from a script.
+`MB_DB_NAME` already chooses one, and every query in the codebase already goes
+through the one connection `connect.php` opens, so a second world as a second
+database needs no `world_id` in any query. The alternative is a `round_id`
+filter on the round-wide queries, which rounds.md weighs. Either way the
+ruleset is recorded with the round, as below.
 
 **The world's database records its ruleset**, in a new `game_info.ruleset`
 column, not in the environment. The pages and the tick have to agree, and a

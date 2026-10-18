@@ -48,6 +48,58 @@ In progress. The known work, in no committed order:
   default is strict), create the databases as `utf8mb4_unicode_ci`, and run
   the suite. Whatever it finds is a Phase 3 bug. The specific risks are
   listed under Blockers in deployment.md.
+- **Schema migrations — next, because the two items around it need them.**
+  The schema is one hand-edited `db.sql`, and every change so far has been
+  made by editing it and reloading the fixture. That stops working at the
+  first deploy: a live database cannot be dropped and reloaded, and moving to
+  MySQL 8.4 is itself a set of schema changes on a running server. And if
+  rounds are separate databases ([rounds.md](rounds.md), "Where a round
+  lives"), every live round needs the same change applied, which by hand is a
+  missed round waiting to happen.
+
+  The work: numbered migration files, a table recording which have run, and a
+  runner that applies the rest — to the accounts database and to every round
+  that `mb_accounts.round` lists as live. Phinx or Doctrine Migrations would
+  do, or about a hundred lines of our own if Composer stays out (below).
+  `db.sql` stays as the fresh-install schema, and a test holds the two to
+  account: a database built from `db.sql` and one built by running every
+  migration must dump identically.
+- **Composer — a decision, not a task.** The game has no dependencies and
+  CLAUDE.md says so as a fact. Every library that would help from here — a
+  migration runner, a query builder, a mailer that does more than `mail()` —
+  arrives through Composer, and the host has it. Adding it is small: a
+  `composer.json`, `vendor/` out of the repository, and `deploy/` running
+  `composer install --no-dev`. The cost is a dependency to keep current,
+  which is the trade to make knowingly rather than one library at a time.
+- **A data-access layer, grown a page at a time.** About 1300 queries sit
+  inline in 133 procedural files. Binding their values closed injection, but
+  each page still knows the schema, and a cross-cutting rule has to be
+  applied at every site — the email/pw credential was 386 of them. The next
+  such rule is the round: in the one-database design every round-wide query
+  needs a `round_id` filter, and in the multi-database design something has
+  to own which connection a query runs on. Either is one change in a layer
+  and hundreds without one.
+
+  So queries move behind named functions — `mb_kingdom_get($userid)`,
+  `mb_round_kingdoms()`, `mb_settlement_members($setid)` — as Phase 3
+  restructures each page anyway, the way `include/kingdom.php`,
+  `accounts.php` and `empire.php` already started. A page whose queries have
+  all moved is one the golden masters can vouch for in isolation, and the
+  layer is where round scoping goes, as one rule rather than a filter
+  remembered at every site; until it covers the round-wide queries, an audit
+  in the suite does the job (rounds.md).
+- **Not yet: an ORM or query builder.** Retrofitting Doctrine or Eloquent
+  onto this code would be a rewrite of every page at once, with the golden
+  masters asked to vouch for all of it — the opposite of how every change in
+  this phase has been made safe. The time for one is when the code is being
+  rewritten anyway: the modern ruleset ([rulesets.md](rulesets.md)) will
+  probably want a normalized data model — `units(userid, type, count)`
+  rather than a hundred-column `military`, research as rows rather than
+  `r1`–`r18` columns — and that rewrite is where a query builder used
+  standalone (Doctrine DBAL, `illuminate/database`) earns its place, with
+  global scopes doing what the data-access layer does by hand. Until then
+  the layer is written so that its functions are what a later builder would
+  sit behind.
 - **SQL injection.** **The audit reached zero, 161 entries down to none — and
   then reopened at 11, because it had only ever been reading half the sinks.**
   It matched the `mysqli_query` token, and sixty calls in seven files use the
