@@ -43,20 +43,20 @@ $GAMEDATA['economy'] = array(
     // Not yet inverted -- still transcribed, still cited.
     'recruit_cost_gp'   => 150,     // military.php:41,48
     'troops_per_barrack' => 50,     // military.php:72, status.php:23
-    'wp_defense'        => 15,      // functions.php:317, attack/defANDoff.php:70
-    'catapult_defense'  => 30,      // functions.php:317, attack/defANDoff.php:70
-    'golem_power'       => 38,      // functions.php:317, attack/defANDoff.php:68
-    'irongolem_power'   => 50,      // functions.php:317, attack/defANDoff.php:68
+    'wp_defense'        => 15,      // functions.php:311, attack/defANDoff.php:70
+    'catapult_defense'  => 30,      // functions.php:311, attack/defANDoff.php:70
+    'golem_power'       => 38,      // functions.php:311, attack/defANDoff.php:68
+    'irongolem_power'   => 50,      // functions.php:311, attack/defANDoff.php:68
 );
 
 /* ------------------------------------------------------------------ *
- * Buildings. Costs: functions.php:286-289, buildings.php:41-47.
+ * Buildings. Costs: functions.php:280-283, buildings.php:41-47.
  * Timing: buildings.php:81-129, update.php:388-408.
  * ------------------------------------------------------------------ */
 $GAMEDATA['buildings'] = array(
-    'cost_base'        => 300,    // functions.php:286-289: 300 + 4 * count
+    'cost_base'        => 300,    // functions.php:280-283: 300 + 4 * count
     'cost_per_owned'   => 4,      //   (count includes buildings under construction)
-    'cost_cap'         => 20000,  // functions.php:287,289
+    'cost_cap'         => 20000,  // functions.php:281,283
     'demolish_cost'    => 75,     // dbuildings.php:41,55
     'ticks_per_building' => 1,    // buildings.php:87-108: queue of N takes N ticks
     'ticks_cap'        => 20,     // buildings.php:87: queues of 20+ take 20 ticks
@@ -87,7 +87,7 @@ $GAMEDATA['exploring'] = array(
 /* ------------------------------------------------------------------ *
  * Races. Deltas are applied on top of the economy base, mirroring the
  * engine's order (class first, then race). update.php:82-115.
- * Off/def modifier: attack/defANDoff.php:55-66, functions.php:304-314.
+ * Off/def modifier: attack/defANDoff.php:55-66, functions.php:298-308.
  *
  * Two entries are definitions: the Demon's gold and iron deltas, which
  * update.php reads. They are the only race or class economy values the tick
@@ -100,7 +100,7 @@ $GAMEDATA['races'] = array(
     'Angel' => array(
         'flavor'   => 'Charged with guiding the younger races, the Angels wage a reluctant war to preserve the world.',
         'civ_mod_delta'    => +0.10,  // update.php:84
-        'priest_cost_mult' => 0.75,   // functions.php:255
+        'priest_cost_mult' => 0.75,   // functions.php:249
         'bans'     => array('Golems and Iron Golems'),  // animate.php:4, trade.php:4
     ),
     'Demon' => array(
@@ -109,7 +109,7 @@ $GAMEDATA['races'] = array(
         'ironmod_delta'     => +0.5,   // read by update.php
         'civ_mod_delta'     => -0.10,  // update.php:99 -- masked by overcrowding in the fixture
         'offdef_delta'      => +0.10,  // defANDoff.php:65
-        'warrior_cost_mult' => 0.75,   // functions.php:254
+        'warrior_cost_mult' => 0.75,   // functions.php:248
         'bans'     => array('Priests', 'Priest weapons'),  // military.php:121, wconstruct.php:433+
     ),
     'Dwarf' => array(
@@ -151,7 +151,7 @@ $GAMEDATA['races'] = array(
 
 /* ------------------------------------------------------------------ *
  * Classes. update.php:61-81 (economy), :199-203 (research speed),
- * defANDoff.php:57-63 (off/def), functions.php:249-258 (unit costs),
+ * defANDoff.php:57-63 (off/def), functions.php:243-252 (unit costs),
  * checksignup.php:113-138 (signup bonuses).
  * ------------------------------------------------------------------ */
 $GAMEDATA['classes'] = array(
@@ -170,7 +170,7 @@ $GAMEDATA['classes'] = array(
         'flavor'  => 'Fire and blasting powder answer questions steel cannot.',
         'gpmod'        => 0.90,  // update.php:79
         'offdef_mult'  => 1.05,  // defANDoff.php:63
-        'suicide_cost_mult' => 0.50,  // functions.php:258
+        'suicide_cost_mult' => 0.50,  // functions.php:252
         'starts_with'  => array('Demolitions researched', '10-20 Suicide Civilians'),  // checksignup.php:137
         'bans'    => array('Wizards', 'Golems and Iron Golems'),  // military.php:91, animate.php:4
     ),
@@ -197,15 +197,15 @@ $GAMEDATA['classes'] = array(
     'Warlock' => array(
         'flavor'  => 'Forbidden shortcuts to power, at a price paid later.',
         'offdef_mult'   => 0.95,  // defANDoff.php:61
-        'wizard_cost_mult' => 0.75,  // functions.php:256
+        'wizard_cost_mult' => 0.75,  // functions.php:250
         'research_mult' => 0.75,  // update.php:200 -- research points accrue 25% SLOWER
         'starts_with'  => array('Fireball researched'),  // checksignup.php:135
-        'note' => 'A Demon Warlock pays 1.05x for warriors instead of the Demon 0.75x discount.',  // functions.php:257
+        'note' => 'A Demon Warlock pays 1.05x for warriors instead of the Demon 0.75x discount.',  // functions.php:251
     ),
 );
 
 /* ------------------------------------------------------------------ *
- * Units. Costs: functions.php:249-283, military.php:106,133.
+ * Units. Costs: functions.php:243-277, military.php:106,133.
  * Training times: update.php:457-459 queue depths.
  * Barracks space: military.php:71-73,126-132.
  * ------------------------------------------------------------------ */
@@ -455,5 +455,5 @@ $GAMEDATA['quirks'] = array(
     'An attacking golem\'s hit points are computed from your wizards\' defence, and the golem survivor formula multiplies by the archer\'s hit points rather than the golem\'s -- so how many golems come home depends on two unrelated units. (attack/calculations.php:22-23, attack/calculations.php:71)',
     'Surviving iron golems are booked into the archer return slot, not the iron golem one, so they come home as archers, replacing the archers that survived. Without archers in the same attack the slot name is never set, the statement is a syntax error, and the iron golems are lost. (attack/calculations.php:84)',
     'A defender\'s wizard losses are never floored at zero: the clamp after the wizard calculation tests the warrior loss instead. (attack/calculations.php:141)',
-    'Sage accounting disagrees with itself about how many research projects there are. Points accrue across all eighteen, the assigned-sage totals on the status and research screens count the first sixteen, and your score counts only the first fourteen -- so a sage on Animation or Advanced Animation is invisible to both totals, and one on Advanced Farming or Advanced Construction is invisible to your score. (update.php:203 vs functions.php:244 and cresearch.php:112 vs update.php:292)',
+    'Sage accounting disagrees with itself about how many research projects there are. Points accrue across all eighteen, the assigned-sage totals on the status and research screens count the first sixteen, and your score counts only the first fourteen -- so a sage on Animation or Advanced Animation is invisible to both totals, and one on Advanced Farming or Advanced Construction is invisible to your score. (update.php:203 vs functions.php:240 and cresearch.php:112 vs update.php:292)',
 );
