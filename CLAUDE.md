@@ -75,6 +75,6 @@ docker compose exec -w /repo web php update.php
 
 Fixture logins are `tester@example.com` / `test1234` (plus `idle@` / `pass2`, `poor@` / `pass3`).
 
-The admin area is `http://127.0.0.1:8080/admin/`, logging in with `MB_ADMIN_USER` / `MB_ADMIN_PASSWORD` — `mako` / `quickshot` unless the environment overrides them. The defaults are the 2003 hardcoded pair and are public; they exist so nothing that worked before the gate stops working.
+The admin area is `http://127.0.0.1:8080/admin/`. There is no admin password: an administrator is a player account with `user.admin` set, logged into the game as usual — the fixture's is `tester@`. Grant and revoke from the command line: `docker compose exec web php /repo/bin/admin.php list | grant <email> | revoke <email>`. See `app/admin/include/auth.php`.
 
 **On Windows, prefix `docker compose exec` with `MSYS_NO_PATHCONV=1`** when passing container paths, or Git Bash rewrites `/repo/...` into a Windows path and the command fails. The scripts in `tests/` already set it.

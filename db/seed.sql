@@ -196,3 +196,7 @@ UPDATE `settlement` SET members = 1, setname = 'Poorhaven' WHERE setid = 2;
 -- Make sure the game is not stuck mid-tick; update.php sets this to 'yes' and
 -- never resets it, which makes every page render "Tick in progress" and die.
 UPDATE `game_info` SET tick = 'no';
+
+-- The primary tester is the admin account. The crawl's admin phase logs in as
+-- it, and asserts that poor@ -- logged in, not an admin -- is refused.
+UPDATE `user` SET admin = 1 WHERE userid = 1;

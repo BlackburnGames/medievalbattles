@@ -14,7 +14,7 @@
 	Display Users By: <br>
 	<a href="dusers.php">Ename</a> <a href="dusers_email.php">Email</a> <a href="dusers_ip.php">IP</a> <a href="dusers_suid.php">Su ID</a> <a href="dusers_curid.php">Cur ID</a>
 <hr>
-	<a href="adminlogin.php?logout=1">Log out</a>
+	<a href="../main.php">Back to the game</a> <a href="../logout.php">Log out</a>
 <hr>
 </font>
 </center>

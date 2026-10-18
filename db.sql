@@ -716,6 +716,8 @@ CREATE TABLE `user` (
   `barterclock` int(3) NOT NULL default '336',
   `current_comp_id` varchar(255) NOT NULL default '',
   `signup_comp_id` varchar(255) NOT NULL default '',
+  -- May use app/admin/. Granted from the command line: bin/admin.php.
+  `admin` tinyint(1) NOT NULL default '0',
   PRIMARY KEY  (`userid`)
 ) ENGINE=MyISAM;
 

@@ -85,12 +85,22 @@ $MB_ADMIN_ACTIONS = array(
 			"UPDATE settlement SET setstrength='0'",
 		),
 	),
+	// Administrators are player accounts, so deleting every account used to
+	// delete the admin running it, who was then locked out of this page. Admin
+	// accounts are kept, and the other tables are cleared of every row whose
+	// empire is gone rather than emptied.
 	'accounts' => array(
-		'label'      => 'Delete EVERY account',
+		'label'      => 'Delete every account except administrators',
 		'statements' => array(
-			'DELETE FROM user', 'DELETE FROM buildings', 'DELETE FROM military',
-			'DELETE FROM research', 'DELETE FROM explore', 'DELETE FROM returntbl',
-			'DELETE FROM barter', 'DELETE FROM empnews', 'DELETE FROM emailvalidate',
+			'DELETE FROM user WHERE admin = 0',
+			'DELETE FROM buildings WHERE userid NOT IN (SELECT userid FROM user)',
+			'DELETE FROM military WHERE userid NOT IN (SELECT userid FROM user)',
+			'DELETE FROM research WHERE userid NOT IN (SELECT userid FROM user)',
+			'DELETE FROM explore WHERE userid NOT IN (SELECT userid FROM user)',
+			'DELETE FROM returntbl WHERE userid NOT IN (SELECT userid FROM user)',
+			'DELETE FROM barter WHERE userid NOT IN (SELECT userid FROM user)',
+			'DELETE FROM empnews WHERE yourid NOT IN (SELECT userid FROM user)',
+			'DELETE FROM emailvalidate WHERE userid NOT IN (SELECT userid FROM user)',
 		),
 	),
 );
@@ -127,6 +137,15 @@ if (IsSet($daccount)) {
 	// `email=''`, which matches any row whose address happens to be blank.
 	if ($tmail === null) {
 		echo "<b>No empire called " . htmlspecialchars($empre) . ".</b><br><br>";
+		echo "<a href=gameconfig.php>Return</a></center>";
+		die();
+	}
+
+	// An administrator's account is not deleted from here, the admin running
+	// this page's own included. Revoke the flag first: bin/admin.php.
+	$empreadmin = mysqli_query($db, "SELECT admin FROM user WHERE ename=$q_empre");
+	if ((int) mb_db_result($empreadmin, "empreadmin") === 1) {
+		echo "<b>" . htmlspecialchars($empre) . " is an administrator. Revoke that first, with bin/admin.php.</b><br><br>";
 		echo "<a href=gameconfig.php>Return</a></center>";
 		die();
 	}

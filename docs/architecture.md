@@ -24,11 +24,13 @@ folder, `include/...` resolves inside it — whose files are thin forwarders to
 `app/include/` rather than the copies they used to be. It lived under
 `app/css/admin/`, inside the stylesheet directory, until Phase 3.
 
-Its gate is `app/admin/include/auth.php`: one credential from `MB_ADMIN_USER` /
-`MB_ADMIN_PASSWORD`, recorded in `$_SESSION['mb_admin']`, checked by
-`mb_admin_require()`. That slot is separate from the player session on purpose
-— being logged into the game is not being an admin, and the smoke crawl asserts
-both refusals. Pages inherit the call through `include/igtop.php`;
+Its gate is `app/admin/include/auth.php`: an administrator is a player account
+with `user.admin` set, logged in through the game's own login. `mb_admin_require()`
+reads the flag from the database on every request, so a revocation or a
+session that `session.php` logs out takes the privilege with it. Being logged
+into the game is not being an admin, and the smoke crawl asserts both
+refusals. Flags are granted and revoked with `bin/admin.php`; the world-wipe
+actions keep admin accounts, and an admin cannot be deleted from the page. Pages inherit the call through `include/igtop.php`;
 `gameconfig.php` and `newgame.php` do not include it and call it themselves.
 
 ## Page flow

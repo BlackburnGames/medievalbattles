@@ -703,6 +703,24 @@ attribute.
     `$ADMIN_PAGES` is checked against `glob(app/admin/*.php)`, so a new page
     added and not gated fails the run.
 
+  **Then the shared credential went too.** One password in the environment,
+  defaulting to a pair published in this repository, cannot be taken back from
+  one person, records nothing about who acted, and is one more secret to leak.
+  An administrator is a player account with `user.admin` set now. There is no
+  admin login: an admin logs into the game, through the same bcrypt, session
+  rotation and revocation as anyone, and `mb_admin_require()` reads the flag
+  from the database on every request, so revoking it takes effect on the next
+  click. `bin/admin.php` grants and revokes from the command line, because the
+  first admin cannot come from a page only admins can see. `adminlogin.php`,
+  `MB_ADMIN_USER`, `MB_ADMIN_PASSWORD` and the session's `mb_admin` slot are
+  gone.
+
+  Making admins accounts surfaced one consequence: "delete every account" and
+  `newgame.php` deleted the admin running them, who was then locked out. Both
+  keep administrator accounts now, `newgame.php` clears the admins' guild,
+  votes and leadership with everyone else's and recounts the settlements, and
+  an admin account cannot be deleted by name from the page — revoke it first.
+
   This does not make the area safe to expose. What is behind the gate still
   interpolates, still echoes raw, and still deletes the world from one link.
 

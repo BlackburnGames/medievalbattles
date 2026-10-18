@@ -567,12 +567,19 @@ this schema has never had, so "delete all news" and "delete all forums" had
 never once done anything. Running them leaves the fixture spent, so nothing may
 be added after it.
 
-Two passes, and the first is the one that matters. Before logging in, every
+Two passes, and the first is the one that matters. Before the admin pass, every
 entry point in `$ADMIN_PAGES` is fetched twice: once by a client with no
-session and once by a **logged-in player**. Both must be refused. Without that
-second arm a gate keyed on the wrong session slot would pass. The list is
-checked against `glob(app/admin/*.php)` minus the login pair, so an admin page
-added and left ungated fails the run.
+session and once by **`poor@`, a logged-in player who is not an admin**. Both
+must get a 403. Without that second arm a gate that checked only for a session
+would pass. The list is checked against `glob(app/admin/*.php)`, so an admin
+page added and left ungated fails the run. There is no login page to exempt:
+the admin is `tester@`, logged in through the game, because an administrator is
+a flagged player account.
+
+After the bulk actions the phase asserts two things about that: deleting an
+admin account by name is refused, and the admin is still admitted after both
+world wipes — "delete every account" and `newgame.php` keep administrators
+rather than deleting the account running them.
 
 The crawl is confined to `admin/`. `extractLinks()` normalises every href to a
 path from the docroot, and the admin navbar's links are relative — so without

@@ -1,51 +1,31 @@
 <?php
 /**
- * The admin area's authentication, which until now did not exist.
+ * Who may use the admin area: a logged-in player whose account is flagged
+ * `user.admin`.
  *
- * What was here: adminlogin.php compared the posted name and password against
- * a hardcoded `mako` / `quickshot` and, when they matched, printed a link to
- * main.php. That was the whole mechanism. No session was written, and no page
- * in the area asked whether one existed -- so every screen served to anyone
- * who typed its URL, including gameconfig.php (DELETE FROM user) and
- * newgame.php, which wipes the world on a plain GET with no parameters at all.
- * gameconfig.php's own check had been commented out since 2003.
+ * Until Phase 3 nothing gated the area at all -- adminlogin.php compared a
+ * hardcoded `mako` / `quickshot` and printed a link, and no page checked
+ * anything. The first gate was one shared credential from the environment. A
+ * shared password cannot be taken back from one person, says nothing about who
+ * did what, and is one more secret to leak, so there is no admin password now:
+ * an admin logs into the game like any player, through the same login, hashing,
+ * session rotation and revocation, and the account carries the privilege.
  *
- * What replaces it is deliberately small. This is a single-operator admin
- * screen for a 2003 hobby game, not an account system: one credential, held in
- * the environment, checked once and remembered in the session.
+ * The flag is read from the database on every request rather than remembered
+ * in the session, so revoking it takes effect on the admin's next click, and
+ * a session that include/session.php logs out -- expired, password changed,
+ * account deleted -- takes the privilege with it.
  *
- *   MB_ADMIN_USER      defaults to "mako"
- *   MB_ADMIN_PASSWORD  defaults to "quickshot"
- *
- * The defaults are the historical pair, so nothing that worked before stops
- * working -- and they are published in this repository's history, which is the
- * reason they are only defaults. Set both in the environment for any instance
- * that is not a throwaway. docker-compose.yml passes them through.
+ * Granting and revoking is bin/admin.php, from the command line, because the
+ * first admin has to come from somewhere other than a page only admins see.
  *
  * This does not make the admin area safe to expose. The pages behind it still
- * build queries by interpolation, still echo user data unescaped, and still
- * delete the entire game with one link. The gate stops a stranger reaching
- * them; it does not make what is behind it sound. Both container ports stay
- * bound to 127.0.0.1.
+ * build queries by interpolation and still delete the entire game with one
+ * link. The gate stops a stranger reaching them; it does not make what is
+ * behind it sound.
  */
 
 require_once __DIR__ . '/../../include/session.php';
-
-if (!function_exists('mb_admin_credentials')) {
-    /**
-     * @return array{0: string, 1: string} configured user and password
-     */
-    function mb_admin_credentials()
-    {
-        $user = getenv('MB_ADMIN_USER');
-        $pass = getenv('MB_ADMIN_PASSWORD');
-
-        return array(
-            $user === false || $user === '' ? 'mako'      : $user,
-            $pass === false || $pass === '' ? 'quickshot' : $pass,
-        );
-    }
-}
 
 if (!function_exists('mb_admin_logged_in')) {
     /**
@@ -53,55 +33,23 @@ if (!function_exists('mb_admin_logged_in')) {
      */
     function mb_admin_logged_in()
     {
-        return isset($_SESSION['mb_admin']) && $_SESSION['mb_admin'] === true;
-    }
-}
+        global $email, $pw;
 
-if (!function_exists('mb_admin_login')) {
-    /**
-     * Check a submitted credential and, if it holds, mark the session.
-     *
-     * hash_equals() rather than == for two reasons. The obvious one is timing,
-     * which barely matters on a loopback-only app. The one that does matter is
-     * that PHP's == on two strings that both look numeric compares them as
-     * numbers, so a password of "0e12345" and one of "0" have compared equal
-     * in this codebase's idiom before now.
-     *
-     * @param  string $user
-     * @param  string $pass
-     * @return bool
-     */
-    function mb_admin_login($user, $pass)
-    {
-        list($expectUser, $expectPass) = mb_admin_credentials();
-
-        // Both compared before either is acted on, rather than && -- which
-        // short-circuits, and so answers "was the username right?" on its own.
-        $userOk = hash_equals($expectUser, (string) $user);
-        $passOk = hash_equals($expectPass, (string) $pass);
-
-        if (!$userOk || !$passOk) {
+        // session.php has already validated and checked these against the
+        // account, and blanked them if either failed.
+        if ($email === '' || $pw === '') {
             return false;
         }
 
-        // A fresh id, so a session handed to the browser before the login
-        // cannot be used to ride in on the privilege granted after it.
-        if (session_status() === PHP_SESSION_ACTIVE && !headers_sent()) {
-            session_regenerate_id(true);
-        }
-        $_SESSION['mb_admin'] = true;
-        // The session's 24-hour clock, which include/session.php enforces for
-        // the admin flag as it does for a player login.
-        $_SESSION['mb_auth_at'] = time();
+        // Global first, so that if this is the include that connects, the
+        // connection lands in the global rather than this function's scope.
+        global $db;
+        require_once __DIR__ . '/../../include/connect.php';
+        $r = mysqli_query($db, "SELECT admin FROM user WHERE email=" . mb_sql_str($db, $email)
+            . " AND pw=" . mb_sql_str($db, $pw));
+        $row = $r ? mysqli_fetch_row($r) : null;
 
-        return true;
-    }
-}
-
-if (!function_exists('mb_admin_logout')) {
-    function mb_admin_logout()
-    {
-        unset($_SESSION['mb_admin']);
+        return $row && (int) $row[0] === 1;
     }
 }
 
@@ -125,8 +73,9 @@ if (!function_exists('mb_admin_require')) {
             header('Content-Type: text/html; charset=utf-8');
         }
         echo "<html><body bgcolor=white text=black><center><br><br>"
-            . "<b>Not logged in.</b><br><br>"
-            . "<a href=\"index.php\">Administration login</a>"
+            . "<b>Administrators only.</b><br><br>"
+            . "Log into the game with an administrator's account first.<br><br>"
+            . "<a href=\"../index.php\">Game login</a>"
             . "</center></body></html>";
         exit;
     }

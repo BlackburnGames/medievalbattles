@@ -51,18 +51,16 @@ $MAX_MEMBER_PAGES = 120;
  * The admin area, whose URL space is small and closed -- unlike the game's, a
  * modest cap here is a real ceiling rather than a budget that always trips.
  *
- * The credential matches app/admin/include/auth.php's defaults, which
- * docker-compose.yml passes through unchanged unless MB_ADMIN_USER and
- * MB_ADMIN_PASSWORD are set in the environment.
+ * There is no admin credential: an admin is a player account with `user.admin`
+ * set, and the fixture's is tester@. See app/admin/include/auth.php.
  */
 $MAX_ADMIN_PAGES = 40;
-$ADMIN_USER = getenv('MB_ADMIN_USER') ? getenv('MB_ADMIN_USER') : 'mako';
-$ADMIN_PASS = getenv('MB_ADMIN_PASSWORD') ? getenv('MB_ADMIN_PASSWORD') : 'quickshot';
 
 // Every entry point, including the two that nothing links to. A page added to
 // app/admin/ and left off this list is a page whose gate is never checked, so
 // the coverage report at the end of the run flags one that is missing.
 $ADMIN_PAGES = array(
+    'admin/index.php',
     'admin/main.php',
     'admin/gameconfig.php',
     'admin/newgame.php',
@@ -938,7 +936,7 @@ function prefsEmailChange(MbClient $client)
  * is spent afterwards. Nothing below this point may depend on game state.
  */
 adminGate($BASE, $ADMIN_PAGES);
-$admin = adminLogin($BASE, $ADMIN_USER, $ADMIN_PASS);
+$admin = login($BASE, 'tester@example.com', 'test1234');
 // Confined to admin/. The navbar's links are relative -- href="main.php" from
 // a page served out of /admin/ -- and extractLinks() normalises every href to
 // a path from the docroot, so without this the admin pass walks straight out
@@ -947,29 +945,29 @@ crawl($admin, array('admin/main.php'), $MAX_ADMIN_PAGES, 'admin/');
 adminActions($admin, $MB_ADMIN_ACTIONS);
 
 /**
- * Every admin entry point must refuse a client that has not logged in.
+ * Every admin entry point must refuse a client that is not an admin.
  *
- * Checked before the login pass, and on a client that HAS a game session --
- * being a logged-in player must not be enough to reach the admin area, and a
- * gate keyed on the wrong session slot would look fine without this.
+ * Checked before the admin pass, and on a client that HAS a game session --
+ * poor@, logged in and not flagged. Not idle@, which the crawl has renamed
+ * and deleted by now. Being a logged-in player must not be enough
+ * to reach the admin area, and a gate that checked only the session would look
+ * fine without this arm.
  */
 function adminGate($base, array $pages)
 {
     global $failures, $visited;
 
     $stranger = new MbClient($base);
-    $player   = login($base, 'tester@example.com', 'test1234');
+    $player   = login($base, 'poor@example.com', 'pass3');
 
     foreach (array('anonymous' => $stranger, 'logged-in player' => $player) as $who => $client) {
         foreach ($pages as $path) {
             $body = $client->get('/' . $path);
             $visited++;
 
-            // 403 from the gate, or 302 from the two pages that redirect
-            // (index.php sends an authenticated caller on to main.php, and
-            // adminlogin.php redirects either way). Anything that renders is
-            // a page that served itself to someone who is not an admin.
-            if ($client->lastStatus !== 403 && $client->lastStatus !== 302) {
+            // 403 from the gate. Anything else is a page that served itself,
+            // or sent its caller onward, without asking.
+            if ($client->lastStatus !== 403) {
                 $failures["$path | reachable by $who (HTTP {$client->lastStatus})"] =
                     'app/admin/include/auth.php: mb_admin_require() is not gating this page';
                 continue;
@@ -980,26 +978,6 @@ function adminGate($base, array $pages)
             }
         }
     }
-}
-
-/**
- * Log into the admin area, or fail the run.
- */
-function adminLogin($base, $user, $pass)
-{
-    global $visited;
-
-    $client = new MbClient($base);
-    $client->post('/admin/adminlogin.php', array('username' => $user, 'pw' => $pass));
-    $visited++;
-
-    if ($client->lastStatus !== 302) {
-        fwrite(STDERR, "FATAL: admin login did not redirect (got HTTP {$client->lastStatus}).\n");
-        fwrite(STDERR, "MB_ADMIN_USER/MB_ADMIN_PASSWORD must match app/admin/include/auth.php's defaults.\n");
-        exit(2);
-    }
-
-    return $client;
 }
 
 /**
@@ -1020,6 +998,15 @@ function adminActions(MbClient $admin, array $actions)
     postForm($admin, 'admin/gameconfig.php', array('daccount' => 'Delete', 'empre' => 'PoorSerf'));
     postForm($admin, 'admin/gameconfig.php', array('daccount' => 'Delete', 'empre' => "No O'Brien here"));
 
+    // An administrator's account is refused by name -- including the admin's
+    // own, which is the one this client is.
+    global $failures;
+    $body = postForm($admin, 'admin/gameconfig.php', array('daccount' => 'Delete', 'empre' => 'TestLord'));
+    if (stripos($body, 'is an administrator') === false) {
+        $failures['admin/gameconfig.php | deleted an administrator by name'] =
+            'app/admin/gameconfig.php: deleting an admin account must be refused';
+    }
+
     foreach ($actions as $action) {
         postForm($admin, 'admin/gameconfig.php', array('action' => $action));
     }
@@ -1027,6 +1014,14 @@ function adminActions(MbClient $admin, array $actions)
     // newgame.php takes no parameters and wipes the world on a bare GET, so it
     // is left until everything else has run.
     postForm($admin, 'admin/newgame.php', array());
+
+    // Both world wipes keep administrators, so the admin who ran them is still
+    // one. They used to delete every account, the admin's own included.
+    $admin->get('/admin/main.php');
+    if ($admin->lastStatus !== 200) {
+        $failures['admin/main.php | the admin was locked out by a world wipe'] =
+            'app/admin/gameconfig.php, newgame.php: administrators must survive deleting every account';
+    }
 }
 
 /**
@@ -1407,16 +1402,14 @@ foreach (array_keys($newGaps) as $script) {
  * The admin area is counted separately, against $ADMIN_PAGES rather than
  * against what the crawl happened to reach.
  *
- * $ADMIN_PAGES is the list adminGate() proves is refused to a stranger, so a
- * page missing from it is a page whose gate nothing checks. index.php and
- * adminlogin.php are the login pair and are deliberately outside it -- they
- * are the two that must serve to someone who is not signed in yet.
+ * $ADMIN_PAGES is the list adminGate() proves is refused to a stranger and to
+ * a player who is not an admin, so a page missing from it is a page whose gate
+ * nothing checks. There is no admin login page to exempt any more.
  */
 $adminScripts = array();
 foreach (glob(__DIR__ . '/../app/admin/*.php') as $file) {
     $adminScripts['admin/' . basename($file)] = true;
 }
-unset($adminScripts['admin/index.php'], $adminScripts['admin/adminlogin.php']);
 
 $adminUngated = array_diff_key($adminScripts, array_flip($ADMIN_PAGES));
 echo "Admin pages behind a checked gate: " . count($ADMIN_PAGES) . " of " . count($adminScripts) . "\n";
