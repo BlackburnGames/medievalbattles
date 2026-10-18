@@ -47,7 +47,26 @@ In progress. The known work, in no committed order:
   `activate_account.php`. So the zero was true of every authenticated page and
   silent about the three that need no account at all — `checksignup.php`
   interpolates the address into a `SELECT` twenty lines before it validates it.
-  `mb_is_query_sink()` matches both forms now. All ~1300 queries
+  `mb_is_query_sink()` matches both forms now, and **the 11 are closed**:
+
+  - **Signup** escapes every value once, near the top. The interesting part is
+    the empire name, for the same reason the address was: it is read back on
+    every page and interpolated bare at forty-odd `WHERE ename='$ename'` sites.
+    Those were safe by accident — a quote broke signup's `INSERT`, so no such
+    name could be stored — and escaping the `INSERT` removes the accident.
+    `mb_valid_ename()` in `credentials.php` states the rule instead, and
+    signup is the only place an empire is ever named. Race and class are held
+    to `$GAMEDATA`'s keys.
+  - **Activation had never parsed.** `check` is a reserved word and both of
+    its statements named it bare, so the `SELECT` failed, `$validate` was null,
+    and the loose `!=` answered "activated" to a request carrying no code at
+    all. It casts the id, escapes the code, backticks the column and compares
+    with `hash_equals()` now. Signup still stores `check='2'`, so accounts are
+    born activated and the page changes nothing a player sees; it is driven by
+    hand, not by the crawl, which cannot sign up.
+  - **Login** escapes the address it records and the empire name it reads back.
+
+  All ~1300 queries
   are built by string interpolation with no escaping. This is the reason the
   app must not be exposed to a network. `tests/sql-injection-audit.php` finds
   the reachable half of it — request input that survives into a

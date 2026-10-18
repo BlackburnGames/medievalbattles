@@ -2,6 +2,4 @@
 # Request input that reaches a query call unescaped, as file, variable
 # and the quoting context it lands in. This list may only ever SHRINK.
 # Regenerate with: php tests/sql-injection-audit.php --accept
-app/activate_account.php	act_code	quoted
-app/activate_account.php	act_userid	quoted
-app/checklogin.php	ipaddress	quoted
+

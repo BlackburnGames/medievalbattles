@@ -156,7 +156,10 @@ $NOTICE_PATTERN = '/\b(Notice|Deprecated)\s*:\s*(.{0,200})/i';
  * which ones is the prerequisite for turning error reporting on for good.
  */
 $QUERY_AUDIT = getenv('MB_QUERY_AUDIT') === '1';
-$QUERY_ERROR_PATTERN = '/^mysqli_(query|real_query|multi_query|prepare)\(\)/i';
+// Both spellings: the procedural call warns as "mysqli_query():" and the
+// object form, which the signup, login and activation pages use, as
+// "mysqli::query():".
+$QUERY_ERROR_PATTERN = '/^mysqli(_|::)(query|real_query|multi_query|prepare)\(\)/i';
 $queryErrors = array();
 
 /*

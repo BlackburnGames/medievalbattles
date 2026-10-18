@@ -71,12 +71,17 @@ if (mb_password_verify($plain_pw, $stored)) {
 	$ipaddress = $_SERVER["REMOTE_ADDR"];
 	$uename = $db->query("SELECT ename FROM user WHERE email=$q_email AND pw=$q_pw");
 	$ename = mb_db_result($uename, "ename");
+	// Read back out of the database, so mb_valid_ename() already holds it to a
+	// safe charset -- escaped anyway, because a page should not lean on a rule
+	// enforced at signup for a row that may predate it.
+	$q_ename = mb_sql_str($db, $ename);
+	$q_ip    = mb_sql_str($db, $ipaddress);
 
-	$db->query("UPDATE user SET ip='$ipaddress' WHERE ename='$ename'");
+	$db->query("UPDATE user SET ip=$q_ip WHERE ename=$q_ename");
 	$db->query("UPDATE user SET countdown='336' WHERE email=$q_email AND pw=$q_pw");
-	$db->query("UPDATE user SET lastlogin='$clock' WHERE ename='$ename'");
-	$db->query("UPDATE user SET online='1' WHERE ename='$ename'");
-	$db->query("UPDATE user SET current_comp_id='$computer_id' WHERE ename='$ename'");
+	$db->query("UPDATE user SET lastlogin='$clock' WHERE ename=$q_ename");
+	$db->query("UPDATE user SET online='1' WHERE ename=$q_ename");
+	$db->query("UPDATE user SET current_comp_id='$computer_id' WHERE ename=$q_ename");
 
 	$user_set_query = $db->query("SELECT setid FROM user WHERE email=$q_email AND pw=$q_pw");
 	$set = mb_db_result($user_set_query, "set");
