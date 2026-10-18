@@ -267,23 +267,31 @@ fingerprint of the account's address and hash:
   see "Where a round lives".
 - **One round at a time at launch, or concurrent from the start?** The design
   allows either. Step 4 can wait until a second ruleset gives a reason for it.
-- **Does a round end on a date or when an admin ends it?** A scheduled end
-  that players can see is fairer, and `bin/round.php end` from cron would do
-  it.
-- **What does a round result rank by?** The game has five rankings: land
-  (`emland.php`), mountains (`emmountains.php`), experience (`esscores.php`),
-  settlement strength (`setstrength.php`) and guild strength (`sguild.php`).
-  The round result should store all the values those rankings use, so any of
-  them can be rebuilt later. Which one counts as "the winner" is a ruling for
-  each ruleset to make.
+- ~~**Does a round end on a date or when an admin ends it?**~~ **When an
+  admin ends it** (decided 2026-10-18): `bin/round.php end`, or its admin
+  page. No scheduled end.
+- ~~**What does a round result rank by?**~~ **`user.exp`, the networth**
+  (decided 2026-10-18). Despite the name it is not accumulated experience:
+  the tick recomputes it each run (`update.php`, "calculate all units") as a
+  weighted sum of every unit including those away, assigned sages,
+  explorers, land, mountains and weapon upgrades. It is what "Strongest
+  Empires" (`esscores.php`) ranks by, and settlement and guild strength are
+  sums of it. The round result stores `exp`, `land` and `mts` and the
+  kingdom's settlement and guild, so the other four rankings can be rebuilt
+  too. A later ruleset may rule differently.
 - **How long are ended rounds' rows kept?** Round results are kept
   indefinitely. The raw rows are needed only for anything that wants more
   than the snapshot.
 - ~~**Should an account have a public name across rounds?**~~ **Yes, and it
   has one:** `account.handle`, chosen at signup, unique ignoring case, held to
   the empire-name rule by `mb_valid_handle()`, and shown on the preferences
-  page. A round result should record it beside the kingdom's name, so history
-  reads as the player rather than as a different empire each round. It is
-  not changeable from the game yet; whether it should be — and what history
-  then shows — is a decision for step 3. Accounts moved by
-  `bin/accounts-migrate.php` take their empire's name.
+  page. Accounts moved by `bin/accounts-migrate.php` take their empire's
+  name.
+
+  **The leaderboard and history show the kingdom's name, not the handle**
+  (decided 2026-10-18). A player names their kingdom each round — `user.ename`
+  is per kingdom already, chosen at signup now and at join once step 3
+  lands — and that name is what a round is remembered by. The round result
+  records `account_id` beside the name, so a player's own history can list
+  their kingdoms; the handle is not part of it, so whether a handle may change
+  no longer touches history.
