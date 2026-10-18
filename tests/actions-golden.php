@@ -173,6 +173,23 @@ $SCENARIOS[] = array(
 );
 
 /*
+ * Recalling sages from research: one of the first sixteen projects, and one of
+ * the last two.
+ */
+$SCENARIOS[] = array(
+    'name'  => 'cancel-sages',
+    'why'   => 'Two of the five sages on Fireball come home.',
+    'setup' => array(),
+    'requests' => array(array('cresearch.php', array('first' => 1, 'ur1' => 2))),
+);
+$SCENARIOS[] = array(
+    'name'  => 'quirk-cancel-animation-sages',
+    'why'   => 'QUIRK: sages on Animation cannot be recalled. The page says they were, and nothing moves.',
+    'setup' => array(set('research', $T, array('r17' => 3))),
+    'requests' => array(array('cresearch.php', array('first' => 1, 'ur17' => 2))),
+);
+
+/*
  * Explorers in the field, and one tick. At 1,000 land every exploring rate
  * needs a different number of explorers per land -- 40 for a Human at 0.8, 42
  * at 0.85, 45 at the default 0.9, 47 at 0.95 -- so 600 out gains a different
