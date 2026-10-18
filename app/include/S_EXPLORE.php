@@ -37,32 +37,14 @@ $cexploremt = implode("", explode(",", $cexploremt));
 $exploreland = implode("", explode(",", $exploreland));
 $exploremt = implode("", explode(",", $exploremt));
 
-// the race's exploring rate, as the tick applies it (lower number is better)
-$exp_num = mb_explore_rate($race);
-
-//  explorers needed for land or mountian max
-$max_land = $land * $exp_num;
-$max_mts = $mts * $exp_num;
-$max_land = round($max_land);
-$max_mts = round($max_mts);
-
-//  explorers neded to get 1 land or mountain
-$per_land = $max_land / 20;
-$per_mt = $max_mts / 20;
-$per_land = round($per_land);
-$per_mt = round($per_mt);
-
-if($expland != 0) { $land_gain = $expland / $per_land;  }
-if($expmt != 0) { $mt_gain = $expmt / $per_mt;  }
-
-$mt_gain = round($mt_gain);
-$land_gain = round($land_gain);
-
-if($land_gain > 20) { $land_gain = 20;  }
-if($mt_gain > 20) { $mt_gain = 20;  }
-
-if($mt_gain == "")   {  $mt_gain = 0; }
-if($land_gain == "")  { $land_gain = 0; }
+// what the explorers out will find, as the tick works it out
+$found = mb_explore($race, $land, $mts, $expland, $expmt);
+$max_land = $found['max_land'];
+$max_mts = $found['max_mts'];
+$per_land = $found['per_land'];
+$per_mt = $found['per_mt'];
+$land_gain = $found['land_gain'];
+$mt_gain = $found['mt_gain'];
 
 echo "
 <center>

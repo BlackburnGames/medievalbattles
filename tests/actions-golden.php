@@ -172,8 +172,15 @@ foreach (array('Human', 'Angel', 'Demon', 'Giant') as $race) {
     );
 }
 $SCENARIOS[] = array(
-    'name'  => 'quirk-explore-small-empire',
-    'why'   => 'QUIRK: under 23 land a land costs no explorers at all -- round(land * 0.8) / 20 floors to 0 -- and the tick divides by it.',
+    'name'  => 'explore-capped',
+    'why'   => 'No more than 20 land and 20 mountains a tick, however many explorers are out.',
+    'setup' => array(set('explore', $T, array('expland' => 5000, 'expmt' => 5000))),
+    'show'  => $exploreShow,
+    'requests' => array(array(TICK, array())),
+);
+$SCENARIOS[] = array(
+    'name'  => 'explore-small-empire',
+    'why'   => 'Under 23 land a land costs one explorer, the least it can. round(land * 0.8) / 20 floored to none, and the tick divided by it and died, for every empire.',
     'setup' => array(set('user', $T, array('land' => 20)),
         set('buildings', $T, array('home' => 5, 'barrack' => 5, 'farm' => 5, 'aland' => 5)),
         set('explore', $T, array('expland' => 10))),

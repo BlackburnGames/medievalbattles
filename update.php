@@ -82,9 +82,6 @@ while($INC_ID < $max_UID + 1) {
       $result6 = mysqli_query($db, $query6) or die("Error in query! " . mysqli_error($db));
       $ret = mysqli_fetch_array($result6);
 
-        $land_gain = 0;
-        $mt_gain = 0;
-        $exp_num = mb_explore_rate($user['race']);
         // The per-tick base rates. The switches below adjust these copies for
         // race, class and research; the values themselves are gamedata's.
         $foodmod = $ECON['food_per_farm'];
@@ -210,19 +207,9 @@ while($INC_ID < $max_UID + 1) {
 ##################
   echo "<p>Updating Land and Mountains...</p>";
 
-      $max_land = round($user['land'] * $exp_num);
-      $max_mts  = round($user['mts'] *  $exp_num);
-      $per_land = floor($max_land / 20);
-      $per_mt   = floor($max_mts / 20);
-
-      if($explore['expland'] != 0)  { $land_gain = $explore['expland'] / $per_land; }
-      if($explore['expmt'] != 0)   {  $mt_gain = $explore['expmt'] / $per_mt; }
-
-      $mt_gain = floor($mt_gain);
-      $land_gain = floor($land_gain);
-
-      if($land_gain > 20) { $land_gain = 20;  }
-      if($mt_gain > 20) { $mt_gain = 20;  }
+      $found = mb_explore($user['race'], $user['land'], $user['mts'], $explore['expland'], $explore['expmt']);
+      $land_gain = $found['land_gain'];
+      $mt_gain = $found['mt_gain'];
 
       mysqli_query($db, "UPDATE buildings SET aland = aland + $land_gain, amts = amts + $mt_gain WHERE userid='$INC_ID'");
       mysqli_query($db, "UPDATE user SET land = land + $land_gain, mts = mts + $mt_gain WHERE userid='$INC_ID'");

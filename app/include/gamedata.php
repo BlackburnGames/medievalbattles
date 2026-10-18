@@ -74,18 +74,16 @@ $GAMEDATA['buildings'] = array(
 );
 
 /* ------------------------------------------------------------------ *
- * Exploring. update.php:213-228.
- *
- * The exploring rate is a definition: the default here and each race's
- * explore_exp_num below are read through mb_explore_rate() in
- * include/exploring.php, by the tick and by the explore page alike. The page
+ * Exploring. Every value here is a definition, read by mb_explore() in
+ * include/exploring.php -- the one calculation the tick applies and the
+ * explore page shows -- along with each race's explore_exp_num below. The page
  * used to carry its own copy with the Angel and Demon rates in it, which the
  * tick never applied; the page's numbers were taken as the design.
  * ------------------------------------------------------------------ */
 $GAMEDATA['exploring'] = array(
     'exp_num_default' => 0.9,   // read by mb_explore_rate(): races without their own
-    'divisor'         => 20,    // update.php:215: explorers per land = floor(round(land * exp_num) / 20)
-    'max_gain_per_tick' => 20,  // update.php:224-225
+    'divisor'         => 20,    // read by mb_explore(): explorers per land = floor(round(land * rate) / 20), never below 1
+    'max_gain_per_tick' => 20,  // read by mb_explore()
 );
 
 /* ------------------------------------------------------------------ *
@@ -455,7 +453,6 @@ $GAMEDATA['exp_values'] = array(
  * ------------------------------------------------------------------ */
 $GAMEDATA['quirks'] = array(
     'The Scepter of Zakarum sets its speed on equip but never its power, so the listed power is not actually applied. (equip.php:199)',
-    'An empire under 23 land with explorers in the field stops the tick: explorers per land rounds down to 0 and the tick divides by it, which on PHP 8 is fatal -- for every empire, not just that one. (update.php:218)',
     'Night Elves are dealt 4-10 archers at signup, but the free Archery research is immediately overwritten unless they are also Rangers. (checksignup.php:130-134)',
     'Sage accounting disagrees with itself about how many research projects there are. Points accrue across all eighteen, the assigned-sage totals on the status and research screens count the first sixteen, and your score counts only the first fourteen -- so a sage on Animation or Advanced Animation is invisible to both totals, and one on Advanced Farming or Advanced Construction is invisible to your score. (update.php:203 vs functions.php:240 and cresearch.php:112 vs update.php:292)',
 );

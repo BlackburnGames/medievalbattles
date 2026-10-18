@@ -145,12 +145,17 @@
 > tick
     buildings [1] amts 100 -> 111, aland 850 -> 863
 
-### quirk-explore-small-empire
-# QUIRK: under 23 land a land costs no explorers at all -- round(land * 0.8) / 20 floors to 0 -- and the tick divides by it.
+### explore-capped
+# No more than 20 land and 20 mountains a tick, however many explorers are out.
 
 > tick
-  php:  Fatal error: Uncaught DivisionByZeroError: Division by zero (update.php)
-  (no change)
+    buildings [1] amts 100 -> 120, aland 100 -> 120
+
+### explore-small-empire
+# Under 23 land a land costs one explorer, the least it can. round(land * 0.8) / 20 floored to none, and the tick divided by it and died, for every empire.
+
+> tick
+    buildings [1] aland 5 -> 15
 
 ### blank-boxes-buildings-uhome
 # buildings.php with uhome filled in and every other box empty, as a browser sends it.
