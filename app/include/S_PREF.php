@@ -4,15 +4,17 @@
 		<td class=main colspan=2><b>Update Preferences</b></td>
     <tr>
 		<td class=main2><b>Email:</b></td>
-		<td class=inner2><input type="text" name="newemail" maxlength=50 value="<?
+		<td class=inner2><input type="text" name="newemail" maxlength=254 value="<?
 
 // Request input, formerly supplied by register_globals.
 include("include/request.php");
 $msn = mb_input('msn');
- echo "$email"; ?>"></td>
+ // Escaped though the address is validated: an apostrophe, an ampersand
+ // and the rest of what an address may hold are text here, not markup.
+ echo mb_h($email); ?>"></td>
 	<tr>
 		<td class=main2><b>AIM:</b></td>
-		<td class=inner2><input type="text" name="newaim" maxlength=20 value="<? echo "$aim"; ?>"></td>
+		<td class=inner2><input type="text" name="newaim" maxlength=20 value="<? echo mb_h($aim); ?>"></td>
 	<tr>
 		<td class=main2><b>MSN:</b></td>
 		<td class=inner2><input type="text" name="newmsn" maxlength=50 value="<? echo mb_h($msn); ?>"></td>

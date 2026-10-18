@@ -233,8 +233,10 @@ fingerprint of the account's address and hash:
    - **Revocation**: a SHA-256 fingerprint of the account's address and hash
      in the session, compared with the account's on every request, plus the
      kingdom still being that account's. `tests/session.php` drives each.
-   - **Addresses are capped at 50**, the column width. A longer one was
-     silently truncated on insert and could never log in.
+   - **Addresses may be any valid address up to 254 characters**, the
+     column width. A longer one would be silently truncated on insert and
+     could never log in; an apostrophe, refused while addresses were
+     interpolated, is allowed again.
 3. **Rounds.** Add the `round` and `round_result` tables and `bin/round.php`.
    Make the round list, join and history pages. Retire `newgame.php`.
 4. **Concurrent rounds.** The session chooses among running rounds, and the

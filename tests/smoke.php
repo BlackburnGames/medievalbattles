@@ -885,7 +885,10 @@ function prefsEmailChange(MbClient $client)
 {
     global $failures;
 
-    $hostile = "a'b@example.com";
+    // Not a quote, which an address may hold now that nothing interpolates
+    // it, but a newline: the address goes into mail()'s To: header, where one
+    // would start a header of the sender's choosing.
+    $hostile = "a@example.com\r\nBcc: everyone@example.com";
     $body = postForm($client, 'preferences.php', array(
         'update'   => 'Update',
         'newemail' => $hostile,
@@ -893,8 +896,8 @@ function prefsEmailChange(MbClient $client)
         'newmsn'   => 'msn',
     ));
     if (stripos($body, 'not a valid email address') === false) {
-        $failures['preferences.php | accepted an address containing a quote'] =
-            'app/include/credentials.php: mb_valid_email() is not being applied before the six UPDATEs';
+        $failures['preferences.php | accepted an address carrying a header'] =
+            'app/include/credentials.php: mb_valid_email() is not being applied before the change';
     }
 
     $body = postForm($client, 'preferences.php', array(

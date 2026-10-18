@@ -18,8 +18,7 @@
  * mb_query(), and the round no longer holds an address at all: a kingdom is
  * found by its userid, and the address lives once, on the account
  * (include/accounts.php). The rule is now about what an address must be to be
- * stored and mailed, and it still has a cost worth stating -- see
- * mb_valid_email().
+ * stored and mailed -- see mb_valid_email().
  *
  * The empire and guild names below are still interpolation-era rules too, and
  * still worth having: both are read back and echoed on every page.
@@ -32,23 +31,25 @@ if (!function_exists('mb_valid_email')) {
      */
     function mb_valid_email($value)
     {
-        // 50, not the 254 an address may run to: every table that holds one
-        // is varchar(50), and with this server's non-strict sql_mode a longer
-        // address was stored cut short without a word -- so the account it
-        // made could never log in, because nothing matched what it typed.
-        if (!is_string($value) || $value === '' || strlen($value) > 50) {
+        // 254, the longest an address can be, and account.email's width. With
+        // this server's non-strict sql_mode a longer value would be stored cut
+        // short without a word, and the account could never log in.
+        if (!is_string($value) || $value === '' || strlen($value) > 254) {
             return false;
         }
 
-        // A positive charset, not a blacklist of the characters that happen to
-        // matter to MySQL today. Everything outside it -- quote, backslash,
-        // backtick, NUL, newline, anything above ASCII -- is refused, so this
-        // does not have to be revisited when the next sink is HTML or a header
-        // rather than a query.
-        if (preg_match('/^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$/', $value) !== 1) {
-            return false;
-        }
-
+        // What an address may be, and no narrower. Until every query bound its
+        // values this was a positive charset -- [A-Za-z0-9._%+-] and a dotted
+        // domain -- because the address was interpolated bare into some 400
+        // queries, and it refused real addresses like o'brien@example.com to
+        // keep a quote out of them. No query sees it unbound now, and the
+        // round does not hold it at all.
+        //
+        // What still matters is where it goes: mail()'s To: header, where a
+        // newline would start a header of the attacker's choosing, and the
+        // preferences form, where it is escaped. FILTER_VALIDATE_EMAIL refuses
+        // every control character, whitespace and anything above ASCII, and
+        // that is the guarantee both depend on.
         return filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
     }
 }

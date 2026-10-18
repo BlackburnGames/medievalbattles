@@ -162,6 +162,10 @@ In progress. The known work, in no committed order:
     It costs something and the cost is stated in that file: an apostrophe is
     legal in a real address and `o'brien@example.com` is now refused. That
     restriction can be lifted the day those queries bind their parameters.
+    **Lifted.** Every query binds, and the round holds no address;
+    `mb_valid_email()` is `FILTER_VALIDATE_EMAIL` and a 254-character limit,
+    which still refuses the newline that would inject a mail header.
+    `tests/signup.php` signs `o'brien@` up and logs it in.
 
   Two shapes of false positive turned up often enough to name. Both are one
   variable meaning two things, which a flow-insensitive audit cannot tell apart

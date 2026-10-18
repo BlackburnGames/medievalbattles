@@ -14,7 +14,7 @@
 CREATE TABLE `account` (
   `account_id` int unsigned NOT NULL AUTO_INCREMENT,
   -- mb_valid_email() refuses anything longer than this column.
-  `email` varchar(50) NOT NULL,
+  `email` varchar(254) NOT NULL,
   -- bcrypt, or the legacy unsalted MD5 that checklogin.php rehashes on the
   -- way through. Bound in every query that touches it, never interpolated.
   `pw` varchar(255) NOT NULL,

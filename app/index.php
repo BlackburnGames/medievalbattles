@@ -40,7 +40,7 @@ if ($computer_id === '') {
         </tr>
         <tr>
           <td>Email:</td>
-          <td><input type="text" name="email" maxlength=50 size=15></td>
+          <td><input type="text" name="email" maxlength=254 size=15></td>
         </tr>
         <tr>
           <td>Password:</td>

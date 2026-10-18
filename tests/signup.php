@@ -68,6 +68,30 @@ foreach ($CASES as $i => $case) {
     }
 }
 
+// An address with an apostrophe, which is legal and which the game refused
+// while addresses were interpolated into its queries. It signs up, logs in,
+// and comes back escaped in the preferences form's attribute.
+$obrien = "o'brien@example.com";
+mysqli_query($db, "UPDATE user SET ip = ''");
+$client = new MbClient($BASE);
+$client->get('/index.php');
+$body = $client->post('/checksignup.php', array(
+    'signup' => 1, 'email' => $obrien, 'cemail' => $obrien, 'pw' => 'pass1234', 'cpw' => 'pass1234',
+    'ename' => 'Obrien', 'race' => 'Human', 'class' => 'Fighter', 'msn' => '', 'aim' => '',
+));
+$client = new MbClient($BASE);
+$client->get('/index.php');
+$client->post('/checklogin.php', array('email' => $obrien, 'pw' => 'pass1234', 'login' => 'Login'));
+if ($client->lastStatus !== 302) {
+    echo "FAIL: $obrien could not sign up and log in. Signup said: " . trim(substr(strip_tags($body), 0, 200)) . "\n";
+    $failures++;
+} elseif (strpos($client->get('/preferences.php'), 'value="o&#039;brien@example.com"') === false) {
+    echo "FAIL: $obrien is not shown escaped on the preferences form\n";
+    $failures++;
+} else {
+    echo "ok: $obrien signs up, logs in and is shown escaped\n";
+}
+
 loadFixture($db);
 
 if ($failures) {
