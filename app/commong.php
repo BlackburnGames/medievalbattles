@@ -22,9 +22,10 @@ $color1 = "#303030";
 $color2 = "#460101";
 $color3 = "#303030";
 $tablewidth= "80%";
-	$guild_id_query = mysqli_query($db, "SELECT gid FROM guild WHERE gname=" . mb_sql_str($db, $empireguild) . "");	
-		$gid = mb_db_result($guild_id_query, "gid");
-$empireguild = str_replace(" ", "", $empireguild);
-$topicdb = "$empireguild" . "main" . "$gid";
-$msgsdb = "$empireguild" . "msgs" . "$gid";
+// No per-guild table names any more. This file used to build them --
+// "<guild>main<gid>" -- out of $empireguild with its spaces stripped, and
+// stripped them in $empireguild itself, so every page that included it looked
+// a guild with a space in its name up as a guild that does not exist. The
+// guild forum has been two shared tables, guildthreads and guildmsgs, for as
+// long as this schema has existed.
 ?>

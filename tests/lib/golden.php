@@ -99,7 +99,11 @@ function runScenarios(array $scenarios, $fields = null)
         // After the setup, so the login sees the setup, and before the first
         // snapshot, so the login's own writes (the rehash, lastlogin) are not
         // reported as the action.
-        $client = login($BASE, 'tester@example.com', 'test1234');
+        // The tester unless the scenario names another fixture login, as
+        // array(email, password) -- a guard has to be driven from the arm it
+        // refuses, and the tester leads everything.
+        list($as, $password) = isset($s['login']) ? $s['login'] : array('tester@example.com', 'test1234');
+        $client = login($BASE, $as, $password);
 
         echo "### {$s['name']}\n";
         echo "# {$s['why']}\n";

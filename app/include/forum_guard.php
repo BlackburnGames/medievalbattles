@@ -79,9 +79,10 @@ function mb_forum_require_guild($empireguild)
 /**
  * Is this thread on the caller's own guild board?
  *
- * $empireguild must be the value commong.php leaves behind -- it strips spaces
- * out of the name, and that stripped form is what `guildthreads.guildname`
- * holds.
+ * `guildthreads.guildname` holds the guild's name as it was typed. commong.php
+ * used to strip the spaces out of $empireguild first, so guilds whose names
+ * differed only by spaces shared one board and passed this check for each
+ * other's threads.
  */
 function mb_forum_require_guild_thread($db, $topicid, $empireguild)
 {

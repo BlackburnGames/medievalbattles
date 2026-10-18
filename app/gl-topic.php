@@ -10,18 +10,15 @@ $topicid = (int) mb_input('topicid');
 include("include/igtop.php");
 include("commong.php");
 
-$result= mysqli_query($db, "SELECT topicid, guildname FROM guildthreads WHERE guildname=" . mb_sql_str($db, $empireguild) . " AND topicid='$topicid'") or die("Error! " . mysqli_error($db));
-$guild_check = mysqli_fetch_array($result);
-
-if($empireguild != $guild_check['guildname'])	{
-	echo"<div align=center><font class=yellow>You cannot view forum posts in other guilds!</font></div>";
-	die();
-}
-
-if($empireguild == 'None')	{
-	echo"<div align=center>You have to be in a guild to view this page!</div>";
-	die();
-}
+// The leader's view of a thread, the guild counterpart of sl-topic.php: the
+// same thread topicg.php shows every member, with a Delete link on each reply.
+// gl-delposts.php and gl-inputposts.php both send a leader here when they are
+// done. It used to read "<guild>main<gid>" and "<guild>msgs<gid>", per-guild
+// tables from an older schema that db.sql has never had, so all it ever showed
+// was an error -- and it asked only that the caller be in the guild, not lead it.
+include("include/forum_guard.php");
+mb_forum_require_gl($db, $userid, $empireguild);
+mb_forum_require_guild_thread($db, $topicid, $empireguild);
 
 // The reply form below prefills its Topic field from $topic, which until now
 // meant two things at once: the request parameter read above, and whatever the
@@ -31,14 +28,14 @@ if($empireguild == 'None')	{
 // is decidable and the audit can see it.
 $r_topic = $topic;
 
-$result1 = mysqli_query($db, "SELECT name, topic, message, lastpost FROM $topicdb WHERE topicid='$topicid'") or die("Error! " . mysqli_error($db));
+$result1 = mysqli_query($db, "SELECT name, topic, message, lastpost FROM guildthreads WHERE topicid='$topicid' AND guildname=" . mb_sql_str($db, $empireguild)) or die("Error! " . mysqli_error($db));
 
 if ($result1) { 
 	echo"
 	<table border=0 class=f align=center cellspacing=1 cellpadding=1 width=95%>
 		<tr>
 			<td valign=top> </td>
-			<td valign=top align=center><a href=gforums.php name=top class=black-small>Return to Guild Forums</a></td>
+			<td valign=top align=center><a href=gl-forum.php name=top class=black-small>Return to Guild Leader Forum</a></td>
 			<td valign=top align=right> <br><br></td>
 		</tr>";
 										
@@ -47,7 +44,8 @@ if ($result1) {
 	echo "
 		<tr>
 			<td bgcolor=$color3 width=15% align=left><b class=forum>" . mb_h($r_name) . "</b></td>
-			<td bgcolor=$color3 width=85% align=left><b class=forum>" . mb_h($r_topic) . "</b></td>
+			<td bgcolor=$color3 width=80% align=left><b class=forum>" . mb_h($r_topic) . "</b></td>
+			<td bgcolor=$color3></td>
 		</tr>
 		<tr>
 			<td bgcolor=$color2 valign=top colspan=3><pre>" . mb_h($r_lastpost) . "</pre>" . mb_rich($r_message) . "<br><br></td>
@@ -58,7 +56,9 @@ echo "
 mysqli_free_result($result1);	
 }
 
-$query2 = "SELECT messageid, name, topic, message, datestamp FROM $msgsdb WHERE topicid='$topicid' ORDER BY datestamp";
+// guildmsgs has no guild column of its own; the thread check above is what
+// scopes it.
+$query2 = "SELECT messageid, name, topic, message, datestamp FROM guildmsgs WHERE topicid='$topicid' ORDER BY messageid ASC";
 $result2 = mysqli_query($db, $query2) or die("Could not execute the query!");
 
 if ($result2) { 
@@ -66,18 +66,17 @@ echo "
 	<table border=0 class=f width=95% align=center cellspacing=1 cellpadding=1>";
 	
 	while ($r2 = mysqli_fetch_array($result2)) {
-	$r_name = $r2['name']; $r_topic = $r2['topic']; $r_message = $r2['message']; $r_datestamp = $r2['datestamp'];
+	$r_name = $r2['name']; $r_topic = $r2['topic']; $r_message = $r2['message'];
+	$r_datestamp = $r2['datestamp']; $messageid = $r2['messageid'];
 
 echo "
 		<tr>
 			<td bgcolor=$color3 width=15% align=left><b class=forum>" . mb_h($r_name) . "</b></td>
-			<td bgcolor=$color3 width=85% align=left><b class=forum>" . mb_h($r_topic) . "</b></td>
+			<td bgcolor=$color3 width=80% align=left><b class=forum>" . mb_h($r_topic) . "</b></td>
+			<td bgcolor=$color3><strong class=white><a href=" . mb_attr("gl-delposts.php?delpost=true&mid=$messageid&tid=$topicid") . "><font size=-2> &nbsp; Delete</a></strong></td>
 		</tr>
 		<tr>
 			<td bgcolor=$color2 valign=top colspan=3><pre>" . mb_h($r_datestamp) . "</pre>" . mb_rich($r_message) . "<br><br></td>
-		</tr>
-		<tr>
-			<td></td>
 		</tr>";
 	} 
 echo "

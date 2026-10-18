@@ -185,7 +185,6 @@ $UNREACHABLE = array(
     // by postForm() now; these two are not.
     'checklogin.php'       => 'POST handler: exercised by the login that starts this run',
     'checksignup.php'      => 'POST handler: creates a user from rand(), see docs/testing.md',
-    'gl-topic.php'         => 'POST handler: guild-leader thread moderation view',
 
     // Deliberately skipped: destructive by plain GET. See $SKIP.
     'disband.php'          => 'skipped: destroys the fixture army',

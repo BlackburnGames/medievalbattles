@@ -201,26 +201,33 @@ $twoGuilds = array(
     "UPDATE user SET guild='Testguild' WHERE userid=3",
 );
 $SCENARIOS[] = array(
-    'name'  => 'quirk-guild-reads-lookalike-thread',
-    'why'   => 'QUIRK: "Test guild" opens a thread belonging to "Testguild". commong.php strips the spaces out of the guild name of the caller before the pages look threads up by it, so the two guilds share one forum, and the page lets it through.',
+    'name'  => 'guild-refused-lookalike-thread',
+    'why'   => '"Test guild" may not open a thread belonging to "Testguild". commong.php stripped the spaces out of the guild name of the caller before the pages looked threads up by it, so the two guilds shared one forum.',
     'setup' => $twoGuilds,
     'requests' => array(array('topicg.php', array('topicid' => 1))),
 );
 $SCENARIOS[] = array(
-    'name'  => 'quirk-guild-replies-to-lookalike-thread',
-    'why'   => 'QUIRK: and posts a reply into it.',
+    'name'  => 'guild-refused-lookalike-reply',
+    'why'   => 'Nor reply into it. The reply used to be written.',
     'setup' => $twoGuilds,
     'requests' => array(array('inputpostsg.php', array('addreply' => 1, 'topicid' => 1, 'topic' => 'Re', 'message' => 'Aye'))),
 );
 $SCENARIOS[] = array(
-    'name'  => 'quirk-guild-with-space-files-thread',
-    'why'   => 'QUIRK: a new thread from "Test guild" is filed under "Testguild".',
+    'name'  => 'guild-with-space-files-thread',
+    'why'   => 'A new thread from "Test guild" is filed under its own name. It was filed under "Testguild".',
     'setup' => $twoGuilds,
     'requests' => array(array('inputpostsg.php', array('addtopic' => 1, 'topic' => 'Orders', 'message' => 'Hold'))),
 );
 $SCENARIOS[] = array(
-    'name'  => 'quirk-guild-leader-thread-view',
-    'why'   => 'QUIRK: the guild leader thread view, where deleting a post or replying on the leader board lands. It reads <guild>main<gid>, a per-guild table from an older schema that db.sql has never had.',
+    'name'  => 'guild-leader-thread-view',
+    'why'   => 'The guild leader thread view, where deleting a post or replying on the leader board lands. It read a per-guild table from an older schema and showed only an error.',
+    'setup' => array(),
+    'requests' => array(array('gl-topic.php', array('topicid' => 1))),
+);
+$SCENARIOS[] = array(
+    'name'  => 'guild-leader-thread-view-refused',
+    'why'   => 'A member who does not lead the guild is refused it. It asked only for membership.',
+    'login' => array('idle@example.com', 'pass2'),
     'setup' => array(),
     'requests' => array(array('gl-topic.php', array('topicid' => 1))),
 );

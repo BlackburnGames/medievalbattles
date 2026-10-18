@@ -43,7 +43,7 @@ echo "
 
 echo "
 					<tr bgcolor=$color2>
-						<td valign=top><strong class=black-small><a href=" . mb_attr("topicg.php?topicid={$r['topicid']}") . ">" . mb_h($r['topic']) . "</a></strong></td>
+						<td valign=top><strong class=black-small><a href=" . mb_attr("gl-topic.php?topicid={$r['topicid']}") . ">" . mb_h($r['topic']) . "</a></strong></td>
 						<td valign=top align=center>" . mb_h($topic_replies) . "</td>
 						<td valign=top align=center><strong class=black-small>" . mb_h($r['name']) . "</strong></td>
 						<td valign=top align=center><strong class=black-small>" . mb_h($r['lastposter']) . "</strong></td>

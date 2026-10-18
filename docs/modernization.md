@@ -929,7 +929,7 @@ The crawl cannot see a race, so `tests/barter-race.php` makes one.
 ### Prerequisite: coverage — done
 
 The smoke crawl reached 39 of 69 top-level scripts when Phase 3 opened. It
-reaches 58, and every one of the eleven it does not reach has a reason recorded
+reaches 59, and every one of the ten it does not reach has a reason recorded
 in `$UNREACHABLE` that is checked on each run. It also covers all ten admin
 pages and both barter boards, neither of which is in that count — the
 denominator is `app/*.php`. Rewriting a page the suite does not visit is not a
@@ -946,11 +946,13 @@ Three steps got there:
    outside the net. `postForm()` now submits both arms of the four forum thread
    handlers, and the moderation handlers are called directly.
 
-The remaining eleven are three includes, three POST handlers with no safe
-fixture (`checksignup.php` creates a user from `rand()`), `disband.php` and
-`logout.php` (both destroy what the run depends on), one dead file
-(`scoreboard.php`), and the two-step account activation flow. `guildbarter.php`
-came off the list when the barter system was switched back on.
+The remaining ten are three includes, two POST handlers with no safe
+fixture (`checksignup.php` creates a user from `rand()`, and has its own test
+in `tests/signup.php`), `disband.php` and `logout.php` (both destroy what the
+run depends on), one dead file (`scoreboard.php`), and the two-step account
+activation flow. `guildbarter.php` came off the list when the barter system
+was switched back on, and `gl-topic.php` when it was rebuilt to read the
+tables the guild forum actually uses, and linked from `gl-forum.php`.
 
 Two things learned doing it.
 
