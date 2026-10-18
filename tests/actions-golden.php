@@ -146,6 +146,33 @@ $SCENARIOS = array(
 );
 
 /*
+ * Equipping weapons. The tester has the Scepter of Zakarum built (a weapon
+ * column at 1 is a finished weapon); 'ns' is the form's "no change".
+ */
+$equip = function (array $weapons) {
+    return array('equip.php', array('update' => 1) + $weapons + array('uwarrior' => 'ns', 'uwizard' => 'ns', 'upriest' => 'ns'));
+};
+$scepterBuilt = set('military', $T, array('zakarum' => 1, 'pripower' => 2));
+$SCENARIOS[] = array(
+    'name'  => 'quirk-equip-scepter',
+    'why'   => 'QUIRK: the Scepter of Zakarum sets its speed, 8, and no power at all.',
+    'setup' => array($scepterBuilt),
+    'requests' => array($equip(array('upriest' => 'Scepter of Zakarum'))),
+);
+$SCENARIOS[] = array(
+    'name'  => 'quirk-equip-scepter-with-spell',
+    'why'   => 'QUIRK: equipped in the same order as a wizard spell, the Scepter takes the spell\'s power.',
+    'setup' => array($scepterBuilt),
+    'requests' => array($equip(array('uwizard' => 'Magic Missile', 'upriest' => 'Scepter of Zakarum'))),
+);
+$SCENARIOS[] = array(
+    'name'  => 'equip-flail',
+    'why'   => 'A priest weapon that sets both: the Flail, speed 7 and power 5.',
+    'setup' => array(set('military', $T, array('flail' => 1))),
+    'requests' => array($equip(array('upriest' => 'Flail'))),
+);
+
+/*
  * Explorers in the field, and one tick. At 1,000 land every exploring rate
  * needs a different number of explorers per land -- 40 for a Human at 0.8, 42
  * at 0.85, 45 at the default 0.9, 47 at 0.95 -- so 600 out gains a different

@@ -121,6 +121,27 @@
   says: You can't construct Lumber Mills, because you haven't researched Archery yet!
   (no change)
 
+### quirk-equip-scepter
+# QUIRK: the Scepter of Zakarum sets its speed, 8, and no power at all.
+
+> equip.php update=1 upriest=Scepter+of+Zakarum uwarrior=ns uwizard=ns
+  says: Your troops have been equipped with what you specified.
+    military [1] cstaff Quarterstaff -> Scepter of Zakarum, prispeedw 4 -> 8, pripower 2 -> 0
+
+### quirk-equip-scepter-with-spell
+# QUIRK: equipped in the same order as a wizard spell, the Scepter takes the spell's power.
+
+> equip.php update=1 uwizard=Magic+Missile upriest=Scepter+of+Zakarum uwarrior=ns
+  says: Your troops have been equipped with what you specified.
+    military [1] cstaff Quarterstaff -> Scepter of Zakarum, prispeedw 4 -> 8, pripower 2 -> 3
+
+### equip-flail
+# A priest weapon that sets both: the Flail, speed 7 and power 5.
+
+> equip.php update=1 upriest=Flail uwarrior=ns uwizard=ns
+  says: Your troops have been equipped with what you specified.
+    military [1] cstaff Quarterstaff -> Flail, prispeedw 4 -> 7, pripower 2 -> 5
+
 ### explore-human
 # An empire of race Human exploring, at its own rate -- the tick applied only the Human one, and gave the Angel, the Demon and the Giant 13 land. Mountains are priced on its 200 mountains; they were priced on its 1,000 land, and 100 explorers found 2.
 
