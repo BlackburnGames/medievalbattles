@@ -158,21 +158,33 @@
     military [1] sages 8 -> 10
     research [1] r17 3 -> 1
 
-### quirk-guild-with-space-reads-thread
-# QUIRK: a member of a guild with a space in its name opens one of its threads. commong.php strips the spaces out of $empireguild, and the page then looks the thread up under a guild that does not exist.
+### quirk-guild-reads-lookalike-thread
+# QUIRK: "Test guild" opens a thread belonging to "Testguild". commong.php strips the spaces out of the guild name of the caller before the pages look threads up by it, so the two guilds share one forum, and the page lets it through.
 
 > topicg.php topicid=1
-  says: You cannot view forum posts in other guilds!
   (no change)
 
-### quirk-guild-with-space-replies
-# QUIRK: and replies to it.
+### quirk-guild-replies-to-lookalike-thread
+# QUIRK: and posts a reply into it.
 
 > inputpostsg.php addreply=1 topicid=1 topic=Re message=Aye
+  HTTP 302
   says: <no game page: Warning:  Undefined variable $goldpro in /var/www/html/functions.php on line 405
 
 Deprecated:  number_format(): Passing>
-  (no change)
+  + guildmsgs messageid=2 | name=TestLord | host= | topic=Re | topicid=1 | message=Aye
+  - guildthreads topicid=1 | name=TestLord | host=localhost | topic=Guild orders | lastpost=<CLOCK> | lastposter=IdleBaron | replies=1 | message=Muster at dawn. | guildname=Testguild
+  + guildthreads topicid=1 | name=TestLord | host=localhost | topic=Guild orders | lastpost=<CLOCK> | lastposter=TestLord | replies=1 | message=Muster at dawn. | guildname=Testguild
+
+### quirk-guild-with-space-files-thread
+# QUIRK: a new thread from "Test guild" is filed under "Testguild".
+
+> inputpostsg.php addtopic=1 topic=Orders message=Hold
+  HTTP 302
+  says: <no game page: Warning:  Undefined variable $goldpro in /var/www/html/functions.php on line 405
+
+Deprecated:  number_format(): Passing>
+  + guildthreads topicid=3 | name=TestLord | host= | topic=Orders | lastpost=<CLOCK> | lastposter=TestLord | replies=0 | message=Hold | guildname=Testguild
 
 ### quirk-guild-leader-thread-view
 # QUIRK: the guild leader thread view, where deleting a post or replying on the leader board lands. It reads <guild>main<gid>, a per-guild table from an older schema that db.sql has never had.

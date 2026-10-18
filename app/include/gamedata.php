@@ -452,6 +452,6 @@ $GAMEDATA['exp_values'] = array(
  * truth and so Phase 3 has a checklist.
  * ------------------------------------------------------------------ */
 $GAMEDATA['quirks'] = array(
-    'A guild whose name has a space in it cannot use its own forum: the guild forum pages strip the spaces out of the name before looking threads up by it, so its members are told they cannot view posts in other guilds, and their replies go nowhere. (commong.php:27)',
+    'Guild names that differ only by spaces share one guild forum: the forum pages strip the spaces out of the name before looking threads up by it, so the members of a guild called Ale Axe read and post in the private forum of a guild called AleAxe. (commong.php:27)',
     'The thread view for guild leaders, where deleting a post or replying on the leader board takes you, reads a per-guild table from an older version of the game and shows only an error. (gl-topic.php:34)',
 );

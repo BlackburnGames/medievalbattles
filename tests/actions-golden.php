@@ -190,27 +190,34 @@ $SCENARIOS[] = array(
 );
 
 /*
- * A guild whose name has a space in it, which mb_valid_gname() allows. The
- * fixture's is renamed everywhere it is stored; thread 1 is the guild's.
+ * Two guilds whose names differ only by a space, which mb_valid_gname() and
+ * gc.php's uniqueness check both allow. The tester's guild becomes "Test
+ * guild"; PoorSerf founds "Testguild", which keeps the fixture's thread 1.
  */
-$spacedGuild = array(
+$twoGuilds = array(
     "UPDATE guild SET gname='Test guild' WHERE gid=1",
     "UPDATE user SET guild='Test guild' WHERE guild='Testguild'",
-    "UPDATE guildthreads SET guildname='Test guild' WHERE guildname='Testguild'",
+    "INSERT INTO guild (gname, cpw, strength, gid, datemade, info, owner, mem, notice) VALUES ('Testguild', '', 0, 2, '', '', '3', 1, 'None')",
+    "UPDATE user SET guild='Testguild' WHERE userid=3",
 );
 $SCENARIOS[] = array(
-    'name'  => 'quirk-guild-with-space-reads-thread',
-    'why'   => 'QUIRK: a member of a guild with a space in its name opens one of its threads. commong.php strips the spaces out of $empireguild, and the page then looks the thread up under a guild that does not exist.',
-    'setup' => $spacedGuild,
+    'name'  => 'quirk-guild-reads-lookalike-thread',
+    'why'   => 'QUIRK: "Test guild" opens a thread belonging to "Testguild". commong.php strips the spaces out of the guild name of the caller before the pages look threads up by it, so the two guilds share one forum, and the page lets it through.',
+    'setup' => $twoGuilds,
     'requests' => array(array('topicg.php', array('topicid' => 1))),
 );
 $SCENARIOS[] = array(
-    'name'  => 'quirk-guild-with-space-replies',
-    'why'   => 'QUIRK: and replies to it.',
-    'setup' => $spacedGuild,
+    'name'  => 'quirk-guild-replies-to-lookalike-thread',
+    'why'   => 'QUIRK: and posts a reply into it.',
+    'setup' => $twoGuilds,
     'requests' => array(array('inputpostsg.php', array('addreply' => 1, 'topicid' => 1, 'topic' => 'Re', 'message' => 'Aye'))),
 );
-
+$SCENARIOS[] = array(
+    'name'  => 'quirk-guild-with-space-files-thread',
+    'why'   => 'QUIRK: a new thread from "Test guild" is filed under "Testguild".',
+    'setup' => $twoGuilds,
+    'requests' => array(array('inputpostsg.php', array('addtopic' => 1, 'topic' => 'Orders', 'message' => 'Hold'))),
+);
 $SCENARIOS[] = array(
     'name'  => 'quirk-guild-leader-thread-view',
     'why'   => 'QUIRK: the guild leader thread view, where deleting a post or replying on the leader board lands. It reads <guild>main<gid>, a per-guild table from an older schema that db.sql has never had.',
