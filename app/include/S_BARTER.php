@@ -14,8 +14,7 @@ echo "
 			<td class=main2><b class=reg>Cost</b></td>
 			<td class=main2 width=20%><b class=reg>Barter</b></td>";
 
-$query_string = "SELECT seller, type, amount, method, cost, barterid, userid FROM barter WHERE page != 'guild' ORDER BY type ASC";
-$result_id = mysqli_query($db, $query_string);
+$result_id = mb_query($db, "SELECT seller, type, amount, method, cost, barterid, userid FROM barter WHERE page != 'guild' ORDER BY type ASC");
 $row_num = 0;
 while ($row = mysqli_fetch_row($result_id))	{
 

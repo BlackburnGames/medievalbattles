@@ -10,8 +10,7 @@ echo "  <br><br>
 			<td class='main2'><b class=reg>Origin</b></td>
 			<td class='main2' width='80%'><b class=reg>Message</b></td>";
 
-$query_string = "SELECT origin, datesent, message, mid FROM messages WHERE yourid='$userid' ORDER BY datesent DESC";
-$result_id = mysqli_query($db, $query_string);
+$result_id = mb_query($db, "SELECT origin, datesent, message, mid FROM messages WHERE yourid=? ORDER BY datesent DESC", array($userid));
 while ($row = mysqli_fetch_array($result_id))	{
 	$origin = $row['origin']; $message = $row['message']; $datesent = $row['datesent'];
 	// $link is markup in one branch and a bare name in the other, so it is

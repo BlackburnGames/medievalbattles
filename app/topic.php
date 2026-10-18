@@ -54,8 +54,7 @@ echo "
 	mysqli_free_result($result1);	
 }
 
-$query2 = "SELECT * FROM setforumsmsgs WHERE topicid='$topicid' AND setid='$setid' ORDER BY messageid ASC";
-$result2 = mysqli_query($db, $query2) or die("Could not execute the query!");
+$result2 = mb_query($db, "SELECT * FROM setforumsmsgs WHERE topicid=? AND setid=? ORDER BY messageid ASC", array($topicid, $setid)) or die("Could not execute the query!");
 
 if ($result2) { 
 echo	"

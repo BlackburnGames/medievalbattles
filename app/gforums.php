@@ -23,8 +23,7 @@ if($owner_query == $userid)	{
 
 include("commong.php");
 
-$query = "SELECT topicid, name, topic, replies, lastpost, lastposter FROM guildthreads WHERE guildname=" . mb_sql_str($db, $empireguild) . " ORDER by lastpost DESC";
-$result= mysqli_query($db, $query) or die("Error in query! " . mysqli_error($db));
+$result= mb_query($db, "SELECT topicid, name, topic, replies, lastpost, lastposter FROM guildthreads WHERE guildname=? ORDER by lastpost DESC", array($empireguild)) or die("Error in query! " . mysqli_error($db));
 
 if ($result) { 
 echo "

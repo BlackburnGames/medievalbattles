@@ -21,8 +21,7 @@ if($setchg == 1)	{
 			<select name=empvalue>
 				<option selected value=ns>-Suicide Attack-</option>";
 
-	$query_string = "SELECT userid, ename FROM user WHERE setid = " . mb_sql_int($snum);
-	$result_id = mysqli_query($db, $query_string);
+	$result_id = mb_query($db, "SELECT userid, ename FROM user WHERE setid = ?", array((int) $snum));
 	while ($row = mysqli_fetch_row($result_id))	{
 		echo "<option value=" . mb_attr($row[0]) . ">" . mb_h($row[1]) . "\n</option>";
 	}
@@ -37,8 +36,7 @@ else	{
 			<select name=empvalue>
 				<option selected value=ns>-Suicide Attack-</option>";
 
-	$query_string = "SELECT userid, ename FROM user WHERE setid = '$csnum'";
-	$result_id = mysqli_query($db, $query_string);
+	$result_id = mb_query($db, "SELECT userid, ename FROM user WHERE setid = ?", array($csnum));
 	while ($row = mysqli_fetch_row($result_id))	{
 		echo "<option value=" . mb_attr($row[0]) . ">" . mb_h($row[1]) . "\n</option>";
     }

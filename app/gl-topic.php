@@ -58,8 +58,7 @@ mysqli_free_result($result1);
 
 // guildmsgs has no guild column of its own; the thread check above is what
 // scopes it.
-$query2 = "SELECT messageid, name, topic, message, datestamp FROM guildmsgs WHERE topicid='$topicid' ORDER BY messageid ASC";
-$result2 = mysqli_query($db, $query2) or die("Could not execute the query!");
+$result2 = mb_query($db, "SELECT messageid, name, topic, message, datestamp FROM guildmsgs WHERE topicid=? ORDER BY messageid ASC", array($topicid)) or die("Could not execute the query!");
 
 if ($result2) { 
 echo "

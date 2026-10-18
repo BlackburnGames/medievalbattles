@@ -50,8 +50,7 @@ echo "
 		<td class='main2'><b class='reg'>Experience</b></td>
 		<td class='main2'><b class='reg'>Last Login</b></td>";
 
-$query_string = "SELECT ename, aim, msn, exp, userid, lastlogin FROM user WHERE guild=" . mb_sql_str($db, $empireguild) . " ORDER BY exp DESC";
-$result_id = mysqli_query($db, $query_string);
+$result_id = mb_query($db, "SELECT ename, aim, msn, exp, userid, lastlogin FROM user WHERE guild=? ORDER BY exp DESC", array($empireguild));
 $num = 0;
 while ($row = mysqli_fetch_row($result_id))	{
 		

@@ -48,12 +48,10 @@ echo "<p>Starting update process</p>";
 $INC_ID = 1;
 
 while($INC_ID < $max_UID + 1) {
-      $query = "SELECT * FROM emailvalidate WHERE userid='$INC_ID'";
-      $result = mysqli_query($db, $query) or die("Error in query! " . mysqli_error($db));
+      $result = mb_query($db, "SELECT * FROM emailvalidate WHERE userid=?", array($INC_ID)) or die("Error in query! " . mysqli_error($db));
       $validate = mysqli_fetch_array($result);
 
-      $query1 = "SELECT * FROM user WHERE userid='$INC_ID'";
-      $result1 = mysqli_query($db, $query1) or die("Error in query! " . mysqli_error($db));
+      $result1 = mb_query($db, "SELECT * FROM user WHERE userid=?", array($INC_ID)) or die("Error in query! " . mysqli_error($db));
       $user = mysqli_fetch_array($result1);
 
       // A gap in the id sequence -- a deleted player, or an id never issued.
@@ -62,24 +60,19 @@ while($INC_ID < $max_UID + 1) {
         continue;
       }
 
-      $query2 = "SELECT * FROM military WHERE userid='$INC_ID'";
-      $result2 = mysqli_query($db, $query2) or die("Error in query! " . mysqli_error($db));
+      $result2 = mb_query($db, "SELECT * FROM military WHERE userid=?", array($INC_ID)) or die("Error in query! " . mysqli_error($db));
       $mil = mysqli_fetch_array($result2);
 
-      $query3 = "SELECT * FROM buildings WHERE userid='$INC_ID'";
-      $result3 = mysqli_query($db, $query3) or die("Error in query! " . mysqli_error($db));
+      $result3 = mb_query($db, "SELECT * FROM buildings WHERE userid=?", array($INC_ID)) or die("Error in query! " . mysqli_error($db));
       $build = mysqli_fetch_array($result3);
 
-      $query4 = "SELECT * FROM research WHERE userid='$INC_ID'";
-      $result4 = mysqli_query($db, $query4) or die("Error in query! " . mysqli_error($db));
+      $result4 = mb_query($db, "SELECT * FROM research WHERE userid=?", array($INC_ID)) or die("Error in query! " . mysqli_error($db));
       $res = mysqli_fetch_array($result4);
 
-      $query5 = "SELECT * FROM explore WHERE userid='$INC_ID'";
-      $result5 = mysqli_query($db, $query5) or die("Error in query! " . mysqli_error($db));
+      $result5 = mb_query($db, "SELECT * FROM explore WHERE userid=?", array($INC_ID)) or die("Error in query! " . mysqli_error($db));
       $explore = mysqli_fetch_array($result5);
 
-      $query6 = "SELECT * FROM returntbl WHERE userid='$INC_ID'";
-      $result6 = mysqli_query($db, $query6) or die("Error in query! " . mysqli_error($db));
+      $result6 = mb_query($db, "SELECT * FROM returntbl WHERE userid=?", array($INC_ID)) or die("Error in query! " . mysqli_error($db));
       $ret = mysqli_fetch_array($result6);
 
         // The per-tick base rates. The switches below adjust these copies for
@@ -199,8 +192,8 @@ while($INC_ID < $max_UID + 1) {
       $recruit_rate  = $ECON['recruit_pool_rate'];
       $gold_per_mine = $ECON['gold_per_mine'];
 
-      mysqli_query($db, "UPDATE military SET maxciv = round($mil[maxciv] + ($recruit_rate * $mil[civ])), civ=round($base * $civmod) WHERE userid='$INC_ID'");
-      mysqli_query($db, "UPDATE user SET gp = round(($build[gm] * $gold_per_mine) * $gpmod + $user[gp]), iron = round($build[im] * $ironmod + $user[iron]), food = round($foodmod * $fbase + $food), lumber = round($build[lmill] * $lumbmod + $user[lumber]) WHERE userid='$INC_ID'");
+      mb_query($db, "UPDATE military SET maxciv = round(? + (? * ?)), civ=round(? * ?) WHERE userid=?", array(mb_num($mil['maxciv']), mb_num($recruit_rate), mb_num($mil['civ']), mb_num($base), mb_num($civmod), $INC_ID));
+      mb_query($db, "UPDATE user SET gp = round((? * ?) * ? + ?), iron = round(? * ? + ?), food = round(? * ? + ?), lumber = round(? * ? + ?) WHERE userid=?", array(mb_num($build['gm']), mb_num($gold_per_mine), mb_num($gpmod), mb_num($user['gp']), mb_num($build['im']), mb_num($ironmod), mb_num($user['iron']), mb_num($foodmod), mb_num($fbase), mb_num($food), mb_num($build['lmill']), mb_num($lumbmod), mb_num($user['lumber']), $INC_ID));
 
 ##################
 ### Update Land & Mountains
@@ -211,8 +204,8 @@ while($INC_ID < $max_UID + 1) {
       $land_gain = $found['land_gain'];
       $mt_gain = $found['mt_gain'];
 
-      mysqli_query($db, "UPDATE buildings SET aland = aland + $land_gain, amts = amts + $mt_gain WHERE userid='$INC_ID'");
-      mysqli_query($db, "UPDATE user SET land = land + $land_gain, mts = mts + $mt_gain WHERE userid='$INC_ID'");
+      mb_query($db, "UPDATE buildings SET aland = aland + ?, amts = amts + ? WHERE userid=?", array(mb_num($land_gain), mb_num($mt_gain), $INC_ID));
+      mb_query($db, "UPDATE user SET land = land + ?, mts = mts + ? WHERE userid=?", array(mb_num($land_gain), mb_num($mt_gain), $INC_ID));
 
 ##################
 ### Return Parties
@@ -220,19 +213,19 @@ while($INC_ID < $max_UID + 1) {
   echo "<p>Updating Return Parties...</p>";
 
       if($ret['time1'] == 1)  {
-        mysqli_query($db, "UPDATE military SET warriors = warriors + $ret[war1], wizards = wizards + $ret[wiz1], priests = priests + $ret[pri1], archers = archers + $ret[arch1], golem = golem + $ret[golem1], irongolem = irongolem + $ret[irongolem1]  WHERE userid='$INC_ID'");
+        mb_query($db, "UPDATE military SET warriors = warriors + ?, wizards = wizards + ?, priests = priests + ?, archers = archers + ?, golem = golem + ?, irongolem = irongolem + ?  WHERE userid=?", array(mb_num($ret['war1']), mb_num($ret['wiz1']), mb_num($ret['pri1']), mb_num($ret['arch1']), mb_num($ret['golem1']), mb_num($ret['irongolem1']), $INC_ID));
         mb_query($db, "UPDATE user SET fleets = fleets + 1 WHERE userid=?", array($INC_ID));
       }
       if($ret['time2'] == 1)   {
-        mysqli_query($db, "UPDATE military SET warriors = warriors + $ret[war2], wizards = wizards + $ret[wiz2], priests = priests + $ret[pri2], archers = archers + $ret[arch2], golem = golem + $ret[golem2], irongolem = irongolem + $ret[irongolem2] WHERE userid='$INC_ID'");
+        mb_query($db, "UPDATE military SET warriors = warriors + ?, wizards = wizards + ?, priests = priests + ?, archers = archers + ?, golem = golem + ?, irongolem = irongolem + ? WHERE userid=?", array(mb_num($ret['war2']), mb_num($ret['wiz2']), mb_num($ret['pri2']), mb_num($ret['arch2']), mb_num($ret['golem2']), mb_num($ret['irongolem2']), $INC_ID));
         mb_query($db, "UPDATE user SET fleets = fleets + 1 WHERE userid=?", array($INC_ID));
       }
       if($ret['time3'] == 1)  {
-        mysqli_query($db, "UPDATE military SET warriors = warriors + $ret[war3], wizards = wizards + $ret[wiz3], priests = priests + $ret[pri3], archers = archers + $ret[arch3], golem = golem + $ret[golem3], irongolem = irongolem + $ret[irongolem3] WHERE userid='$INC_ID'");
+        mb_query($db, "UPDATE military SET warriors = warriors + ?, wizards = wizards + ?, priests = priests + ?, archers = archers + ?, golem = golem + ?, irongolem = irongolem + ? WHERE userid=?", array(mb_num($ret['war3']), mb_num($ret['wiz3']), mb_num($ret['pri3']), mb_num($ret['arch3']), mb_num($ret['golem3']), mb_num($ret['irongolem3']), $INC_ID));
         mb_query($db, "UPDATE user SET fleets = fleets + 1 WHERE userid=?", array($INC_ID));
       }
       if($ret['time4'] == 1)  {
-        mysqli_query($db, "UPDATE military SET warriors = warriors + $ret[war4], wizards = wizards + $ret[wiz4], priests = priests + $ret[pri4], archers = archers + $ret[arch4], golem = golem + $ret[golem4], irongolem = irongolem + $ret[irongolem4] WHERE userid='$INC_ID'");
+        mb_query($db, "UPDATE military SET warriors = warriors + ?, wizards = wizards + ?, priests = priests + ?, archers = archers + ?, golem = golem + ?, irongolem = irongolem + ? WHERE userid=?", array(mb_num($ret['war4']), mb_num($ret['wiz4']), mb_num($ret['pri4']), mb_num($ret['arch4']), mb_num($ret['golem4']), mb_num($ret['irongolem4']), $INC_ID));
         mb_query($db, "UPDATE user SET fleets = fleets + 1 WHERE userid=?", array($INC_ID));
       }
 ##################
@@ -244,7 +237,7 @@ while($INC_ID < $max_UID + 1) {
   elseif($user['class'] == 'Warlock') { $research_mod = .75;  }
   else  { $research_mod = 1;  }
 
-  mysqli_query($db, "UPDATE research SET r1pts = r1pts + (r1 * $research_mod), r2pts = r2pts + (r2 * $research_mod), r3pts = r3pts + (r3 * $research_mod), r4pts = r4pts + (r4 * $research_mod), r5pts = r5pts + (r5 * $research_mod), r6pts = r6pts + (r6 * $research_mod), r7pts = r7pts + (r7 * $research_mod), r8pts = r8pts + (r8 * $research_mod), r9pts = r9pts + (r9 * $research_mod), r10pts = r10pts + (r10 * $research_mod), r11pts = r11pts + (r11 * $research_mod), r12pts = r12pts + (r12 * $research_mod), r13pts = r13pts + (r13 * $research_mod), r14pts = r14pts + (r14 * $research_mod), r15pts= r15pts + (r15 * $research_mod), r16pts= r16pts + (r16 * $research_mod), r17pts= r17pts + (r17 * $research_mod), r18pts= r18pts + (r18 * $research_mod) WHERE userid='$INC_ID'");
+  mb_query($db, "UPDATE research SET r1pts = r1pts + (r1 * ?), r2pts = r2pts + (r2 * ?), r3pts = r3pts + (r3 * ?), r4pts = r4pts + (r4 * ?), r5pts = r5pts + (r5 * ?), r6pts = r6pts + (r6 * ?), r7pts = r7pts + (r7 * ?), r8pts = r8pts + (r8 * ?), r9pts = r9pts + (r9 * ?), r10pts = r10pts + (r10 * ?), r11pts = r11pts + (r11 * ?), r12pts = r12pts + (r12 * ?), r13pts = r13pts + (r13 * ?), r14pts = r14pts + (r14 * ?), r15pts= r15pts + (r15 * ?), r16pts= r16pts + (r16 * ?), r17pts= r17pts + (r17 * ?), r18pts= r18pts + (r18 * ?) WHERE userid=?", array(mb_num($research_mod), mb_num($research_mod), mb_num($research_mod), mb_num($research_mod), mb_num($research_mod), mb_num($research_mod), mb_num($research_mod), mb_num($research_mod), mb_num($research_mod), mb_num($research_mod), mb_num($research_mod), mb_num($research_mod), mb_num($research_mod), mb_num($research_mod), mb_num($research_mod), mb_num($research_mod), mb_num($research_mod), mb_num($research_mod), $INC_ID));
 
 ##################
 ### Activation System (ASS)
@@ -546,7 +539,7 @@ This email is automated. Your reply will not be recieved.";
   mb_query($db, "DELETE FROM setnews WHERE age=?", array($msg_ttl));
   mb_query($db, "DELETE FROM guildnews WHERE age=?", array($msg_ttl));
 
-  mysqli_query($db, "UPDATE user SET exp = $exp_floor WHERE exp < $exp_floor");
+  mb_query($db, "UPDATE user SET exp = ? WHERE exp < ?", array(mb_num($exp_floor), $exp_floor));
   mysqli_query($db, "UPDATE game_info SET tick = 'no'");
 
   // The strength recalculation walks settlement ids rather than rows, so it is

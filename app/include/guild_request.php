@@ -8,8 +8,7 @@ echo "
 		<td class='main2'><b class='reg'>Experience</b></td>
 		<td class='main2'><b class='reg'>Decision</b></td>";
 
-$query_string = "SELECT applicant FROM guildrequests WHERE gl_userid='$userid'";
-$result_id = mysqli_query($db, $query_string);
+$result_id = mb_query($db, "SELECT applicant FROM guildrequests WHERE gl_userid=?", array($userid));
 while ($row = mysqli_fetch_row($result_id))	{
 
 	$applicant_query = mb_query($db, "SELECT ename, setid, exp FROM user WHERE userid=?", array((int) $row[0]));

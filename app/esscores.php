@@ -20,8 +20,7 @@ echo "
 		<td class='main2'><b class='reg' width='15%'>Land</b></td>
 		<td class='main2'><b class='reg' width='20%'>Experience</b></td>";
 
-	$query_string = "SELECT ename, mts, land, exp, userid FROM user ORDER BY exp DESC LIMIT 0,40";
-	$result_id = mysqli_query($db, $query_string);
+	$result_id = mb_query($db, "SELECT ename, mts, land, exp, userid FROM user ORDER BY exp DESC LIMIT 0,40");
 	$placeno = 0;
 	while ($row = mysqli_fetch_row($result_id))	{
 

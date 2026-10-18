@@ -29,8 +29,7 @@ echo "
 		<td class=main2 width=20% align=left><b class=reg>Date/Time</b></td>
 		<td class=main2 align=left><b class=reg width=80%>News</b></td>";
 
-$query_string = "SELECT date, news, gnid, class FROM guildnews WHERE gid=" . mb_sql_int($guild_id['gid']) . " ORDER BY date DESC LIMIT 0, 60";
-$result_id = mysqli_query($db, $query_string);
+$result_id = mb_query($db, "SELECT date, news, gnid, class FROM guildnews WHERE gid=? ORDER BY date DESC LIMIT 0, 60", array((int) $guild_id['gid']));
 $num = 0;
 while ($row = mysqli_fetch_row($result_id))	{
 	$num = $num + 1;

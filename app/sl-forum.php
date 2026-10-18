@@ -20,8 +20,7 @@ $numrows=mysqli_num_rows($numresults);
 $mb_sl_q = mb_query($db, "SELECT ename FROM user WHERE sl='yes' AND setid=?", array((int) $setid));
 $mb_leader = mb_db_result($mb_sl_q, "ename");
 
-$query = "SELECT topicid, name, topic, replies, lastpost, lastposter FROM setforums WHERE setid = '$setid' ORDER by lastpost DESC";
-$result= mysqli_query($db, $query) or die("Could not run the database query!");
+$result= mb_query($db, "SELECT topicid, name, topic, replies, lastpost, lastposter FROM setforums WHERE setid = ? ORDER by lastpost DESC", array($setid)) or die("Could not run the database query!");
 
 if ($result) { 
 echo "

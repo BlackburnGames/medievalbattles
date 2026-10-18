@@ -72,8 +72,7 @@ else	{
 	 * which MySQL rejected -- the count has never gone down on either version.
 	 * Doing the arithmetic in SQL removes the round trip along with the bug.
 	 */
-	$ureplies = "UPDATE setforums SET replies=replies-1 WHERE topicid=" . mb_sql_int($tid) . " AND setid='$setid'";
-	mysqli_query($db, $ureplies);
+	mb_query($db, "UPDATE setforums SET replies=replies-1 WHERE topicid=? AND setid=?", array((int) $tid, $setid));
 
 	header ("Location: sl-topic.php?topicid=" . (int) $tid);
 }

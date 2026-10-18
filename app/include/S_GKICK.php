@@ -14,8 +14,7 @@ echo "
 		<td class='inner2'>
 			<select name='remp'>
 			<option selected value='ns'>-- Select Empire To Remove --</option>";
-				$query_string = "SELECT userid, ename FROM user WHERE guild=" . mb_sql_str($db, $guild_name) . " ORDER BY userid ASC";
-				$result_id = mysqli_query($db, $query_string);
+				$result_id = mb_query($db, "SELECT userid, ename FROM user WHERE guild=? ORDER BY userid ASC", array($guild_name));
 				while ($row = mysqli_fetch_row($result_id))	{
 					echo "<option value=" . mb_attr($row[0]) . ">" . mb_h($row[1]) . "</option>\n";
 				}

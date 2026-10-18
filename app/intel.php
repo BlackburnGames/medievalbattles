@@ -89,7 +89,7 @@ else	{
 		
 			// The arithmetic around $send is MySQL's, not PHP's, so it launders
 			// nothing -- the parameter is still a piece of the statement text.
-			mysqli_query($db, "UPDATE military SET thieves = round($thieves - (" . mb_sql_int($send) . " * .1)) WHERE email='$email' AND pw='$pw'");
+			mb_query($db, "UPDATE military SET thieves = round(? - (? * .1)) WHERE email=? AND pw=?", array(mb_num($thieves), (int) $send, $email, $pw));
 			mb_query($db, "UPDATE user SET nno = nno + 1 WHERE userid=?", array((int) $empvalue));
 			mb_news_emp($db, "$clock", 'yellow', "$ename ($setid) has failed to gather information on you", $empvalue);
 			
@@ -98,7 +98,7 @@ else	{
 		}
 		else	{
 	
-			mysqli_query($db, "UPDATE military SET thieves = round($thieves - (" . mb_sql_int($send) . " * .03)) WHERE email='$email' AND pw='$pw'");
+			mb_query($db, "UPDATE military SET thieves = round(? - (? * .03)) WHERE email=? AND pw=?", array(mb_num($thieves), (int) $send, $email, $pw));
 			mb_query($db, "UPDATE user SET nno = nno + 1 WHERE userid=?", array((int) $empvalue));
 			mb_news_emp($db, "$clock", 'yellow', "Thieves have gathered intelligence on your empire", $empvalue);
 

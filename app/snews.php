@@ -28,8 +28,7 @@
 	{
 			Global $setid, $db;
 
-			$query_string = "SELECT date, news, class FROM setnews  WHERE setid='$setid' ORDER BY date DESC";
-			$result_id = mysqli_query($db, $query_string);
+			$result_id = mb_query($db, "SELECT date, news, class FROM setnews  WHERE setid=? ORDER BY date DESC", array($setid));
 
 			 
 			while ($row = mysqli_fetch_row($result_id))

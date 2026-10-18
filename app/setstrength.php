@@ -19,8 +19,7 @@ echo "
 		<td class='main2'><b class='reg' width='15%'>Settlement</b></td>
 		<td class='main2'><b class='reg' width='20%'>Experience</b></td>";
 
-	$query_string = "SELECT setname, setid, setstrength FROM settlement ORDER BY setstrength DESC LIMIT 0,20";
-	$result_id = mysqli_query($db, $query_string);
+	$result_id = mb_query($db, "SELECT setname, setid, setstrength FROM settlement ORDER BY setstrength DESC LIMIT 0,20");
 	$placeno = 0;
 	while ($row = mysqli_fetch_row($result_id))	{
 

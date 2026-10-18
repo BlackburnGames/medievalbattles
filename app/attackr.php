@@ -194,15 +194,15 @@ else	{
 		$civgain = round($civgain);
 		$lumbergain = round($lumbergain);
 	
-		mysqli_query($db, "UPDATE user SET gp = gp + $gpgain WHERE email='$email' AND pw='$pw'");
-		mysqli_query($db, "UPDATE user SET iron = iron + $irongain WHERE email='$email' AND pw='$pw'");
-		mysqli_query($db, "UPDATE user SET lumber = lumber + $lumbergain WHERE email='$email' AND pw='$pw'");
-		mysqli_query($db, "UPDATE military SET civ = civ + $civgain WHERE email='$email' AND pw='$pw'");
+		mb_query($db, "UPDATE user SET gp = gp + ? WHERE email=? AND pw=?", array(mb_num($gpgain), $email, $pw));
+		mb_query($db, "UPDATE user SET iron = iron + ? WHERE email=? AND pw=?", array(mb_num($irongain), $email, $pw));
+		mb_query($db, "UPDATE user SET lumber = lumber + ? WHERE email=? AND pw=?", array(mb_num($lumbergain), $email, $pw));
+		mb_query($db, "UPDATE military SET civ = civ + ? WHERE email=? AND pw=?", array(mb_num($civgain), $email, $pw));
 		
-		mysqli_query($db, "UPDATE user SET gp = gp - $gpgain WHERE userid = " . mb_sql_int($empvalue));
-		mysqli_query($db, "UPDATE user SET iron = iron - $irongain WHERE userid = " . mb_sql_int($empvalue));
-		mysqli_query($db, "UPDATE user SET lumber = lumber - $lumbergain WHERE userid = " . mb_sql_int($empvalue));
-		mysqli_query($db, "UPDATE military SET civ  = civ - $civgain WHERE userid = " . mb_sql_int($empvalue));
+		mb_query($db, "UPDATE user SET gp = gp - ? WHERE userid = ?", array(mb_num($gpgain), (int) $empvalue));
+		mb_query($db, "UPDATE user SET iron = iron - ? WHERE userid = ?", array(mb_num($irongain), (int) $empvalue));
+		mb_query($db, "UPDATE user SET lumber = lumber - ? WHERE userid = ?", array(mb_num($lumbergain), (int) $empvalue));
+		mb_query($db, "UPDATE military SET civ  = civ - ? WHERE userid = ?", array(mb_num($civgain), (int) $empvalue));
 
 		mb_news_set($db, "$clock", 'yellow', "$ename ($setid) successfully attacked $evu[ename] ($evu[setid]) for resources", $setid, 0);
 				

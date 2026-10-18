@@ -11,8 +11,7 @@ echo "
 			<td class='main2'><b class='reg'>Last Logged In</b></td>
 			<td class='main2'><b class='reg'>Votes Received</b></td>
 			<td class='main2'><b class='reg'>Voting For</b></td>";
-$query_string = "SELECT ename, aim, msn, lastlogin, vote, votefor, sl, userid FROM user WHERE setid='$setid' ORDER BY userid ASC";
-$result_id = mysqli_query($db, $query_string);
+$result_id = mb_query($db, "SELECT ename, aim, msn, lastlogin, vote, votefor, sl, userid FROM user WHERE setid=? ORDER BY userid ASC", array($setid));
 while ($row = mysqli_fetch_row($result_id))	{
 	//	Check to see if AIM is not blank
 		$A_result = mb_query($db, "SELECT aim FROM user WHERE aim=?", array($row['aim']));

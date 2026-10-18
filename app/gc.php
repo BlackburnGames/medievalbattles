@@ -117,8 +117,7 @@ echo "  <br><br>
 // mysqli_fetch_array() was a fatal TypeError. Phase 1 selected an empty
 // placeholder to keep the query running; the column exists now, so this reads
 // the real one again.
-$query_string = "SELECT g.gname, g.info, g.datemade, g.gid, g.flag, count(u.ename) AS guildmem FROM guild g LEFT JOIN user u ON g.gname = u.guild GROUP BY u.guild ORDER BY guildmem DESC LIMIT 0, 60";
-$result_id = mysqli_query($db, $query_string);
+$result_id = mb_query($db, "SELECT g.gname, g.info, g.datemade, g.gid, g.flag, count(u.ename) AS guildmem FROM guild g LEFT JOIN user u ON g.gname = u.guild GROUP BY u.guild ORDER BY guildmem DESC LIMIT 0, 60");
 while ($row = mysqli_fetch_array($result_id))	{
 	$row[0] = htmlspecialchars($row[0]);
 	$row[1] = htmlspecialchars($row[1]);

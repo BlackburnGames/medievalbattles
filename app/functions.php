@@ -13,8 +13,7 @@ if($login == 1 && $pw != "" && $email !="") {
 	$userid = mb_db_result($uuserid, 0);
 
 	// account validation
-	$validate_query = "SELECT * FROM emailvalidate WHERE userid=" . mb_sql_int($userid) . "";
-	$validate_result = $db->query($validate_query);
+	$validate_result = mb_query($db, "SELECT * FROM emailvalidate WHERE userid=?", array((int) $userid));
 	$validate = mysqli_fetch_array($validate_result);
 
 	$code = $validate['code'];
@@ -22,28 +21,23 @@ if($login == 1 && $pw != "" && $email !="") {
 	$validate_clock = $validate['clock'];
 
 	// select all armors
-	$armor_query = "SELECT * FROM military WHERE email='$email' AND pw='$pw'";
-	$armor_result = $db->query($armor_query);
+	$armor_result = mb_query($db, "SELECT * FROM military WHERE email=? AND pw=?", array($email, $pw));
 	$armor = mysqli_fetch_array($armor_result);
 
 	// select warrior weapons
-	$war_weapon_query = "SELECT * FROM military WHERE email='$email' AND pw='$pw'";
-	$war_weapon_result = $db->query($war_weapon_query);
+	$war_weapon_result = mb_query($db, "SELECT * FROM military WHERE email=? AND pw=?", array($email, $pw));
 	$warweapon = mysqli_fetch_array($war_weapon_result);
 
 	// select priest weapons
-	$pri_weapon_query = "SELECT * FROM military WHERE email='$email' AND pw='$pw'";
-	$pri_weapon_result = $db->query($pri_weapon_query);
+	$pri_weapon_result = mb_query($db, "SELECT * FROM military WHERE email=? AND pw=?", array($email, $pw));
 	$priweapon = mysqli_fetch_array($pri_weapon_result);
 
 	// select archer weapons
-	$arch_weapon_query = "SELECT * FROM military WHERE email='$email' AND pw='$pw'";
-	$arch_weapon_result = $db->query($arch_weapon_query);
+	$arch_weapon_result = mb_query($db, "SELECT * FROM military WHERE email=? AND pw=?", array($email, $pw));
 	$archweapon = mysqli_fetch_array($arch_weapon_result);
 
 	// select research items
-	$research_query = "SELECT * FROM research WHERE email='$email' AND pw= '$pw'";
-	$res_query = $db->query($research_query) or die("Error: " . mysqli_error($db));
+	$res_query = mb_query($db, "SELECT * FROM research WHERE email=? AND pw= ?", array($email, $pw)) or die("Error: " . mysqli_error($db));
 	$res = mysqli_fetch_array($res_query);
 
 	// select user items
@@ -219,20 +213,16 @@ $return = mysqli_fetch_array($return_query);
 		$_FLEETS = mb_db_result($FLEETS_, "_FLEETS");
 
 //	total all units together
-	$warquery = "SELECT sum(amount) FROM barter WHERE seller=" . mb_sql_str($db, $ename) . " AND type='Warrior'";
-	$warresult = $db->query($warquery) or die("Error: " . mysqli_error($db));
+	$warresult = mb_query($db, "SELECT sum(amount) FROM barter WHERE seller=? AND type='Warrior'", array($ename)) or die("Error: " . mysqli_error($db));
 	$warcheck = mysqli_fetch_array($warresult);
 
-	$wizquery = "SELECT sum(amount) FROM barter WHERE seller=" . mb_sql_str($db, $ename) . " AND type='Wizard'";
-	$wizresult = $db->query($wizquery) or die("Error: " . mysqli_error($db));
+	$wizresult = mb_query($db, "SELECT sum(amount) FROM barter WHERE seller=? AND type='Wizard'", array($ename)) or die("Error: " . mysqli_error($db));
 	$wizcheck = mysqli_fetch_array($wizresult);
 
-	$priquery = "SELECT sum(amount) FROM barter WHERE seller=" . mb_sql_str($db, $ename) . " AND type='Priest'";
-	$priresult = $db->query($priquery) or die("Error: " . mysqli_error($db));
+	$priresult = mb_query($db, "SELECT sum(amount) FROM barter WHERE seller=? AND type='Priest'", array($ename)) or die("Error: " . mysqli_error($db));
 	$pricheck = mysqli_fetch_array($priresult);
 
-	$archquery = "SELECT sum(amount) FROM barter WHERE seller=" . mb_sql_str($db, $ename) . " AND type='Archer'";
-	$archresult = $db->query($archquery) or die("Error: " . mysqli_error($db));
+	$archresult = mb_query($db, "SELECT sum(amount) FROM barter WHERE seller=? AND type='Archer'", array($ename)) or die("Error: " . mysqli_error($db));
 	$archcheck = mysqli_fetch_array($archresult);
 
 	$asages = $sages;

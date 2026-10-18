@@ -32,21 +32,15 @@ include("include/forum_guard.php");
 // regardless. So the leader-only board took posts from any guild member.
 mb_forum_require_gl($db, $userid, $empireguild);
 
-$q_topic   = mb_sql_str($db, $topic);
-$q_ename   = mb_sql_str($db, $ename);
-$q_guild   = mb_sql_str($db, $empireguild);
-$q_topicid = mb_sql_int($topicid);
 
 if ($addtopic) {
 
 	$replies = "0";
 	$result = mb_query($db, "INSERT INTO guildthreads (name, topic, replies, message, datestamp, guildname) VALUES (?, ?, ?, ?, ?, ?)", array($ename, $topic, $replies, $message, $clock, $empireguild));
 
-	$query4 = "UPDATE guildthreads SET lastpost='$clock' WHERE topic=$q_topic AND guildname = $q_guild";
-	$result4 = mysqli_query($db, $query4);
+	$result4 = mb_query($db, "UPDATE guildthreads SET lastpost=? WHERE topic=? AND guildname = ?", array($clock, $topic, $empireguild));
 
-	$query6 = "UPDATE guildthreads SET lastposter=$q_ename WHERE topic=$q_topic AND guildname = $q_guild";
-	$result6 = mysqli_query($db, $query6);
+	$result6 = mb_query($db, "UPDATE guildthreads SET lastposter=? WHERE topic=? AND guildname = ?", array($ename, $topic, $empireguild));
 	// A debug echo of both UPDATE statements stood here, printing the SQL to
 	// the page on every guild-leader post since 2003.
 	header ("Location: gl-forum.php");
@@ -67,14 +61,11 @@ elseif ($addreply) {
 	$result1 = mb_query($db, "INSERT INTO guildmsgs (name, topic, topicid, message, datestamp) VALUES (?, ?, ?, ?, ?)", array($ename, $topic, (int) $topicid, $message, $clock));
 	$lastid = mysqli_insert_id($db);
 
-	$query5 = "UPDATE guildthreads SET lastpost='$clock' WHERE topicid=$q_topicid";
-	$result5 = mysqli_query($db, $query5);
+	$result5 = mb_query($db, "UPDATE guildthreads SET lastpost=? WHERE topicid=?", array($clock, (int) $topicid));
 
-	$query2 = "UPDATE guildthreads SET lastposter= $q_ename WHERE topicid= $q_topicid";
-	$result2 = mysqli_query($db, $query2);
+	$result2 = mb_query($db, "UPDATE guildthreads SET lastposter= ? WHERE topicid= ?", array($ename, (int) $topicid));
 
-	$query3 = "UPDATE guildthreads SET replies=replies+1 WHERE topicid=$q_topicid";
-	$result3 = mysqli_query($db, $query3);
+	$result3 = mb_query($db, "UPDATE guildthreads SET replies=replies+1 WHERE topicid=?", array((int) $topicid));
 	header ("Location: gl-topic.php?topicid=$topicid");
 }
 

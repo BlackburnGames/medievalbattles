@@ -43,8 +43,7 @@ echo "
     <td class=main2 width=><b class=reg>Experience</b></td>
     <td class=main2 width=><b class=reg>Guild</b></td>";
 
-$query_string = "SELECT userid, ename, race, class, mts, land, exp, guild FROM user WHERE setid = " . mb_sql_int($N_NUM) . " ORDER BY userid ASC";
-$result_id = mysqli_query($db, $query_string);
+$result_id = mb_query($db, "SELECT userid, ename, race, class, mts, land, exp, guild FROM user WHERE setid = ? ORDER BY userid ASC", array((int) $N_NUM));
 while ($row = mysqli_fetch_row($result_id))  {
 
   $ONLINE_NO = mb_query($db, "SELECT online FROM user WHERE userid=?", array((int) $row[0]));

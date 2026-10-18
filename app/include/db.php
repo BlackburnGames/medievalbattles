@@ -141,6 +141,16 @@ if (!function_exists('mb_query')) {
                     return false;
                 }
                 $value = $params[$next++];
+                if (is_array($value) && array_key_exists('mb_num', $value)) {
+                    // mb_num(): a bare numeric literal, as interpolation wrote it.
+                    $num = is_string($value['mb_num']) ? trim($value['mb_num']) : $value['mb_num'];
+                    if (!is_int($num) && !is_float($num) && !(is_string($num) && is_numeric($num))) {
+                        trigger_error('mb_query(): mb_num() given something that is not a number', E_USER_WARNING);
+                        return false;
+                    }
+                    $out .= (string) $num;
+                    continue;
+                }
                 $out .= is_int($value) ? (string) $value
                     : "'" . mysqli_real_escape_string($db, (string) $value) . "'";
             }
@@ -152,6 +162,30 @@ if (!function_exists('mb_query')) {
         }
 
         return mysqli_query($db, $sql);
+    }
+}
+
+if (!function_exists('mb_num')) {
+    /**
+     * A value for mb_query() to write as a bare number rather than a quoted
+     * string:
+     *
+     *     mb_query($db, "UPDATE user SET gp = gp - ? WHERE userid=?", array(mb_num($cost), $id))
+     *
+     * For a number in a SET or in arithmetic, where the query used to have it
+     * interpolated bare. MySQL reads a bare 2.5 as an exact decimal and a
+     * quoted '2.5' as a double, and ROUND() -- which combat and the tick use
+     * everywhere -- can give a different answer for the two. mb_num() keeps
+     * the decimal. mb_query() checks that the value is a number; anything else
+     * is a warning and the query does not run, as the syntax error it used to
+     * produce was.
+     *
+     * @param mixed $value an int, a float or a numeric string
+     * @return array a marker mb_query() recognises
+     */
+    function mb_num($value)
+    {
+        return array('mb_num' => $value);
     }
 }
 

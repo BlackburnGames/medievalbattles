@@ -30,8 +30,7 @@ if (!IsSet($change)) {
           <option selected value=ns>-- Select an Empire --</option>
             <option select value=NOemp>-None-</option>";
 
-  $query_string = "SELECT userid, ename FROM user WHERE setid='$setid' ORDER BY userid ASC";
-  $result_id = mysqli_query($db, $query_string);
+  $result_id = mb_query($db, "SELECT userid, ename FROM user WHERE setid=? ORDER BY userid ASC", array($setid));
   while ($row = mysqli_fetch_row($result_id))  {
     echo "<option value=" . mb_attr($row[0]) . ">" . mb_h($row[1]) . "\n</option>";
   }

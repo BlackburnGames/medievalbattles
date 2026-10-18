@@ -244,7 +244,7 @@ else	{
 		include("include/attack/mdrop.php");
 		include("include/attack/table.php");
 	
-		mysqli_query($db, "UPDATE user SET exp2 = exp2 + ($mtgain * $mtexpa) WHERE email='$email' AND pw='$pw'");
+		mb_query($db, "UPDATE user SET exp2 = exp2 + (? * ?) WHERE email=? AND pw=?", array(mb_num($mtgain), mb_num($mtexpa), $email, $pw));
       
 		mb_query($db, "UPDATE user SET mts=? WHERE userid = ?", array($tmtloss, (int) $empvalue));
 		mb_query($db, "UPDATE buildings SET amts=? WHERE userid = ?", array($evb['amts'], (int) $empvalue));

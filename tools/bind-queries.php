@@ -329,9 +329,20 @@ function mb_build(array $pieces)
             && !preg_match('/[-+*\/]\s*[\w.\'"]*\s*(=|<|>)?$/', substr($before, 0, -1))
             && preg_match('/^(\)\s*)?($|AND\b|OR\b|ORDER\b|LIMIT\b|GROUP\b|\))/i', $after);
         if (!$limit && !($clause === 'WHERE' && $comparison)) {
-            return preg_match('/(=|<|>|\(|,|\+|-|\*|\/)$/', $before)
-                ? "a bare number in a SET or in arithmetic ($expr)"
-                : "a variable where a name may go ($expr)";
+            // A number in a SET or in arithmetic keeps its bare literal through
+            // mb_num(), which is the exact decimal MySQL read before. Only in a
+            // value position: an operator, paren or comma before it, and one,
+            // or the end of a clause, after it.
+            $valueAfter = preg_match('/^(\)|,|\+|-|\*|\/|$)/', $after)
+                || preg_match('/^(AND|OR|WHERE|ORDER|LIMIT|GROUP)\b/i', $after);
+            if (preg_match('/(=|<|>|\(|,|\+|-|\*|\/)$/', $before) && $valueAfter) {
+                global $MB_BARE;
+                $MB_BARE[] = substr($before, -40) . ' [mb_num ' . $expr . '] ' . substr($after, 0, 30);
+                $sql .= '?';
+                $params[] = "mb_num($expr)";
+                continue;
+            }
+            return "a variable where a name may go ($expr)";
         }
         global $MB_BARE;
         $MB_BARE[] = substr($before, -40) . ' [' . $expr . '] ' . substr($after, 0, 30);
@@ -340,6 +351,95 @@ function mb_build(array $pieces)
     }
 
     return array($sql, $params);
+}
+
+/** Index of the token that ends the statement before position $i, or -1. */
+function mb_statement_boundary(array $t, $i)
+{
+    for ($k = $i; $k >= 0; $k--) {
+        $x = $t[$k];
+        if ($x === ';' || $x === '{' || $x === '}'
+            || (is_array($x) && in_array($x[0], array(T_OPEN_TAG, T_CLOSE_TAG), true))) {
+            return $k;
+        }
+    }
+    return -1;
+}
+
+/**
+ * The SQL a query call's variable holds, traced to its assignment.
+ *
+ * Only when that is certain to be what the call runs: the assignment is
+ * "$var = <expr>;", it is the statement immediately before the call's own,
+ * the call's statement does not mention $var, and nothing reads $var after
+ * the call before it is next assigned -- so removing the assignment changes
+ * nothing else.
+ *
+ * @return array(expression tokens, edit removing the assignment) or a reason
+ */
+function mb_trace_assignment(array $t, $callStart, $callClose, $var)
+{
+    $n = count($t);
+    $why = "a statement held in a variable it cannot trace ($var)";
+
+    $end = mb_statement_boundary($t, $callStart - 1);
+    if ($end < 0 || $t[$end] !== ';') {
+        return $why;
+    }
+    for ($k = $end + 1; $k < $callStart; $k++) {
+        if (is_array($t[$k]) && $t[$k][0] === T_VARIABLE && $t[$k][1] === $var) {
+            return $why;
+        }
+    }
+    $begin = mb_statement_boundary($t, $end - 1);
+    $first = mb_skip_ws($t, $begin + 1);
+    if (!is_array($t[$first]) || $t[$first][0] !== T_VARIABLE || $t[$first][1] !== $var) {
+        return $why;
+    }
+    $eq = mb_skip_ws($t, $first + 1);
+    if ($t[$eq] !== '=') {
+        return $why;
+    }
+    $expr = mb_trim_tokens(array_slice($t, $eq + 1, $end - $eq - 1));
+    foreach ($expr as $x) {
+        if (is_array($x) && $x[0] === T_VARIABLE && $x[1] === $var) {
+            return $why;
+        }
+    }
+
+    // Nothing reads it after the call, up to its next assignment.
+    for ($k = $callClose + 1; $k < $n; $k++) {
+        if (!is_array($t[$k]) || $t[$k][0] !== T_VARIABLE || $t[$k][1] !== $var) {
+            continue;
+        }
+        $after = mb_skip_ws($t, $k + 1);
+        $prev = mb_statement_boundary($t, $k - 1);
+        if ($after < $n && $t[$after] === '=' && mb_skip_ws($t, $prev + 1) === $k) {
+            break;
+        }
+        return "a statement held in a variable that is read again ($var)";
+    }
+
+    // Remove the assignment's line: the whitespace either side is folded into
+    // the edit, keeping the line break before it and the indentation of the
+    // line after.
+    $from = $first;
+    $prefix = '';
+    if (isset($t[$first - 1]) && is_array($t[$first - 1]) && $t[$first - 1][0] === T_WHITESPACE) {
+        $from = $first - 1;
+        $ws = $t[$first - 1][1];
+        $nl = strrpos($ws, "\n");
+        $prefix = $nl === false ? $ws : substr($ws, 0, $nl + 1);
+    }
+    $to = $end;
+    $suffix = '';
+    if (isset($t[$end + 1]) && is_array($t[$end + 1]) && $t[$end + 1][0] === T_WHITESPACE) {
+        $to = $end + 1;
+        $ws = $t[$end + 1][1];
+        $nl = strpos($ws, "\n");
+        $suffix = $nl === false ? $ws : substr($ws, $nl + 1);
+    }
+    return array($expr, array($from, $to, $prefix . $suffix));
 }
 
 /**
@@ -491,7 +591,20 @@ function mb_bind_file($src)
             $sqlToks = mb_trim_tokens($args[0]);
         }
 
-        $hasValue = false;
+        // A statement held in a variable: inline it, when the assignment is
+        // the statement right before this one and nothing reads the variable
+        // afterwards.
+        $assignEdit = null;
+        if (count($sqlToks) === 1 && is_array($sqlToks[0]) && $sqlToks[0][0] === T_VARIABLE) {
+            $traced = mb_trace_assignment($t, $start, $close, $sqlToks[0][1]);
+            if (is_string($traced)) {
+                $skipped[] = array($line, $traced);
+                continue;
+            }
+            list($sqlToks, $assignEdit) = $traced;
+        }
+
+        $hasValue = $assignEdit !== null;
         foreach ($sqlToks as $x) {
             if (is_array($x) && $x[0] === T_VARIABLE) {
                 $hasValue = true;
@@ -526,6 +639,9 @@ function mb_bind_file($src)
 
         $replacement = 'mb_query(' . $conn . ', "' . $sql . '"'
             . ($params ? ', array(' . implode(', ', $params) . ')' : '') . ')';
+        if ($assignEdit !== null) {
+            $edits[] = $assignEdit;
+        }
         $edits[] = array($start, $close, $replacement);
         $converted[] = $line;
     }

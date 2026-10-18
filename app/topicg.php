@@ -48,8 +48,7 @@ echo "
 mysqli_free_result($result1);	
 }
 
-$query2 = "SELECT messageid, name, topic, message, datestamp FROM guildmsgs WHERE topicid='$topicid' ORDER BY messageid ASC";
-$result2 = mysqli_query($db, $query2) or die(mysqli_error($db));
+$result2 = mb_query($db, "SELECT messageid, name, topic, message, datestamp FROM guildmsgs WHERE topicid=? ORDER BY messageid ASC", array($topicid)) or die(mysqli_error($db));
 
 if ($result2) { 
 echo "

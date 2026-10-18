@@ -88,8 +88,7 @@ echo "
         <td class=main2 width=20%><b class=reg>Date</b></td>
         <td class=main2><b class=reg>News</b></td>";
 
-  $query_string = "SELECT `date`, news, class FROM empnews WHERE yourid='$userid' ORDER BY `date` DESC";
-  $result_id = $db->query($query_string);
+  $result_id = mb_query($db, "SELECT `date`, news, class FROM empnews WHERE yourid=? ORDER BY `date` DESC", array($userid));
 
   while ($row = mysqli_fetch_row($result_id))  {
     echo "

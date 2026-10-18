@@ -40,7 +40,6 @@ else	{
 		die();
 	}
 
-	$q_evuid = mb_sql_int($evu['userid']);
 
 	$result1 = mb_query($db, "SELECT * FROM military WHERE userid=?", array((int) $evu['userid']));
 		$evm = mysqli_fetch_array($result1);
@@ -192,8 +191,7 @@ echo "
 				<td class=inner2 width=20%><b>Date</b></td>
 				<td class=inner22><b>News</b></td>";
 
-	$query_string = "SELECT date, news, class FROM empnews WHERE yourid=$q_evuid ORDER BY date DESC";
-	$result_id = mysqli_query($db, $query_string);
+	$result_id = mb_query($db, "SELECT date, news, class FROM empnews WHERE yourid=? ORDER BY date DESC", array((int) $evu['userid']));
 	while ($row = mysqli_fetch_row($result_id))	{
 		echo "
 			<tr align=left valign=TOP>

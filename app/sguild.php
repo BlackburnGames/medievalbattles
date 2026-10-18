@@ -19,8 +19,7 @@ echo "
 		<td class='main2'><b class='reg' width='15%'>Empires</b></td>
 		<td class='main2'><b class='reg' width='15%'>Strength</b></td>";
 
-	$query_string = "SELECT gname, mem, strength FROM guild ORDER BY strength DESC LIMIT 0,10";
-	$result_id = mysqli_query($db, $query_string);
+	$result_id = mb_query($db, "SELECT gname, mem, strength FROM guild ORDER BY strength DESC LIMIT 0,10");
 	$placeno = 0;
 	while ($row = mysqli_fetch_row($result_id))	{
 

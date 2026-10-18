@@ -1,8 +1,7 @@
 <?
 
 // select research items	
-$research_query = "SELECT * FROM research WHERE email='$email' AND pw= '$pw'";
-$res_query = mysqli_query($db, $research_query) or die("Error: " . mysqli_error($db));
+$res_query = mb_query($db, "SELECT * FROM research WHERE email=? AND pw= ?", array($email, $pw)) or die("Error: " . mysqli_error($db));
 $res = mysqli_fetch_array($res_query);
 
 ##################
