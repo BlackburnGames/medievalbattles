@@ -14,6 +14,18 @@ $uwizard    = mb_input('uwizard');
 $result = mysqli_query($db, "SELECT * FROM user WHERE userid=" . mb_sql_int($empvalue));
 $evu = mysqli_fetch_array($result);
 
+// An id that names nobody. Every page that includes this has already passed
+// the 'ns' check, so without this the battle ran against an empty row: the
+// land attack scored it as land 0 and took the "destroyed" branch, which
+// deletes by $evu['userid'] -- an empty string. Nothing has been sent yet;
+// calculations.php is what moves the troops, and it comes later.
+if(!$evu)	{
+	echo"<div align=center><font class=yellow>That empire does not exist.</font></div><br><br>";
+	include("include/attack/mdrop.php");
+	include("include/attack/table.php");
+	die();
+}
+
 // select buildings table for the empire being attacked
 $result1 = mysqli_query($db, "SELECT * FROM buildings WHERE userid=" . mb_sql_int($empvalue));
 $evb = mysqli_fetch_array($result1);

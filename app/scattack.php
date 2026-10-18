@@ -35,6 +35,41 @@ else	{
 		include("include/attack/scattack.php");
 		die();
 	}
+
+	// Who, before how many. The target used to be looked up only after every
+	// unit check had passed, and nothing then asked whether the row existed:
+	// an id that named nobody "succeeded" against an empty row and
+	// spent the units.
+	include("include/connect.php");
+
+	// select user values
+		$result = mysqli_query($db, "SELECT * FROM user WHERE userid=" . mb_sql_int($empvalue));
+		$evu = mysqli_fetch_array($result);
+	// select military values
+		$result1 = mysqli_query($db, "SELECT * FROM military WHERE userid=" . mb_sql_int($empvalue));
+		$evm = mysqli_fetch_array($result1);
+	// select explore values
+		$result2 = mysqli_query($db, "SELECT * FROM explore WHERE userid=" . mb_sql_int($empvalue));
+		$eve = mysqli_fetch_array($result2);
+	// select building values
+		$result3 = mysqli_query($db, "SELECT * FROM buildings WHERE userid=" . mb_sql_int($empvalue));
+		$evb = mysqli_fetch_array($result3);
+
+	if(!$evu)	{
+		echo"<div align=center><font class=yellow>That empire does not exist.</font></div>";
+		include("include/attack/scattack.php");
+		die();
+	}
+	elseif($evu['safemode'] > 0)	{
+		echo"<div align=center><font class=yellow>You can't attack someone who's in safe mode!</font></div>";
+		include("include/attack/scattack.php");
+		die();
+	}
+	elseif($evu['guild'] === $empireguild AND $evu['guild'] != "None" AND $empireguild != "None")	{
+		echo"<div align=center><font class=yellow>You can't attack someone who is in your guild!</font></div>";
+		include("include/attack/scattack.php");
+		die();
+	}
 	elseif($send == "")	{
 		echo "<div align=center><font class=yellow>You didn't send any units!</font></div>";
 		include("include/attack/scattack.php");
@@ -61,32 +96,6 @@ else	{
 		die();
 	}
 	else	{
-
-		include("include/connect.php");
-
-		// select user values
-			$result = mysqli_query($db, "SELECT * FROM user WHERE userid=" . mb_sql_int($empvalue));
-			$evu = mysqli_fetch_array($result);
-		// select military values
-			$result1 = mysqli_query($db, "SELECT * FROM military WHERE userid=" . mb_sql_int($empvalue));
-			$evm = mysqli_fetch_array($result1);
-		// select explore values
-			$result2 = mysqli_query($db, "SELECT * FROM explore WHERE userid=" . mb_sql_int($empvalue));
-			$eve = mysqli_fetch_array($result2);
-		// select building values
-			$result3 = mysqli_query($db, "SELECT * FROM buildings WHERE userid=" . mb_sql_int($empvalue));
-			$evb = mysqli_fetch_array($result3);
-
-		if($evu['safemode'] > 0)	{
-			echo"<div align=center><font class=yellow>You can't attack someone who's in safe mode!</font></div>";
-			include("include/attack/scattack.php");
-			die();
-		}
-		elseif($evu['guild'] === $empireguild AND $evu['guild'] != "None" AND $empireguild != "None")	{
-			echo"<div align=center><font class=yellow>You can't attack someone who is in your guild!</font></div>";
-			include("include/attack/scattack.php");
-			die();
-		} 
 
 		if($toatk == 'civ')	{
 			//	their civilians

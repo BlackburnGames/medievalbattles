@@ -372,6 +372,33 @@ foreach (array(
  * one more would hand calculations.php a fifth army for four return slots,
  * which is a fixture change with an engine bug attached rather than coverage.
  */
+/*
+ * The refusal arms of the combat pages, before the two attacks they protect.
+ *
+ * userid 999 names nobody. Every one of these pages used to fight the empty
+ * row: attack.php scored it as land 0 and ran the "empire destroyed" branch,
+ * whose DELETEs and UPDATEs are keyed on $evu['userid'] -- an empty string --
+ * and the others spent a general, troops, suicide civilians or thieves on it.
+ * The attacker sends a real unit each time, so it is the target check that has
+ * to stop it rather than an empty form; intel and scattack look the target up
+ * before counting units now, which is what lets an account holding no thieves
+ * and no suicide civilians reach the check at all.
+ *
+ * Ordered first because a refusal that leaks is a general gone: the fixture
+ * has exactly two, and the land attack and the resource raid below need both,
+ * so a guard that failed open here also fails the news assertions after them.
+ */
+foreach (array(
+    'attack.php'  => array('attack' => 1, 'empvalue' => 999, 'uwarrior' => 1),
+    'attackr.php' => array('attack' => 1, 'empvalue' => 999, 'upriest' => 1),
+    'attackm.php' => array('attack' => 1, 'empvalue' => 999, 'upriest' => 1),
+    'scattack.php' => array('suicideatk' => 1, 'empvalue' => 999, 'send' => 1, 'toatk' => 'civ'),
+    'intel.php'   => array('gather' => 1, 'empvalue' => 999, 'send' => 1),
+) as $page => $fields) {
+    forumRefuses($tester, $page, $fields, 'That empire does not exist',
+        "app/$page: an empvalue that names no empire was fought as an empty row");
+}
+
 foreach (array(
     // The land attack, won: three warriors at power 2 and three wizards at
     // power 3 make 15 against their 10. This is the branch with the most news

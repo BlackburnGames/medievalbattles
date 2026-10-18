@@ -36,6 +36,35 @@ else	{
 		include("include/S_INTEL.php");
 		die();
 	}
+
+	// Who, before how many. The target used to be looked up only after the
+	// thief checks had passed, and nothing asked whether the row existed: an id
+	// that named nobody "succeeded", spent the thieves and rendered a report on
+	// an empty empire.
+	$result = mysqli_query($db, "SELECT * FROM user WHERE userid=" . mb_sql_int($empvalue));
+	$evu = mysqli_fetch_array($result);
+
+	$result1 = mysqli_query($db, "SELECT * FROM military WHERE userid=" . mb_sql_int($empvalue));
+	$evm = mysqli_fetch_array($result1);
+
+	$result2 = mysqli_query($db, "SELECT wp FROM buildings WHERE userid=" . mb_sql_int($empvalue));
+	$evb = mysqli_fetch_array($result2);
+
+	if(!$evu)	{
+		echo"<div align=center><font class=yellow>That empire does not exist.</font></div>";
+		include("include/S_INTEL.php");
+		die();
+	}
+	elseif($evu['safemode'] > 0)	{
+		echo"<div align=center><font class=yellow>You cannot thieve someone that is in safe mode.</font></div>";
+		include("include/S_INTEL.php");
+		die();
+	}
+	elseif($evu['ename'] == $ename)	{
+		echo"<div align=center><font class=yellow>You cannot thieve yourself.</font></div>";
+		include("include/S_INTEL.php");
+		die();
+	}
 	elseif($send == "")	{
 		echo"<div align=center><font class=yellow>You did not send any thieves.</font></div>";
 		include("include/S_INTEL.php");
@@ -53,25 +82,6 @@ else	{
 	}
 	else	{
 
-		$result = mysqli_query($db, "SELECT * FROM user WHERE userid=" . mb_sql_int($empvalue));
-		$evu = mysqli_fetch_array($result);
-
-		$result1 = mysqli_query($db, "SELECT * FROM military WHERE userid=" . mb_sql_int($empvalue));
-		$evm = mysqli_fetch_array($result1);
-
-		$result2 = mysqli_query($db, "SELECT wp FROM buildings WHERE userid=" . mb_sql_int($empvalue));
-		$evb = mysqli_fetch_array($result2);
-
-		if($evu['safemode'] > 0)	{
-			echo"<div align=center><font class=yellow>You cannot thieve someone that is in safe mode.</font></div>";
-			include("include/S_INTEL.php");
-			die();
-		}
-		if($evu['ename'] == $ename)	{
-			echo"<div align=center><font class=yellow>You cannot thieve yourself.</font></div>";
-			include("include/S_INTEL.php");
-			die();
-		}
 		if($send < $evm['thieves'])	{
 			echo"<div align=center><font class=yellow>You have failed to gather information on $empireattacked and lost 10% of your thieves.</div></align>";
 		
