@@ -169,9 +169,7 @@
 # Nor reply into it. The reply used to be written.
 
 > inputpostsg.php addreply=1 topicid=1 topic=Re message=Aye
-  says: <no game page: Warning:  Undefined variable $goldpro in /var/www/html/functions.php on line 405
-
-Deprecated:  number_format(): Passing>
+  says: <no game page: That thread is not in your guild.>
   (no change)
 
 ### guild-with-space-files-thread
@@ -179,9 +177,7 @@ Deprecated:  number_format(): Passing>
 
 > inputpostsg.php addtopic=1 topic=Orders message=Hold
   HTTP 302
-  says: <no game page: Warning:  Undefined variable $goldpro in /var/www/html/functions.php on line 405
-
-Deprecated:  number_format(): Passing>
+  says: <no game page>
   + guildthreads topicid=3 | name=TestLord | host= | topic=Orders | lastpost=<CLOCK> | lastposter=TestLord | replies=0 | message=Hold | guildname=Test guild
 
 ### guild-leader-thread-view

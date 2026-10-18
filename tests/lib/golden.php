@@ -339,7 +339,11 @@ function pageSays($body)
     $marker = "Don't get your hopes up, however.";
     $at = strpos($body, $marker);
     if ($at === false) {
-        return array('<no game page: ' . trim(substr(strip_tags($body), 0, 120)) . '>');
+        // PHP's own messages are reported by diagnostics(), and quoting them
+        // here would churn the golden on every edit that moves a line number.
+        $text = preg_replace('/(Warning|Notice|Deprecated|Fatal error):.*?on line \d+/s', '', strip_tags($body));
+        $text = trim(preg_replace('/\s+/', ' ', $text));
+        return array($text === '' ? '<no game page>' : '<no game page: ' . substr($text, 0, 120) . '>');
     }
     $body = substr($body, $at + strlen($marker));
     // The diagnostics are reported on their own.
