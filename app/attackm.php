@@ -186,33 +186,35 @@ else	{
 		include("include/connect.php");
 		include("include/attack/calculations.php");
 	
-		// $mgain is never assigned -- the gain is $mtgain -- so this loop never
-		// runs. That is a recorded quirk ($GAMEDATA['quirks']), a game change to
-		// retire rather than a read to restore, and it is left as it is.
+		// Take the gain from open mountains, then mines under construction, then
+		// built ones. This read $mgain, which nothing assigns, so it never ran and
+		// the next tick gave the defender its mountains back from the mines.
 		$mtally = 0;
-		While($mgain > $mtally)	 {
-			if($evb['amts'] > 0 AND $mgain > $mtally)	{
+		While($mtgain > $mtally)	 {
+			$mtaken = $mtally;	// a pass that takes nothing would loop forever
+			if($evb['amts'] > 0 AND $mtgain > $mtally)	{
 				$evb['amts'] = $evb['amts'] - 1;
 				$mtally = $mtally + 1;
 			}
-			if($evb['dgm'] > 0 AND $mgain > $mtally AND $evb['amts'] == 0)	 {
+			if($evb['dgm'] > 0 AND $mtgain > $mtally AND $evb['amts'] == 0)	 {
 				$evb['dgm'] = $evb['dgm'] - 1;
 				$mtally = $mtally + 1;
 			}
-			if($evb['dim'] > 0 AND $mgain > $mtally AND $evb['amts'] == 0)	{
+			if($evb['dim'] > 0 AND $mtgain > $mtally AND $evb['amts'] == 0)	{
 				$evb['dim'] = $evb['dim'] - 1;
 				$mtally = $mtally + 1;
 			}
 		
 
-			if($evb['gm'] > 0 AND $mgain > $mtally AND $evb['amts'] == 0 AND $evb['dgm'] == 0 AND $evb['dim'] == 0)	{
+			if($evb['gm'] > 0 AND $mtgain > $mtally AND $evb['amts'] == 0 AND $evb['dgm'] == 0 AND $evb['dim'] == 0)	{
 					$evb['gm'] = $evb['gm'] - 1;
 					$mtally = $mtally + 1;
 				}
-			if($evb['im'] > 0 AND $mgain > $mtally AND $evb['amts'] == 0 AND $evb['dgm'] == 0 AND $evb['dim'] == 0)	{
+			if($evb['im'] > 0 AND $mtgain > $mtally AND $evb['amts'] == 0 AND $evb['dgm'] == 0 AND $evb['dim'] == 0)	{
 					$evb['im'] = $evb['im'] - 1;
 					$mtally = $mtally + 1;
 				}
+			if($mtally == $mtaken)	{	break;	}
 		}
 		
 		mb_news_set($db, "$clock", 'yellow', "$ename ($setid) successfully attacked $evu[ename] ($evu[setid]) and gained $mtgain mountains", $setid, 0);

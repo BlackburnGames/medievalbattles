@@ -448,7 +448,6 @@ $GAMEDATA['exp_values'] = array(
  * ------------------------------------------------------------------ */
 $GAMEDATA['quirks'] = array(
     'Advanced Construction divides the build timer by 0.5, which DOUBLES construction time instead of halving it. (buildings.php:81)',
-    'Mountain attacks award the attacker mountains, but a dead loop means the defender\'s mountains are restored by the next tick\'s recalculation. (attackm.php:193, update.php:331-341)',
     'The Scepter of Zakarum sets its speed on equip but never its power, so the listed power is not actually applied. (equip.php:199)',
     'The explore page shows special rates for Angels (fewer explorers needed) and Demons (more needed), but the tick only implements the Human rate; everyone else gets the default. (include/S_EXPLORE.php:33-36 vs update.php:88)',
     'Night Elves are dealt 4-10 archers at signup, but the free Archery research is immediately overwritten unless they are also Rangers. (checksignup.php:130-134)',

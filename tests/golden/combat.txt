@@ -193,11 +193,29 @@
     user [3] nno 0 -> 1
 
 ### mountain-win
-# Mountain attack won: 10% of the defender's mountains and experience for each. QUIRK: the defender's mountain buildings are left alone (the loop reads $mgain, which nothing assigns).
+# Mountain attack won: 10% of the defender's mountains and experience for each, taken from open mountains, then mines under construction, then built ones. The loop that takes them read $mgain, which nothing assigns, and never ran.
 
 > attackm.php attack=1 empvalue=3 uwarrior=300
   says: You have conquered 20 mountains from PoorSerf (2)! Your losses: 3 warriors
     buildings [1] amts 100 -> 120
+    buildings [3] amts 5 -> 0, gm 10 -> 4, im 10 -> 5, dgm 2 -> 0, dim 2 -> 0
+  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 20 mountains | class=yellow | yourid=3
+  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 20 mountains | class=yellow | gnid=0 | age=0 | gid=1
+    military [1] warriors 300 -> 0
+    military [3] wizards 10 -> 9, priests 10 -> 9, archers 5 -> 4
+    returntbl [1] war4 0 -> 297, time4 0 -> 6
+  + setnews news=PoorSerf (2) lost 20 mountains to TestLord (1) | class=lg | setid=2 | sid=0 | age=0
+  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 20 mountains | class=yellow | setid=1 | sid=0 | age=0
+    user [1] mts 200 -> 220, exp2 0 -> 100, fleets 2 -> 1
+    user [3] mts 200 -> 180, nno 0 -> 1
+
+### mountain-win-short-of-mines
+# A defender whose mountains outnumber its mountain buildings -- 200 against 10, a gain of 20. The loop takes all ten and stops; it used to spin until the request timed out.
+
+> attackm.php attack=1 empvalue=3 uwarrior=300
+  says: You have conquered 20 mountains from PoorSerf (2)! Your losses: 3 warriors
+    buildings [1] amts 100 -> 120
+    buildings [3] gm 5 -> 0, im 5 -> 0
   + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 20 mountains | class=yellow | yourid=3
   + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 20 mountains | class=yellow | gnid=0 | age=0 | gid=1
     military [1] warriors 300 -> 0

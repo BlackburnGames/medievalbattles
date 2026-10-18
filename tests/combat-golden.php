@@ -234,9 +234,16 @@ $SCENARIOS = array(
 
     array(
         'name'  => 'mountain-win',
-        'why'   => 'Mountain attack won: 10% of the defender\'s mountains and experience for each. QUIRK: the defender\'s mountain buildings are left alone (the loop reads $mgain, which nothing assigns).',
+        'why'   => 'Mountain attack won: 10% of the defender\'s mountains and experience for each, taken from open mountains, then mines under construction, then built ones. The loop that takes them read $mgain, which nothing assigns, and never ran.',
         'setup' => array($strong, $defenders, $defenderStats,
             set('buildings', $D, array('amts' => 5, 'dgm' => 2, 'dim' => 2, 'gm' => 10, 'im' => 10))),
+        'requests' => array(array('attackm.php', array('empvalue' => $D, 'uwarrior' => 300))),
+    ),
+    array(
+        'name'  => 'mountain-win-short-of-mines',
+        'why'   => 'A defender whose mountains outnumber its mountain buildings -- 200 against 10, a gain of 20. The loop takes all ten and stops; it used to spin until the request timed out.',
+        'setup' => array($strong, $defenders, $defenderStats,
+            set('buildings', $D, array('amts' => 0, 'dgm' => 0, 'dim' => 0, 'gm' => 5, 'im' => 5))),
         'requests' => array(array('attackm.php', array('empvalue' => $D, 'uwarrior' => 300))),
     ),
     array(
