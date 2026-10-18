@@ -63,28 +63,40 @@ Phinx for the migrations, InnoDB for the tables, and one database with a
   5.7 and MyISAM. It came before migrations because nothing was deployed, so
   the schema could still be fixed in `db.sql`; the first migration
   baselines a schema already right for 8.4.
-- **Schema migrations — next after 8.4.** The schema is one hand-edited
-  `db.sql`, and every change so far has been made by editing it and
-  reloading the fixture. That stops working at the first deploy: a live
-  database cannot be dropped and reloaded, and step 3 of rounds.md — a
-  `round_id` on every round table — is the first change that has to reach a
-  running one.
+- ~~**Schema migrations.**~~ **Done.** Until now the schema was one
+  hand-edited `db.sql`, changed by editing it and reloading the fixture.
+  That stops working at the first deploy: a live database cannot be dropped
+  and reloaded, and step 3 of rounds.md — a `round_id` on every round table
+  — is the first change that has to reach a running one.
 
-  The work: Phinx (below) with one environment per database, the round and
-  `mb_accounts`; a first migration that is today's schema, so a fresh
-  install and a live one start from the same point; and `deploy/` running
-  `phinx migrate` after the files land. `db.sql` stays as the fixture's
-  schema, and a test holds the two to account: a database built from
-  `db.sql` and one built by running every migration must dump identically.
-- **Composer — decided: yes.** The game has no dependencies, and every
-  library that would help from here — the migration runner, a query builder
-  later, a mailer that does more than `mail()` — arrives through Composer,
-  and the host has it. Phinx is the first. Adding it: a `composer.json` and
-  `composer.lock`, `vendor/` out of the repository, the image running
-  `composer install`, and `deploy/` running `composer install --no-dev`
-  before it syncs. The cost is a dependency to keep current, made knowingly
-  once rather than one library at a time. `vendor/` is outside `app/`, so
-  nothing in it is ever served.
+  Phinx (`robmorgan/phinx`), with a config per database because Phinx keeps
+  one migrations path per config: `db/phinx/round.php` over
+  `db/migrations/round/`, `db/phinx/accounts.php` over
+  `db/migrations/accounts/`, each on the app's own settings and session
+  mode, each with its own `phinxlog`. `bin/migrate.php` runs a Phinx command
+  against both. The first migration in each is a **baseline**: a frozen copy
+  of the schema file as of 2026-10-18, run a statement at a time, so a fresh
+  install and a live one start from the same point and a later edit to
+  `db.sql` cannot rewrite it.
+
+  **A schema change is a migration and the same edit to `db.sql` or
+  `db/accounts.sql`.** The fixture is still built from the schema files,
+  never migrated, and `tests/migrations.sh` holds the two to account: it
+  builds each database both ways in scratch databases and fails unless they
+  dump identically, and unless a second run changes nothing. `deploy.sh`
+  runs the migrations on the server from the staged copy before any file
+  moves, so a migration must leave the previous commit's code working.
+- ~~**Composer.**~~ **Done: yes**, with Phinx as its first dependency. Every
+  library that would help from here — a query builder later, a mailer that
+  does more than `mail()` — arrives through it. `composer.json` and
+  `composer.lock` are at the root, `vendor/` is ignored and outside `app/`,
+  so nothing in it is ever served. The image carries a pinned Composer, and
+  `vendor/` is installed into the mounted repo
+  (`docker compose exec web composer install -d /repo`). `deploy.sh` builds
+  the deployed commit's `vendor/` (`--no-dev`) in the local container and
+  ships it, so the host needs neither Composer nor network access. The cost
+  is a dependency to keep current, made knowingly once rather than one
+  library at a time.
 - **A data-access layer, grown a page at a time.** About 1300 queries sit
   inline in 133 procedural files. Binding their values closed injection, but
   each page still knows the schema, and a cross-cutting rule has to be

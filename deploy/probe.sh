@@ -63,7 +63,8 @@ ssh "$HOST_ALIAS" bash -s -- "$INI_KEYS" <<'REMOTE'
 PHP=/usr/local/php83/bin/php
 "$PHP" -r 'echo "php            ", PHP_VERSION, " (", PHP_SAPI, ")\n";
   foreach (explode(" ", $argv[1]) as $k) printf("%-14s %s\n", $k, var_export(ini_get($k), true));
-  echo "mysqli         ", extension_loaded("mysqli") ? "loaded" : "MISSING", "\n";' "$1"
+  echo "mysqli         ", extension_loaded("mysqli") ? "loaded" : "MISSING", "\n";
+  echo "pdo_mysql      ", extension_loaded("pdo_mysql") ? "loaded" : "MISSING (bin/migrate.php needs it)", "\n";' "$1"
 echo "flock          $(command -v flock || echo MISSING)"
 
 echo

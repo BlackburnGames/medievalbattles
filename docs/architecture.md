@@ -9,7 +9,7 @@ being changed and why.
 Fully procedural: 133 PHP files containing 15 function declarations between
 them, as released. (The modernization has since added helpers under
 `app/include/` -- `db.php`, `html.php`, `credentials.php` and the like -- so the
-count today is higher; none of them is a class.) No classes, no framework, no Composer, no autoloader. A page is a file;
+count today is higher; none of them is a class.) No classes, no framework, no autoloader in the game. A page is a file;
 control flow is `include`.
 
 ## Include paths and working directory

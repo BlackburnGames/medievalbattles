@@ -92,6 +92,14 @@ if ! docker compose exec -T web php /repo/tests/session.php; then
   status=1
 fi
 
+# The schema files and the migrations build the same databases. Scratch
+# databases of its own, so order-independent.
+echo
+echo "=== migrations ==="
+if ! bash tests/migrations.sh; then
+  status=1
+fi
+
 # Static, so order does not matter; last because it is the port checklist
 # rather than a behavioural test.
 echo

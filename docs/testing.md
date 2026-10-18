@@ -426,6 +426,20 @@ failed five runs in five.
 It needs the fixture's listings, which the crawl consumes, so `run-all.sh`
 resets the database before it.
 
+### `tests/migrations.sh`
+
+The fixture is built from `db.sql` and `db/accounts.sql`; a real database is
+built by the migrations in `db/migrations/` (`bin/migrate.php`). This builds
+each of the two databases both ways, in scratch databases beside the fixture
+(`mbmig_*`, dropped afterwards), dumps them with `tests/schema-dump.php` —
+every `CREATE TABLE` without its `AUTO_INCREMENT` counter, and every row,
+sorted — and fails on any difference. Then it runs the migrations again,
+which must change nothing. `phinxlog` is the one table it ignores.
+
+So a schema change is two edits, a migration and the schema file, and this
+fails until they agree. Changing a `varchar(255)` to `varchar(254)` in
+`db.sql` alone fails it, on both runs.
+
 ### `tests/query-audit.sh`
 
 Not a test — an inventory generator, and the only thing that runs the stack

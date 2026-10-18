@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Medieval Battles v6 — a PHP/MySQL browser strategy game written in 2003 for PHP 4, released publicly for historical purposes (see README.md). It is fully procedural: 133 PHP files containing 15 function declarations between them as released (more now, from the Phase 3 helpers in `app/include/`), no classes, no framework, no Composer.
+Medieval Battles v6 — a PHP/MySQL browser strategy game written in 2003 for PHP 4, released publicly for historical purposes (see README.md). It is fully procedural: 133 PHP files containing 15 function declarations between them as released (more now, from the Phase 3 helpers in `app/include/`), no classes, no framework. Composer brings in tooling only — Phinx, for the schema migrations — and nothing in `app/` loads it.
 
 The work in progress is a staged modernization. Phase 1 (a running, test-covered baseline in Docker) and Phase 2 (the mechanical port, now **running on PHP 8.3** with the suite green on both 8.3 and 5.6) are done. Phase 3 is the structural and security rewrite. See [docs/modernization.md](docs/modernization.md).
 
@@ -35,6 +35,7 @@ Four things load-bearing enough to repeat here:
 - **The kingdom is `$userid`, and the round holds no credential.** `app/include/session.php` sets `$userid` (a string, as `functions.php` always produced it — the guild-leader check compares it with `===`) and nearly every query filters `WHERE userid=?`. The address and the password hash live once, on the account, in the separate `mb_accounts` database (`app/include/accounts.php`); a kingdom belongs to its account by `user.account_id`. `$email` is the account's address, for showing and mailing only — never filter on it. `$pw` no longer exists. A password change is one `UPDATE` through `mb_password_store()`, an address change one through `mb_account_set_email()`, and each must call `mb_session_rotate()` or the session that made it is logged out with the others. See [docs/rounds.md](docs/rounds.md).
 - **`connect.php` reports query errors as warnings, not exceptions**, and the crawl and the tick both fail on one. Going further to `MYSQLI_REPORT_STRICT` needs the ~1300 call sites to check their return values first. `bash tests/query-audit.sh` regenerates the combined inventory.
 - **`app/include/gamedata.php` is the only place a game value may be written**, and every value carries a `file:line` citation. Change a cited engine line and the citation must change with it.
+- **A schema change is two edits: a Phinx migration and the same change to `db.sql` or `db/accounts.sql`.** The fixture is built from the schema files and never migrated; a real database is built by `bin/migrate.php` from the baselines up. `tests/migrations.sh` fails until the two agree. Never edit a baseline (`db/migrations/*/20261018000000_baseline.*`) — it is history. Migrations run before the new code on deploy, so one must leave the previous commit's code working.
 
 ## Commands
 
@@ -43,9 +44,12 @@ docker compose up -d --build     # start the stack on PHP 8.3; app on http://127
 docker compose logs -f web       # PHP errors always go to stderr, whatever display_errors says
 bash tests/run-all.sh            # full suite (tick + combat golden masters, smoke crawl, audits)
 bash tests/reset-db.sh           # restore the fixture world (both databases: mbv6 and mb_accounts)
+docker compose exec web composer install -d /repo        # install vendor/ (Phinx) into the mounted repo
+docker compose exec web php /repo/bin/migrate.php status # migrations, both databases (also: migrate, create <Name> round|accounts)
+bash tests/migrations.sh         # db.sql and the migrations build the same databases
 ```
 
-The database volume is `dbdata84`; the 5.7 stack's `dbdata` cannot be opened by 8.4 and is no longer used. MySQL runs its init scripts only on an empty volume, so after a schema change run `bash tests/reset-db.sh`. A real world is moved over with `docker compose exec web php /repo/bin/accounts-migrate.php` instead, which keeps its players.
+The database volume is `dbdata84`; the 5.7 stack's `dbdata` cannot be opened by 8.4 and is no longer used. MySQL runs its init scripts only on an empty volume, so after a schema change run `bash tests/reset-db.sh`. A world from before the accounts database existed is moved over with `docker compose exec web php /repo/bin/accounts-migrate.php`, which keeps its players.
 
 PHP 5.6 is **no longer a per-change gate**. It was the Phase 2 port's proof
 that behaviour did not move, and the shared golden master now does that on

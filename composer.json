@@ -1,0 +1,16 @@
+{
+    "name": "mb/medievalbattles",
+    "description": "Medieval Battles v6",
+    "type": "project",
+    "license": "GPL-2.0-only",
+    "require": {
+        "php": ">=8.3",
+        "robmorgan/phinx": "^0.16"
+    },
+    "config": {
+        "platform": {
+            "php": "8.3"
+        },
+        "sort-packages": true
+    }
+}

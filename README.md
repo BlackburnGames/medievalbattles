@@ -21,7 +21,9 @@ docker compose up -d --build
 ```
 
 That builds a PHP 8.3 + Apache container and a MySQL 8.4 container, and loads
-the schema plus a small deterministic test world on first start.
+the schema plus a small deterministic test world on first start. Composer runs
+inside the container: `docker compose exec web composer install -d /repo`
+installs `vendor/` (Phinx, for the schema migrations).
 
 Then open:
 

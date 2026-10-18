@@ -1,19 +1,20 @@
-# Build for either PHP version:
+# PHP 8.3, the version the host runs.
 #
-#   docker compose build                          # 8.3, the Phase 2 target
-#   docker compose build --build-arg PHP_VERSION=5.6-apache
-#
-# 5.6 was the Phase 1 baseline because the mysql_* extension is fatal from PHP
-# 7.0 onward. Those call sites are converted, so 8.3 is now the default and 5.6
-# stays buildable only as the behavioural reference the golden master came from.
-#
-# Nothing is installed via apt: the 5.6 images are archived and their Debian
-# jessie repos are dead, so any apt call breaks that build. mysqli builds
-# against bundled mysqlnd and needs no system packages on either version.
+# 5.6 was the Phase 1 baseline, and this file once built either version. It no
+# longer does: main stopped running on 5.6 at the tag php5.6-freeze, and the
+# 5.6 build lives there (CLAUDE.md). That is also why apt is allowed again --
+# the 5.6 images' Debian jessie repos are dead, so the old file used none.
 ARG PHP_VERSION=8.3-apache
 FROM php:${PHP_VERSION}
 
-RUN docker-php-ext-install mysqli
+# mysqli for the game; pdo_mysql for Phinx, which runs the schema migrations
+# (docs/modernization.md). unzip because Composer unpacks its downloads with it.
+RUN apt-get update  && apt-get install -y --no-install-recommends unzip  && rm -rf /var/lib/apt/lists/*  && docker-php-ext-install mysqli pdo_mysql
+
+# Composer, pinned. vendor/ is installed into the mounted repo (/repo/vendor),
+# not into the image, because the repo is mounted over anything built here:
+#   docker compose exec web composer install -d /repo
+COPY --from=composer:2.8.12 /usr/bin/composer /usr/bin/composer
 
 COPY php.ini /usr/local/etc/php/conf.d/zz-medievalbattles.ini
 COPY compat.php /opt/mb/compat.php

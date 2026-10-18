@@ -131,10 +131,11 @@ All in `deploy/`, run from the repo root in Git Bash.
    with all privileges on both.
 4. Install `public_html/.htaccess` and `~/.mb-env` from the templates.
 5. `bash deploy/probe.sh` — check every answer, especially `getenv`,
-   `short_open_tag` and `sql_mode`.
-6. Load the schema: `db.sql` into the round database, `db/accounts.sql`
-   into the accounts database (from `mb/` over SSH, with `mysql`).
-7. `bash deploy/deploy.sh`, read the dry run, then `--go`.
+   `short_open_tag`, `pdo_mysql` and `sql_mode`.
+6. ~~Load the schema by hand.~~ Nothing to do: the deploy runs the
+   migrations, and on empty databases the baselines build the schema.
+7. `bash deploy/deploy.sh`, read the dry run (its migrations section should
+   list both baselines as down), then `--go`.
 8. Run `bash ~/www/jacobp259.sg-host.com/mb/tick.sh` by hand once and read
    `~/logs/tick.log`.
 9. Site Tools > Devs > Cron Jobs: the same command, at the tick interval.
