@@ -38,54 +38,54 @@ if($uwarrior > 0)	{
 	if($subwar < 0)	{	$subwar = 0;	}
 		$subwar = round($subwar);
 		$warcol = "war" . "$tfleets";
-	mb_query($db, "UPDATE returntbl SET $warcol=? WHERE email=? AND pw=?", array($subwar, $email, $pw)); // mb-unbound-ok: column from a return slot, 1-4
+	mb_query($db, "UPDATE returntbl SET $warcol=? WHERE userid=?", array($subwar, $userid)); // mb-unbound-ok: column from a return slot, 1-4
 	$warriors = $warriors - $uwarrior;
-	mb_query($db, "UPDATE military SET warriors=? WHERE email=? AND pw=?", array($warriors, $email, $pw));
+	mb_query($db, "UPDATE military SET warriors=? WHERE userid=?", array($warriors, $userid));
 }
 if($uwizard > 0)	{		
 	$subwiz = (($uwizard * $wizhp) - $divided_pts) / $wizhp;
 	if($subwiz < 0)	 {	$subwiz = 0;	}
 		$subwiz = round($subwiz);
 		$wizcol = "wiz" . "$tfleets";
-	mb_query($db, "UPDATE returntbl SET $wizcol=? WHERE email=? AND pw=?", array($subwiz, $email, $pw)); // mb-unbound-ok: column from a return slot, 1-4
+	mb_query($db, "UPDATE returntbl SET $wizcol=? WHERE userid=?", array($subwiz, $userid)); // mb-unbound-ok: column from a return slot, 1-4
 	$wizards = $wizards - $uwizard;
-	mb_query($db, "UPDATE military SET wizards=? WHERE email=? AND pw=?", array($wizards, $email, $pw));
+	mb_query($db, "UPDATE military SET wizards=? WHERE userid=?", array($wizards, $userid));
 }
 if($upriest > 0)	{		
 	$subpri = (($upriest * $prihp) - $divided_pts) / $prihp;
 	if($subpri < 0)	{	$subpri = 0;	}
 		$subpri = round($subpri);
 		$pricol = "pri" . "$tfleets";
-	mb_query($db, "UPDATE returntbl SET $pricol=? WHERE email=? AND pw=?", array($subpri, $email, $pw)); // mb-unbound-ok: column from a return slot, 1-4
+	mb_query($db, "UPDATE returntbl SET $pricol=? WHERE userid=?", array($subpri, $userid)); // mb-unbound-ok: column from a return slot, 1-4
 	$priests = $priests - $upriest;
-	mb_query($db, "UPDATE military SET priests=? WHERE email=? AND pw=?", array($priests, $email, $pw));
+	mb_query($db, "UPDATE military SET priests=? WHERE userid=?", array($priests, $userid));
 }
 if($uarcher > 0)	{
 	$subarch = (($uarcher * $archhp) - $divided_pts) / $archhp;
 	if($subarch < 0)	{	$subarch = 0;	}
 		$subarch = round($subarch);
 		$archcol = "arch" . "$tfleets";
-	mb_query($db, "UPDATE returntbl SET $archcol=? WHERE email=? AND pw=?", array($subarch, $email, $pw)); // mb-unbound-ok: column from a return slot, 1-4
+	mb_query($db, "UPDATE returntbl SET $archcol=? WHERE userid=?", array($subarch, $userid)); // mb-unbound-ok: column from a return slot, 1-4
 	$archers = $archers - $uarcher;
-	mb_query($db, "UPDATE military SET archers=? WHERE email=? AND pw=?", array($archers, $email, $pw));
+	mb_query($db, "UPDATE military SET archers=? WHERE userid=?", array($archers, $userid));
 }
 if($ugolem > 0)	{
 	$subgolem = (($ugolem * $golemhp) - $divided_pts) / $golemhp;
 	if($subgolem < 0)	{	$subgolem = 0;	}
 		$subgolem = round($subgolem);
 		$golemcol = "golem" . "$tfleets";
-	mb_query($db, "UPDATE returntbl SET $golemcol=? WHERE email=? AND pw=?", array($subgolem, $email, $pw)); // mb-unbound-ok: column from a return slot, 1-4
+	mb_query($db, "UPDATE returntbl SET $golemcol=? WHERE userid=?", array($subgolem, $userid)); // mb-unbound-ok: column from a return slot, 1-4
 	$golem = $golem - $ugolem;
-	mb_query($db, "UPDATE military SET golem=? WHERE email=? AND pw=?", array($golem, $email, $pw));
+	mb_query($db, "UPDATE military SET golem=? WHERE userid=?", array($golem, $userid));
 }
 if($uirongolem > 0)	{
 	$subirongolem = (($uirongolem * $irongolemhp) - $divided_pts) / $irongolemhp;
 	if($subirongolem < 0)	{	$subirongolem = 0;	}
 		$subirongolem = round($subirongolem);
 		$irongolemcol = "irongolem" . "$tfleets";
-	mb_query($db, "UPDATE returntbl SET $irongolemcol=? WHERE email=? AND pw=?", array($subirongolem, $email, $pw)); // mb-unbound-ok: column from a return slot, 1-4
+	mb_query($db, "UPDATE returntbl SET $irongolemcol=? WHERE userid=?", array($subirongolem, $userid)); // mb-unbound-ok: column from a return slot, 1-4
 	$irongolem = $irongolem - $uirongolem;
-	mb_query($db, "UPDATE military SET irongolem=? WHERE email=? AND pw=?", array($irongolem, $email, $pw));
+	mb_query($db, "UPDATE military SET irongolem=? WHERE userid=?", array($irongolem, $userid));
 }
 	
 if($uwarrior > 0 AND $uwarrior != "")	{	$wspeed = $warspeedw + $warspeeda;	}
@@ -107,8 +107,8 @@ if($race == 'Night Elf')	{
 }
 
 $returning = "time" . "$tfleets";
-mb_query($db, "UPDATE returntbl SET $returning=? WHERE email=? AND pw=?", array($R_time, $email, $pw)); // mb-unbound-ok: column from a return slot, 1-4
-mb_query($db, "UPDATE user SET fleets = fleets - 1 WHERE email=? AND pw=?", array($email, $pw));
+mb_query($db, "UPDATE returntbl SET $returning=? WHERE userid=?", array($R_time, $userid)); // mb-unbound-ok: column from a return slot, 1-4
+mb_query($db, "UPDATE user SET fleets = fleets - 1 WHERE userid=?", array($userid));
 
 ############################
 ##	losses for empire being attacked

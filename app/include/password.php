@@ -5,14 +5,13 @@
  * The 2003 code stored md5($pw) -- unsalted, unstretched, and denormalized into
  * six tables beside the email address that identifies the row -- and the
  * digest did two jobs. It protected the account, and it was the bearer token:
- * the session carried it and roughly 1300 queries filtered on
+ * the session carried it and some 400 queries filtered on
  *
- *     ... WHERE email=? AND pw=?
+ *     ... WHERE email='$email' AND pw='$pw'
  *
- * Both jobs have moved. The hash protects the account, and lives in one row of
- * the accounts database (include/accounts.php). The token is a kingdom key the
- * round holds instead (include/kingdom.php), so those 1300 queries are
- * untouched and none of them ever sees a password hash.
+ * Only the first job is left. The hash lives in one row of the accounts
+ * database (include/accounts.php), and the game finds a kingdom by its userid,
+ * so no round query ever sees it.
  *
  * password_hash() salts per row and costs enough to make a stolen table
  * expensive rather than free. PASSWORD_BCRYPT rather than PASSWORD_DEFAULT:
@@ -111,11 +110,9 @@ if (!function_exists('mb_password_store')) {
      * buildings, military, research, returntbl and explore, and a table left
      * holding the old hash was a page that silently stopped matching -- and
      * the list lived here so that preferences.php and the login upgrade could
-     * not disagree about it. The round's six columns hold the kingdom key now,
-     * which a password change does not touch.
+     * not disagree about it. The round holds no copy now.
      *
-     * The session that made the change has to carry the new hash's
-     * fingerprint, or include/session.php ends it with the others:
+     * The session that made the change has to carry the new fingerprint, or include/session.php ends it with the others:
      * mb_session_rotate().
      *
      * @param  int   $account_id

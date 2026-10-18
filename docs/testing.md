@@ -591,14 +591,13 @@ untidiness.** `idle@` is bcrypt â€” what `app/include/password.php` writes now â
 while `tester@` and `poor@` keep the unsalted MD5 the game stored until Phase 3,
 so every run drives both arms of `mb_password_verify()` *and* the rehash that
 follows a legacy login. The hashes are in `db/accounts-seed.sql`, because the
-password is the account's; the round's six `pw` columns hold fixed kingdom
-keys, so the rehash moves no round row and the tick golden master is the same
-on every run. Deleting the MD5 rows would delete the only coverage that path
+password is the account's; the round holds no credential at all, so the
+rehash moves no round row and the tick golden master is the same on every
+run. Deleting the MD5 rows would delete the only coverage that path
 has.
 
-`pw` is no longer on the golden harness's ignore list. It was there only
-because every login rehashed it in six tables; now a scenario that moves it is
-moving the credential, and should say so.
+`pw` used to be on the golden harness's ignore list, because every login
+rehashed it in six tables. The column is gone from the round.
 
 `passwordChange()` closes the other half, on `idle2@` after the email change.
 It refuses a wrong current password, changes the password, and then logs in on

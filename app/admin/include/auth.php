@@ -33,11 +33,11 @@ if (!function_exists('mb_admin_logged_in')) {
      */
     function mb_admin_logged_in()
     {
-        global $email, $pw, $mb_account_id;
+        global $userid, $mb_account_id;
 
-        // session.php has already validated and checked these against the
-        // account and the kingdom, and blanked them if either failed.
-        if ($email === '' || $pw === '' || !$mb_account_id) {
+        // session.php has already checked these against the account and the
+        // kingdom, and blanked them if either failed.
+        if ($userid === '' || !$mb_account_id) {
             return false;
         }
 

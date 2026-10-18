@@ -237,8 +237,8 @@ else	{
 			if($ltally == $ltaken)	{	break;	}
 	}
 	
-	mb_query($db, "UPDATE user SET land = land + ? WHERE email=? AND pw=?", array(mb_num($landgain), $email, $pw));
-	mb_query($db, "UPDATE buildings SET aland = aland + ? WHERE email=? AND pw=?", array(mb_num($landgain), $email, $pw));
+	mb_query($db, "UPDATE user SET land = land + ? WHERE userid=?", array(mb_num($landgain), $userid));
+	mb_query($db, "UPDATE buildings SET aland = aland + ? WHERE userid=?", array(mb_num($landgain), $userid));
 										
 	mb_query($db, "UPDATE user SET land = land - ? WHERE userid = ?", array(mb_num($landgain), (int) $empvalue));
 	mb_query($db, "UPDATE buildings SET home=?, barrack=?, farm=?, wp=?, lmill=?, dhome=?, dbarrack=?, dfarm=?, dwp=?, dlmill=?, aland=? WHERE userid = ?", array(mb_num($evb['home']), mb_num($evb['barrack']), mb_num($evb['farm']), mb_num($evb['wp']), mb_num($evb['lmill']), mb_num($evb['dhome']), mb_num($evb['dbarrack']), mb_num($evb['dfarm']), mb_num($evb['dwp']), mb_num($evb['dlmill']), mb_num($evb['aland']), (int) $empvalue));

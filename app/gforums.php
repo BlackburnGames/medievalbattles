@@ -4,7 +4,7 @@ include("include/igtop.php");
 
 
 //	determine guild name
-$empire_guild_query = mb_query($db, "SELECT guild FROM user WHERE email=? AND pw=?", array($email, $pw));	
+$empire_guild_query = mb_query($db, "SELECT guild FROM user WHERE userid=?", array($userid));	
 	$empireguild = mb_db_result($empire_guild_query,"empireguild");
 
 if($empireguild == 'None')	{

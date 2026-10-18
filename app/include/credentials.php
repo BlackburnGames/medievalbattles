@@ -1,59 +1,29 @@
 <?php
 /**
- * What an email address, a kingdom key and an empire name are allowed to be.
+ * What an email address, an empire name and a guild name are allowed to be.
  *
- * This exists because of one entry on tests/sql-injection.txt that could not be
- * fixed where it was reported. preferences.php lets a player choose a new
- * address, writes it to six tables and assigns it to $email -- and $email, with
- * $pw beside it, is the credential that roughly 1300 queries in this codebase
- * filter on:
+ * This began with one entry on tests/sql-injection.txt that could not be fixed
+ * where it was reported. preferences.php let a player choose a new address,
+ * wrote it to six tables and assigned it to $email -- and $email, with $pw
+ * beside it, was the credential some 400 queries filtered on, interpolated:
  *
  *     ... WHERE email='$email' AND pw='$pw'
  *
- * Escaping the call sites is the fix everywhere else in Phase 3 and is not
- * available here: there are 1300 of them, in every file, and the address gets
- * there by way of the session rather than by way of the page that reads it, so
- * the per-file audit cannot even see most of them. checksignup.php makes it
- * worse -- its address validation has been commented out since 2003 (line 52),
- * so any string at all could be stored and then interpolated on every page the
- * account ever loads.
+ * Escaping 400 sites in every file was not the move, so the boundary moved
+ * instead: if the value could only ever be something with no SQL meaning,
+ * every one of those interpolations was safe by construction. checksignup.php,
+ * preferences.php and include/session.php all held addresses to this rule.
  *
- * So the boundary moves instead of the call sites. If the two values can only
- * ever be things that carry no SQL meaning, then all 1300 interpolations are
- * safe by construction and stay safe as they are rewritten. Three places agree
- * on the rule:
+ * None of that is the reason any more. Every query binds its values through
+ * mb_query(), and the round no longer holds an address at all: a kingdom is
+ * found by its userid, and the address lives once, on the account
+ * (include/accounts.php). The rule is now about what an address must be to be
+ * stored and mailed, and it still has a cost worth stating -- see
+ * mb_valid_email().
  *
- *   - checksignup.php, so a hostile address is never stored;
- *   - preferences.php, so it cannot be changed into one later;
- *   - include/session.php, so a row that predates this file cannot log in and
- *     put one back into scope.
- *
- * The other half of the credential is not the password hash any more. The hash
- * is the account's, in the accounts database (include/accounts.php), and is
- * only ever bound. What the session carries as $pw, and what the round's six
- * `pw` columns hold, is a kingdom key: 64 lowercase hex characters from
- * include/kingdom.php's mb_kingdom_key(). That is a stricter rule than the one
- * it replaces, which had to admit both bcrypt's alphabet and the legacy md5.
- *
- * The address half does cost something, and it is worth being explicit about
- * it. An apostrophe is legal in the local part of a real address, and
- * o'brien@example.com is rejected here. That is a genuine loss. It is the
- * cheaper side of the trade against a value that reaches every query in the
- * game unescaped, and it stops being necessary the day those queries bind
- * their parameters instead of interpolating them -- at which point this file
- * can relax to FILTER_VALIDATE_EMAIL alone.
+ * The empire and guild names below are still interpolation-era rules too, and
+ * still worth having: both are read back and echoed on every page.
  */
-
-if (!function_exists('mb_valid_kingdom_key')) {
-    /**
-     * @param  mixed $value
-     * @return bool  true for a key as mb_kingdom_key() makes one
-     */
-    function mb_valid_kingdom_key($value)
-    {
-        return is_string($value) && preg_match('/^[0-9a-f]{64}$/', $value) === 1;
-    }
-}
 
 if (!function_exists('mb_valid_email')) {
     /**

@@ -249,7 +249,9 @@ while($INC_ID < $max_UID + 1) {
   if($validate['clock'] == 1 AND $validate['check'] == 1)  {
     mb_news_set($db, "$clock", 'red', "$user[ename] has been deleted for inactivity.", $user['setid'], 0);
 
-    $email = $user['email'];
+    // The address is the account's; the round holds none.
+    $mb_acct = mb_account_get($user['account_id']);
+    $email = $mb_acct ? $mb_acct['email'] : '';
     $subject = "Your Medieval Battles Account Deleted";
     $body = "
 Since you did not activate your account within one day upon signing up, your account was deleted. You are welcome to create another account though. Just go to:
@@ -259,12 +261,12 @@ This email is automated. Your reply will not be recieved.";
     $from = "From: account_deleted@medievalbattles.com\r\nbcc: phb@sendhost\r\nContent-type: text/plain\r\nX-mailer: PHP/" . phpversion();
     $mailsend = mail("$email", "$subject", "$body", "$from");
 
-    mb_query($db, "DELETE FROM user WHERE email=? AND pw=?", array($user['email'], $user['pw']));
-    mb_query($db, "DELETE FROM military WHERE email=? AND pw=?", array($user['email'], $user['pw']));
-    mb_query($db, "DELETE FROM buildings WHERE email=? AND pw=?", array($user['email'], $user['pw']));
-    mb_query($db, "DELETE FROM research WHERE email=? AND pw=?", array($user['email'], $user['pw']));
-    mb_query($db, "DELETE FROM returntbl WHERE email=? AND pw=?", array($user['email'], $user['pw']));
-    mb_query($db, "DELETE FROM explore WHERE email=? AND pw=?", array($user['email'], $user['pw']));
+    mb_query($db, "DELETE FROM user WHERE userid=?", array((int) $user['userid']));
+    mb_query($db, "DELETE FROM military WHERE userid=?", array((int) $user['userid']));
+    mb_query($db, "DELETE FROM buildings WHERE userid=?", array((int) $user['userid']));
+    mb_query($db, "DELETE FROM research WHERE userid=?", array((int) $user['userid']));
+    mb_query($db, "DELETE FROM returntbl WHERE userid=?", array((int) $user['userid']));
+    mb_query($db, "DELETE FROM explore WHERE userid=?", array((int) $user['userid']));
     mb_query($db, "DELETE FROM emailvalidate WHERE userid=?", array($INC_ID));
     mb_query($db, "UPDATE user SET votefor='None' WHERE votefor=?", array($user['ename']));
   }
@@ -279,7 +281,9 @@ This email is automated. Your reply will not be recieved.";
   if($user['countdown'] == 1)  {
     mb_news_set($db, "$clock", 'red', "$user[ename] has been deleted for inactivity.", $user['setid'], 0);
 
-    $email = $user['email'];
+    // The address is the account's; the round holds none.
+    $mb_acct = mb_account_get($user['account_id']);
+    $email = $mb_acct ? $mb_acct['email'] : '';
     $subject = "Your Medieval Battles Account Deleted";
     $body = "
 Since you have not logged into your account after one week upon signing up, your account was deleted. You are welcome to create another account though. Just go to:
@@ -289,12 +293,12 @@ This email is automated. Your reply will not be recieved.";
     $from = "From: account_deleted@medievalbattles.com\r\nbcc: phb@sendhost\r\nContent-type: text/plain\r\nX-mailer: PHP/" . phpversion();
     $mailsend = mail("$email", "$subject", "$body", "$from");
 
-    mb_query($db, "DELETE FROM user WHERE email=? AND pw=?", array($user['email'], $user['pw']));
-    mb_query($db, "DELETE FROM military WHERE email=? AND pw=?", array($user['email'], $user['pw']));
-    mb_query($db, "DELETE FROM buildings WHERE email=? AND pw=?", array($user['email'], $user['pw']));
-    mb_query($db, "DELETE FROM research WHERE email=? AND pw=?", array($user['email'], $user['pw']));
-    mb_query($db, "DELETE FROM returntbl WHERE email=? AND pw=?", array($user['email'], $user['pw']));
-    mb_query($db, "DELETE FROM explore WHERE email=? AND pw=?", array($user['email'], $user['pw']));
+    mb_query($db, "DELETE FROM user WHERE userid=?", array((int) $user['userid']));
+    mb_query($db, "DELETE FROM military WHERE userid=?", array((int) $user['userid']));
+    mb_query($db, "DELETE FROM buildings WHERE userid=?", array((int) $user['userid']));
+    mb_query($db, "DELETE FROM research WHERE userid=?", array((int) $user['userid']));
+    mb_query($db, "DELETE FROM returntbl WHERE userid=?", array((int) $user['userid']));
+    mb_query($db, "DELETE FROM explore WHERE userid=?", array((int) $user['userid']));
     mb_query($db, "DELETE FROM emailvalidate WHERE userid=?", array($INC_ID));
     mb_query($db, "UPDATE user SET votefor='None' WHERE votefor=?", array($user['ename']));
   }

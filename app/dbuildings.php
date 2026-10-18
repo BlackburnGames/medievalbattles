@@ -68,17 +68,17 @@ else  {
     $gm = $gm - $ugm;
     $im = $im - $uim;
 
-    mb_query($db, "UPDATE buildings SET amts=? WHERE email=? AND pw=?", array($amts, $email, $pw));
-      mb_query($db, "UPDATE buildings SET aland=? WHERE email=? AND pw=?", array($aland, $email, $pw));
+    mb_query($db, "UPDATE buildings SET amts=? WHERE userid=?", array($amts, $userid));
+      mb_query($db, "UPDATE buildings SET aland=? WHERE userid=?", array($aland, $userid));
 
-    mb_query($db, "UPDATE buildings SET home=? WHERE email=? AND pw=?", array($home, $email, $pw));
-      mb_query($db, "UPDATE buildings SET barrack=? WHERE email=? AND pw=?", array($barrack, $email, $pw));
-      mb_query($db, "UPDATE buildings SET farm=? WHERE email=? AND pw=?", array($farm, $email, $pw));
-      mb_query($db, "UPDATE buildings SET wp=? WHERE email=? AND pw=?", array($wp, $email, $pw));
-    mb_query($db, "UPDATE buildings SET lmill=? WHERE email=? AND pw=?", array($lmill, $email, $pw));
+    mb_query($db, "UPDATE buildings SET home=? WHERE userid=?", array($home, $userid));
+      mb_query($db, "UPDATE buildings SET barrack=? WHERE userid=?", array($barrack, $userid));
+      mb_query($db, "UPDATE buildings SET farm=? WHERE userid=?", array($farm, $userid));
+      mb_query($db, "UPDATE buildings SET wp=? WHERE userid=?", array($wp, $userid));
+    mb_query($db, "UPDATE buildings SET lmill=? WHERE userid=?", array($lmill, $userid));
 
-    mb_query($db, "UPDATE buildings SET gm=? WHERE email=? AND pw=?", array($gm, $email, $pw));
-      mb_query($db, "UPDATE buildings SET im=? WHERE email=? AND pw=?", array($im, $email, $pw));
+    mb_query($db, "UPDATE buildings SET gm=? WHERE userid=?", array($gm, $userid));
+      mb_query($db, "UPDATE buildings SET im=? WHERE userid=?", array($im, $userid));
 
     echo"<div align=center><font class=yellow>Your orders have been carried out.</font></div>";
     include("include/S_DBUILD.php");

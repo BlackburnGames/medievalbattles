@@ -3,14 +3,9 @@ include("include/connect.php");
 
 include("include/session.php");
 
-// check and make sure email exists
-$EMAIL_RESULT = mb_query($db, "SELECT email FROM user WHERE email=? AND pw=?", array($email, $pw));
-$E_Check = mysqli_fetch_array($EMAIL_RESULT);
-
-if($login == 1 && $pw != "" && $email !="") {
-
-	$uuserid = mb_query($db, "SELECT userid FROM user WHERE email = ? AND pw = ?", array($email, $pw));
-	$userid = mb_db_result($uuserid, 0);
+// include/session.php has already checked that $userid names a kingdom of
+// the logged-in account, and blanked it otherwise.
+if($login == 1 && $userid != "") {
 
 	// account validation
 	$validate_result = mb_query($db, "SELECT * FROM emailvalidate WHERE userid=?", array((int) $userid));
@@ -21,27 +16,27 @@ if($login == 1 && $pw != "" && $email !="") {
 	$validate_clock = $validate['clock'];
 
 	// select all armors
-	$armor_result = mb_query($db, "SELECT * FROM military WHERE email=? AND pw=?", array($email, $pw));
+	$armor_result = mb_query($db, "SELECT * FROM military WHERE userid=?", array($userid));
 	$armor = mysqli_fetch_array($armor_result);
 
 	// select warrior weapons
-	$war_weapon_result = mb_query($db, "SELECT * FROM military WHERE email=? AND pw=?", array($email, $pw));
+	$war_weapon_result = mb_query($db, "SELECT * FROM military WHERE userid=?", array($userid));
 	$warweapon = mysqli_fetch_array($war_weapon_result);
 
 	// select priest weapons
-	$pri_weapon_result = mb_query($db, "SELECT * FROM military WHERE email=? AND pw=?", array($email, $pw));
+	$pri_weapon_result = mb_query($db, "SELECT * FROM military WHERE userid=?", array($userid));
 	$priweapon = mysqli_fetch_array($pri_weapon_result);
 
 	// select archer weapons
-	$arch_weapon_result = mb_query($db, "SELECT * FROM military WHERE email=? AND pw=?", array($email, $pw));
+	$arch_weapon_result = mb_query($db, "SELECT * FROM military WHERE userid=?", array($userid));
 	$archweapon = mysqli_fetch_array($arch_weapon_result);
 
 	// select research items
-	$res_query = mb_query($db, "SELECT * FROM research WHERE email=? AND pw= ?", array($email, $pw)) or die("Error: " . mysqli_error($db));
+	$res_query = mb_query($db, "SELECT * FROM research WHERE userid=?", array($userid)) or die("Error: " . mysqli_error($db));
 	$res = mysqli_fetch_array($res_query);
 
 	// select user items
-	$user_query = mb_query($db, "SELECT * FROM user WHERE email=? AND pw=?", array($email, $pw)) or die("Error: " . mysqli_error($db));
+	$user_query = mb_query($db, "SELECT * FROM user WHERE userid=?", array($userid)) or die("Error: " . mysqli_error($db));
 	$user = mysqli_fetch_array($user_query);
 
 	$setid = $user['setid'];
@@ -69,7 +64,7 @@ if($login == 1 && $pw != "" && $email !="") {
 	$barter_clock = $user['barterclock'];
 
 // select buildings items
-$buildings_query = mb_query($db, "SELECT * FROM buildings WHERE email=? AND pw=?", array($email, $pw)) or die("Error: " . mysqli_error($db));
+$buildings_query = mb_query($db, "SELECT * FROM buildings WHERE userid=?", array($userid)) or die("Error: " . mysqli_error($db));
 $buildings = mysqli_fetch_array($buildings_query);
 
 	$home = $buildings['home'];
@@ -99,7 +94,7 @@ $buildings = mysqli_fetch_array($buildings_query);
 	$Ihrs = $buildings['Ihrs'];
 
 // select military items
-$military_query = mb_query($db, "SELECT * FROM military WHERE email=? AND pw=?", array($email, $pw)) or die("Error: " . mysqli_error($db));
+$military_query = mb_query($db, "SELECT * FROM military WHERE userid=?", array($userid)) or die("Error: " . mysqli_error($db));
 $military = mysqli_fetch_array($military_query);
 
 	## current unit x
@@ -160,7 +155,7 @@ $military = mysqli_fetch_array($military_query);
 		$dbirongolem = $military['dbirongolem'];
 
 //	select explore items
-$explore_query = mb_query($db, "SELECT * FROM explore WHERE email=? AND pw=?", array($email, $pw)) or die("Error: " . mysqli_error($db));
+$explore_query = mb_query($db, "SELECT * FROM explore WHERE userid=?", array($userid)) or die("Error: " . mysqli_error($db));
 $explore = mysqli_fetch_array($explore_query);
 
 	$expland = $explore['expland'];
@@ -169,7 +164,7 @@ $explore = mysqli_fetch_array($explore_query);
 	$mthrs = $explore['mthrs'];
 
 //	select data from return table
-$return_query = mb_query($db, "SELECT * FROM returntbl WHERE email=? AND pw=?", array($email, $pw)) or die("Error: " . mysqli_error($db));
+$return_query = mb_query($db, "SELECT * FROM returntbl WHERE userid=?", array($userid)) or die("Error: " . mysqli_error($db));
 $return = mysqli_fetch_array($return_query);
 	## party 1
 		$war1 = $return['war1'];		$WAR_1 = $return['war1'];
@@ -556,8 +551,8 @@ $amrbutton = "<form type=get action=aconstruct.php><input class=button type=subm
 		$dim = number_format($dim);
 
 //	update various user info
-	mb_query($db, "UPDATE user SET online='1' WHERE email=?", array($email));
-	mb_query($db, "UPDATE user SET countdown='336' WHERE email=? AND pw=?", array($email, $pw));
+	mb_query($db, "UPDATE user SET online='1' WHERE userid=?", array($userid));
+	mb_query($db, "UPDATE user SET countdown='336' WHERE userid=?", array($userid));
 
 } else {
 	header("Location: logout.php?pageid=timeout");

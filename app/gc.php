@@ -230,7 +230,7 @@ else	{
 
 		include("include/connect.php");
 		mb_query($db, "INSERT INTO guild (gname, info, gid, datemade, cpw, owner)	 VALUES	(?, ?, ?, ?, ?, ?) ", array($creating_guild_name, $info, $new_gid, $clock, $cpw, $userid));
-		mb_query($db, "UPDATE user SET guild=? WHERE email=? AND pw=?", array($creating_guild_name, $email, $pw));
+		mb_query($db, "UPDATE user SET guild=? WHERE userid=?", array($creating_guild_name, $userid));
 		mb_query($db, "DELETE FROM guildrequests WHERE applicant=?", array($userid));
 						
 		echo"<div align=center><font class=yellow><b><u>" . mb_h($creating_guild_name) . "</u> has been successfully created!</b></font></div>";

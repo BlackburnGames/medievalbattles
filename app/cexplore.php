@@ -34,9 +34,9 @@ else	{
 	 	$expland = $expland - $cexploreland;
 	 	$expmt = $expmt - $cexploremt;
 
-		 mb_query($db, "UPDATE military SET explorers=? WHERE email=? AND pw=?", array($explorers, $email, $pw)); 
-		 mb_query($db, "UPDATE explore SET expland=? WHERE email=? AND pw=?", array($expland, $email, $pw));
-		 mb_query($db, "UPDATE explore SET expmt=? WHERE email=? AND pw=?", array($expmt, $email, $pw));
+		 mb_query($db, "UPDATE military SET explorers=? WHERE userid=?", array($explorers, $userid)); 
+		 mb_query($db, "UPDATE explore SET expland=? WHERE userid=?", array($expland, $userid));
+		 mb_query($db, "UPDATE explore SET expmt=? WHERE userid=?", array($expmt, $userid));
       
 		 echo"<div align=center><font class=yellow>You have successfully cancelled your explorers(s).</font></div>";
 		 include("include/S_CEXPLORE.php");

@@ -43,10 +43,11 @@ foreach ($CASES as $i => $case) {
     ));
 
     $label = "$race $class";
-    $q = "'" . mysqli_real_escape_string($db, $email) . "'";
+    // By empire name: the round holds no address.
     $row = mysqli_fetch_assoc(mysqli_query($db,
         "SELECT r.r1pts, r.r13pts, r.r14pts, m.archers, m.wizards, m.priests, m.suicide
-         FROM research r JOIN military m ON m.userid = r.userid WHERE r.email = $q"));
+         FROM user u JOIN research r ON r.userid = u.userid JOIN military m ON m.userid = u.userid
+         WHERE u.ename = 'Signup $i'"));
     if (!$row) {
         echo "FAIL: $label: no account was made. The page said: "
             . trim(substr(strip_tags($body), 0, 200)) . "\n";

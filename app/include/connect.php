@@ -49,6 +49,14 @@ require_once __DIR__ . '/accounts.php';
 require_once __DIR__ . '/password.php';
 
 /**
+ * And what an address, an empire name and a guild name may be. session.php
+ * used to load these, because the address was half of the session's
+ * credential; it is not any more, and the pages that store one -- signup,
+ * preferences, gc.php -- are all pages that ran a query first.
+ */
+require_once __DIR__ . '/credentials.php';
+
+/**
  * And the settlement count, which nine readers across the tick, the range
  * checks, the drop-downs, signup and the manual used to answer two ways.
  */

@@ -17,27 +17,15 @@ $update    = mb_input('update');
 include("include/igtop.php");
 
 /**
- * The credential, escaped once, for the twenty WHERE clauses below.
+ * The account's settings: its password and address, which live on the account
+ * in the accounts database (include/accounts.php), and the kingdom's contact
+ * fields and empire news.
  *
- * This file is the last entry on tests/sql-injection.txt, and it is the honest
- * one: a player picks a new address here, it is written to six tables and then
- * assigned to $email -- the name that every "WHERE email='$email' AND
- * pw='$pw'" in the game interpolates.
- *
- * Two things close it. include/credentials.php constrains what an address may
- * be, at signup, here, and again when include/session.php reads it back, which
- * is what makes the other ~1300 call sites safe without touching them. And
- * this, which escapes the twenty in this file, because a page that lets you
- * change the value should not be relying on a rule enforced somewhere else.
- *
- * The queries below bind $email and $pw with mb_query(), so the AIM and MSN
- * updates after an address change filter on the new address by reading
- * $email after it is reassigned.
- *
- * The password and the address are the account's, in the accounts database
- * (include/accounts.php); $pw is the kingdom's key. So every password check
- * here is against the account's hash, and an address change moves the
- * account as well as the kingdom's six rows.
+ * This page was the last entry on tests/sql-injection.txt: a player picked a
+ * new address here, it was written to six tables and became the $email that
+ * every "WHERE email='$email' AND pw='$pw'" in the game interpolated. Every
+ * query binds its values now, the kingdom is found by userid, and the round
+ * holds no address -- so an address change is one row, the account's.
  */
 $mb_account = mb_account_get($mb_account_id);
 $account_hash = $mb_account ? $mb_account['pw'] : '';
@@ -63,8 +51,7 @@ else	{
 	// Verified against the account's hash rather than compared to it. With md5
 	// the check could be digest == digest; a salted hash cannot be recomputed
 	// from the password alone, which is the point of it, so the plaintext goes
-	// to include/password.php instead. Not against $pw, which was the hash
-	// once and is the kingdom's key now.
+	// to include/password.php instead.
 	if(!mb_password_verify($currentpw, $account_hash))	{
 		echo"<div align=center><font class=yellow>Your current password is not correct.</font></div>";
 		include("include/chngpw_table.php");
@@ -92,13 +79,14 @@ else	{
 	// and was harmless only because the next line immediately overwrote it.
 	//
 	// One row, the account's. It was six UPDATEs while the hash was copied into
-	// every kingdom table; the kingdom's key does not change with the password.
+	// every kingdom table.
 	$newpw_hash = mb_password_hash($newpw);
 	mb_password_store($mb_account_id, $newpw_hash);
 	$account_hash = $newpw_hash;
-	// Every other session on this account still holds the old hash's
-	// fingerprint, and is ended by include/session.php on its next request.
-	mb_session_rotate($email, $pw, $account_hash);
+	$mb_account['pw'] = $newpw_hash;
+	// Every other session on this account still holds the old fingerprint,
+	// and is ended by include/session.php on its next request.
+	mb_session_rotate($mb_account);
 
 	echo"<div align=center><font class=yellow>Your password has been changed.</font></div>";
 	include("include/chngpw_table.php");
@@ -115,10 +103,7 @@ else	{
 	$cnewemail = strtolower($newemail);
 
 	// The new address is checked before anything is written, by the same rule
-	// signup and include/session.php use. Without it a player could put a
-	// quote into $email, and $email is what ~1300 "WHERE email='$email'"
-	// clauses across the game interpolate on every page they load. See
-	// include/credentials.php.
+	// signup and login use. See include/credentials.php.
 	if(!mb_valid_email($cnewemail))	{
 		echo"<div align=center><font class=yellow>That is not a valid email address.</font></div>";
 		include("include/chngpw_table.php");
@@ -127,17 +112,10 @@ else	{
 		die();
 	}
 
-	$E_Result = mb_query($db, "SELECT email FROM user WHERE email=?", array($cnewemail));
-	$New_Email = mysqli_fetch_array($E_Result);
-
-	$New_Email[0] = strtolower($New_Email[0]);
-
-	// And the accounts, which hold addresses whose kingdoms are gone. Another
-	// account's address is taken whether or not it plays this round.
+	// Another account's address is taken, whether or not it plays this round.
 	$E_Account = mb_account_find($cnewemail);
-	$taken_by_account = $E_Account && (int) $E_Account['account_id'] !== $mb_account_id;
 
-	if(($New_Email[0] == $cnewemail AND $newemail != $email) OR $taken_by_account)	{
+	if($E_Account && (int) $E_Account['account_id'] !== $mb_account_id)	{
 		echo"<div align=center><font class=yellow>This email is already in use.</font></div>";
 		include("include/chngpw_table.php");
 		include("include/S_PREF.php");
@@ -147,29 +125,17 @@ else	{
 	
 	// update email
 	//
-	// htmlspecialchars() used to stand in for escaping here, and whether it
-	// stopped a quote reaching MySQL depended on the PHP version -- ENT_QUOTES
-	// only became the default in 8.1, so single quotes survived it on the 5.6
-	// image this suite also runs against. The values are bound now, and
-	// mb_valid_email() above has already refused every character it was
-	// standing between MySQL and. The table names are a literal list.
-	//
-	// The account first, then the round's copy in the kingdom's six tables.
-	// The kingdom is linked to the account by user.account_id, so the copy is
-	// not what holds them together -- but it is what every "email=? AND pw=?"
-	// in the game matches, and this session moves onto it below. An ended
-	// round keeps the address it had.
+	// htmlspecialchars() used to stand in for escaping here, and it was six
+	// UPDATEs, one per kingdom table, each carrying a copy. It is the account's
+	// row alone now. Every other session on the account still holds the old
+	// address's fingerprint, and is ended on its next request.
 	mb_account_set_email($mb_account_id, $newemail);
-	foreach (array('user', 'buildings', 'military', 'research', 'returntbl', 'explore') as $table) {
-		mb_query($db, "UPDATE $table SET email=? WHERE email=? AND pw=?", array($newemail, $email, $pw)) or die(mysqli_error($db)); // mb-unbound-ok: table names from a literal list
-	}
 	$email = $newemail;
-	mb_session_rotate($email, $pw, $account_hash);
+	$mb_account['email'] = $newemail;
+	mb_session_rotate($mb_account);
 
-	// The six UPDATEs above have just moved the kingdom onto the new address,
-	// and $email now holds it, so these filter on that one.
-	mb_query($db, "UPDATE user SET aim=? WHERE email=? AND pw=?", array($newaim, $email, $pw));
-	mb_query($db, "UPDATE user SET msn=? WHERE email=? AND pw=?", array($newmsn, $email, $pw));
+	mb_query($db, "UPDATE user SET aim=? WHERE userid=?", array($newaim, $userid));
+	mb_query($db, "UPDATE user SET msn=? WHERE userid=?", array($newmsn, $userid));
 		
 	$email = $newemail;
 	$msn = $newmsn;
@@ -233,7 +199,7 @@ else	{
 		mb_account_delete($mb_account_id);
 
 		mb_session_end();
-		$login = $email = $pw = '';
+		$login = $email = $userid = '';
 
 		// Not a redirect. This page has no output buffer and igtop.php has
 		// rendered the whole frame by now, so header("Location: index.php")

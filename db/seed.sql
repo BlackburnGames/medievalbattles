@@ -11,14 +11,11 @@
 --   idle@example.com   / pass2
 --   poor@example.com   / pass3
 --
--- The passwords are not in this file. They belong to the accounts, which live
--- in a database of their own -- db/accounts.sql and db/accounts-seed.sql --
--- because an account outlasts a round and this world does not. What the six
--- `pw` columns below hold is each kingdom's key: 64 hex characters that
--- checklogin.php reads out of `user` once the password has been verified
--- against the account, and that the session then carries as the `pw` half of
--- every "WHERE email=? AND pw=?" in the game. Fixed rather than random, so the
--- tick golden master is the same on every run.
+-- Neither the addresses nor the passwords are in this file. They belong to the
+-- accounts, which live in a database of their own -- db/accounts.sql and
+-- db/accounts-seed.sql -- because an account outlasts a round and this world
+-- does not. Each kingdom names its account by `user.account_id`, and the game
+-- finds a kingdom by its userid.
 --
 -- The `emailvalidate` codes below are unchanged: they are activation codes and
 -- happen to look like MD5 digests because signup used to store the password
@@ -47,20 +44,20 @@ INSERT INTO `emailvalidate` (userid, code, `check`, clock) VALUES
 -- safemode 0 on the primary tester so combat and tick paths are reachable;
 -- user 2 keeps a low countdown to exercise the inactivity branch of the tick.
 INSERT INTO `user`
-  (email, pw, ename, race, class, gp, iron, lumber, exp, food, land, mts,
+  (ename, race, class, gp, iron, lumber, exp, food, land, mts,
    setid, csnum, userid, online, safemode, countdown, guild, lastlogin, signup_comp_id, account_id)
 VALUES
-  ('tester@example.com', '5edee65bb219de558b34c4b590d562b21dfd533475148e1c63e3e70cbc417b91', 'TestLord',  'Human', 'Warrior', 300000, 5000, 4000, 1000, 1500, 250, 200, 1, 1, 1, 0, 0,  336, 'None', '1/1/03, 12:00am', 'seed', 1),  -- fleets set below
-  ('idle@example.com',   '65c6d5d174bc8fb2464f57b6dc73418271ad9d164195eec7247482c3b7e4814a', 'IdleBaron', 'Demon', 'Cleric',  120000, 6200, 3100,  400, 1500, 250, 200, 1, 1, 2, 0, 0,    2, 'None', '1/1/03, 12:00am', 'seed', 2),
-  ('poor@example.com',   'c31bb58e7268f78233cf3fc96629f72b88219b371dc18fbf8a3c3e91773855ad', 'PoorSerf',  'Giant', 'Ranger',       0,    0,    0,    0,    0, 250, 200, 2, 2, 3, 0, 0,  336, 'None', '1/1/03, 12:00am', 'seed', 3);
+  ('TestLord',  'Human', 'Warrior', 300000, 5000, 4000, 1000, 1500, 250, 200, 1, 1, 1, 0, 0,  336, 'None', '1/1/03, 12:00am', 'seed', 1),  -- fleets set below
+  ('IdleBaron', 'Demon', 'Cleric',  120000, 6200, 3100,  400, 1500, 250, 200, 1, 1, 2, 0, 0,    2, 'None', '1/1/03, 12:00am', 'seed', 2),
+  ('PoorSerf',  'Giant', 'Ranger',       0,    0,    0,    0,    0, 250, 200, 2, 2, 3, 0, 0,  336, 'None', '1/1/03, 12:00am', 'seed', 3);
 
-INSERT INTO `buildings` (email, pw, home, barrack, farm, wp, gm, im, aland, amts, userid) VALUES
-  ('tester@example.com', '5edee65bb219de558b34c4b590d562b21dfd533475148e1c63e3e70cbc417b91', 50, 50, 50, 0, 50, 50, 100, 100, 1),
-  ('idle@example.com',   '65c6d5d174bc8fb2464f57b6dc73418271ad9d164195eec7247482c3b7e4814a', 50, 50, 50, 0, 50, 50, 100, 100, 2),
-  ('poor@example.com',   'c31bb58e7268f78233cf3fc96629f72b88219b371dc18fbf8a3c3e91773855ad',  1,  1,  1, 0,  1,  1, 100, 100, 3);
+INSERT INTO `buildings` (home, barrack, farm, wp, gm, im, aland, amts, userid) VALUES
+  (50, 50, 50, 0, 50, 50, 100, 100, 1),
+  (50, 50, 50, 0, 50, 50, 100, 100, 2),
+  (1,  1,  1, 0,  1,  1, 100, 100, 3);
 
 INSERT INTO `military`
-  (email, pw, civ, recruits, warriors, wizards, priests, maxciv, userid, warpower,
+  (civ, recruits, warriors, wizards, priests, maxciv, userid, warpower,
    warspeedw, cweapon, wizpower, wizspeeds, cspell, pripower, prispeedw, cstaff,
    cbow, archspeedw, archpower, wararmor, wizarmor, priarmor, wardef, wizdef,
 -- `sages` on the primary tester, so the barter board can trade one. The unit
@@ -69,18 +66,18 @@ INSERT INTO `military`
 -- rename and is now written by nothing.
    pridef, warspeeda, wizspeeda, prispeeda, archers, suicide, sages)
 VALUES
-  ('tester@example.com', '5edee65bb219de558b34c4b590d562b21dfd533475148e1c63e3e70cbc417b91', 1200, 200, 3, 3, 3, 200, 1, 2, 6, 'Dagger', 3, 4, 'Magic Missile', 2, 4, 'Quarterstaff', 'Bow', 4, 2, 'Studded Leather', 'Robe', 'Leather', 1, 1, 2, 0, 0, 1, 0, 0, 8),
-  ('idle@example.com',   '65c6d5d174bc8fb2464f57b6dc73418271ad9d164195eec7247482c3b7e4814a', 1300, 250, 5, 0, 5, 300, 2, 2, 6, 'Dagger', 3, 4, 'Magic Missile', 2, 4, 'Quarterstaff', 'Bow', 4, 2, 'Studded Leather', 'Robe', 'Leather', 1, 1, 2, 0, 0, 1, 0, 0, 0),
-  ('poor@example.com',   'c31bb58e7268f78233cf3fc96629f72b88219b371dc18fbf8a3c3e91773855ad',    0,   0, 0, 0, 0, 100, 3, 2, 6, 'Dagger', 3, 4, 'Magic Missile', 2, 4, 'Quarterstaff', 'Bow', 4, 2, 'Studded Leather', 'Robe', 'Leather', 1, 1, 2, 0, 0, 1, 5, 0, 0);
+  (1200, 200, 3, 3, 3, 200, 1, 2, 6, 'Dagger', 3, 4, 'Magic Missile', 2, 4, 'Quarterstaff', 'Bow', 4, 2, 'Studded Leather', 'Robe', 'Leather', 1, 1, 2, 0, 0, 1, 0, 0, 8),
+  (1300, 250, 5, 0, 5, 300, 2, 2, 6, 'Dagger', 3, 4, 'Magic Missile', 2, 4, 'Quarterstaff', 'Bow', 4, 2, 'Studded Leather', 'Robe', 'Leather', 1, 1, 2, 0, 0, 1, 0, 0, 0),
+  (0,   0, 0, 0, 0, 100, 3, 2, 6, 'Dagger', 3, 4, 'Magic Missile', 2, 4, 'Quarterstaff', 'Bow', 4, 2, 'Studded Leather', 'Robe', 'Leather', 1, 1, 2, 0, 0, 1, 5, 0, 0);
 
 -- r1/r15 are sages ASSIGNED to a project; r1pts/r15pts are the points they have
 -- accumulated. The primary tester has both kinds so the tick's research step is
 -- covered: without an assigned sage the UPDATE writes nothing observable, which
 -- is how the schema being four columns short went unnoticed for the whole port.
-INSERT INTO `research` (email, pw, userid, r1, r15, r1pts, r13pts, r14pts) VALUES
-  ('tester@example.com', '5edee65bb219de558b34c4b590d562b21dfd533475148e1c63e3e70cbc417b91', 1, 5, 2, 0, 0, 0),
-  ('idle@example.com',   '65c6d5d174bc8fb2464f57b6dc73418271ad9d164195eec7247482c3b7e4814a', 2, 0, 0, 0, 0, 0),
-  ('poor@example.com',   'c31bb58e7268f78233cf3fc96629f72b88219b371dc18fbf8a3c3e91773855ad', 3, 0, 0, 0, 125000, 0);
+INSERT INTO `research` (userid, r1, r15, r1pts, r13pts, r14pts) VALUES
+  (1, 5, 2, 0, 0, 0),
+  (2, 0, 0, 0, 0, 0),
+  (3, 0, 0, 0, 125000, 0);
 
 -- An army in the field, so the tick's return path is exercised.
 --
@@ -89,10 +86,10 @@ INSERT INTO `research` (email, pw, userid, r1, r15, r1pts, r13pts, r14pts) VALUE
 -- have its timer decremented. Golems are included deliberately -- they are the
 -- reason both of those statements used to fail.
 DELETE FROM `returntbl` WHERE userid IN (1, 2, 3);
-INSERT INTO `returntbl` (email, pw, userid, war1, wiz1, pri1, arch1, golem1, irongolem1, time1, war2, golem2, time2) VALUES
-  ('tester@example.com', '5edee65bb219de558b34c4b590d562b21dfd533475148e1c63e3e70cbc417b91', 1, 40, 2, 1, 3, 2, 1, 1, 25, 1, 3),
-  ('idle@example.com',   '65c6d5d174bc8fb2464f57b6dc73418271ad9d164195eec7247482c3b7e4814a', 2,  0, 0, 0, 0, 0, 0, 0,  0, 0, 0),
-  ('poor@example.com',   'c31bb58e7268f78233cf3fc96629f72b88219b371dc18fbf8a3c3e91773855ad', 3,  0, 0, 0, 0, 0, 0, 0,  0, 0, 0);
+INSERT INTO `returntbl` (userid, war1, wiz1, pri1, arch1, golem1, irongolem1, time1, war2, golem2, time2) VALUES
+  (1, 40, 2, 1, 3, 2, 1, 1, 25, 1, 3),
+  (2,  0, 0, 0, 0, 0, 0, 0,  0, 0, 0),
+  (3,  0, 0, 0, 0, 0, 0, 0,  0, 0, 0);
 
 -- user.fleets counts generals still AVAILABLE, not armies in the field: sending
 -- an army decrements it and update.php:180 gives one back per army that lands.
@@ -100,10 +97,10 @@ INSERT INTO `returntbl` (email, pw, userid, war1, wiz1, pri1, arch1, golem1, iro
 -- the tester a fifth general on a roster of four.
 UPDATE `user` SET fleets = 2 WHERE userid = 1;
 
-INSERT INTO `explore` (email, pw, userid) VALUES
-  ('tester@example.com', '5edee65bb219de558b34c4b590d562b21dfd533475148e1c63e3e70cbc417b91', 1),
-  ('idle@example.com',   '65c6d5d174bc8fb2464f57b6dc73418271ad9d164195eec7247482c3b7e4814a', 2),
-  ('poor@example.com',   'c31bb58e7268f78233cf3fc96629f72b88219b371dc18fbf8a3c3e91773855ad', 3);
+INSERT INTO `explore` (userid) VALUES
+  (1),
+  (2),
+  (3);
 
 -- A guild exists so the guild and guild-forum pages are reachable. Without
 -- membership the crawler cannot enter roughly ten scripts at all, and they

@@ -45,7 +45,7 @@ $NOT_ADMIN = 'poor@example.com';
 
 // Who an account is, which a reset keeps; and the columns signup rolls dice
 // for, checked against its ranges below instead of against the twin.
-$IDENTITY = array('email', 'pw', 'userid', 'ename', 'race', 'class', 'setid', 'csnum', 'aim',
+$IDENTITY = array('userid', 'ename', 'race', 'class', 'setid', 'csnum', 'aim',
     'msn', 'ip', 'lastlog', 'lastlogin', 'current_comp_id', 'signup_comp_id', 'account_id');
 $ROLLED = array(
     'user'     => array('gp', 'iron'),
@@ -77,6 +77,14 @@ function rowsFor($db, $table, $userid)
         $rows[] = $row;
     }
     return $rows;
+}
+
+/** How many kingdoms the account with this address has: the round holds no address. */
+function kingdomsOf($db, $adb, $email)
+{
+    $row = mysqli_fetch_row(mysqli_query($adb, "SELECT account_id FROM account WHERE email = '"
+        . mysqli_real_escape_string($adb, $email) . "'"));
+    return $row ? countWhere($db, "SELECT count(*) FROM user WHERE account_id = " . (int) $row[0]) : 0;
 }
 
 function countWhere($db, $sql)
@@ -117,7 +125,7 @@ foreach ($WIPES as $wipe => $form) {
         fail("$wipe: $d");
     }
 
-    if (countWhere($db, "SELECT count(*) FROM user WHERE email = '$NOT_ADMIN'") !== 0) {
+    if (kingdomsOf($db, $adb, $NOT_ADMIN) !== 0) {
         fail("$wipe: $NOT_ADMIN, not an admin, kept its kingdom");
     }
     // The kingdom, not the account: accounts outlast a round.
@@ -146,7 +154,7 @@ foreach ($WIPES as $wipe => $form) {
             'signup' => 1, 'email' => $twinEmail, 'cemail' => $twinEmail, 'pw' => 'pass1234', 'cpw' => 'pass1234',
             'ename' => "Twin $id", 'race' => $a['race'], 'class' => $a['class'], 'msn' => '', 'aim' => '',
         ));
-        $twinRow = mysqli_fetch_row(mysqli_query($db, "SELECT userid FROM user WHERE email = '$twinEmail'"));
+        $twinRow = mysqli_fetch_row(mysqli_query($db, "SELECT userid FROM user WHERE ename = 'Twin $id'"));
         if (!$twinRow) {
             fail("$wipe: could not sign up a twin for {$a['email']}");
             continue;
@@ -210,12 +218,12 @@ foreach ($WIPES as $wipe => $form) {
     $rejoin = array('signup' => 1, 'email' => $NOT_ADMIN, 'cemail' => $NOT_ADMIN, 'pw' => 'wrong', 'cpw' => 'wrong',
         'ename' => 'Returned Serf', 'race' => 'Giant', 'class' => 'Ranger', 'msn' => '', 'aim' => '');
     $back->post('/checksignup.php', $rejoin);
-    if (countWhere($db, "SELECT count(*) FROM user WHERE email = '$NOT_ADMIN'") !== 0) {
+    if (kingdomsOf($db, $adb, $NOT_ADMIN) !== 0) {
         fail("$wipe: signup gave $NOT_ADMIN's address a kingdom without its password");
     }
     $rejoin['pw'] = $rejoin['cpw'] = 'pass3';
     $back->post('/checksignup.php', $rejoin);
-    if (countWhere($db, "SELECT count(*) FROM user WHERE email = '$NOT_ADMIN'") !== 1) {
+    if (kingdomsOf($db, $adb, $NOT_ADMIN) !== 1) {
         fail("$wipe: $NOT_ADMIN could not sign up again with its own password");
     }
     if (countWhere($adb, "SELECT count(*) FROM account WHERE email = '$NOT_ADMIN'") !== 1) {

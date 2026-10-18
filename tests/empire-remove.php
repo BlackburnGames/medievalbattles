@@ -102,11 +102,11 @@ foreach (array(
     $VOTER   => array('Voter Empire',  'None',  'Gone Empire',  0),
     $OTHERGL => array('Other Leader',  "$GNAME-other", 'Votee Empire', 0),
 ) as $id => $r) {
-    q($db, "INSERT INTO user (email, pw, ename, userid, setid, guild, votefor, vote)
-            VALUES ('rm$id@example.com', 'x', '$r[0]', $id, $SETID, '$r[1]', '$r[2]', $r[3])");
+    q($db, "INSERT INTO user (ename, userid, setid, guild, votefor, vote)
+            VALUES ('$r[0]', $id, $SETID, '$r[1]', '$r[2]', $r[3])");
 }
 foreach (array('military', 'buildings', 'research', 'returntbl', 'explore') as $t) {
-    q($db, "INSERT INTO $t (email, pw, userid) VALUES ('rm$GONE@example.com', 'x', $GONE)");
+    q($db, "INSERT INTO $t (userid) VALUES ($GONE)");
 }
 q($db, "INSERT INTO emailvalidate (userid, code, `check`) VALUES ($GONE, 'x', '2')");
 q($db, "INSERT INTO guild (gname, owner, mem) VALUES ('$GNAME', '$GONE', 2), ('$GNAME-other', '$OTHERGL', 1)");

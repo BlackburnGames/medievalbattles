@@ -31,8 +31,6 @@ CREATE TABLE `barter` (
 #
 
 CREATE TABLE `buildings` (
-  `email` varchar(50) NOT NULL default '',
-  `pw` varchar(255) NOT NULL default '',
   `amts` bigint(255) NOT NULL default '0',
   `aland` bigint(255) NOT NULL default '0',
   `home` bigint(255) NOT NULL default '0',
@@ -57,7 +55,8 @@ CREATE TABLE `buildings` (
   `Lhrs` bigint(255) NOT NULL default '0',
   `Ghrs` bigint(255) NOT NULL default '0',
   `Ihrs` bigint(255) NOT NULL default '0',
-  `userid` bigint(255) NOT NULL default '0'
+  `userid` bigint(255) NOT NULL default '0',
+  KEY `userid` (`userid`)
 ) ENGINE=MyISAM;
 
 #
@@ -117,13 +116,12 @@ CREATE TABLE `empnews` (
 #
 
 CREATE TABLE `explore` (
-  `email` varchar(50) NOT NULL default '',
-  `pw` varchar(255) NOT NULL default '',
   `userid` bigint(20) NOT NULL default '0',
   `expland` bigint(20) NOT NULL default '0',
   `expmt` bigint(20) NOT NULL default '0',
   `landhrs` bigint(255) NOT NULL default '0',
-  `mthrs` bigint(255) NOT NULL default '0'
+  `mthrs` bigint(255) NOT NULL default '0',
+  KEY `userid` (`userid`)
 ) ENGINE=MyISAM;
 
 #
@@ -343,8 +341,6 @@ CREATE TABLE `messages` (
 #
 
 CREATE TABLE `military` (
-  `email` varchar(50) NOT NULL default '',
-  `pw` varchar(255) NOT NULL default '',
   `warriors` bigint(255) unsigned NOT NULL default '0',
   `wizards` bigint(255) unsigned NOT NULL default '0',
   `priests` bigint(255) unsigned NOT NULL default '0',
@@ -443,7 +439,8 @@ CREATE TABLE `military` (
   `golem` bigint(255) NOT NULL default '0',
   `dbgolem` bigint(255) NOT NULL default '0',
   `irongolem` bigint(255) NOT NULL default '0',
-  `dbirongolem` bigint(255) NOT NULL default '0'
+  `dbirongolem` bigint(255) NOT NULL default '0',
+  KEY `userid` (`userid`)
 ) ENGINE=MyISAM;
 
 #
@@ -461,8 +458,6 @@ CREATE TABLE `military` (
 #
 
 CREATE TABLE `research` (
-  `email` varchar(50) NOT NULL default '',
-  `pw` varchar(255) NOT NULL default '',
   `userid` bigint(255) NOT NULL default '0',
   `r1` bigint(255) NOT NULL default '0',
   `r2` bigint(255) NOT NULL default '0',
@@ -506,7 +501,8 @@ CREATE TABLE `research` (
   `r15pts` bigint(255) NOT NULL default '0',
   `r16pts` bigint(255) NOT NULL default '0',
   `r17pts` bigint(255) NOT NULL default '0',
-  `r18pts` bigint(255) NOT NULL default '0'
+  `r18pts` bigint(255) NOT NULL default '0',
+  KEY `userid` (`userid`)
 ) ENGINE=MyISAM;
 
 #
@@ -524,8 +520,6 @@ CREATE TABLE `research` (
 #
 
 CREATE TABLE `returntbl` (
-  `email` varchar(50) NOT NULL default '',
-  `pw` varchar(255) NOT NULL default '',
   `userid` bigint(255) NOT NULL default '0',
   `war1` bigint(255) NOT NULL default '0',
   `war2` bigint(255) NOT NULL default '0',
@@ -563,7 +557,8 @@ CREATE TABLE `returntbl` (
   `time3` bigint(255) NOT NULL default '0',
   `time4` bigint(255) NOT NULL default '0',
   `dogs` bigint(255) NOT NULL default '0',
-  `dogtime` bigint(255) NOT NULL default '0'
+  `dogtime` bigint(255) NOT NULL default '0',
+  KEY `userid` (`userid`)
 ) ENGINE=MyISAM;
 
 #
@@ -682,8 +677,6 @@ INSERT INTO settlement () VALUES (), (), (), (), (), (), (), (), (), ();
 #
 
 CREATE TABLE `user` (
-  `email` varchar(50) NOT NULL default '',
-  `pw` varchar(255) NOT NULL default '',
   `ename` varchar(255) NOT NULL default '',
   `race` varchar(255) NOT NULL default '',
   `class` varchar(255) NOT NULL default '',
@@ -717,8 +710,7 @@ CREATE TABLE `user` (
   `current_comp_id` varchar(255) NOT NULL default '',
   `signup_comp_id` varchar(255) NOT NULL default '',
   -- The account this kingdom belongs to, in the accounts database
-  -- (db/accounts.sql). The link, rather than `email`: an address can change,
-  -- and a round that has ended keeps the one it had.
+  -- (db/accounts.sql). The round holds no address or password of its own.
   `account_id` int unsigned NOT NULL default '0',
   PRIMARY KEY  (`userid`),
   KEY `account_id` (`account_id`)

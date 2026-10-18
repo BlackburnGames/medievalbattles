@@ -42,7 +42,7 @@ else	{
 	if($snum != "")	 {	$N_NUM = $snum;	}
 	if($snum == "")	{	$N_NUM = $csnum;	}
 
-	mb_query($db, "UPDATE user SET csnum=? WHERE email=?", array((int) $N_NUM, $email));
+	mb_query($db, "UPDATE user SET csnum=? WHERE userid=?", array((int) $N_NUM, $userid));
 
 	include("include/S_SET.php");
 }

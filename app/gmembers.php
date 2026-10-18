@@ -33,7 +33,7 @@ else	{
 	echo "<div align=center><font class=yellow>You have left $empireguild</a><br>";
 	
 	mb_news_guild($db, "$clock", 'blue', "$ename has left $empireguild", $guild_id['gid'], $gnid);
-	mb_query($db, "UPDATE user SET guild='None' WHERE email=? AND pw=?", array($email, $pw));
+	mb_query($db, "UPDATE user SET guild='None' WHERE userid=?", array($userid));
 }
 
 //	display all empires in your guild

@@ -17,8 +17,9 @@ echo "
 		<td><b>Guild</b></td>
 		<td><b>LastLogin</b></td>";
 
-$result_id = mysqli_query($db, "SELECT ename, email, ip, signup_comp_id, current_comp_id, exp, guild, lastlogin FROM user ORDER BY signup_comp_id ASC");
-while ($row = mysqli_fetch_row($result_id))	{
+// The address is the owner's, from the accounts database: include/kingdoms.php.
+require_once __DIR__ . '/include/kingdoms.php';
+foreach (mb_admin_kingdoms($db, array('ename', 'email', 'ip', 'signup_comp_id', 'current_comp_id', 'exp', 'guild', 'lastlogin'), 'signup_comp_id') as $row) {
 	echo "
 	<tr align=center valign=top colspan=10>
 		<td><tt>" . mb_h($row[0]) . "</tt></td>

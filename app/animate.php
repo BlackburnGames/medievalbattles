@@ -66,12 +66,12 @@ if(($race != 'Giant') AND ($race != 'Angel') AND ($class != 'Ranger') AND ($clas
 		 	$dbgolem = $dbgolem + $ugolem;
 		 	$dbirongolem = $dbirongolem + $uirongolem;
 		
-			mb_query($db, "UPDATE user SET gp=? WHERE email=? AND pw=?", array($gp, $email, $pw));  
-			mb_query($db, "UPDATE user SET iron=? WHERE email=? AND pw=?", array($iron, $email, $pw));  
-		  	mb_query($db, "UPDATE military SET wizards=? WHERE email=? AND pw=?", array($wizards, $email, $pw));
+			mb_query($db, "UPDATE user SET gp=? WHERE userid=?", array($gp, $userid));  
+			mb_query($db, "UPDATE user SET iron=? WHERE userid=?", array($iron, $userid));  
+		  	mb_query($db, "UPDATE military SET wizards=? WHERE userid=?", array($wizards, $userid));
 	 
-		  	mb_query($db, "UPDATE military SET dbgolem=? WHERE email=? AND pw=?", array($dbgolem, $email, $pw));
-		  	mb_query($db, "UPDATE military SET dbirongolem=? WHERE email=? AND pw=?", array($dbirongolem, $email, $pw));
+		  	mb_query($db, "UPDATE military SET dbgolem=? WHERE userid=?", array($dbgolem, $userid));
+		  	mb_query($db, "UPDATE military SET dbirongolem=? WHERE userid=?", array($dbirongolem, $userid));
 
 			echo"<div align=center><font class=yellow>Your orders have been carried out.</font></div>";
 			include("include/animate_table.php");

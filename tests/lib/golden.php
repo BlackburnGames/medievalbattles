@@ -43,9 +43,7 @@ mysqli_set_charset($adb, 'utf8mb4');
 /*
  * Columns left out of the comparison, all of them wall-clock. `pw` used to be
  * one too, because the login before each scenario rehashed the tester's MD5
- * into a salted bcrypt in all six tables. The hash is the account's now and
- * the round holds a fixed kingdom key, so `pw` is compared like any column:
- * a page that moved it would be moving the credential.
+ * into a salted bcrypt in all six tables. The round holds no credential now.
  */
 $IGNORED_COLUMNS = array('ip', 'lastlogin', 'lastlog', 'date', 'datestamp');
 

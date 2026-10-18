@@ -23,7 +23,7 @@ if (!function_exists('mb_query')) {
      * Run a query with its values bound to placeholders rather than written
      * into the SQL by hand.
      *
-     *     mb_query($db, "SELECT userid FROM user WHERE email=? AND pw=?", array($email, $pw))
+     *     mb_query($db, "SELECT ename FROM user WHERE userid=?", array($userid))
      *
      * This is what mb_sql_str() and mb_sql_int() were standing in for. Every
      * value goes through this one function, so no call site chooses quotes,

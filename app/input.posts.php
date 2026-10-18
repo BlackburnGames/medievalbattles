@@ -19,9 +19,9 @@ include("include/connect.php");
 		
 include("include/session.php");
 
-$uename = mb_query($db, "SELECT ename FROM user WHERE email=? AND pw=?", array($email, $pw));
+$uename = mb_query($db, "SELECT ename FROM user WHERE userid=?", array($userid));
 	$ename = mb_db_result($uename,"ename");
-$usetid = mb_query($db, "SELECT setid FROM user WHERE email=? AND pw=?", array($email, $pw));
+$usetid = mb_query($db, "SELECT setid FROM user WHERE userid=?", array($userid));
 	$setid = mb_db_result($usetid,"setid");
 
 

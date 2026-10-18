@@ -62,19 +62,19 @@ if(!IsSet($update)) {
   $max_land = $max_land - ($uhome + $ubarrack + $ufarm + $ulmill + $uwp);
   $max_mt = $max_mt - ($ugm + $uim);
 
-  mb_query($db, "UPDATE user SET gp =? WHERE email=? AND pw=?", array($gp, $email, $pw));
-  mb_query($db, "UPDATE user SET exp2 =? WHERE email=? AND pw=?", array($forexp2, $email, $pw));
+  mb_query($db, "UPDATE user SET gp =? WHERE userid=?", array($gp, $userid));
+  mb_query($db, "UPDATE user SET exp2 =? WHERE userid=?", array($forexp2, $userid));
 
-  mb_query($db, "UPDATE buildings SET amts=? WHERE email=? AND pw=?", array($amts, $email, $pw));
-  mb_query($db, "UPDATE buildings SET dgm=? WHERE email=? AND pw=?", array($dgm, $email, $pw));
-  mb_query($db, "UPDATE buildings SET dim=? WHERE email=? AND pw=?", array($dim, $email, $pw));
+  mb_query($db, "UPDATE buildings SET amts=? WHERE userid=?", array($amts, $userid));
+  mb_query($db, "UPDATE buildings SET dgm=? WHERE userid=?", array($dgm, $userid));
+  mb_query($db, "UPDATE buildings SET dim=? WHERE userid=?", array($dim, $userid));
 
-  mb_query($db, "UPDATE buildings SET aland=? WHERE email=? AND pw=?", array($aland, $email, $pw));
-  mb_query($db, "UPDATE buildings SET dhome=? WHERE email=? AND pw=?", array($dhome, $email, $pw));
-  mb_query($db, "UPDATE buildings SET dbarrack=? WHERE email=? AND pw=?", array($dbarrack, $email, $pw));
-  mb_query($db, "UPDATE buildings SET dfarm= ? WHERE email=? AND pw=?", array($dfarm, $email, $pw));
-  mb_query($db, "UPDATE buildings SET dwp=? WHERE email=? AND pw=?", array($dwp, $email, $pw));
-  mb_query($db, "UPDATE buildings SET dlmill=? WHERE email=? AND pw=?", array($dlmill, $email, $pw));
+  mb_query($db, "UPDATE buildings SET aland=? WHERE userid=?", array($aland, $userid));
+  mb_query($db, "UPDATE buildings SET dhome=? WHERE userid=?", array($dhome, $userid));
+  mb_query($db, "UPDATE buildings SET dbarrack=? WHERE userid=?", array($dbarrack, $userid));
+  mb_query($db, "UPDATE buildings SET dfarm= ? WHERE userid=?", array($dfarm, $userid));
+  mb_query($db, "UPDATE buildings SET dwp=? WHERE userid=?", array($dwp, $userid));
+  mb_query($db, "UPDATE buildings SET dlmill=? WHERE userid=?", array($dlmill, $userid));
 
 //  determines how long building are under development: a tick per building,
 //  at most 20, both scaled by the modifiers. A queue already running keeps the
@@ -99,13 +99,13 @@ if(!IsSet($update)) {
   if($ugm > 0)      { $Ghrs = ceil(min($Ghrs + $ugm * $constr_mult, $constr_cap));  }
   if($uim > 0)      { $Ihrs = ceil(min($Ihrs + $uim * $constr_mult, $constr_cap));  }
 
-  mb_query($db, "UPDATE buildings SET Hhrs =? WHERE email=? AND pw=?", array($Hhrs, $email, $pw));
-  mb_query($db, "UPDATE buildings SET Bhrs =? WHERE email=? AND pw=?", array($Bhrs, $email, $pw));
-  mb_query($db, "UPDATE buildings SET Fhrs =? WHERE email=? AND pw=?", array($Fhrs, $email, $pw));
-  mb_query($db, "UPDATE buildings SET Whrs =? WHERE email=? AND pw=?", array($Whrs, $email, $pw));
-  mb_query($db, "UPDATE buildings SET Lhrs =? WHERE email=? AND pw=?", array($Lhrs, $email, $pw));
-  mb_query($db, "UPDATE buildings SET Ghrs =? WHERE email=? AND pw=?", array($Ghrs, $email, $pw));
-  mb_query($db, "UPDATE buildings SET Ihrs =? WHERE email=? AND pw=?", array($Ihrs, $email, $pw));
+  mb_query($db, "UPDATE buildings SET Hhrs =? WHERE userid=?", array($Hhrs, $userid));
+  mb_query($db, "UPDATE buildings SET Bhrs =? WHERE userid=?", array($Bhrs, $userid));
+  mb_query($db, "UPDATE buildings SET Fhrs =? WHERE userid=?", array($Fhrs, $userid));
+  mb_query($db, "UPDATE buildings SET Whrs =? WHERE userid=?", array($Whrs, $userid));
+  mb_query($db, "UPDATE buildings SET Lhrs =? WHERE userid=?", array($Lhrs, $userid));
+  mb_query($db, "UPDATE buildings SET Ghrs =? WHERE userid=?", array($Ghrs, $userid));
+  mb_query($db, "UPDATE buildings SET Ihrs =? WHERE userid=?", array($Ihrs, $userid));
 
   echo"<div align=center><font class=yellow>Your orders have been carried out.</font></div>";
   include("include/S_BUILD.php");

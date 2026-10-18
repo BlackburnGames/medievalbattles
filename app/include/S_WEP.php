@@ -3,15 +3,15 @@ include("include/buttons.php");
 include("include/connect.php");
 
 // select warrior weapons	
-$war_weapon_result = mb_query($db, "SELECT * FROM military WHERE email=? AND pw=?", array($email, $pw));
+$war_weapon_result = mb_query($db, "SELECT * FROM military WHERE userid=?", array($userid));
 $warweapon = mysqli_fetch_array($war_weapon_result);
 
 // select priest weapons	
-$pri_weapon_result = mb_query($db, "SELECT * FROM military WHERE email=? AND pw=?", array($email, $pw));
+$pri_weapon_result = mb_query($db, "SELECT * FROM military WHERE userid=?", array($userid));
 $priweapon = mysqli_fetch_array($pri_weapon_result);
 
 // select archer weapons	
-$arch_weapon_result = mb_query($db, "SELECT * FROM military WHERE email=? AND pw=?", array($email, $pw));
+$arch_weapon_result = mb_query($db, "SELECT * FROM military WHERE userid=?", array($userid));
 $archweapon = mysqli_fetch_array($arch_weapon_result);
 ?>
 			<table border=0 width="80%" align=center cellpadding=1 cellspacing=1>

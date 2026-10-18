@@ -41,6 +41,10 @@ else	{
 	}
 
 
+	// The address is the owner's, from the accounts database.
+	$evu_acct = $evu ? mb_account_get($evu['account_id']) : null;
+	$evu_email = $evu_acct ? $evu_acct['email'] : '';
+
 	$result1 = mb_query($db, "SELECT * FROM military WHERE userid=?", array((int) $evu['userid']));
 		$evm = mysqli_fetch_array($result1);
 
@@ -65,7 +69,7 @@ echo"
 			<tr>
 				<td>
 					Empire Name: " . mb_h($evu['ename']) . "<br>
-					Email: " . mb_h($evu['email']) . "<br>
+					Email: " . mb_h($evu_email) . "<br>
 					Setid: " . mb_h($evu['setid']) . "<br>
 					GP: " . mb_h($evu['gp']) . "<br>
 					Iron: " . mb_h($evu['iron']) . "<br>

@@ -25,40 +25,18 @@ require_once __DIR__ . '/db.php';
 // mb_account_admin_ids(): who an administrator is is the account's to say.
 require_once __DIR__ . '/accounts.php';
 
-if (!function_exists('mb_kingdom_key')) {
-	/**
-	 * A new kingdom's key: what its six `pw` columns hold, and what the
-	 * session carries as $pw.
-	 *
-	 * Those columns used to hold the password hash, which made the hash the
-	 * bearer token for every "WHERE email=? AND pw=?" in the game and put a
-	 * copy of it in six tables. The password is the account's now, in one row
-	 * of the accounts database, and the round holds a token that means only
-	 * "this kingdom". 64 lowercase hex characters, which is exactly what
-	 * include/credentials.php's mb_valid_kingdom_key() lets through.
-	 *
-	 * @return string
-	 */
-	function mb_kingdom_key()
-	{
-		return bin2hex(random_bytes(32));
-	}
-}
-
 if (!function_exists('mb_kingdom_find')) {
 	/**
 	 * The kingdom this account plays in this round, or null.
 	 *
-	 * By account id, not by address. The round keeps a copy of the address in
-	 * its six tables for the game's "email=? AND pw=?" queries, and that copy
-	 * is the kingdom's, not the account's: a round that has ended keeps the
-	 * address it had, whatever the account has moved to since.
+	 * By account id: the round holds no address, and a round that has ended
+	 * would otherwise keep whichever one the account had then.
 	 *
-	 * @return array|null  userid, email -- the round's copy -- and pw, the key
+	 * @return array|null  userid
 	 */
 	function mb_kingdom_find($db, $account_id)
 	{
-		$r = mb_query($db, "SELECT userid, email, pw FROM user WHERE account_id=?", array((int) $account_id));
+		$r = mb_query($db, "SELECT userid FROM user WHERE account_id=?", array((int) $account_id));
 		$row = $r ? mysqli_fetch_assoc($r) : null;
 		return $row ? $row : null;
 	}
@@ -144,31 +122,30 @@ if (!function_exists('mb_kingdom_seed')) {
 	 * Write a kingdom's buildings, military, research, explore and return rows.
 	 *
 	 * Everything but the user row, which signup inserts and a reset updates.
-	 * `email` and `pw` -- the kingdom key -- are written to each, because the
-	 * game's queries filter every one of the six tables on the pair.
+	 * Each is keyed by userid alone; the email and password-hash copies these
+	 * tables used to carry are gone.
 	 *
 	 * @param array $start  what mb_kingdom_start() returned
 	 */
-	function mb_kingdom_seed($db, $userid, $email, $pw, array $start)
+	function mb_kingdom_seed($db, $userid, array $start)
 	{
 		$userid = (int) $userid;
 		$m = $start['military'];
 		$r = $start['research'];
 
-		mb_query($db, "INSERT INTO buildings (email, pw, home, barrack, farm, wp, gm, im, aland, amts, userid)
-			VALUES (?, ?, '50', '50', '50', '0', '50', '50', '100', '100', ?)", array($email, $pw, $userid));
+		mb_query($db, "INSERT INTO buildings (home, barrack, farm, wp, gm, im, aland, amts, userid)
+			VALUES ('50', '50', '50', '0', '50', '50', '100', '100', ?)", array($userid));
 
-		mb_query($db, "INSERT INTO military (email, pw, civ, recruits, warriors, wizards, priests, maxciv, userid, warpower, warspeedw, cweapon, wizpower, wizspeeds, cspell, pripower, prispeedw, cstaff, cbow, archspeedw, archpower, wararmor, wizarmor, priarmor, wardef, wizdef, pridef, warspeeda, wizspeeda, prispeeda, archers, suicide)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, '2', '6','Dagger', '3', '4', 'Magic Missile', '2', '4', 'Quarterstaff', 'Bow', '4', '2', 'Studded Leather', 'Robe', 'Leather', '1', '1', '2', '0', '0', '1', ?, ?)",
-			array($email, $pw, $m['civ'], $m['recruits'], $m['warriors'], $m['wizards'], $m['priests'], $m['maxciv'], $userid, $m['archers'], $m['suicide']));
+		mb_query($db, "INSERT INTO military (civ, recruits, warriors, wizards, priests, maxciv, userid, warpower, warspeedw, cweapon, wizpower, wizspeeds, cspell, pripower, prispeedw, cstaff, cbow, archspeedw, archpower, wararmor, wizarmor, priarmor, wardef, wizdef, pridef, warspeeda, wizspeeda, prispeeda, archers, suicide)
+			VALUES (?, ?, ?, ?, ?, ?, ?, '2', '6','Dagger', '3', '4', 'Magic Missile', '2', '4', 'Quarterstaff', 'Bow', '4', '2', 'Studded Leather', 'Robe', 'Leather', '1', '1', '2', '0', '0', '1', ?, ?)",
+			array($m['civ'], $m['recruits'], $m['warriors'], $m['wizards'], $m['priests'], $m['maxciv'], $userid, $m['archers'], $m['suicide']));
 
-		mb_query($db, "INSERT INTO research (email, pw, userid, r1pts, r13pts, r14pts)
-			VALUES (?, ?, ?, ?, ?, ?)", array($email, $pw, $userid, $r['r1pts'], $r['r13pts'], $r['r14pts']));
+		mb_query($db, "INSERT INTO research (userid, r1pts, r13pts, r14pts)
+			VALUES (?, ?, ?, ?)", array($userid, $r['r1pts'], $r['r13pts'], $r['r14pts']));
 
-		mb_query($db, "INSERT INTO explore (email, pw, userid)
-			VALUES (?, ?, ?)", array($email, $pw, $userid));
+		mb_query($db, "INSERT INTO explore (userid) VALUES (?)", array($userid));
 
-		mb_query($db, "INSERT INTO returntbl (email, pw, userid) VALUES (?, ?, ?)", array($email, $pw, $userid));
+		mb_query($db, "INSERT INTO returntbl (userid) VALUES (?)", array($userid));
 	}
 }
 
@@ -176,9 +153,9 @@ if (!function_exists('mb_kingdom_reset')) {
 	/**
 	 * Put an existing kingdom back to what signup would have given it.
 	 *
-	 * Keeps who the kingdom is -- its account, email, kingdom key, empire name, race, class,
-	 * contact fields, computer ids -- and its settlement, which
-	 * the caller recounts. Everything the game changes is returned to its
+	 * Keeps who the kingdom is -- its account, empire name, race, class,
+	 * contact fields, computer ids -- and its settlement, which the caller
+	 * recounts. Everything the game changes is returned to its
 	 * column default and then to a fresh roll for the kingdom's race and
 	 * class. Its child rows are deleted and re-seeded rather than updated, so
 	 * a column signup never wrote cannot keep last round's value.
@@ -189,7 +166,7 @@ if (!function_exists('mb_kingdom_reset')) {
 	{
 		$userid = (int) $userid;
 		$row = mysqli_fetch_assoc(mb_query($db,
-			"SELECT email, pw, race, class FROM user WHERE userid=?", array($userid)));
+			"SELECT race, class FROM user WHERE userid=?", array($userid)));
 		if (!$row) {
 			return false;
 		}
@@ -218,7 +195,7 @@ if (!function_exists('mb_kingdom_reset')) {
 		mb_query($db, "UPDATE user SET gp=?, iron=?, exp=?, food=?, land=?, mts=?, safemode=? WHERE userid=?",
 			array($u['gp'], $u['iron'], $u['exp'], $u['food'], $u['land'], $u['mts'], $u['safemode'], $userid));
 
-		mb_kingdom_seed($db, $userid, $row['email'], $row['pw'], $start);
+		mb_kingdom_seed($db, $userid, $start);
 		return true;
 	}
 }

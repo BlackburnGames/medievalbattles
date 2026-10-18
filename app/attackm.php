@@ -237,14 +237,14 @@ else	{
 		$A_A_Mts = $mts + $mtgain;
 		$A_AMTS = $amts + $mtgain;
 		
-		mb_query($db, "UPDATE user SET mts=? WHERE email=? AND pw=?", array($A_A_Mts, $email, $pw));
-		mb_query($db, "UPDATE buildings SET amts=? WHERE email=? AND pw=?", array($A_AMTS, $email, $pw));
+		mb_query($db, "UPDATE user SET mts=? WHERE userid=?", array($A_A_Mts, $userid));
+		mb_query($db, "UPDATE buildings SET amts=? WHERE userid=?", array($A_AMTS, $userid));
       
 		echo"<div align=center><font class=yellow>You have conquered $mtgain mountains from $evu[ename] ($evu[setid])!</font><br><br><font class=orange>$your_losses<br><br></font></div>";
 		include("include/attack/mdrop.php");
 		include("include/attack/table.php");
 	
-		mb_query($db, "UPDATE user SET exp2 = exp2 + (? * ?) WHERE email=? AND pw=?", array(mb_num($mtgain), mb_num($mtexpa), $email, $pw));
+		mb_query($db, "UPDATE user SET exp2 = exp2 + (? * ?) WHERE userid=?", array(mb_num($mtgain), mb_num($mtexpa), $userid));
       
 		mb_query($db, "UPDATE user SET mts=? WHERE userid = ?", array($tmtloss, (int) $empvalue));
 		mb_query($db, "UPDATE buildings SET amts=? WHERE userid = ?", array($evb['amts'], (int) $empvalue));

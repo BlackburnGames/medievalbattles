@@ -33,14 +33,14 @@ else	{
 	//SELECTING SETID
 		$empreset = mb_query($db, "SELECT setid FROM user WHERE ename=?", array($empre));
 		$esetid = mb_db_result($empreset,"esetid");
-	//SELECTING EMAIL
-		$theiremail = mb_query($db, "SELECT email FROM user WHERE ename=?", array($empre));
-		$tmail = mb_db_result($theiremail,"tmail");
+	//SELECTING THE KINGDOM
+		$theirid = mb_query($db, "SELECT userid FROM user WHERE ename=?", array($empre));
+		$tuid = mb_db_result($theirid,"tuid");
 
-	// No such empire: say so rather than running six unfiltered DELETEs. With
-	// $tmail unset every WHERE below read `email=''`, which matches any row
-	// whose address is blank.
-	if ($tmail === null) {
+	// No such empire: say so rather than running six DELETEs on nothing. When
+	// they were keyed by address, an unset one read `email=''`, which matched
+	// any row whose address was blank.
+	if ($tuid === null) {
 		echo "<center>No empire called " . htmlspecialchars($empre) . ".<br>";
 		die();
 	}
@@ -49,12 +49,12 @@ else	{
 
 	mb_news_set($db, "$clock", 'red', $news, $esetid, 0);
 
-	mb_query($db, "DELETE FROM buildings WHERE email=?", array($tmail));
-	mb_query($db, "DELETE FROM military WHERE email=?", array($tmail));
-	mb_query($db, "DELETE FROM returntbl WHERE email=?", array($tmail));
-	mb_query($db, "DELETE FROM research WHERE email=?", array($tmail));
-	mb_query($db, "DELETE FROM explore WHERE email=?", array($tmail));
-	mb_query($db, "DELETE FROM user WHERE email=?", array($tmail));
+	mb_query($db, "DELETE FROM buildings WHERE userid=?", array((int) $tuid));
+	mb_query($db, "DELETE FROM military WHERE userid=?", array((int) $tuid));
+	mb_query($db, "DELETE FROM returntbl WHERE userid=?", array((int) $tuid));
+	mb_query($db, "DELETE FROM research WHERE userid=?", array((int) $tuid));
+	mb_query($db, "DELETE FROM explore WHERE userid=?", array((int) $tuid));
+	mb_query($db, "DELETE FROM user WHERE userid=?", array((int) $tuid));
 
 	echo "<center>" . htmlspecialchars($empre) . " has been deleted.<br>";
 	die();

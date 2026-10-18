@@ -78,7 +78,7 @@ if ($pageid == 'news')  {
     die();
   }
 
-  mb_query($db, "UPDATE user SET nno='0' WHERE email=? AND pw=?", array($email, $pw));
+  mb_query($db, "UPDATE user SET nno='0' WHERE userid=?", array($userid));
 
 echo "
     <table border=0 bordercolor=#404040 width=80% align=center cellspacing=1>

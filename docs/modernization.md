@@ -431,15 +431,16 @@ attribute.
   ~~What is still true: the hash is a bearer token with no expiry, no rotation
   and no CSRF protection around it.~~ **Done**, as its own change — see
   "Sessions" below. ~~The hash is still in six places; that is the schema's,
-  and it does not reach the browser.~~ **It is in one place now.** The hash
-  moved to an `account` table in a database of its own, `mb_accounts`, which
-  outlasts a round, and the round's six `pw` columns hold a random kingdom key
-  instead, and `user.account_id` links each kingdom to its account — the bridge [rounds.md](rounds.md) designed as its step 2. The
-  1300 `WHERE email=? AND pw=?` queries did not change; what they compare
-  against did. A password change is one `UPDATE`, the admin flag is the
-  account's, and the two world wipes delete kingdoms and keep every login.
-  The tick golden was re-accepted with only the `pw` values, the dropped
-  `user.admin` column and the new `user.account_id` moving, and the action goldens stopped ignoring `pw`.
+  and it does not reach the browser.~~ **It is in one place now, and the round holds no credential
+  at all.** The address, the hash and the admin flag moved to an `account`
+  table in a database of its own, `mb_accounts`, which outlasts a round, and
+  `user.account_id` links each kingdom to its account. Then the 386
+  `WHERE email=? AND pw=?` filters became `WHERE userid=?` — 365 of them in one
+  mechanical pass, since every one ended its parameters with `$email, $pw` —
+  and `email` and `pw` left all six round tables. See [rounds.md](rounds.md),
+  steps 2 and 5. A password or address change is one `UPDATE`, and the two
+  world wipes delete kingdoms and keep every login. The tick golden was
+  re-accepted twice, each time with only the credential columns moving.
   `bin/admin.php grant` and `revoke` had been dead since the escaping helpers
   were retired — they still called `mb_sql_str()` — and came back with the
   move.

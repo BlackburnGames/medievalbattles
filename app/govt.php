@@ -64,7 +64,7 @@ if (!IsSet($change)) {
 
       //  take the vote back from the old empire and set votefor to none
       mb_query($db, "UPDATE user SET vote = vote - 1 WHERE ename=? AND vote > 0", array($votefor));
-      mb_query($db, "UPDATE user SET votefor='None' WHERE email=? AND pw=?", array($email, $pw));
+      mb_query($db, "UPDATE user SET votefor='None' WHERE userid=?", array($userid));
 
       mb_settlement_elect($db, $setid);
 
@@ -90,7 +90,7 @@ if (!IsSet($change)) {
     if($votefor != 'None')  {
       mb_query($db, "UPDATE user SET vote = vote - 1 WHERE ename=? AND vote > 0", array($votefor));
     }
-    mb_query($db, "UPDATE user SET votefor=? WHERE email=? AND pw=?", array($fename, $email, $pw));
+    mb_query($db, "UPDATE user SET votefor=? WHERE userid=?", array($fename, $userid));
     mb_query($db, "UPDATE user SET vote = vote + 1 WHERE userid=?", array((int) $empvalue));
 
     mb_settlement_elect($db, $setid);

@@ -19,7 +19,7 @@ include("include/connect.php");
 
 include("include/session.php");
 
-$uename = mb_query($db, "SELECT ename FROM user WHERE email=? AND pw=?", array($email, $pw));
+$uename = mb_query($db, "SELECT ename FROM user WHERE userid=?", array($userid));
 	$ename = mb_db_result($uename,"ename");
 
 include("commong.php");

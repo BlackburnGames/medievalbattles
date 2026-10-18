@@ -9,12 +9,10 @@
  * the account lives in the accounts database (db/accounts.sql), beside the
  * round, and outlasts it.
  *
- * The round is linked to the account by `user.account_id`, not by address: an
- * address can change, and an ended round keeps whichever it had. The round's
- * six `pw` columns no longer hold the password hash: they hold a
- * kingdom key, a random token written when the kingdom is made. Every one of
- * the game's "WHERE email=? AND pw=?" queries keeps meaning "this kingdom"
- * without being touched, and the password exists in exactly one row.
+ * The round is linked to the account by `user.account_id`, and holds neither
+ * the address nor the password: an address can change, and an ended round
+ * would keep whichever it had. The game finds a kingdom by its userid, and the
+ * address and the password each exist in exactly one row, here.
  *
  * The connection is opened on first use rather than with connect.php's, since
  * most requests that need it are logged in and the session check asks for it
@@ -90,6 +88,30 @@ if (!function_exists('mb_account_get')) {
     }
 }
 
+if (!function_exists('mb_account_emails')) {
+    /**
+     * The addresses of these accounts, by id, for pages that list kingdoms
+     * with their owners' addresses: the round holds no address of its own.
+     *
+     * @param  int[] $ids
+     * @return array  account_id => email; an id with no account is absent
+     */
+    function mb_account_emails(array $ids)
+    {
+        $ids = array_values(array_unique(array_map('intval', $ids)));
+        if (!$ids) {
+            return array();
+        }
+        $marks = implode(',', array_fill(0, count($ids), '?'));
+        $emails = array();
+        $r = mb_query(mb_accounts_db(), "SELECT account_id, email FROM account WHERE account_id IN ($marks)", $ids); // mb-unbound-ok: one placeholder per id
+        while ($r && ($row = mysqli_fetch_row($r))) {
+            $emails[(int) $row[0]] = $row[1];
+        }
+        return $emails;
+    }
+}
+
 if (!function_exists('mb_account_create')) {
     /**
      * Make an account. The caller has validated the address and hashed the
@@ -153,18 +175,19 @@ if (!function_exists('mb_account_admin_ids')) {
 
 if (!function_exists('mb_account_fingerprint')) {
     /**
-     * What the session remembers of the account's password hash.
+     * What the session remembers of the account's address and password hash.
      *
-     * include/session.php ends a session once the hash it logged in against
-     * has changed -- that is how a password change logs out the account's
-     * other sessions -- so it has to keep something to compare. A digest of
-     * the hash rather than the hash, so a session file is not a copy of the
+     * include/session.php ends a session once either has changed since it
+     * logged in -- that is how a password or address change logs out the
+     * account's other sessions -- so it has to keep something to compare. A
+     * digest rather than the values, so a session file is not a copy of the
      * one value an offline attack wants.
      *
+     * @param  array  $account  a row with email and pw
      * @return string
      */
-    function mb_account_fingerprint($hash)
+    function mb_account_fingerprint(array $account)
     {
-        return hash('sha256', (string) $hash);
+        return hash('sha256', $account['email'] . "\0" . $account['pw']);
     }
 }

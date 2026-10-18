@@ -6,7 +6,7 @@ include("include/connect.php");
 // empty array and logging out never marked the player offline.
 include("include/session.php");
 
-mb_query($db, "UPDATE user SET online='0' WHERE email=? AND pw=?", array($email, $pw));
+mb_query($db, "UPDATE user SET online='0' WHERE userid=?", array($userid));
 
 // The whole session, not the two keys it used to unset: the session file, and
 // the id that named it, outlived every logout. A request another site made

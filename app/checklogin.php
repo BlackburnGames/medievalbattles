@@ -31,15 +31,13 @@ require_once __DIR__ . '/include/credentials.php';
 /*
  * The address is checked before it is used, not after.
  *
- * It goes straight into "WHERE email='$email'" below, and this page is reached
- * by an unauthenticated POST -- so it is the one credential site where the
- * value has never been through include/session.php's check. checksignup.php
- * and preferences.php both refuse to store an address this would reject, so
- * refusing it here can only ever reject a login that could not have matched a
- * row anyway.
+ * It is bound into the account lookup below, so this is not about SQL any
+ * more; it is that checksignup.php and preferences.php both refuse to store an
+ * address this would reject, so refusing it here can only ever reject a login
+ * that could not have matched an account anyway, and costs one query less.
  */
 if (!mb_valid_email($email)) {
-	unset($_SESSION['login'], $_SESSION['email'], $_SESSION['pw']);
+	unset($_SESSION['login'], $_SESSION['userid'], $_SESSION['mb_account'], $_SESSION['mb_account_fp']);
 	echo "Your email or password is incorrect.<br>";
 	echo "<a href=index.php>Login again.</a>";
 	exit();
@@ -62,13 +60,13 @@ if ($account && mb_password_verify($plain_pw, $stored)) {
 	if (mb_password_needs_upgrade($stored)) {
 		$stored = mb_password_hash($plain_pw);
 		mb_password_store($account['account_id'], $stored);
+		$account['pw'] = $stored;
 	}
 
 	/*
 	 * The kingdom this account plays in the round, found by account id. Its
-	 * address and key are what the session carries as $email and $pw, and
-	 * what every page's "WHERE email=? AND pw=?" matches -- the round's copy
-	 * of the address, not the one typed, whose case the lookup ignored.
+	 * userid is what the session carries, and what every page's
+	 * "WHERE userid=?" matches.
 	 *
 	 * There may be none. Accounts outlast kingdoms -- the tick deletes an
 	 * inactive one, an administrator can delete one, and a new game deletes
@@ -78,43 +76,36 @@ if ($account && mb_password_verify($plain_pw, $stored)) {
 	require_once __DIR__ . '/include/kingdom.php';
 	$kingdom = mb_kingdom_find($db, $account['account_id']);
 	if (!$kingdom) {
-		unset($_SESSION['login'], $_SESSION['email'], $_SESSION['pw'], $_SESSION['mb_account'], $_SESSION['mb_account_fp']);
+		unset($_SESSION['login'], $_SESSION['userid'], $_SESSION['mb_account'], $_SESSION['mb_account_fp']);
 		echo "Your account has no kingdom in this round.<br>";
 		echo "<a href=index.php?page=signup>Sign up</a> with the same email and password to start one.";
 		exit();
 	}
-	$email = $kingdom['email'];
-	$pw = $kingdom['pw'];
+	$userid = $kingdom['userid'];
 
 	// insert ip address into db
 	$ipaddress = $_SERVER["REMOTE_ADDR"];
-	$uename = mb_query($db, "SELECT ename FROM user WHERE email=? AND pw=?", array($email, $pw));
-	$ename = mb_db_result($uename, "ename");
 
-	// Every value below is bound, so none of them -- the address, the empire
-	// name read back out of the database, the client's IP -- is ever part of
-	// the SQL text.
-	mb_query($db, "UPDATE user SET ip=? WHERE ename=?", array($ipaddress, $ename));
-	mb_query($db, "UPDATE user SET countdown='336' WHERE email=? AND pw=?", array($email, $pw));
-	mb_query($db, "UPDATE user SET lastlogin=? WHERE ename=?", array($clock, $ename));
-	mb_query($db, "UPDATE user SET online='1' WHERE ename=?", array($ename));
-	mb_query($db, "UPDATE user SET current_comp_id=? WHERE ename=?", array($computer_id, $ename));
+	// Every value below is bound, so none of them -- the client's IP, the
+	// computer id it claims -- is ever part of the SQL text.
+	mb_query($db, "UPDATE user SET ip=? WHERE userid=?", array($ipaddress, $userid));
+	mb_query($db, "UPDATE user SET countdown='336' WHERE userid=?", array($userid));
+	mb_query($db, "UPDATE user SET lastlogin=? WHERE userid=?", array($clock, $userid));
+	mb_query($db, "UPDATE user SET online='1' WHERE userid=?", array($userid));
+	mb_query($db, "UPDATE user SET current_comp_id=? WHERE userid=?", array($computer_id, $userid));
 
-	$user_set_query = mb_query($db, "SELECT setid FROM user WHERE email=? AND pw=?", array($email, $pw));
+	$user_set_query = mb_query($db, "SELECT setid FROM user WHERE userid=?", array($userid));
 	$set = mb_db_result($user_set_query, "set");
 
-	mb_query($db, "UPDATE user SET csnum=? WHERE email=?", array((int) $set, $email));
+	mb_query($db, "UPDATE user SET csnum=? WHERE userid=?", array((int) $set, $userid));
 	unset($_SESSION['bad']);
 	$login = 1;
 	// A fresh session id for the logged-in session; see include/session.php.
-	mb_session_login($account['account_id'], $stored, $email, $pw);
+	mb_session_login($account, $userid);
 	header("Location: main.php?pageid=news");
 	exit();
 } else {
-	unset($_SESSION['login']);
-	unset($_SESSION['email']);
-	unset($_SESSION['pw']);
-	unset($_SESSION['mb_account'], $_SESSION['mb_account_fp']);
+	unset($_SESSION['login'], $_SESSION['userid'], $_SESSION['mb_account'], $_SESSION['mb_account_fp']);
 	echo "Your email or password is incorrect.<br>";
 	echo "<a href=index.php>Login again.</a>";
 	exit();

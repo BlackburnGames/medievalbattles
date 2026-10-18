@@ -132,7 +132,7 @@ else	{
 
 		// calculate and update your new suicide civs
 			$new_suicide_civilians = $suicide - $send;
-			mb_query($db, "UPDATE military SET suicide=? WHERE email=? AND pw=?", array($new_suicide_civilians, $email, $pw));
+			mb_query($db, "UPDATE military SET suicide=? WHERE userid=?", array($new_suicide_civilians, $userid));
 		//  attack news - their empire news		
 			mb_query($db, "UPDATE user SET nno=nno+1 WHERE userid=?", array((int) $empvalue));
 			mb_news_emp($db, "$clock", 'yellow', "$ename ($setid) has sucessfully suicided on your empire. You lost $dead_civs Civilian(s) and $dead_thieves Thieve(s).", $empvalue);

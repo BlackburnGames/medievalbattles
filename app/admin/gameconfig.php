@@ -146,12 +146,12 @@ if (IsSet($action)) {
 if (IsSet($daccount)) {
 	$clock   = date("m/d/y, H:ia");
 
-	$theiremail = mb_query($db, "SELECT email FROM user WHERE ename=?", array($empre));
-	$tmail      = mb_db_result($theiremail, "tmail");
+	$theirid = mb_query($db, "SELECT userid FROM user WHERE ename=?", array($empre));
+	$tuid    = mb_db_result($theirid, "tuid");
 
-	// No such empire: stop. With $tmail unset every DELETE below read
-	// `email=''`, which matches any row whose address happens to be blank.
-	if ($tmail === null) {
+	// No such empire: stop. With the old address-keyed DELETEs an unset value
+	// read `email=''`, which matched any row whose address happened to be blank.
+	if ($tuid === null) {
 		echo "<b>No empire called " . htmlspecialchars($empre) . ".</b><br><br>";
 		echo "<a href=gameconfig.php>Return</a></center>";
 		die();
@@ -179,12 +179,12 @@ if (IsSet($daccount)) {
 
 	mb_news_set($db, "$clock", 'red', $news, $esetid, 0);
 
-	mb_query($db, "DELETE FROM buildings WHERE email=?", array($tmail));
-	mb_query($db, "DELETE FROM military WHERE email=?", array($tmail));
-	mb_query($db, "DELETE FROM returntbl WHERE email=?", array($tmail));
-	mb_query($db, "DELETE FROM research WHERE email=?", array($tmail));
-	mb_query($db, "DELETE FROM explore WHERE email=?", array($tmail));
-	mb_query($db, "DELETE FROM user WHERE email=?", array($tmail));
+	mb_query($db, "DELETE FROM buildings WHERE userid=?", array((int) $tuid));
+	mb_query($db, "DELETE FROM military WHERE userid=?", array((int) $tuid));
+	mb_query($db, "DELETE FROM returntbl WHERE userid=?", array((int) $tuid));
+	mb_query($db, "DELETE FROM research WHERE userid=?", array((int) $tuid));
+	mb_query($db, "DELETE FROM explore WHERE userid=?", array((int) $tuid));
+	mb_query($db, "DELETE FROM user WHERE userid=?", array((int) $tuid));
 
 	echo "<b>" . htmlspecialchars($empre) . " has been deleted.</b><br><br>";
 	echo "<a href=gameconfig.php>Return</a></center>";
@@ -210,8 +210,7 @@ echo "</table><br>";
 //
 // It was "the credential dump this page has always been": the second column was
 // the password hash, which was also the session token. The hash is the
-// account's now and `pw` holds the kingdom key, which is a session token still,
-// so the column is gone rather than relabelled.
+// account's now and the round holds no copy, so the column is gone.
 
 echo "<table border=1 width=\"100%\">
 	<tr>
@@ -224,8 +223,9 @@ echo "<table border=1 width=\"100%\">
 
 // One query, not one per row. The online marker used to be a second SELECT
 // inside the loop, filtered on the empire name it had just fetched.
-$result_id = mysqli_query($db, "SELECT ename, email, aim, msn, ip, online FROM user ORDER BY ip");
-while ($row = mysqli_fetch_row($result_id)) {
+// The address is the owner's, from the accounts database: include/kingdoms.php.
+require_once __DIR__ . '/include/kingdoms.php';
+foreach (mb_admin_kingdoms($db, array('ename', 'email', 'aim', 'msn', 'ip', 'online'), 'ip') as $row) {
 	// Assigned in two statements rather than by a ternary on $row[5]: the marker
 	// is a constant either way, and taking the value out of the assignment is
 	// what makes that visible to tests/xss-audit.php as well as to a reader.

@@ -7,7 +7,7 @@ $deletem = mb_input('deletem');
 
 include("include/igtop.php");
 
-mb_query($db, "UPDATE user SET mno='0' WHERE email=? AND pw=?", array($email, $pw)); 
+mb_query($db, "UPDATE user SET mno='0' WHERE userid=?", array($userid)); 
 $MSG_COUNT = mb_query($db, "SELECT count(message) FROM messages WHERE yourid=?", array($userid));	
 	$MSG_C = mb_db_result($MSG_COUNT,"MSG_C");
 	

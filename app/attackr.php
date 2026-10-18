@@ -194,10 +194,10 @@ else	{
 		$civgain = round($civgain);
 		$lumbergain = round($lumbergain);
 	
-		mb_query($db, "UPDATE user SET gp = gp + ? WHERE email=? AND pw=?", array(mb_num($gpgain), $email, $pw));
-		mb_query($db, "UPDATE user SET iron = iron + ? WHERE email=? AND pw=?", array(mb_num($irongain), $email, $pw));
-		mb_query($db, "UPDATE user SET lumber = lumber + ? WHERE email=? AND pw=?", array(mb_num($lumbergain), $email, $pw));
-		mb_query($db, "UPDATE military SET civ = civ + ? WHERE email=? AND pw=?", array(mb_num($civgain), $email, $pw));
+		mb_query($db, "UPDATE user SET gp = gp + ? WHERE userid=?", array(mb_num($gpgain), $userid));
+		mb_query($db, "UPDATE user SET iron = iron + ? WHERE userid=?", array(mb_num($irongain), $userid));
+		mb_query($db, "UPDATE user SET lumber = lumber + ? WHERE userid=?", array(mb_num($lumbergain), $userid));
+		mb_query($db, "UPDATE military SET civ = civ + ? WHERE userid=?", array(mb_num($civgain), $userid));
 		
 		mb_query($db, "UPDATE user SET gp = gp - ? WHERE userid = ?", array(mb_num($gpgain), (int) $empvalue));
 		mb_query($db, "UPDATE user SET iron = iron - ? WHERE userid = ?", array(mb_num($irongain), (int) $empvalue));

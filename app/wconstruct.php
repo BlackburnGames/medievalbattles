@@ -85,11 +85,11 @@ else
 		    $exp2 = $exp2 + 5000;	// new exp
 			$shortsword = 8;	 // ticks to make
 	 
-		 	mb_query($db, "UPDATE user SET iron=? WHERE email=? AND pw=?", array($iron, $email, $pw)); 
-	  		mb_query($db, "UPDATE user SET exp2=? WHERE email=? AND pw=?", array($exp2, $email, $pw)); 
-	 		mb_query($db, "UPDATE user SET gp=? WHERE email=? AND pw=?", array($gp, $email, $pw)); 
-	  		mb_query($db, "UPDATE military SET shortsword= ? WHERE email=? AND pw=?", array($shortsword, $email, $pw));
-	  		mb_query($db, "UPDATE military SET warriorwep= '1' WHERE email=? AND pw=?", array($email, $pw));
+		 	mb_query($db, "UPDATE user SET iron=? WHERE userid=?", array($iron, $userid)); 
+	  		mb_query($db, "UPDATE user SET exp2=? WHERE userid=?", array($exp2, $userid)); 
+	 		mb_query($db, "UPDATE user SET gp=? WHERE userid=?", array($gp, $userid)); 
+	  		mb_query($db, "UPDATE military SET shortsword= ? WHERE userid=?", array($shortsword, $userid));
+	  		mb_query($db, "UPDATE military SET warriorwep= '1' WHERE userid=?", array($userid));
 					
 			echo"<div align=center><font class=yellow>Short Sword is now under construction.<br><br></font></div>";
 			include("include/S_WEP.php");
@@ -126,11 +126,11 @@ else
 				    $exp2 = $exp2 + 8000;	// new exp
 					$longsword = 14;	// ticks to make
 	 
-					mb_query($db, "UPDATE user SET iron =? WHERE email=? AND pw=?", array($iron, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET exp2=? WHERE email=? AND pw=?", array($exp2, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET gp =? WHERE email=? AND pw=?", array($gp, $email, $pw));  
-	  				mb_query($db, "UPDATE military SET longsword =? WHERE email=? AND pw=?", array($longsword, $email, $pw));
-					mb_query($db, "UPDATE military SET warriorwep= '2' WHERE email=? AND pw=?", array($email, $pw));
+					mb_query($db, "UPDATE user SET iron =? WHERE userid=?", array($iron, $userid)); 
+	  				mb_query($db, "UPDATE user SET exp2=? WHERE userid=?", array($exp2, $userid)); 
+	  				mb_query($db, "UPDATE user SET gp =? WHERE userid=?", array($gp, $userid));  
+	  				mb_query($db, "UPDATE military SET longsword =? WHERE userid=?", array($longsword, $userid));
+					mb_query($db, "UPDATE military SET warriorwep= '2' WHERE userid=?", array($userid));
 			
 					echo"<div align=center><font class=yellow>Long Sword is now under construction.<br><br></font></div>";
 					include("include/S_WEP.php");
@@ -170,11 +170,11 @@ else
 				    $exp2 = $exp2 + 16000;	// new exp
 					$bastardsword = 20;		// ticks to make
 	 
-					mb_query($db, "UPDATE user SET iron =? WHERE email=? AND pw=?", array($iron, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET exp2 =? WHERE email=? AND pw=?", array($exp2, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET gp =? WHERE email=? AND pw=?", array($gp, $email, $pw));  
-	  				mb_query($db, "UPDATE military SET bastardsword =? WHERE email=? AND pw=?", array($bastardsword, $email, $pw));
-					mb_query($db, "UPDATE military SET warriorwep= '3' WHERE email=? AND pw=?", array($email, $pw));
+					mb_query($db, "UPDATE user SET iron =? WHERE userid=?", array($iron, $userid)); 
+	  				mb_query($db, "UPDATE user SET exp2 =? WHERE userid=?", array($exp2, $userid)); 
+	  				mb_query($db, "UPDATE user SET gp =? WHERE userid=?", array($gp, $userid));  
+	  				mb_query($db, "UPDATE military SET bastardsword =? WHERE userid=?", array($bastardsword, $userid));
+					mb_query($db, "UPDATE military SET warriorwep= '3' WHERE userid=?", array($userid));
 
 					echo"<div align=center><font class=yellow>Bastard Sword is now under construction.<br><br></font></div>";
 					include("include/S_WEP.php");
@@ -216,11 +216,11 @@ else
 				    $exp2 = $exp2 + 24000;	// new exp
 					$scourge = 25;	// ticks to make
 	 
-					mb_query($db, "UPDATE user SET iron =? WHERE email=? AND pw=?", array($iron, $email, $pw)); 
-	 				mb_query($db, "UPDATE user SET exp2 =? WHERE email=? AND pw=?", array($exp2, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET gp =? WHERE email=? AND pw=?", array($gp, $email, $pw));  
-	  				mb_query($db, "UPDATE military SET scourge =? WHERE email=? AND pw=?", array($scourge, $email, $pw));
-					mb_query($db, "UPDATE military SET warriorwep= '4' WHERE email=? AND pw=?", array($email, $pw));
+					mb_query($db, "UPDATE user SET iron =? WHERE userid=?", array($iron, $userid)); 
+	 				mb_query($db, "UPDATE user SET exp2 =? WHERE userid=?", array($exp2, $userid)); 
+	  				mb_query($db, "UPDATE user SET gp =? WHERE userid=?", array($gp, $userid));  
+	  				mb_query($db, "UPDATE military SET scourge =? WHERE userid=?", array($scourge, $userid));
+					mb_query($db, "UPDATE military SET warriorwep= '4' WHERE userid=?", array($userid));
 
 					echo"<div align=center><font class=yellow>Scourge is now under construction.<br><br></font></div>";
 					include("include/S_WEP.php");
@@ -265,11 +265,11 @@ else
 					$scimitar = 30;	// ticks to make
 	 
 					include("include/connect.php");
-	  				mb_query($db, "UPDATE user SET iron =? WHERE email=? AND pw=?", array($iron, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET exp2 =? WHERE email=? AND pw=?", array($exp2, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET gp =? WHERE email=? AND pw=?", array($gp, $email, $pw));  
-	  				mb_query($db, "UPDATE military SET scimitar =? WHERE email=? AND pw=?", array($scimitar, $email, $pw));
-					mb_query($db, "UPDATE military SET warriorwep= '5' WHERE email=? AND pw=?", array($email, $pw));
+	  				mb_query($db, "UPDATE user SET iron =? WHERE userid=?", array($iron, $userid)); 
+	  				mb_query($db, "UPDATE user SET exp2 =? WHERE userid=?", array($exp2, $userid)); 
+	  				mb_query($db, "UPDATE user SET gp =? WHERE userid=?", array($gp, $userid));  
+	  				mb_query($db, "UPDATE military SET scimitar =? WHERE userid=?", array($scimitar, $userid));
+					mb_query($db, "UPDATE military SET warriorwep= '5' WHERE userid=?", array($userid));
 
 					echo"<div align=center><font class=yellow>Scimitar is now under construction.<br><br></font></div>";
 					include("include/S_WEP.php");
@@ -317,11 +317,11 @@ else
 					$romsfury = 36;	// ticks to make
 	 
 					include("include/connect.php");
-	  				mb_query($db, "UPDATE user SET iron =? WHERE email=? AND pw=?", array($iron, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET exp2 =? WHERE email=? AND pw=?", array($exp2, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET gp =? WHERE email=? AND pw=?", array($gp, $email, $pw));  
-	  				mb_query($db, "UPDATE military SET romsfury =? WHERE email=? AND pw=?", array($romsfury, $email, $pw));
-					mb_query($db, "UPDATE military SET warriorwep= '6' WHERE email=? AND pw=?", array($email, $pw));
+	  				mb_query($db, "UPDATE user SET iron =? WHERE userid=?", array($iron, $userid)); 
+	  				mb_query($db, "UPDATE user SET exp2 =? WHERE userid=?", array($exp2, $userid)); 
+	  				mb_query($db, "UPDATE user SET gp =? WHERE userid=?", array($gp, $userid));  
+	  				mb_query($db, "UPDATE military SET romsfury =? WHERE userid=?", array($romsfury, $userid));
+					mb_query($db, "UPDATE military SET warriorwep= '6' WHERE userid=?", array($userid));
 
 					echo"<div align=center><font class=yellow>Rom's Fury is now under construction.<br><br></font></div>";
 					include("include/S_WEP.php");
@@ -375,11 +375,11 @@ else
 					$broadsword = 42;	// ticks to make
 	 
 					include("include/connect.php");
-	  				mb_query($db, "UPDATE user SET iron =? WHERE email=? AND pw=?", array($iron, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET exp2 =? WHERE email=? AND pw=?", array($exp2, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET gp =? WHERE email=? AND pw=?", array($gp, $email, $pw));  
-	  				mb_query($db, "UPDATE military SET broadsword =? WHERE email=? AND pw=?", array($broadsword, $email, $pw));
-					mb_query($db, "UPDATE military SET warriorwep= '7' WHERE email=? AND pw=?", array($email, $pw));
+	  				mb_query($db, "UPDATE user SET iron =? WHERE userid=?", array($iron, $userid)); 
+	  				mb_query($db, "UPDATE user SET exp2 =? WHERE userid=?", array($exp2, $userid)); 
+	  				mb_query($db, "UPDATE user SET gp =? WHERE userid=?", array($gp, $userid));  
+	  				mb_query($db, "UPDATE military SET broadsword =? WHERE userid=?", array($broadsword, $userid));
+					mb_query($db, "UPDATE military SET warriorwep= '7' WHERE userid=?", array($userid));
 
 					echo"<div align=center><font class=yellow>Toledo's Broad Sword is now under construction.<br><br></font></div>";
 					include("include/S_WEP.php");
@@ -436,11 +436,11 @@ else
 					$gandalara = 48;	// ticks to make
 	 
 					include("include/connect.php");
-	  				mb_query($db, "UPDATE user SET iron =? WHERE email=? AND pw=?", array($iron, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET exp2 =? WHERE email=? AND pw=?", array($exp2, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET gp =? WHERE email=? AND pw=?", array($gp, $email, $pw));  
-	  				mb_query($db, "UPDATE military SET gandalara =? WHERE email=? AND pw=?", array($gandalara, $email, $pw));
-					mb_query($db, "UPDATE military SET warriorwep= '8' WHERE email=? AND pw=?", array($email, $pw));
+	  				mb_query($db, "UPDATE user SET iron =? WHERE userid=?", array($iron, $userid)); 
+	  				mb_query($db, "UPDATE user SET exp2 =? WHERE userid=?", array($exp2, $userid)); 
+	  				mb_query($db, "UPDATE user SET gp =? WHERE userid=?", array($gp, $userid));  
+	  				mb_query($db, "UPDATE military SET gandalara =? WHERE userid=?", array($gandalara, $userid));
+					mb_query($db, "UPDATE military SET warriorwep= '8' WHERE userid=?", array($userid));
 
 					echo"<div align=center><font class=yellow>Sword of Gandalara is now under construction.<br><br></font></div>";
 					include("include/S_WEP.php");
@@ -484,11 +484,11 @@ else
 				    $exp2 = $exp2 + 5000;
 					$wep_mace = 8;
 	 
-					mb_query($db, "UPDATE user SET iron =? WHERE email=? AND pw=?", array($iron, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET exp2 =? WHERE email=? AND pw=?", array($exp2, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET gp =? WHERE email=? AND pw=?", array($gp, $email, $pw));  
-	  				mb_query($db, "UPDATE military SET mace =? WHERE email=? AND pw=?", array($wep_mace, $email, $pw));
-					mb_query($db, "UPDATE military SET priestwep= '1' WHERE email=? AND pw=?", array($email, $pw));
+					mb_query($db, "UPDATE user SET iron =? WHERE userid=?", array($iron, $userid)); 
+	  				mb_query($db, "UPDATE user SET exp2 =? WHERE userid=?", array($exp2, $userid)); 
+	  				mb_query($db, "UPDATE user SET gp =? WHERE userid=?", array($gp, $userid));  
+	  				mb_query($db, "UPDATE military SET mace =? WHERE userid=?", array($wep_mace, $userid));
+					mb_query($db, "UPDATE military SET priestwep= '1' WHERE userid=?", array($userid));
 
 					echo"<div align=center><font class=yellow>Mace is now under construction.<br><br></font></div>";
 					include("include/S_WEP.php");
@@ -531,11 +531,11 @@ else
 				    $exp2 = $exp2 + 10000;
 					$flail = 12;
 	 
-					mb_query($db, "UPDATE user SET iron =? WHERE email=? AND pw=?", array($iron, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET exp2 =? WHERE email=? AND pw=?", array($exp2, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET gp =? WHERE email=? AND pw=?", array($gp, $email, $pw));  
-	  				mb_query($db, "UPDATE military SET flail =? WHERE email=? AND pw=?", array($flail, $email, $pw));
-					mb_query($db, "UPDATE military SET priestwep= '2' WHERE email=? AND pw=?", array($email, $pw));
+					mb_query($db, "UPDATE user SET iron =? WHERE userid=?", array($iron, $userid)); 
+	  				mb_query($db, "UPDATE user SET exp2 =? WHERE userid=?", array($exp2, $userid)); 
+	  				mb_query($db, "UPDATE user SET gp =? WHERE userid=?", array($gp, $userid));  
+	  				mb_query($db, "UPDATE military SET flail =? WHERE userid=?", array($flail, $userid));
+					mb_query($db, "UPDATE military SET priestwep= '2' WHERE userid=?", array($userid));
 
 					echo"<div align=center><font class=yellow>Flail is now under construction.<br><br></font></div>";
 					include("include/S_WEP.php");
@@ -580,11 +580,11 @@ else
 				    $exp2 = $exp2 + 20000;
 					$zakarum = 18;
 	 
-					mb_query($db, "UPDATE user SET iron =? WHERE email=? AND pw=?", array($iron, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET exp2 =? WHERE email=? AND pw=?", array($exp2, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET gp =? WHERE email=? AND pw=?", array($gp, $email, $pw));  
-	  				mb_query($db, "UPDATE military SET zakarum =? WHERE email=? AND pw=?", array($zakarum, $email, $pw));
-					mb_query($db, "UPDATE military SET priestwep= '3' WHERE email=? AND pw=?", array($email, $pw));
+					mb_query($db, "UPDATE user SET iron =? WHERE userid=?", array($iron, $userid)); 
+	  				mb_query($db, "UPDATE user SET exp2 =? WHERE userid=?", array($exp2, $userid)); 
+	  				mb_query($db, "UPDATE user SET gp =? WHERE userid=?", array($gp, $userid));  
+	  				mb_query($db, "UPDATE military SET zakarum =? WHERE userid=?", array($zakarum, $userid));
+					mb_query($db, "UPDATE military SET priestwep= '3' WHERE userid=?", array($userid));
 
 					echo"<div align=center><font class=yellow>Sword of Zakarum is now under construction.<br><br></font></div>";
 					include("include/S_WEP.php");
@@ -632,11 +632,11 @@ else
 				    $exp2 = $exp2 + 35000;
 					$footmanflail = 22;
 	 
-					mb_query($db, "UPDATE user SET iron =? WHERE email=? AND pw=?", array($iron, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET exp2 =? WHERE email=? AND pw=?", array($exp2, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET gp =? WHERE email=? AND pw=?", array($gp, $email, $pw));  
-	  				mb_query($db, "UPDATE military SET footmanflail =? WHERE email=? AND pw=?", array($footmanflail, $email, $pw));
-					mb_query($db, "UPDATE military SET priestwep= '4' WHERE email=? AND pw=?", array($email, $pw));
+					mb_query($db, "UPDATE user SET iron =? WHERE userid=?", array($iron, $userid)); 
+	  				mb_query($db, "UPDATE user SET exp2 =? WHERE userid=?", array($exp2, $userid)); 
+	  				mb_query($db, "UPDATE user SET gp =? WHERE userid=?", array($gp, $userid));  
+	  				mb_query($db, "UPDATE military SET footmanflail =? WHERE userid=?", array($footmanflail, $userid));
+					mb_query($db, "UPDATE military SET priestwep= '4' WHERE userid=?", array($userid));
 
 					echo"<div align=center><font class=yellow>Footman's Flail is now under construction.<br><br></font></div>";
 					include("include/S_WEP.php");
@@ -687,11 +687,11 @@ else
 				    $exp2 = $exp2 + 50000;
 					$morningstar = 28;
 	 
-					mb_query($db, "UPDATE user SET iron =? WHERE email=? AND pw=?", array($iron, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET exp2 =? WHERE email=? AND pw=?", array($exp2, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET gp =? WHERE email=? AND pw=?", array($gp, $email, $pw));  
-	  				mb_query($db, "UPDATE military SET morningstar =? WHERE email=? AND pw=?", array($morningstar, $email, $pw));
-					mb_query($db, "UPDATE military SET priestwep= '5' WHERE email=? AND pw=?", array($email, $pw));
+					mb_query($db, "UPDATE user SET iron =? WHERE userid=?", array($iron, $userid)); 
+	  				mb_query($db, "UPDATE user SET exp2 =? WHERE userid=?", array($exp2, $userid)); 
+	  				mb_query($db, "UPDATE user SET gp =? WHERE userid=?", array($gp, $userid));  
+	  				mb_query($db, "UPDATE military SET morningstar =? WHERE userid=?", array($morningstar, $userid));
+					mb_query($db, "UPDATE military SET priestwep= '5' WHERE userid=?", array($userid));
 
 					echo"<div align=center><font class=yellow>Morning Star is now under construction.<br><br></font></div>";
 					include("include/S_WEP.php");
@@ -745,11 +745,11 @@ else
 				    $exp2 = $exp2 + 70000;
 					$thyorastear = 30;
 	 
-					mb_query($db, "UPDATE user SET iron =? WHERE email=? AND pw=?", array($iron, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET exp2 =? WHERE email=? AND pw=?", array($exp2, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET gp =? WHERE email=? AND pw=?", array($gp, $email, $pw));  
-	  				mb_query($db, "UPDATE military SET thyorastear =? WHERE email=? AND pw=?", array($thyorastear, $email, $pw));
-					mb_query($db, "UPDATE military SET priestwep= '6' WHERE email=? AND pw=?", array($email, $pw));
+					mb_query($db, "UPDATE user SET iron =? WHERE userid=?", array($iron, $userid)); 
+	  				mb_query($db, "UPDATE user SET exp2 =? WHERE userid=?", array($exp2, $userid)); 
+	  				mb_query($db, "UPDATE user SET gp =? WHERE userid=?", array($gp, $userid));  
+	  				mb_query($db, "UPDATE military SET thyorastear =? WHERE userid=?", array($thyorastear, $userid));
+					mb_query($db, "UPDATE military SET priestwep= '6' WHERE userid=?", array($userid));
 
 					echo"<div align=center><font class=yellow>Thyora's Tear is now under construction.<br><br></font></div>";
 					include("include/S_WEP.php");
@@ -809,11 +809,11 @@ else
 				    $exp2 = $exp2 + 85000;
 					$isidole = 34;
 	 
-					mb_query($db, "UPDATE user SET iron =? WHERE email=? AND pw=?", array($iron, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET exp2 =? WHERE email=? AND pw=?", array($exp2, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET gp =? WHERE email=? AND pw=?", array($gp, $email, $pw));  
-	  				mb_query($db, "UPDATE military SET isidole =? WHERE email=? AND pw=?", array($isidole, $email, $pw));
-					mb_query($db, "UPDATE military SET priestwep= '7' WHERE email=? AND pw=?", array($email, $pw));
+					mb_query($db, "UPDATE user SET iron =? WHERE userid=?", array($iron, $userid)); 
+	  				mb_query($db, "UPDATE user SET exp2 =? WHERE userid=?", array($exp2, $userid)); 
+	  				mb_query($db, "UPDATE user SET gp =? WHERE userid=?", array($gp, $userid));  
+	  				mb_query($db, "UPDATE military SET isidole =? WHERE userid=?", array($isidole, $userid));
+					mb_query($db, "UPDATE military SET priestwep= '7' WHERE userid=?", array($userid));
 
 					echo"<div align=center><font class=yellow>Flail of Isidole is now under construction.<br><br></font></div>";
 					include("include/S_WEP.php");
@@ -876,11 +876,11 @@ else
 				    $exp2 = $exp2 + 100000;
 					$eldamarstar = 36;
 	 
-					mb_query($db, "UPDATE user SET iron =? WHERE email=? AND pw=?", array($iron, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET exp2 =? WHERE email=? AND pw=?", array($exp2, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET gp =? WHERE email=? AND pw=?", array($gp, $email, $pw));  
-	  				mb_query($db, "UPDATE military SET eldamarstar =? WHERE email=? AND pw=?", array($eldamarstar, $email, $pw));
-					mb_query($db, "UPDATE military SET priestwep= '8' WHERE email=? AND pw=?", array($email, $pw));
+					mb_query($db, "UPDATE user SET iron =? WHERE userid=?", array($iron, $userid)); 
+	  				mb_query($db, "UPDATE user SET exp2 =? WHERE userid=?", array($exp2, $userid)); 
+	  				mb_query($db, "UPDATE user SET gp =? WHERE userid=?", array($gp, $userid));  
+	  				mb_query($db, "UPDATE military SET eldamarstar =? WHERE userid=?", array($eldamarstar, $userid));
+					mb_query($db, "UPDATE military SET priestwep= '8' WHERE userid=?", array($userid));
 
 					echo"<div align=center><font class=yellow>Eldamar's Star is now under construction.<br><br></font></div>";
 					include("include/S_WEP.php");
@@ -921,11 +921,11 @@ else
 				    $exp2 = $exp2 + 5000;
 					$shortbow = 8;
 	 
-					mb_query($db, "UPDATE user SET lumber =? WHERE email=? AND pw=?", array($lumber, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET exp2 =? WHERE email=? AND pw=?", array($exp2, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET gp =? WHERE email=? AND pw=?", array($gp, $email, $pw));  
-	  				mb_query($db, "UPDATE military SET shortbow =? WHERE email=? AND pw=?", array($shortbow, $email, $pw));
-					mb_query($db, "UPDATE military SET archerwep= '1' WHERE email=? AND pw=?", array($email, $pw));
+					mb_query($db, "UPDATE user SET lumber =? WHERE userid=?", array($lumber, $userid)); 
+	  				mb_query($db, "UPDATE user SET exp2 =? WHERE userid=?", array($exp2, $userid)); 
+	  				mb_query($db, "UPDATE user SET gp =? WHERE userid=?", array($gp, $userid));  
+	  				mb_query($db, "UPDATE military SET shortbow =? WHERE userid=?", array($shortbow, $userid));
+					mb_query($db, "UPDATE military SET archerwep= '1' WHERE userid=?", array($userid));
 
 					echo"<div align=center><font class=yellow>Short Bow is now under construction.<br><br></font></div>";
 					include("include/S_WEP.php");
@@ -967,11 +967,11 @@ else
 					$ferricbow = 12;
 	 
 					
-	  				mb_query($db, "UPDATE user SET lumber =? WHERE email=? AND pw=?", array($lumber, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET exp2 =? WHERE email=? AND pw=?", array($exp2, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET gp =? WHERE email=? AND pw=?", array($gp, $email, $pw));  
-	  				mb_query($db, "UPDATE military SET ferricbow =? WHERE email=? AND pw=?", array($ferricbow, $email, $pw));
-					mb_query($db, "UPDATE military SET archerwep= '2' WHERE email=? AND pw=?", array($email, $pw));
+	  				mb_query($db, "UPDATE user SET lumber =? WHERE userid=?", array($lumber, $userid)); 
+	  				mb_query($db, "UPDATE user SET exp2 =? WHERE userid=?", array($exp2, $userid)); 
+	  				mb_query($db, "UPDATE user SET gp =? WHERE userid=?", array($gp, $userid));  
+	  				mb_query($db, "UPDATE military SET ferricbow =? WHERE userid=?", array($ferricbow, $userid));
+					mb_query($db, "UPDATE military SET archerwep= '2' WHERE userid=?", array($userid));
 
 					echo"<div align=center><font class=yellow>Ferric Bow is now under construction.<br><br></font></div>";
 					include("include/S_WEP.php");
@@ -1013,11 +1013,11 @@ else
 				    $exp2 = $exp2 + 30000;
 					$keldarsarms = 15;
 	 
-	  				mb_query($db, "UPDATE user SET lumber =? WHERE email=? AND pw=?", array($lumber, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET exp2 =? WHERE email=? AND pw=?", array($exp2, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET gp =? WHERE email=? AND pw=?", array($gp, $email, $pw));  
-	  				mb_query($db, "UPDATE military SET keldarsarms =? WHERE email=? AND pw=?", array($keldarsarms, $email, $pw));
-					mb_query($db, "UPDATE military SET archerwep= '3' WHERE email=? AND pw=?", array($email, $pw));
+	  				mb_query($db, "UPDATE user SET lumber =? WHERE userid=?", array($lumber, $userid)); 
+	  				mb_query($db, "UPDATE user SET exp2 =? WHERE userid=?", array($exp2, $userid)); 
+	  				mb_query($db, "UPDATE user SET gp =? WHERE userid=?", array($gp, $userid));  
+	  				mb_query($db, "UPDATE military SET keldarsarms =? WHERE userid=?", array($keldarsarms, $userid));
+					mb_query($db, "UPDATE military SET archerwep= '3' WHERE userid=?", array($userid));
 
 					echo"<div align=center><font class=yellow>Keldar's Arms are now under construction.<br><br></font></div>";
 					include("include/S_WEP.php");
@@ -1062,11 +1062,11 @@ else
 				    $exp2 = $exp2 + 40000;
 					$splensight = 18;
 	 
-	  				mb_query($db, "UPDATE user SET lumber =? WHERE email=? AND pw=?", array($lumber, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET exp2 =? WHERE email=? AND pw=?", array($exp2, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET gp =? WHERE email=? AND pw=?", array($gp, $email, $pw));  
-	  				mb_query($db, "UPDATE military SET splensight =? WHERE email=? AND pw=?", array($splensight, $email, $pw));
-					mb_query($db, "UPDATE military SET archerwep= '4' WHERE email=? AND pw=?", array($email, $pw));
+	  				mb_query($db, "UPDATE user SET lumber =? WHERE userid=?", array($lumber, $userid)); 
+	  				mb_query($db, "UPDATE user SET exp2 =? WHERE userid=?", array($exp2, $userid)); 
+	  				mb_query($db, "UPDATE user SET gp =? WHERE userid=?", array($gp, $userid));  
+	  				mb_query($db, "UPDATE military SET splensight =? WHERE userid=?", array($splensight, $userid));
+					mb_query($db, "UPDATE military SET archerwep= '4' WHERE userid=?", array($userid));
 
 					echo"<div align=center><font class=yellow>Splen's Sight is now under construction.<br><br></font></div>";
 					include("include/S_WEP.php");
@@ -1114,11 +1114,11 @@ else
 				    $exp2 = $exp2 + 60000;
 					$bowoftion = 26;
 	 
-	  				mb_query($db, "UPDATE user SET lumber =? WHERE email=? AND pw=?", array($lumber, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET exp2 =? WHERE email=? AND pw=?", array($exp2, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET gp =? WHERE email=? AND pw=?", array($gp, $email, $pw));  
-	  				mb_query($db, "UPDATE military SET bowoftion =? WHERE email=? AND pw=?", array($bowoftion, $email, $pw));
-					mb_query($db, "UPDATE military SET archerwep= '5' WHERE email=? AND pw=?", array($email, $pw));
+	  				mb_query($db, "UPDATE user SET lumber =? WHERE userid=?", array($lumber, $userid)); 
+	  				mb_query($db, "UPDATE user SET exp2 =? WHERE userid=?", array($exp2, $userid)); 
+	  				mb_query($db, "UPDATE user SET gp =? WHERE userid=?", array($gp, $userid));  
+	  				mb_query($db, "UPDATE military SET bowoftion =? WHERE userid=?", array($bowoftion, $userid));
+					mb_query($db, "UPDATE military SET archerwep= '5' WHERE userid=?", array($userid));
 
 					echo"<div align=center><font class=yellow>Bow of Tion is now under construction.<br><br></font></div>";
 					include("include/S_WEP.php");
@@ -1169,11 +1169,11 @@ else
 				    $exp2 = $exp2 + 75000;
 					$dynefian = 30;
 	 
-	  				mb_query($db, "UPDATE user SET lumber =? WHERE email=? AND pw=?", array($lumber, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET exp2 =? WHERE email=? AND pw=?", array($exp2, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET gp =? WHERE email=? AND pw=?", array($gp, $email, $pw));  
-	  				mb_query($db, "UPDATE military SET dynefian =? WHERE email=? AND pw=?", array($dynefian, $email, $pw));
-					mb_query($db, "UPDATE military SET archerwep= '6' WHERE email=? AND pw=?", array($email, $pw));
+	  				mb_query($db, "UPDATE user SET lumber =? WHERE userid=?", array($lumber, $userid)); 
+	  				mb_query($db, "UPDATE user SET exp2 =? WHERE userid=?", array($exp2, $userid)); 
+	  				mb_query($db, "UPDATE user SET gp =? WHERE userid=?", array($gp, $userid));  
+	  				mb_query($db, "UPDATE military SET dynefian =? WHERE userid=?", array($dynefian, $userid));
+					mb_query($db, "UPDATE military SET archerwep= '6' WHERE userid=?", array($userid));
 
 					echo"<div align=center><font class=yellow>The Dynefian is now under construction.<br><br></font></div>";
 					include("include/S_WEP.php");
@@ -1230,11 +1230,11 @@ else
 				    $exp2 = $exp2 + 90000;
 					$heartsong = 38;
 	 
-	  				mb_query($db, "UPDATE user SET lumber =? WHERE email=? AND pw=?", array($lumber, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET exp2 =? WHERE email=? AND pw=?", array($exp2, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET gp =? WHERE email=? AND pw=?", array($gp, $email, $pw));  
-	  				mb_query($db, "UPDATE military SET heartsong =? WHERE email=? AND pw=?", array($heartsong, $email, $pw));
-					mb_query($db, "UPDATE military SET archerwep= '7' WHERE email=? AND pw=?", array($email, $pw));
+	  				mb_query($db, "UPDATE user SET lumber =? WHERE userid=?", array($lumber, $userid)); 
+	  				mb_query($db, "UPDATE user SET exp2 =? WHERE userid=?", array($exp2, $userid)); 
+	  				mb_query($db, "UPDATE user SET gp =? WHERE userid=?", array($gp, $userid));  
+	  				mb_query($db, "UPDATE military SET heartsong =? WHERE userid=?", array($heartsong, $userid));
+					mb_query($db, "UPDATE military SET archerwep= '7' WHERE userid=?", array($userid));
 
 					echo"<div align=center><font class=yellow>HeartSong is now under construction.<br><br></font></div>";
 					include("include/S_WEP.php");
@@ -1294,11 +1294,11 @@ else
 				    $exp2 = $exp2 + 100000;
 					$shyrscreamsbow = 42;
 	 
-	  				mb_query($db, "UPDATE user SET lumber =? WHERE email=? AND pw=?", array($lumber, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET exp2 =? WHERE email=? AND pw=?", array($exp2, $email, $pw)); 
-	  				mb_query($db, "UPDATE user SET gp =? WHERE email=? AND pw=?", array($gp, $email, $pw));  
-	  				mb_query($db, "UPDATE military SET shyrscreamsbow =? WHERE email=? AND pw=?", array($shyrscreamsbow, $email, $pw));
-					mb_query($db, "UPDATE military SET archerwep= '8' WHERE email=? AND pw=?", array($email, $pw));
+	  				mb_query($db, "UPDATE user SET lumber =? WHERE userid=?", array($lumber, $userid)); 
+	  				mb_query($db, "UPDATE user SET exp2 =? WHERE userid=?", array($exp2, $userid)); 
+	  				mb_query($db, "UPDATE user SET gp =? WHERE userid=?", array($gp, $userid));  
+	  				mb_query($db, "UPDATE military SET shyrscreamsbow =? WHERE userid=?", array($shyrscreamsbow, $userid));
+					mb_query($db, "UPDATE military SET archerwep= '8' WHERE userid=?", array($userid));
 
 					echo"<div align=center><font class=yellow>Shyrscream's Bow is now under construction.<br><br></font></div>";
 					include("include/S_WEP.php");

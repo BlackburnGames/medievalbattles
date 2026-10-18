@@ -75,10 +75,10 @@ else	{
 	
 	$gp = $gp - (($uthief + $usage + $uexplorer + $upriest + $uwizard + $uwarrior + $uarcher) * 200);	
 	$gp = round($gp);
-	mb_query($db, "UPDATE user SET gp=? WHERE email=? AND pw=?", array($gp, $email, $pw)); 
+	mb_query($db, "UPDATE user SET gp=? WHERE userid=?", array($gp, $userid)); 
 
 	$new_recruits = $recruits + ($uthief + $usage + $uexplorer + $upriest + $uwizard + $uwarrior + $uarcher);
-	mb_query($db, "UPDATE military SET recruits=? WHERE email=? AND pw=?", array($new_recruits, $email, $pw));
+	mb_query($db, "UPDATE military SET recruits=? WHERE userid=?", array($new_recruits, $userid));
 
 	$new_thieves = $thieves - $uthief;
 	$new_sages = $sages - $usage;
@@ -88,13 +88,13 @@ else	{
 	$new_warriors = $warriors - $uwarrior;
 	$new_archers = $archers - $uarcher;
 
-	mb_query($db, "UPDATE military SET thieves=? WHERE email=? AND pw=?", array($new_thieves, $email, $pw));
-	mb_query($db, "UPDATE military SET sages=? WHERE email=? AND pw=?", array($new_sages, $email, $pw));
-	mb_query($db, "UPDATE military SET explorers=? WHERE email=? AND pw=?", array($new_explorers, $email, $pw));
-	mb_query($db, "UPDATE military SET priests=? WHERE email=? AND pw=?", array($new_priests, $email, $pw));
-	mb_query($db, "UPDATE military SET wizards=? WHERE email=? AND pw=?", array($new_wizards, $email, $pw));
-	mb_query($db, "UPDATE military SET warriors=? WHERE email=? AND pw=?", array($new_warriors, $email, $pw));
-	mb_query($db, "UPDATE military SET archers=? WHERE email=? AND pw=?", array($new_archers, $email, $pw));
+	mb_query($db, "UPDATE military SET thieves=? WHERE userid=?", array($new_thieves, $userid));
+	mb_query($db, "UPDATE military SET sages=? WHERE userid=?", array($new_sages, $userid));
+	mb_query($db, "UPDATE military SET explorers=? WHERE userid=?", array($new_explorers, $userid));
+	mb_query($db, "UPDATE military SET priests=? WHERE userid=?", array($new_priests, $userid));
+	mb_query($db, "UPDATE military SET wizards=? WHERE userid=?", array($new_wizards, $userid));
+	mb_query($db, "UPDATE military SET warriors=? WHERE userid=?", array($new_warriors, $userid));
+	mb_query($db, "UPDATE military SET archers=? WHERE userid=?", array($new_archers, $userid));
 
 	echo"<div align=center><font class=yellow>The specified units have been disbanded.</font></div>";
 	include("include/disband_table.php");

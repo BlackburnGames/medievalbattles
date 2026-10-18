@@ -121,7 +121,7 @@ if (!function_exists('mb_barter_move_stock')) {
 	 */
 	function mb_barter_move_stock($db, $type, $delta)
 	{
-		global $MB_BARTER_STOCK, $email, $pw;
+		global $MB_BARTER_STOCK, $userid;
 
 		if (!isset($MB_BARTER_STOCK[$type])) {
 			return true;
@@ -136,9 +136,9 @@ if (!function_exists('mb_barter_move_stock')) {
 			// column come from that fixed table, never from the request.
 			$guarded = $i === 0 && $delta < 0;
 			if ($guarded) {
-				mb_query($db, "UPDATE $table SET $column = $column + ? WHERE email=? AND pw=? AND $column >= ?", array($delta, $email, $pw, -$delta)); // mb-unbound-ok: names from $MB_BARTER_STOCK
+				mb_query($db, "UPDATE $table SET $column = $column + ? WHERE userid=? AND $column >= ?", array($delta, $userid, -$delta)); // mb-unbound-ok: names from $MB_BARTER_STOCK
 			} else {
-				mb_query($db, "UPDATE $table SET $column = $column + ? WHERE email=? AND pw=?", array($delta, $email, $pw)); // mb-unbound-ok: names from $MB_BARTER_STOCK
+				mb_query($db, "UPDATE $table SET $column = $column + ? WHERE userid=?", array($delta, $userid)); // mb-unbound-ok: names from $MB_BARTER_STOCK
 			}
 			if ($guarded && mysqli_affected_rows($db) !== 1) {
 				return false;
@@ -251,7 +251,7 @@ else	{
 	// stored method itself.
 	if ($b_meth == 'gp') { $mb_col = 'gp'; } else { $mb_col = 'iron'; }
 
-	mb_query($db, "UPDATE user SET $mb_col = $mb_col - ? WHERE email=? AND pw=? AND $mb_col >= ?", array($b_cost, $email, $pw, $b_cost)); // mb-unbound-ok: $mb_col is 'gp' or 'iron'
+	mb_query($db, "UPDATE user SET $mb_col = $mb_col - ? WHERE userid=? AND $mb_col >= ?", array($b_cost, $userid, $b_cost)); // mb-unbound-ok: $mb_col is 'gp' or 'iron'
 	if (mysqli_affected_rows($db) !== 1)	{
 		if ($mb_col == 'gp')	{	echo"<font class=yellow><div align=center>Not enough gold!</div></font><br><br>";	}
 		else	{	echo"<font class=yellow><div align=center>Not enough iron!</div></font><br><br>";	}
@@ -260,7 +260,7 @@ else	{
 
 	mb_query($db, "DELETE FROM barter WHERE barterid=? AND (page='guild') = ?", array($bid, $mb_on_guild_board));
 	if (mysqli_affected_rows($db) !== 1)	{
-		mb_query($db, "UPDATE user SET $mb_col = $mb_col + ? WHERE email=? AND pw=?", array($b_cost, $email, $pw)); // mb-unbound-ok: $mb_col is 'gp' or 'iron'
+		mb_query($db, "UPDATE user SET $mb_col = $mb_col + ? WHERE userid=?", array($b_cost, $userid)); // mb-unbound-ok: $mb_col is 'gp' or 'iron'
 		echo"<font class=yellow><div align=center>There is no such barter.</font></div>";
 		include($mb_panel);
 		die();

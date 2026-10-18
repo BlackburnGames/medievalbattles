@@ -48,26 +48,21 @@ if ($signup) {
   // Every value below is bound, never interpolated. The address in particular
   // is queried before mb_valid_email() has looked at it, so nothing can lean on
   // the rule further down.
-  //  email already in the database?
-    $emresult = mb_query($db, "SELECT email FROM user WHERE email=?", array($email));
-    $emnamecheck = mysqli_fetch_array($emresult);
   // empire name already in the database?
     $eresult = mb_query($db, "SELECT ename FROM user WHERE ename=?", array($ename));
     $enamecheck = mysqli_fetch_array($eresult);
   //  dropcase of empire name and email
     $ename1 = strtolower($ename);
     $enamecheck1 = strtolower($enamecheck[0]);
-    $email1 = strtolower($email);
-    $emnamecheck1 = strtolower($emnamecheck[0]);
   //  are they a multi?
     $ip_query = mb_query($db, "SELECT count(userid) FROM user WHERE ip=?", array($ipaddress));
     $check_ip = mb_db_result($ip_query, "check_ip");
 
   if($enamecheck1 == $ename1 AND $ename != "")  { echo mb_h($ename) . " is already being used!"; die();   }
-  elseif($emnamecheck1 == $email1 AND $email != "") { echo mb_h($email) . " is already being used!";  die(); }
   // The address check was commented out in 2003, so anything at all could be
-  // signed up with -- and the address is then written to six tables and
-  // interpolated into every "WHERE email='$email'" the account ever loads.
+  // signed up with -- and the address was then written to six tables and
+  // interpolated into every "WHERE email='$email'" the account ever loaded.
+  // It is the account's alone now, and only ever bound.
   // include/credentials.php holds the rule, shared with preferences.php and
   // include/session.php so all three agree on what an address may be.
   elseif (!mb_valid_email($email)) { echo "Email address is invalid!";  die(); }
@@ -90,16 +85,13 @@ if ($signup) {
   //elseif($class != Cleric AND $class != Fighter AND $class != Mage AND $class != Ranger)   {  echo "That class doesn't exist!";  die(); }
   elseif($check_ip[0] >= 1)  {  echo "You are only allowed one account per computer!";   die(); }
 
-  // The account. The check above found no kingdom with this address in the
-  // round, but the address may still have an account: accounts outlast their
-  // kingdoms (include/accounts.php), so a player whose kingdom was deleted
-  // comes back this way. With the account's password, this signup makes the
+  // The account. Accounts outlast their kingdoms (include/accounts.php), so
+  // a player whose kingdom was deleted comes back this way. With the account's password, this signup makes the
   // account a new kingdom. With any other, the address is taken, as it always
   // was -- and says no more than that.
   //
   // And an account plays one kingdom a round, which is asked by account id:
-  // the round keeps the address the kingdom was made with, and the account
-  // may have moved to another since.
+  // the round holds no address.
   $account = mb_account_find($email);
   if ($account && !mb_password_verify($pw, $account['pw'])) { echo mb_h($email) . " is already being used!";  die(); }
   if ($account && mb_kingdom_find($db, $account['account_id'])) { echo mb_h($email) . " is already being used!";  die(); }
@@ -160,22 +152,18 @@ if ($signup) {
       echo mb_h($email) . " is already being used!";  die();
     }
 
-    // What the six INSERTs below write as `pw` is the kingdom's key, not the
-    // password: see include/kingdom.php.
-    $pw = mb_kingdom_key();
-
   // What the empire starts with is include/kingdom.php's, shared with the
   // reset a new game runs on the administrators' kingdoms.
     $start = mb_kingdom_start($race, $class);
     $u = $start['user'];
 
-    mb_query($db, "INSERT INTO user (email,  pw, ename, msn, aim, gp, iron, exp, food, land, mts, setid, class, userid, race, safemode, signup_comp_id, account_id)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-      array($email, $pw, $ename, $msn, $aim, $u['gp'], $u['iron'], $u['exp'], $u['food'], $u['land'], $u['mts'], (int) $snum, $class, (int) $newbuserid, $race, $u['safemode'], $computer_id, $account_id));
+    mb_query($db, "INSERT INTO user (ename, msn, aim, gp, iron, exp, food, land, mts, setid, class, userid, race, safemode, signup_comp_id, account_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      array($ename, $msn, $aim, $u['gp'], $u['iron'], $u['exp'], $u['food'], $u['land'], $u['mts'], (int) $snum, $class, (int) $newbuserid, $race, $u['safemode'], $computer_id, $account_id));
 
-    mb_kingdom_seed($db, $newbuserid, $email, $pw, $start);
+    mb_kingdom_seed($db, $newbuserid, $start);
 
-    $selectempire = mb_query($db, "SELECT setid FROM user WHERE email=? AND pw=?", array($email, $pw));
+    $selectempire = mb_query($db, "SELECT setid FROM user WHERE userid=?", array((int) $newbuserid));
     $semp = mb_db_result($selectempire,"semp");
 
     include("include/clock.php");

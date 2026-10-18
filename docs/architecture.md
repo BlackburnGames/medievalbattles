@@ -57,19 +57,20 @@ kingdoms and everything hanging off them. The accounts database beside it
 nothing that ends a kingdom deletes a login. `app/include/accounts.php` opens
 its connection on first use. The kingdom is linked to its account by `user.account_id`, not by
 address: an address can change, and an ended round keeps the one it had.
-See [rounds.md](rounds.md), which this is step 2 of.
+See [rounds.md](rounds.md).
 
-`$_SESSION['email']` plus `$_SESSION['pw']` are the kingdom's credential, and
-nearly every query filters `WHERE email=? AND pw=?`. `pw` is not the password
-hash: it is the **kingdom key**, 64 hex characters from `mb_kingdom_key()`,
-written to all six of the kingdom's tables when it is made. The session also
-carries the account id and a SHA-256 fingerprint of the account's hash. All of
-it lives in the server-side session; what the browser holds is the session id,
-and `app/include/session.php` is what guards it — cookie flags, a new id at
-login, expiry, a full logout, no session for a request another site made, and
-a per-request check that the account still has that address and that hash,
-and that the key still names a kingdom. Every session in the game, the admin
-area's included, starts there.
+The session carries the kingdom's `userid`, and nearly every query filters
+`WHERE userid=?`. It used to be `WHERE email=? AND pw=?`, with the password
+hash as the bearer token, copied into all six kingdom tables; the round holds
+neither column now. The session also carries the account id and a SHA-256
+fingerprint of the account's address and hash, and `$email` is the account's
+address, read from it each request for showing and mailing. All of it lives in
+the server-side session; what the browser holds is the session id, and
+`app/include/session.php` is what guards it — cookie flags, a new id at login,
+expiry, a full logout, no session for a request another site made, and a
+per-request check that the account still has that address and hash and that
+the kingdom is still its. Every session in the game, the admin area's
+included, starts there.
 
 The hash is **bcrypt** as of Phase 3 — `app/include/password.php`, pinned to
 `PASSWORD_BCRYPT`. Accounts still holding the old unsalted MD5 verify once and
@@ -78,20 +79,16 @@ then looks the kingdom up by `account_id`; an account with no kingdom in the rou
 is told so, and signing up again with the same address and password gives it
 a new one.
 
-The email/key pair is **denormalized into `buildings`, `military`, `research`,
-`returntbl` and `explore`**, as the email/hash pair was. A password change no
-longer touches any of them — it is one `UPDATE` on the account,
-`mb_password_store()` — but an address change still rewrites the account and
-all six in the live round, since the game's queries match on the copy.
+A password change and an address change are each one `UPDATE` on the account.
 
-`bin/accounts-migrate.php` moves a world that predates this (hashes in `pw`,
-the flag in `user.admin`, no `user.account_id`) into that shape, once.
+`bin/accounts-migrate.php` moves a world that predates this (addresses and
+hashes in all six tables, the flag in `user.admin`) into that shape, once.
 
 `app/include/session.php` is the single bootstrap: it starts the session and
-loads `$login`/`$email`/`$pw`, and every page that needs the credential
+loads `$login`/`$userid`/`$email`/`$mb_account_id`, and every page that needs the credential
 includes it — directly, or transitively via `igtop.php`, `functions.php` or
 `common.php`. Only `checklogin.php` writes those slots; `preferences.php`
-rewrites them when the player changes email or password.
+rotates the fingerprint when the player changes email or password.
 
 ## Request input
 

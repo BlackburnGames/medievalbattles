@@ -1,8 +1,8 @@
 # Rounds and accounts
 
-**Status: partly built.** Steps 1 and 2 under "Order of work" are done:
-permanent accounts in their own database, and a kingdom key in place of the
-password hash. Rounds themselves — step 3 on — are design only. This
+**Status: partly built.** Steps 1, 2 and 5 under "Order of work" are done:
+permanent accounts in their own database, and a round that holds neither the
+address nor the password. Rounds themselves — step 3 on — are design only. This
 records how the game is meant to end a round and start the next one without
 deleting its players, and the decisions that shape it.
 
@@ -106,51 +106,33 @@ What it costs:
   history and admin. The tick takes the round as an argument and runs once
   per running round.
 
-## The credential, during the move
+## The credential
 
-Most queries identify the player with `WHERE email='$email' AND pw='$pw'`. A
-grep for `email='$email'` alone finds about 360 of them across 43 files.
-`$pw` is the stored password hash, and it is copied into the `pw` column of
-`buildings`, `military`, `research`, `explore` and `returntbl` as well as
-`user`. That's why a password change is six `UPDATE`s in
-`mb_password_store()`.
+**Done, and further than the bridge this section first designed.** Most
+queries identified the player with `WHERE email='$email' AND pw='$pw'`, about
+400 of them, and `pw` was the password hash, copied into all six kingdom
+tables. The plan was a bridge: keep the pair, but put a random kingdom key in
+`pw` so the password could leave the round, and retire the key later.
 
-Moving the password into `mb_accounts` should not have to wait for all of
-those queries to be rewritten. The bridge is this:
+It shipped that way for one commit (step 2), and then the key was retired
+too (step 5), because by then every query bound its values and the rewrite was
+mechanical: 365 of the 386 sites ended their parameters with `$email, $pw`
+and had the pair as their last two placeholders, and became `WHERE userid=?`
+in one pass. The rest were the tick's per-user deletions and the barter's
+stock updates, by hand.
 
-**In a round database, `pw` stops holding the password hash and holds a
-kingdom key**: a random token (`bin2hex(random_bytes(32))`), written to all six
-tables when the account joins the round. `email` keeps holding the account's
-email. The session carries the account id, plus the email and key of the
-kingdom in the current round. Every existing `WHERE email='$email' AND
-pw='$pw'` keeps meaning "this kingdom" unchanged.
+What the round holds now is neither the address nor the password. The
+session carries the kingdom's `userid`, the account's id and a SHA-256
+fingerprint of the account's address and hash:
 
-What that buys:
-
-- **The password exists in one place.** `mb_password_store()` updates one
-  row in `mb_accounts`, not six tables across every live round. It stops
-  being a list that has to be kept complete.
-- **The key is validated like the hash is now.** `credentials.php` constrains
-  what `$pw` may be, because it is interpolated bare. The rule changes from
-  "bcrypt or legacy MD5" to "64 lowercase hex characters". That's stricter,
-  and no less safe.
-- **Revocation moves to the account.** `session.php` currently ends a session
-  whose email and hash no longer name a `user` row (`session.php:230`), and
-  that's how a password change logs out the account's other sessions. That
-  check moves to `mb_accounts`: the session records a fingerprint of the
-  account's hash at login and is ended when it no longer matches. A second
-  check, that the kingdom key still names a row, ends the game session of a
-  kingdom an admin deleted.
-
-The key is a bridge, not a destination. Phase 3 converts queries to bind their
-values anyway, and a converted query should filter on the session's `userid`.
-When none of them read `email` or `pw` any more, both columns leave the round
-schema.
-
-`preferences.php` lets a player change their email, with its own six
-`UPDATE`s (`preferences.php:150`). Until the `email` columns leave the round
-schema, that change has to update the account and the kingdom rows in every
-live round database.
+- **The password and the address each exist in one place**, the account row.
+  A password change and an address change are each one `UPDATE`.
+- **Revocation is the account's.** A session ends when its account is gone,
+  when the address or hash changed since it logged in -- which is how either
+  change logs out the account's other sessions -- or when its kingdom no
+  longer exists or is not its account's.
+- **`credentials.php` no longer guards a query.** It still says what an
+  address must be to be stored and mailed.
 
 ## The player's path
 
@@ -210,8 +192,7 @@ live round database.
   - A session whose kingdom was deleted is ended.
   - A password change ends the account's other sessions, carried over from
     `tests/session.php`.
-  - A kingdom key that isn't 64 lowercase hex characters never reaches a
-    query.
+  - A session pointed at another account's kingdom is ended.
 - **The smoke crawl gains the round list, join and history pages**, as a
   logged-in account with no kingdom and as one with a kingdom.
 
@@ -223,9 +204,9 @@ live round database.
    compares each reset kingdom against a twin signed up afterwards.
 2. ~~**Accounts.**~~ **Done.** `mb_accounts` holds the `account` table
    (`db/accounts.sql`, `app/include/accounts.php`). Login, signup, the
-   session and `mb_admin_require()` use it; `user.admin` is gone. The round's
-   six `pw` columns hold a kingdom key, and `bin/accounts-migrate.php` moves
-   an existing world over. There is still exactly one round database.
+   session and `mb_admin_require()` use it; `user.admin` is gone, and
+   `bin/accounts-migrate.php` moves an existing world over. There is still
+   exactly one round database.
 
    The golden masters didn't move except where they had to: the tick golden
    was re-accepted with only its `pw` values, the dropped `user.admin` and
@@ -240,12 +221,7 @@ live round database.
      change, and an ended round is frozen with whatever address it had, so
      an id is the only link that survives into history. `mb_kingdom_find()`
      looks the kingdom up by it; signup refuses a second kingdom for the
-     same account by it; the wipes and the admin checks use it. The round's
-     `email` columns are a copy kept for the game's `email=? AND pw=?`
-     queries until step 5, and an address change still rewrites them in the
-     live round. The session survives the account's address changing; it
-     ends when the kingdom stops answering to its account id, address and
-     key.
+     same account by it; the wipes and the admin checks use it.
    - **Nothing in the round deletes an account.** The two wipes, the tick's
      inactivity deletions and the admin's "delete kingdom" remove the kingdom
      only. Only a player deleting their own account in `preferences.php`
@@ -254,20 +230,22 @@ live round database.
      signs up again with its own password gets a new kingdom; with any other
      password the address is taken. Login tells such an account it has no
      kingdom rather than logging it in.
-   - **Revocation**, as designed above: a SHA-256 fingerprint of the hash in
-     the session, compared with the account's on every request, plus the
-     kingdom key still naming a row. `tests/session.php` drives both.
-   - **Addresses are capped at 50**, the round's column width. A longer one
-     was silently truncated on insert and could never log in.
+   - **Revocation**: a SHA-256 fingerprint of the account's address and hash
+     in the session, compared with the account's on every request, plus the
+     kingdom still being that account's. `tests/session.php` drives each.
+   - **Addresses are capped at 50**, the column width. A longer one was
+     silently truncated on insert and could never log in.
 3. **Rounds.** Add the `round` and `round_result` tables and `bin/round.php`.
    Make the round list, join and history pages. Retire `newgame.php`.
 4. **Concurrent rounds.** The session chooses among running rounds, and the
    tick runs once per round. This lands with, or after, the ruleset loader
    from [rulesets.md](rulesets.md), since two rounds at once is how classic
    and modern run side by side.
-5. **Retire the key.** As queries are converted to `mb_query()`, they filter
-   on `userid` rather than `email`/`pw`. When none are left, drop both columns
-   from the round schema.
+5. ~~**Retire the key.**~~ **Done, ahead of step 3.** Every query filters on
+   `userid`, and `email` and `pw` are gone from all six round tables, which
+   are indexed on `userid` instead. See "The credential" above. The tick
+   golden was re-accepted with only those two columns gone, checked by
+   comparing it, row-sorted, with them stripped.
 
 ## Open questions
 
