@@ -6,10 +6,6 @@
   amts=100 | aland=100 | home=1 | kennel=0 | barrack=1 | farm=1 | wp=0 | lmill=0 | gm=1 | im=1 | dhome=0 | dbarrack=0 | dfarm=0 | dwp=0 | dlmill=0 | dgm=0 | dim=0 | Hhrs=0 | Bhrs=0 | Fhrs=0 | Whrs=0 | Lhrs=0 | Ghrs=0 | Ihrs=0 | userid=3
   amts=100 | aland=100 | home=50 | kennel=0 | barrack=50 | farm=50 | wp=0 | lmill=0 | gm=50 | im=50 | dhome=0 | dbarrack=0 | dfarm=0 | dwp=0 | dlmill=0 | dgm=0 | dim=0 | Hhrs=0 | Bhrs=0 | Fhrs=0 | Whrs=0 | Lhrs=0 | Ghrs=0 | Ihrs=0 | userid=1
   amts=100 | aland=100 | home=50 | kennel=0 | barrack=50 | farm=50 | wp=0 | lmill=0 | gm=50 | im=50 | dhome=0 | dbarrack=0 | dfarm=0 | dwp=0 | dlmill=0 | dgm=0 | dim=0 | Hhrs=0 | Bhrs=0 | Fhrs=0 | Whrs=0 | Lhrs=0 | Ghrs=0 | Ihrs=0 | userid=2
-== emailvalidate (3 rows) ==
-  userid=1 | code=16d7a4fca7442dda3ad93c9a726597e4 | check=2 | clock=47
-  userid=2 | code=c1572d05424d0ecb2a65ec6a82aeacbf | check=2 | clock=47
-  userid=3 | code=3afc79b597f88a72528e864cf81856d2 | check=2 | clock=47
 == empnews (0 rows) ==
 == explore (3 rows) ==
   userid=1 | expland=0 | expmt=0 | landhrs=0 | mthrs=0

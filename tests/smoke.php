@@ -190,9 +190,10 @@ $UNREACHABLE = array(
 
     // Dead in the shipped game, not merely uncovered.
     'scoreboard.php'       => 'dead: orphaned, nothing links to it and index.php has its Scores link commented out',
-    // Auth flow outside both crawl roots.
-    'activate_account.php' => 'auth flow: needs a live activation code emailed by activate_code.php',
-    'activate_code.php'    => 'auth flow: sends the activation mail, requires an unactivated session',
+    // Auth flow outside both crawl roots: the crawl's accounts are verified.
+    // tests/signup.php drives both, on an account it signs up.
+    'activate_account.php' => 'auth flow: needs an unverified account; driven by tests/signup.php',
+    'activate_code.php'    => 'auth flow: needs an unverified account; driven by tests/signup.php',
 );
 
 $baseline = loadBaseline($BASELINE_FILE);

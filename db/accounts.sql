@@ -24,6 +24,13 @@ CREATE TABLE `account` (
   -- round's `user.signup_comp_id` records it for that kingdom.
   `signup_comp_id` varchar(255) NOT NULL DEFAULT '',
   `created` datetime NOT NULL,
+  -- When the address was confirmed by following the mailed link; NULL until
+  -- then, and the game's pages refuse an unverified account. It lived in the
+  -- round's `emailvalidate` table, keyed by userid, which meant confirming an
+  -- address once per round and losing the confirmation with the kingdom.
+  `verified_at` datetime NULL DEFAULT NULL,
+  -- The code the link carries: 32 hex characters, compared with hash_equals().
+  `verify_code` varchar(64) NOT NULL DEFAULT '',
   PRIMARY KEY (`account_id`),
   UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

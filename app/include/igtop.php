@@ -62,8 +62,9 @@ if($tick == 'yes')    {
   die();
 }
 
-//  is their account activated?
-if($validate_checker != 2)  {
+//  is their account activated? The account's to say, not the kingdom's: an
+//  address is confirmed once, not once a round.
+if(!$mb_account_verified)  {
   echo"<div align=center><font class=yellow size=4px><br>You must activate your account.</font></div>";
   echo"<div align=center><font class=yellow size=2px><a href=activate_code.php>Resend activation code.</a></font></div>";
   die();

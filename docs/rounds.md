@@ -233,6 +233,13 @@ fingerprint of the account's address and hash:
    - **Revocation**: a SHA-256 fingerprint of the account's address and hash
      in the session, compared with the account's on every request, plus the
      kingdom still being that account's. `tests/session.php` drives each.
+   - **Confirming an address is the account's**: `account.verified_at` and
+     `verify_code`, replacing the round's `emailvalidate`, so an address is
+     confirmed once rather than once a round. It is enforced again — signup
+     had stored every account as activated since 2007 — and the tick deletes
+     the kingdom, not the account, of one unconfirmed after
+     `activation_hours`. `bin/admin.php verify` stands in for the mail
+     locally.
    - **Addresses may be any valid address up to 254 characters**, the
      column width. A longer one would be silently truncated on insert and
      could never log in; an apostrophe, refused while addresses were

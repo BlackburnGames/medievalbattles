@@ -70,7 +70,6 @@
   says: You have gained 8 land and destroyed PoorSerf(2) Medieval Style! Your losses: 4 warriors
     buildings [1] aland 100 -> 108
   - buildings [3]
-  - emailvalidate [3]
   - explore [3]
   + guildnews news=TestLord (1) gained 8 land and destroyed PoorSerf (2) [i]Medieval style[/i] | class=yellow | gnid=1 | age=0 | gid=1
     military [1] warriors 300 -> 0

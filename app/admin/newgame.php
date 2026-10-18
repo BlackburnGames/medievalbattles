@@ -13,8 +13,6 @@ include("include/connect.php");
 // include is reached by path rather than by the CWD.
 require_once __DIR__ . '/../include/kingdom.php';
 
-mysqli_query($db, "DELETE FROM emailvalidate");
-echo "<div align=center><b>All validation codes have been deleted from the database.</b></div>";
 
 mysqli_query($db, "DELETE FROM messages");
 echo "<div align=center><b>All messages have been deleted from the database.</b></div>";

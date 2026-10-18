@@ -67,7 +67,7 @@ if (!function_exists('mb_account_find')) {
     function mb_account_find($email)
     {
         $r = mb_query(mb_accounts_db(),
-            "SELECT account_id, email, pw, admin FROM account WHERE email=?", array((string) $email));
+            "SELECT account_id, email, pw, admin, verified_at, verify_code, created FROM account WHERE email=?", array((string) $email));
         $row = $r ? mysqli_fetch_assoc($r) : null;
         return $row ? $row : null;
     }
@@ -82,7 +82,7 @@ if (!function_exists('mb_account_get')) {
     function mb_account_get($account_id)
     {
         $r = mb_query(mb_accounts_db(),
-            "SELECT account_id, email, pw, admin FROM account WHERE account_id=?", array((int) $account_id));
+            "SELECT account_id, email, pw, admin, verified_at, verify_code, created FROM account WHERE account_id=?", array((int) $account_id));
         $row = $r ? mysqli_fetch_assoc($r) : null;
         return $row ? $row : null;
     }
@@ -114,17 +114,63 @@ if (!function_exists('mb_account_emails')) {
 
 if (!function_exists('mb_account_create')) {
     /**
-     * Make an account. The caller has validated the address and hashed the
-     * password; signup is the only caller.
+     * Make an account, unverified, with the code its confirmation link will
+     * carry. The caller has validated the address and hashed the password;
+     * signup is the only caller.
      *
      * @return int  the new account's id
      */
     function mb_account_create($email, $hash, $computer_id)
     {
         $adb = mb_accounts_db();
-        mb_query($adb, "INSERT INTO account (email, pw, signup_comp_id, created) VALUES (?, ?, ?, NOW())",
-            array((string) $email, (string) $hash, (string) $computer_id));
+        mb_query($adb, "INSERT INTO account (email, pw, signup_comp_id, created, verify_code) VALUES (?, ?, ?, NOW(), ?)",
+            array((string) $email, (string) $hash, (string) $computer_id, bin2hex(random_bytes(16))));
         return (int) mysqli_insert_id($adb);
+    }
+}
+
+if (!function_exists('mb_account_verify_link')) {
+    /**
+     * The link that confirms this account's address, as mailed at signup and
+     * by activate_code.php.
+     */
+    function mb_account_verify_link(array $account)
+    {
+        return 'http://www.medievalbattles.com/activate_account.php?activate=true'
+            . '&act_account=' . (int) $account['account_id']
+            . '&act_code=' . rawurlencode($account['verify_code']);
+    }
+}
+
+if (!function_exists('mb_account_verify')) {
+    /**
+     * Confirm an account's address, if $code is the one its link carried.
+     *
+     * hash_equals(), not ==: the code is hex, and == compares numeric-looking
+     * strings as numbers -- the 0e... collision the old activation page and
+     * the old login both had. An account already verified stays verified.
+     *
+     * @return bool  whether the code was right
+     */
+    function mb_account_verify($account_id, $code)
+    {
+        $account = mb_account_get($account_id);
+        if (!$account || !is_string($code) || $account['verify_code'] === ''
+            || !hash_equals($account['verify_code'], $code)) {
+            return false;
+        }
+        mb_query(mb_accounts_db(), "UPDATE account SET verified_at=NOW() WHERE account_id=? AND verified_at IS NULL",
+            array((int) $account_id));
+        return true;
+    }
+}
+
+if (!function_exists('mb_account_mark_verified')) {
+    /** Verify an account by hand, for bin/admin.php -- local mail goes nowhere. */
+    function mb_account_mark_verified($account_id)
+    {
+        mb_query(mb_accounts_db(), "UPDATE account SET verified_at=NOW() WHERE account_id=? AND verified_at IS NULL",
+            array((int) $account_id));
     }
 }
 

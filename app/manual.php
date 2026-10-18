@@ -232,7 +232,7 @@ and refuses input; it takes only a moment.</p>
 </div>
 
 <p>Two other clocks matter. You must activate your account by email within
-<b><?php echo $GAMEDATA['timers']['activation_ticks']; ?> ticks</b> or it is deleted,
+<b><?php echo $GAMEDATA['timers']['activation_hours']; ?> hours</b> or your kingdom is deleted,
 and an account that is never logged into for
 <b><?php echo $GAMEDATA['timers']['inactivity_ticks']; ?> ticks</b> is deleted as well.
 Simply logging in resets the second clock. Messages and news items are purged after

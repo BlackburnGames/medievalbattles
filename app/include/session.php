@@ -235,12 +235,16 @@ if ($userid > 0 && $mb_account_id > 0 && empty($GLOBALS['mb_session_checked'])) 
 	}
 	if ($mb_ok) {
 		$GLOBALS['mb_session_email'] = $mb_account['email'];
+		$GLOBALS['mb_session_verified'] = $mb_account['verified_at'] !== null;
 	} else {
 		unset($_SESSION['login'], $_SESSION['userid'], $_SESSION['mb_account'], $_SESSION['mb_account_fp']);
 		$GLOBALS['mb_session_revoked'] = true;
 	}
 	unset($mb_account, $mb_fp, $mb_ok, $mb_r);
 }
+// Whether the account has confirmed its address. include/igtop.php refuses
+// every game page until it has; see activate_account.php.
+$mb_account_verified = false;
 if ($userid < 1 || $mb_account_id < 1 || !empty($GLOBALS['mb_session_revoked'])) {
 	$login = '';
 	$userid = '';
@@ -248,4 +252,5 @@ if ($userid < 1 || $mb_account_id < 1 || !empty($GLOBALS['mb_session_revoked']))
 } else {
 	$userid = (string) $userid;
 	$email = isset($GLOBALS['mb_session_email']) ? $GLOBALS['mb_session_email'] : '';
+	$mb_account_verified = !empty($GLOBALS['mb_session_verified']);
 }

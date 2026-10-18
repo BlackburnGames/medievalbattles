@@ -48,9 +48,6 @@ echo "<p>Starting update process</p>";
 $INC_ID = 1;
 
 while($INC_ID < $max_UID + 1) {
-      $result = mb_query($db, "SELECT * FROM emailvalidate WHERE userid=?", array($INC_ID)) or die("Error in query! " . mysqli_error($db));
-      $validate = mysqli_fetch_array($result);
-
       $result1 = mb_query($db, "SELECT * FROM user WHERE userid=?", array($INC_ID)) or die("Error in query! " . mysqli_error($db));
       $user = mysqli_fetch_array($result1);
 
@@ -244,17 +241,21 @@ while($INC_ID < $max_UID + 1) {
 ##################
   echo "<p>Updating Activation System...</p>";
 
-  mb_query($db, "UPDATE emailvalidate SET clock= clock - 1 WHERE clock > 0 AND userid =?", array($INC_ID));
+  // A kingdom whose account never confirmed its address, within
+  // activation_hours of the account being made. The account is kept -- it is
+  // not the round's to delete -- and can still confirm and sign up again.
+  $mb_acct = mb_account_get($user['account_id']);
+  $mb_unverified = $mb_acct && $mb_acct['verified_at'] === null
+    && strtotime($mb_acct['created']) < time() - $GAMEDATA['timers']['activation_hours'] * 3600;
 
-  if($validate['clock'] == 1 AND $validate['check'] == 1)  {
+  if($mb_unverified)  {
     mb_news_set($db, "$clock", 'red', "$user[ename] has been deleted for inactivity.", $user['setid'], 0);
 
     // The address is the account's; the round holds none.
-    $mb_acct = mb_account_get($user['account_id']);
-    $email = $mb_acct ? $mb_acct['email'] : '';
+    $email = $mb_acct['email'];
     $subject = "Your Medieval Battles Account Deleted";
     $body = "
-Since you did not activate your account within one day upon signing up, your account was deleted. You are welcome to create another account though. Just go to:
+Since you did not activate your account within two days of signing up, your kingdom was deleted. Activate your account with the link you were sent, and you can sign up again with the same email and password. Just go to:
 www.medievalbattles.com/index?signup=yes. If you have any questions reguarding this, just email us at: support@medievalbattles.com
 
 This email is automated. Your reply will not be recieved.";
@@ -267,7 +268,6 @@ This email is automated. Your reply will not be recieved.";
     mb_query($db, "DELETE FROM research WHERE userid=?", array((int) $user['userid']));
     mb_query($db, "DELETE FROM returntbl WHERE userid=?", array((int) $user['userid']));
     mb_query($db, "DELETE FROM explore WHERE userid=?", array((int) $user['userid']));
-    mb_query($db, "DELETE FROM emailvalidate WHERE userid=?", array($INC_ID));
     mb_query($db, "UPDATE user SET votefor='None' WHERE votefor=?", array($user['ename']));
   }
 
@@ -299,7 +299,6 @@ This email is automated. Your reply will not be recieved.";
     mb_query($db, "DELETE FROM research WHERE userid=?", array((int) $user['userid']));
     mb_query($db, "DELETE FROM returntbl WHERE userid=?", array((int) $user['userid']));
     mb_query($db, "DELETE FROM explore WHERE userid=?", array((int) $user['userid']));
-    mb_query($db, "DELETE FROM emailvalidate WHERE userid=?", array($INC_ID));
     mb_query($db, "UPDATE user SET votefor='None' WHERE votefor=?", array($user['ename']));
   }
 

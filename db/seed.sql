@@ -17,9 +17,8 @@
 -- does not. Each kingdom names its account by `user.account_id`, and the game
 -- finds a kingdom by its userid.
 --
--- The `emailvalidate` codes below are unchanged: they are activation codes and
--- happen to look like MD5 digests because signup used to store the password
--- hash as the code. checksignup.php generates a distinct one now.
+-- Whether an account has confirmed its address is the account's too:
+-- db/accounts-seed.sql marks all three verified.
 --
 -- User ids are deliberately 1-3. The tick loops from 0 to max(userid) rather
 -- than over the rows that exist, so its cost is driven by the highest id, not
@@ -33,13 +32,6 @@ DELETE FROM `buildings`     WHERE userid IN (1, 2, 3);
 DELETE FROM `military`      WHERE userid IN (1, 2, 3);
 DELETE FROM `research`      WHERE userid IN (1, 2, 3);
 DELETE FROM `explore`       WHERE userid IN (1, 2, 3);
-DELETE FROM `emailvalidate` WHERE userid IN (1, 2, 3);
-
--- check=2 means "activated"; the app refuses to render game pages otherwise.
-INSERT INTO `emailvalidate` (userid, code, `check`, clock) VALUES
-  (1, '16d7a4fca7442dda3ad93c9a726597e4', 2, 48),
-  (2, 'c1572d05424d0ecb2a65ec6a82aeacbf', 2, 48),
-  (3, '3afc79b597f88a72528e864cf81856d2', 2, 48);
 
 -- safemode 0 on the primary tester so combat and tick paths are reachable;
 -- user 2 keeps a low countdown to exercise the inactivity branch of the tick.

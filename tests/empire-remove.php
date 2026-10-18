@@ -51,7 +51,7 @@ $VOTER   = 999204;   // this one votes for it
 $OTHERGL = 999205;   // leads another guild, which it asked to join
 $SETID   = 999201;
 $GNAME   = 'mb-empire-remove-test';
-$TABLES  = array('user', 'military', 'buildings', 'research', 'returntbl', 'explore', 'emailvalidate');
+$TABLES  = array('user', 'military', 'buildings', 'research', 'returntbl', 'explore');
 
 $failed = 0;
 function check($label, $condition, $detail = '')
@@ -108,7 +108,6 @@ foreach (array(
 foreach (array('military', 'buildings', 'research', 'returntbl', 'explore') as $t) {
     q($db, "INSERT INTO $t (userid) VALUES ($GONE)");
 }
-q($db, "INSERT INTO emailvalidate (userid, code, `check`) VALUES ($GONE, 'x', '2')");
 q($db, "INSERT INTO guild (gname, owner, mem) VALUES ('$GNAME', '$GONE', 2), ('$GNAME-other', '$OTHERGL', 1)");
 q($db, "INSERT INTO guildrequests (applicant, gl_userid) VALUES ('$GONE', '$OTHERGL'), ('$MEMBER', '$GONE')");
 q($db, "INSERT INTO settlement (setid, setname, members) VALUES ($SETID, 'Removal Test', 5)");

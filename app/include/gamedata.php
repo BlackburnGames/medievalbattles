@@ -403,9 +403,12 @@ $GAMEDATA['timers'] = array(
     // Still transcribed: both are schema column defaults, and the tick only
     // counts them down -- there is no literal in the engine to invert.
     'safemode_ticks'     => 48,   // include/kingdom.php:85
-    'activation_ticks'   => 48,   // db.sql emailvalidate.clock
     'inactivity_ticks'   => 336,  // db.sql user.countdown
     // Inverted.
+    // Hours, not ticks: confirming an address is the account's, which has a
+    // creation time and no tick clock. It was 48 ticks on the round's
+    // emailvalidate row.
+    'activation_hours'   => 48,   // read by update.php
     'message_ttl_ticks'  => 192,  // read by update.php -- messages and both news tables
     'exp_floor'          => 1000, // read by update.php
 );

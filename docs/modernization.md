@@ -63,7 +63,11 @@ In progress. The known work, in no committed order:
     all. It casts the id, escapes the code, backticks the column and compares
     with `hash_equals()` now. Signup still stores `check='2'`, so accounts are
     born activated and the page changes nothing a player sees; it is driven by
-    hand, not by the crawl, which cannot sign up.
+    hand, not by the crawl, which cannot sign up. ~~Born activated~~ **No
+    longer:** verification is the account's now (`account.verified_at`), a new
+    account is unverified until its mailed link is followed, and
+    `tests/signup.php` drives the gate, the resend page, the link and the
+    tick's deletion of a kingdom whose account never confirmed.
   - **Login** escapes the address it records and the empire name it reads back.
 
   **The second order has its own list now, and it is at zero too.**
@@ -900,7 +904,10 @@ attribute.
 
   **Two of the timers cannot be inverted and the block says so.** The activation
   and inactivity clocks are schema column defaults; the tick only counts them
-  down, so there is no literal in the engine to take away.
+  down, so there is no literal in the engine to take away. The activation
+  clock is inverted now: confirming an address moved to the account, which
+  has a creation time rather than a tick clock, and the tick reads
+  `activation_hours` to decide.
 
   Inverting the settlement count surfaced a disagreement, now recorded as a
   quirk. `db.sql` ships **ten** settlements, and `settlement.php` and the three

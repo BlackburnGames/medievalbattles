@@ -19,7 +19,7 @@
 // Request input, formerly supplied by register_globals.
 include("include/request.php");
 $act_code   = mb_input('act_code');
-$act_userid = mb_input('act_userid');
+$act_account = mb_input('act_account');
 
 							include("include/clock.php");
 							echo $clock;
@@ -82,22 +82,15 @@ $act_userid = mb_input('act_userid');
 	}	else	{
 		include("include/connect.php");
 
-		// `check` is a reserved word, and both statements here named it bare, so
-		// neither had ever parsed. The SELECT's failure left $validate null, and
-		// the loose != below then let an empty code through: the page answered
-		// "activated" to anyone who sent none, and activated nothing.
-		//
-		// The code is compared with hash_equals(), not !=, because it is an md5
-		// hex digest and != compares numeric-looking strings as numbers -- the
-		// same 0e... collision checklogin.php's digest comparison had.
-		$validate_result = mb_query($db, "SELECT userid, code, `check` FROM emailvalidate WHERE userid=?", array((int) $act_userid));
-		$validate = $validate_result ? mysqli_fetch_array($validate_result) : null;
-
-		if(!$validate || !is_string($act_code) || !hash_equals((string) $validate[1], $act_code))	{
+		// The account's address, confirmed by the code its link carried. It was
+		// the round's emailvalidate row, by userid, where `check` -- a reserved
+		// word, named bare -- meant neither statement had ever parsed, and a
+		// loose != then answered "activated" to a request with no code at all.
+		// mb_account_verify() compares with hash_equals().
+		if(!mb_account_verify($act_account, $act_code))	{
 			echo "<center><b>Validation code is incorrect.</b></center><br>";
 		}
 		else	{
-			mb_query($db, "UPDATE emailvalidate SET `check`='2' WHERE userid=? AND code=?", array((int) $act_userid, (string) $act_code));
 			echo "<center><b>Your account has been activated!</b></center>";
 		}
 	}

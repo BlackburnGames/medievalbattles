@@ -80,6 +80,9 @@ is told so, and signing up again with the same address and password gives it
 a new one.
 
 A password change and an address change are each one `UPDATE` on the account.
+So is confirming the address: `account.verified_at`, set by the link
+`checksignup.php` and `activate_code.php` mail, and `include/igtop.php` refuses
+every game page to an account without it.
 
 `bin/accounts-migrate.php` moves a world that predates this (addresses and
 hashes in all six tables, the flag in `user.admin`) into that shape, once.

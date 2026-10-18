@@ -108,7 +108,6 @@ $MB_ADMIN_ACTIONS = array(
 			'DELETE FROM returntbl WHERE userid NOT IN (SELECT userid FROM user)',
 			'DELETE FROM barter WHERE userid NOT IN (SELECT userid FROM user)',
 			'DELETE FROM empnews WHERE yourid NOT IN (SELECT userid FROM user)',
-			'DELETE FROM emailvalidate WHERE userid NOT IN (SELECT userid FROM user)',
 			'UPDATE settlement s SET members=(SELECT count(*) FROM user u WHERE u.setid=s.setid)',
 		),
 	),

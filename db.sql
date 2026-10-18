@@ -67,27 +67,6 @@ CREATE TABLE `buildings` (
 # --------------------------------------------------------
 
 #
-# Table structure for table `emailvalidate`
-#
-# Creation: Jun 11, 2003 at 01:43 PM
-# Last update: Apr 27, 2015 at 10:24 AM
-#
-
-CREATE TABLE `emailvalidate` (
-  `userid` bigint(255) NOT NULL default '0',
-  `code` varchar(50) NOT NULL default '0',
-  `check` int(11) NOT NULL default '0',
-  `clock` int(11) NOT NULL default '48'
-) ENGINE=MyISAM;
-
-#
-# Dumping data for table `emailvalidate`
-#
-
-
-# --------------------------------------------------------
-
-#
 # Table structure for table `empnews`
 #
 # Creation: Jun 11, 2003 at 01:43 PM

@@ -128,15 +128,11 @@ if ($signup) {
   $buserid = mb_db_result($buildingsuserid,"buserid");
   $newbuserid = $buserid + 1;
 
-  //  create activation code - bypassing validation for now
-  //
-  // Its own random value. This used to store the password digest and then mail
-  // it out as the activate_account.php link, so the activation URL carried the
-  // exact string that "WHERE email=... AND pw=..." accepts as the credential --
-  // and emailvalidate.code is varchar(50), which a bcrypt hash does not fit
-  // into anyway.
-  $act_code = md5(uniqid(rand(), true));
-  mb_query($db, "INSERT INTO emailvalidate (userid, code, `check`) VALUES (?, ?, '2')", array((int) $newbuserid, $act_code));
+  // The activation code is the account's now (include/accounts.php), made
+  // with it below, and confirming an address is no longer once per round. It
+  // was a row in the round's emailvalidate table, written with check='2' --
+  // already activated -- since 2007, "bypassing validation for now". A new
+  // account is unverified until its link is followed.
 
   if (($email === $cemail) and ($pw === $cpw) and ($email != "") and ($cemail != "") and ($pw != "") and ($cpw != ""))  {
     // Hashed here, once, after every comparison that needed the plaintext, and
@@ -172,6 +168,10 @@ if ($signup) {
 
     echo "Thank you for signing up for Medieval Battles. You are in settlement " . mb_h($snum) . ".<br>Your login information and activation code has been emailed to you.<br><br><a href=index.php>You can login now here</a>";
 
+    // An account that already existed keeps the code it was made with; if it
+    // is verified already, the link says so harmlessly.
+    $verify_link = mb_account_verify_link(mb_account_get($account_id));
+
     $subject = "Welcome to Medieval Battles";
     $body = "
     Thank you for being apart of the online game, Medieval Battles.
@@ -181,8 +181,8 @@ if ($signup) {
     Email: [$email]
     Password: [$opw]
 
-    You will need your email and password to login. But before you can login, you must activate your account. To activate your account, click here:
-    http://www.medievalbattles.com/activate_account.php?activate=true&act_userid=$newbuserid&act_code=$act_code
+    You will need your email and password to login. But before you can play, you must activate your account. To activate your account, click here:
+    $verify_link
 
     If you have any questions you can email us at support@medievalbattles.com";
 

@@ -7,13 +7,8 @@ include("include/session.php");
 // the logged-in account, and blanked it otherwise.
 if($login == 1 && $userid != "") {
 
-	// account validation
-	$validate_result = mb_query($db, "SELECT * FROM emailvalidate WHERE userid=?", array((int) $userid));
-	$validate = mysqli_fetch_array($validate_result);
-
-	$code = $validate['code'];
-	$validate_checker = $validate['check'];
-	$validate_clock = $validate['clock'];
+	// Whether the address is confirmed is the account's, and include/session.php
+	// has already read it: $mb_account_verified.
 
 	// select all armors
 	$armor_result = mb_query($db, "SELECT * FROM military WHERE userid=?", array($userid));

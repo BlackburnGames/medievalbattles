@@ -1,11 +1,14 @@
 <?
 include("include/act_igtop.php");
 
+// The account's link: the code and the address are both the account's.
+$verify_link = mb_account_verify_link(mb_account_get($mb_account_id));
+
 $subject = "Account Activation Code";
 $body = "
 Welcome to Medieval Battles! Before you can do anything with your account, you must activate it first. To actiavte your account, click this link.
 
-http://www.medievalbattles.com/activate_account.php?activate=true&act_userid=$userid&act_code=$code
+$verify_link
 
 If you do not activate your account upon 24 hours of signing up, your account will be deleted.";
 

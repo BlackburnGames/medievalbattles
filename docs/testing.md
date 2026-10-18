@@ -510,7 +510,9 @@ The 11 fall into five groups:
   to it and `index.php` has its Scores link commented out. `guildbarter.php`
   was the other one and came off the list when the barter system was switched
   back on.
-- **Auth flow** (2) — the activation pages, which need a live emailed code.
+- **Auth flow** (2) — the activation pages, which need an unverified account;
+  the crawl's are all verified. `tests/signup.php` signs one up and drives both,
+  reading the code back from the account since mail goes nowhere.
 
 ### Driving forms
 

@@ -19,7 +19,8 @@
 
 DELETE FROM `account` WHERE account_id IN (1, 2, 3);
 
-INSERT INTO `account` (account_id, email, pw, admin, signup_comp_id, created) VALUES
-  (1, 'tester@example.com', '16d7a4fca7442dda3ad93c9a726597e4', 1, 'seed', '2003-01-01 00:00:00'),
-  (2, 'idle@example.com',   '$2y$10$zwzsLaBoYCYRMC8wR2Df7eJT1lrq6IjnsIHKElvgu9rGzrSxwyoEW', 0, 'seed', '2003-01-01 00:00:00'),
-  (3, 'poor@example.com',   '3afc79b597f88a72528e864cf81856d2', 0, 'seed', '2003-01-01 00:00:00');
+-- All three verified, as the round's emailvalidate rows used to say.
+INSERT INTO `account` (account_id, email, pw, admin, signup_comp_id, created, verified_at, verify_code) VALUES
+  (1, 'tester@example.com', '16d7a4fca7442dda3ad93c9a726597e4', 1, 'seed', '2003-01-01 00:00:00', '2003-01-01 00:00:00', '16d7a4fca7442dda3ad93c9a726597e4'),
+  (2, 'idle@example.com',   '$2y$10$zwzsLaBoYCYRMC8wR2Df7eJT1lrq6IjnsIHKElvgu9rGzrSxwyoEW', 0, 'seed', '2003-01-01 00:00:00', '2003-01-01 00:00:00', 'c1572d05424d0ecb2a65ec6a82aeacbf'),
+  (3, 'poor@example.com',   '3afc79b597f88a72528e864cf81856d2', 0, 'seed', '2003-01-01 00:00:00', '2003-01-01 00:00:00', '3afc79b597f88a72528e864cf81856d2');
