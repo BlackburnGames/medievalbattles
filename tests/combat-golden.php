@@ -312,8 +312,8 @@ $SCENARIOS = array(
         'requests' => array(array('attack.php', array('empvalue' => $D, 'uwarrior' => 300, 'uwizard' => 100))),
     ),
     array(
-        'name'  => 'quirk-return-time-night-elf',
-        'why'   => 'QUIRK: the Night Elf return bonus compares against " Night Elf" and never fires. Same army as return-time-elf.',
+        'name'  => 'return-time-night-elf',
+        'why'   => 'Night Elves come home in 75% of the time, floored -- a bonus that never fired while the race was compared against " Night Elf". Same army as return-time-elf.',
         'setup' => array($strong, set('user', $A, array('race' => 'Night Elf')), $defenders, $defenderStats),
         'requests' => array(array('attack.php', array('empvalue' => $D, 'uwarrior' => 300, 'uwizard' => 100))),
     ),

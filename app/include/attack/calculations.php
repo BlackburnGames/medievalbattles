@@ -99,7 +99,7 @@ if($race == 'Elf')	{
 	$R_time = $R_time * .8; 
 	$R_time = floor($R_time);
 }
-if($race == ' Night Elf')	{
+if($race == 'Night Elf')	{
 	$R_time = $R_time * .75; 
 	$R_time = floor($R_time);
 }

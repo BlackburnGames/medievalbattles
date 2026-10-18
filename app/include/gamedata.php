@@ -143,6 +143,7 @@ $GAMEDATA['races'] = array(
         'lumbmod_delta' => +0.10,  // update.php:112
         'civ_mod_delta' => -0.25,  // update.php:113
         'offdef_delta'  => -0.10,  // defANDoff.php:66
+        'return_time_mult' => 0.75,   // attack/calculations.php:102-105
         'build_time_mult' => 2,    // buildings.php:83
         'starts_with'   => array('4-10 Archers'),  // checksignup.php:130
         'bans'     => array(),
@@ -445,7 +446,6 @@ $GAMEDATA['exp_values'] = array(
  * truth and so Phase 3 has a checklist.
  * ------------------------------------------------------------------ */
 $GAMEDATA['quirks'] = array(
-    'A Night Elf return-time bonus (x0.75) exists in the code but never triggers: the race name is compared with a stray leading space. (attack/calculations.php:102)',
     'Advanced Construction divides the build timer by 0.5, which DOUBLES construction time instead of halving it. (buildings.php:81)',
     'Mountain attacks award the attacker mountains, but a dead loop means the defender\'s mountains are restored by the next tick\'s recalculation. (attackm.php:147, update.php:270-280)',
     'The Scepter of Zakarum sets its speed on equip but never its power, so the listed power is not actually applied. (equip.php:199)',

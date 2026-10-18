@@ -370,8 +370,8 @@
     user [1] land 250 -> 275, fleets 2 -> 1
     user [3] land 250 -> 225, nno 0 -> 1
 
-### quirk-return-time-night-elf
-# QUIRK: the Night Elf return bonus compares against " Night Elf" and never fires. Same army as return-time-elf.
+### return-time-night-elf
+# Night Elves come home in 75% of the time, floored -- a bonus that never fired while the race was compared against " Night Elf". Same army as return-time-elf.
 
 > attack.php attack=1 empvalue=3 uwarrior=300 uwizard=100
   says: You have conquered 25 land from PoorSerf(2)! Your losses: 3 warriors 3 wizards
@@ -381,7 +381,7 @@
   + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
     military [1] warriors 300 -> 0, wizards 100 -> 0
     military [3] warriors 20 -> 19, wizards 10 -> 8, priests 10 -> 9, archers 5 -> 4
-    returntbl [1] war4 0 -> 297, wiz4 0 -> 97, time4 0 -> 6
+    returntbl [1] war4 0 -> 297, wiz4 0 -> 97, time4 0 -> 4
   + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
   + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
     user [1] land 250 -> 275, fleets 2 -> 1
