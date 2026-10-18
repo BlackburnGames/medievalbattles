@@ -40,10 +40,9 @@ require_once __DIR__ . '/news.php';
 /**
  * And the accounts, with the password helpers that act on them.
  *
- * The account -- address, password hash, admin flag -- lives in a database of
- * its own beside this round's, and include/session.php asks it about every
- * logged-in request. Its connection opens on first use, not here, so a page
- * that never touches an account never makes it.
+ * The account -- address, password hash, admin flag -- lives in the `account`
+ * table beside the round's, and include/session.php asks it about every
+ * logged-in request.
  */
 require_once __DIR__ . '/accounts.php';
 require_once __DIR__ . '/password.php';
@@ -105,22 +104,8 @@ require_once __DIR__ . '/exploring.php';
  */
 mysqli_report(getenv('MB_REPORT_QUERIES') === '0' ? MYSQLI_REPORT_OFF : MYSQLI_REPORT_ERROR);
 
-$dbnam      = getenv('MB_DB_NAME') ? getenv('MB_DB_NAME') : 'mbv6';
-$mb_db_host = getenv('MB_DB_HOST') ? getenv('MB_DB_HOST') : '127.0.0.1';
-$mb_db_user = getenv('MB_DB_USER') ? getenv('MB_DB_USER') : 'mb';
-$mb_db_pass = getenv('MB_DB_PASS') ? getenv('MB_DB_PASS') : 'mb';
-
+// The connection itself is mb_db()'s, in db.php, so code outside page scope
+// shares it. Pages include this file repeatedly; mb_db() connects once.
 if (!isset($db) || !($db instanceof mysqli)) {
-    $db = @mysqli_connect($mb_db_host, $mb_db_user, $mb_db_pass, $dbnam);
-
-    if (!$db) {
-        if (!headers_sent()) {
-            header('Content-Type: text/plain', true, 500);
-        }
-        echo "Error: Unable to connect to database.\n";
-        echo mysqli_connect_error() . "\n";
-        exit;
-    }
-
-    mb_db_session($db);
+    $db = mb_db();
 }

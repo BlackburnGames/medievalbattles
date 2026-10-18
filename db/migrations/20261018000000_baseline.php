@@ -1,12 +1,12 @@
 <?php
 use Phinx\Migration\AbstractMigration;
 
-require_once __DIR__ . '/../../phinx/sql.php';
+require_once __DIR__ . '/../sql-statements.php';
 
 /**
- * The round schema as it stood when migrations began (2026-10-18): a frozen copy
- * of db.sql, next to this file, so that later edits to that file
- * cannot rewrite history. A fresh install and a live database start from here.
+ * The schema as it stood when migrations began (2026-10-18): a frozen copy of
+ * db.sql, next to this file, so that later edits to that file cannot rewrite
+ * history. A fresh install and a live database start from here.
  */
 final class Baseline extends AbstractMigration
 {

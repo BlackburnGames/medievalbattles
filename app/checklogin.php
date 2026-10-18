@@ -43,7 +43,7 @@ if (!mb_valid_email($email)) {
 	exit();
 }
 
-// One lookup, by address alone, and in the accounts database: the password is
+// One lookup, by address alone, and in the `account` table: the password is
 // the account's, not the kingdom's. It used to run this query and a second one
 // filtering on the digest as well, then compare the two results with ==, which
 // is a numeric comparison whenever both strings look numeric -- see
@@ -53,7 +53,7 @@ $stored = $account ? $account['pw'] : '';
 
 if ($account && mb_password_verify($plain_pw, $stored)) {
 	/*
-	 * Upgrade an md5 account in place. One row, in the accounts database; the
+	 * Upgrade an md5 account in place. One row, in the `account` table; the
 	 * round never held a copy of the hash after this change, so nothing in it
 	 * moves.
 	 */

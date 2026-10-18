@@ -79,7 +79,7 @@ $body = $client->post('/checksignup.php', array(
     'signup' => 1, 'email' => 'copycat@example.com', 'cemail' => 'copycat@example.com', 'pw' => 'pass1234', 'cpw' => 'pass1234',
     'handle' => 'TESTER', 'ename' => 'Copycat', 'race' => 'Human', 'class' => 'Fighter', 'msn' => '', 'aim' => '',
 ));
-$made = (int) mysqli_fetch_row(mysqli_query($adb, "SELECT count(*) FROM account WHERE email = 'copycat@example.com'"))[0];
+$made = (int) mysqli_fetch_row(mysqli_query($db, "SELECT count(*) FROM account WHERE email = 'copycat@example.com'"))[0];
 if ($made !== 0 || stripos($body, 'already being used') === false) {
     echo "FAIL: a signup took the player name TESTER, which Tester already has\n";
     $failures++;
@@ -114,8 +114,8 @@ if ($client->lastStatus !== 302) {
         stripos($client->get('/main.php?pageid=news'), 'You must activate your account') !== false;
     $checks['the resend page answers'] =
         stripos($client->get('/activate_code.php'), 'activation code has been resent') !== false;
-    $acct = mysqli_fetch_assoc(mysqli_query($adb, "SELECT account_id, verify_code FROM account WHERE email = '"
-        . mysqli_real_escape_string($adb, $obrien) . "'"));
+    $acct = mysqli_fetch_assoc(mysqli_query($db, "SELECT account_id, verify_code FROM account WHERE email = '"
+        . mysqli_real_escape_string($db, $obrien) . "'"));
     $link = '/activate_account.php?activate=true&act_account=' . (int) $acct['account_id'] . '&act_code=';
     $checks['a wrong code is refused'] =
         stripos((new MbClient($BASE))->get($link . str_repeat('0', 32)), 'Validation code is incorrect') !== false;
@@ -147,14 +147,14 @@ foreach (array($lapsed => 'Lapsed', $fresh => 'Fresh') as $addr => $name) {
     ));
 }
 $hours = $GAMEDATA['timers']['activation_hours'] + 1;
-mysqli_query($adb, "UPDATE account SET created = NOW() - INTERVAL $hours HOUR WHERE email = '$lapsed'");
+mysqli_query($db, "UPDATE account SET created = NOW() - INTERVAL $hours HOUR WHERE email = '$lapsed'");
 $tickLog = runTick();
 $kingdom = function ($ename) use ($db) {
     return (int) mysqli_fetch_row(mysqli_query($db, "SELECT count(*) FROM user WHERE ename = '$ename'"))[0];
 };
-$accountCount = function ($addr) use ($adb) {
-    return (int) mysqli_fetch_row(mysqli_query($adb, "SELECT count(*) FROM account WHERE email = '"
-        . mysqli_real_escape_string($adb, $addr) . "'"))[0];
+$accountCount = function ($addr) use ($db) {
+    return (int) mysqli_fetch_row(mysqli_query($db, "SELECT count(*) FROM account WHERE email = '"
+        . mysqli_real_escape_string($db, $addr) . "'"))[0];
 };
 $checks = array(
     'the tick deletes the kingdom of an account unconfirmed past the window' => $kingdom('Lapsed') === 0,

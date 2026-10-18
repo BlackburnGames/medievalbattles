@@ -699,7 +699,7 @@ prefsEmailChange($member);
  * poor@ are the unsalted MD5 the game stored until this change -- so the
  * logins above have already driven both arms of mb_password_verify(). What
  * they cannot show is what happens afterwards. The hash is the account's, in
- * the accounts database, and a change rewrites that one row; the kingdom's six
+ * its `account` row, and a change rewrites that one row; the kingdom's six
  * tables hold its key, which must not move with it.
  *
  * So the credential is used again, after the change, on a fresh session. A

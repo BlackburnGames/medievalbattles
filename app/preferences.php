@@ -18,7 +18,7 @@ include("include/igtop.php");
 
 /**
  * The account's settings: its password and address, which live on the account
- * in the accounts database (include/accounts.php), and the kingdom's contact
+ * in the `account` table (include/accounts.php), and the kingdom's contact
  * fields and empire news.
  *
  * This page was the last entry on tests/sql-injection.txt: a player picked a

@@ -1,13 +1,14 @@
 <?php
 /**
- * Move a round's credentials out into the accounts database.
+ * Move a round's credentials out onto accounts.
  *
  *   docker compose exec web php /repo/bin/accounts-migrate.php
  *
- * For a world that predates the accounts database: every `user` row holding
- * its address in `email` and its password hash in `pw`, both copied into five
- * more tables, and the admin flag in `user.admin`. For each kingdom this makes
- * an account with the address, the hash and the flag, and records it in
+ * For a world that predates accounts: every `user` row holding its address in
+ * `email` and its password hash in `pw`, both copied into five more tables,
+ * and the admin flag in `user.admin`. For each kingdom this makes an account
+ * with the address, the hash and the flag -- creating the `account` table
+ * first, as db.sql declares it, if the world has none -- and records it in
  * `user.account_id`. Then it drops `email` and `pw` from all six tables and
  * `admin` from `user`, carries each kingdom's activation over to its account
  * and drops `emailvalidate`, and indexes the five child tables on userid, as
@@ -17,8 +18,8 @@
  * done. An address that already has an account keeps that account, and its
  * hash is not overwritten by the round's.
  *
- * The fixture never needs this: db/seed.sql and db/accounts-seed.sql are
- * already split. It is for the one corpus that is not in this repo.
+ * The fixture never needs this: db/seed.sql is already split. It is for the
+ * one corpus that is not in this repo.
  */
 
 if (PHP_SAPI !== 'cli') {
@@ -52,6 +53,15 @@ function mb_migrate_handle(array $row)
 if (!mb_migrate_has_column($db, 'user', 'email')) {
     echo "Already moved: user has no email column.\n";
     exit(0);
+}
+
+if (!mysqli_fetch_row(mysqli_query($db, "SHOW TABLES LIKE 'account'"))) {
+    require_once __DIR__ . '/../db/sql-statements.php';
+    foreach (mb_sql_statements(__DIR__ . '/../db.sql') as $stmt) {
+        if (strpos($stmt, 'CREATE TABLE `account`') === 0) {
+            mysqli_query($db, $stmt); // mb-unbound-ok: db.sql's own statement
+        }
+    }
 }
 
 if (!mb_migrate_has_column($db, 'user', 'account_id')) {

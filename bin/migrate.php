@@ -1,23 +1,19 @@
 <?php
 /**
- * Run a Phinx command against both databases: the accounts, then the round.
+ * Run a Phinx command against the game's database.
  *
  *   docker compose exec web php /repo/bin/migrate.php status
  *   docker compose exec web php /repo/bin/migrate.php migrate
- *   docker compose exec web php /repo/bin/migrate.php create AddRoundId round
+ *   docker compose exec web php /repo/bin/migrate.php create AddRoundId
  *
- * Any other arguments go to Phinx as they are. `create` makes a migration in
- * the one database named after it, and the class name comes before it.
+ * Shorthand for vendor/bin/phinx with -c db/phinx.php, which reads the same
+ * MB_DB_* settings as the app. Any arguments go to Phinx as they are.
  *
- * The databases are the MB_DB_NAME and MB_ACCOUNTS_DB_NAME the app uses
- * (db/phinx/config.php). A new database starts from the baseline migration;
- * the fixture is built from db.sql instead (tests/reset-db.sh) and has no
- * phinxlog, so this is for real databases, and for tests/migrations.sh. A
- * schema change is a migration *and* the same change to db.sql or
- * db/accounts.sql, and that test fails until the two agree.
- *
- * Exits non-zero, and stops before the round, if the accounts' run fails.
- * `status` reports both, and exits non-zero if either has anything pending.
+ * A new database starts from the baseline migration. The fixture is built
+ * from db.sql instead (tests/reset-db.sh) and has no phinxlog, so this is for
+ * real databases, and for tests/migrations.sh. A schema change is a migration
+ * *and* the same change to db.sql, and that test fails until the two agree.
+ * `status` creates phinxlog if it is missing, so it is not read-only.
  */
 
 if (PHP_SAPI !== 'cli') {
@@ -33,34 +29,14 @@ if (!is_file($phinx)) {
 
 $args = array_slice($argv, 1);
 if (!$args) {
-    fwrite(STDERR, "usage: php bin/migrate.php status | migrate [phinx options] | create <Name> round|accounts\n");
+    fwrite(STDERR, "usage: php bin/migrate.php status | migrate | create <Name> [phinx options]\n");
     exit(2);
 }
 
-$targets = array('accounts', 'round');
-if ($args[0] === 'create') {
-    if (count($args) < 3 || !in_array($args[2], $targets, true)) {
-        fwrite(STDERR, "usage: php bin/migrate.php create <Name> round|accounts\n");
-        exit(2);
-    }
-    $targets = array($args[2]);
-    array_splice($args, 2, 1);
+$cmd = escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($phinx);
+foreach ($args as $a) {
+    $cmd .= ' ' . escapeshellarg($a);
 }
-
-// status exits non-zero while anything is pending, which is an answer rather
-// than a failure: it reports both databases and exits with the worse.
-$worst = 0;
-foreach ($targets as $which) {
-    echo "== $which\n";
-    $cmd = escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($phinx);
-    foreach ($args as $a) {
-        $cmd .= ' ' . escapeshellarg($a);
-    }
-    $cmd .= ' -c ' . escapeshellarg("$root/db/phinx/$which.php");
-    passthru($cmd, $status);
-    if ($status !== 0 && $args[0] !== 'status') {
-        exit($status);
-    }
-    $worst = max($worst, $status);
-}
-exit($worst);
+$cmd .= ' -c ' . escapeshellarg("$root/db/phinx.php");
+passthru($cmd, $status);
+exit($status);

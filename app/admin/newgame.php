@@ -26,7 +26,7 @@ echo "<div align=center><b>All settlement forum posts have been deleted from the
 
 // Every kingdom but the administrators', who are player accounts and would
 // otherwise delete themselves -- and lose this page -- by starting a new game.
-// The accounts themselves are kept: they live in the accounts database and
+// The accounts themselves are kept: they live in the `account` table and
 // outlast the round, and a player comes back by signing up again with the
 // same address and password. See include/kingdom.php.
 mb_kingdom_delete_players($db);

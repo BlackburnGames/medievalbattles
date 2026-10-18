@@ -88,7 +88,7 @@ $MB_ADMIN_ACTIONS = array(
 	// Administrators are player accounts, so deleting every account used to
 	// delete the admin running it, who was then locked out of this page.
 	// Accounts are not the round's to delete at all now -- they live in the
-	// accounts database and are kept, so a player whose kingdom went comes back
+	// `account` table and are kept, so a player whose kingdom went comes back
 	// through signup -- and 'first' deletes every kingdom but the admins'.
 	// The other tables are cleared of every row whose kingdom is gone rather
 	// than emptied. That keeps the admins' kingdoms too, mid-game, so 'then'
@@ -222,7 +222,7 @@ echo "<table border=1 width=\"100%\">
 
 // One query, not one per row. The online marker used to be a second SELECT
 // inside the loop, filtered on the empire name it had just fetched.
-// The address is the owner's, from the accounts database: include/kingdoms.php.
+// The address is the owner's, from the `account` table: include/kingdoms.php.
 require_once __DIR__ . '/include/kingdoms.php';
 foreach (mb_admin_kingdoms($db, array('ename', 'email', 'aim', 'msn', 'ip', 'online'), 'ip') as $row) {
 	// Assigned in two statements rather than by a ternary on $row[5]: the marker

@@ -27,7 +27,7 @@
  * account is accepted once and rehashed in place on the way through.
  */
 
-// mb_accounts_db(), for mb_password_store().
+// mb_db(), for mb_password_store().
 require_once __DIR__ . '/accounts.php';
 
 if (!function_exists('mb_password_hash')) {
@@ -121,7 +121,7 @@ if (!function_exists('mb_password_store')) {
      */
     function mb_password_store($account_id, $newHash)
     {
-        mb_query(mb_accounts_db(), "UPDATE account SET pw=? WHERE account_id=?",
+        mb_query(mb_db(), "UPDATE account SET pw=? WHERE account_id=?",
             array((string) $newHash, (int) $account_id));
     }
 }

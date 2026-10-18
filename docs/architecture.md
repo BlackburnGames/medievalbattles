@@ -26,7 +26,7 @@ folder, `include/...` resolves inside it — whose files are thin forwarders to
 
 Its gate is `app/admin/include/auth.php`: an administrator is an account with
 `account.admin` set, logged in through the game's own login. `mb_admin_require()`
-reads the flag from the accounts database on every request, so a revocation or
+reads the flag from the `account` table on every request, so a revocation or
 a session that `session.php` logs out takes the privilege with it. Being logged
 into the game is not being an admin, and the smoke crawl asserts both
 refusals. Flags are granted and revoked with `bin/admin.php`; the world-wipe
@@ -50,14 +50,17 @@ loads the logged-in user's entire state into globals (`$gp`, `$civ`, `$land`,
 
 ## Auth
 
-**Two databases.** The round (`MB_DB_NAME`, `mbv6`, `db.sql`) is the world:
-kingdoms and everything hanging off them. The accounts database beside it
-(`MB_ACCOUNTS_DB_NAME`, `mb_accounts`, `db/accounts.sql`) holds one table,
-`account` — address, public player name, password hash, admin flag, whether
-the address is confirmed — and outlasts the round, so
-nothing that ends a kingdom deletes a login. `app/include/accounts.php` opens
-its connection on first use. The kingdom is linked to its account by `user.account_id`, not by
-address: an address can change, and an ended round keeps the one it had.
+**One database, two halves.** `MB_DB_NAME` (`mbv6` locally, `db.sql`) holds
+the world — kingdoms and everything hanging off them — and beside it the
+`account` table: address, public player name, password hash, admin flag,
+whether the address is confirmed. The account outlasts the round, so nothing
+that ends a kingdom deletes a login. (It had a database of its own,
+`mb_accounts`, while each round was going to be one; with every round in one
+database it moved in.) There is one connection, `mb_db()` in
+`app/include/db.php`; `connect.php`'s `$db` is it, and
+`app/include/accounts.php` reaches it from any scope. The kingdom is linked
+to its account by `user.account_id`, not by address: an address can change,
+and an ended round keeps the one it had.
 See [rounds.md](rounds.md).
 
 The session carries the kingdom's `userid`, and nearly every query filters
@@ -121,14 +124,14 @@ It is HTTP-invokable with no authentication.
 
 ## Schema
 
-`db.sql`: 22 tables, InnoDB and `utf8mb4_unicode_ci` since the move to
+`db.sql`: 22 tables — 21 of the 2003 world and `account` — InnoDB and `utf8mb4_unicode_ci` since the move to
 MySQL 8.4 (MyISAM with no charset declared before it), almost no indexes, types
 nearly all `bigint(255)`/`varchar(255)`. It is **not schema-only** — it seeds
 the `game_info` row and ten empty settlements. `db/seed.sql` adds the
-deterministic test world on top. The accounts database is `db/accounts.sql`
-(one InnoDB table) and `db/accounts-seed.sql`, loaded by
-`docker/db/accounts.sh` on the volume's first boot and by `reset-db.sh` on
-every reset.
+deterministic test world on top, and the fixture's three accounts. Both load
+on the volume's first boot and on every `reset-db.sh`. A real database is
+built by the migrations instead (`db/migrations/`, `bin/migrate.php`), and
+`tests/migrations.sh` holds the two to the same schema.
 
 The app also creates per-settlement tables (`setmain<id>`, `setmsgs<id>`) at
 runtime, which is why the test reset has to drop *all* tables rather than the

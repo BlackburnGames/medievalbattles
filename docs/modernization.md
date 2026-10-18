@@ -69,21 +69,18 @@ Phinx for the migrations, InnoDB for the tables, and one database with a
   and reloaded, and step 3 of rounds.md — a `round_id` on every round table
   — is the first change that has to reach a running one.
 
-  Phinx (`robmorgan/phinx`), with a config per database because Phinx keeps
-  one migrations path per config: `db/phinx/round.php` over
-  `db/migrations/round/`, `db/phinx/accounts.php` over
-  `db/migrations/accounts/`, each on the app's own settings and session
-  mode, each with its own `phinxlog`. `bin/migrate.php` runs a Phinx command
-  against both. The first migration in each is a **baseline**: a frozen copy
-  of the schema file as of 2026-10-18, run a statement at a time, so a fresh
-  install and a live one start from the same point and a later edit to
-  `db.sql` cannot rewrite it.
+  Phinx (`robmorgan/phinx`): `db/phinx.php` over `db/migrations/`, on the
+  app's own settings and session mode, recording what has run in
+  `phinxlog`. `bin/migrate.php` is shorthand for it. The first migration is a
+  **baseline**: a frozen copy of `db.sql` as of 2026-10-18, run a statement
+  at a time, so a fresh install and a live one start from the same point and
+  a later edit to `db.sql` cannot rewrite it.
 
-  **A schema change is a migration and the same edit to `db.sql` or
-  `db/accounts.sql`.** The fixture is still built from the schema files,
-  never migrated, and `tests/migrations.sh` holds the two to account: it
-  builds each database both ways in scratch databases and fails unless they
-  dump identically, and unless a second run changes nothing. `deploy.sh`
+  **A schema change is a migration and the same edit to `db.sql`.** The
+  fixture is still built from `db.sql`, never migrated, and
+  `tests/migrations.sh` holds the two to account: it builds the database
+  both ways in scratch databases and fails unless they dump identically, and
+  unless a second run changes nothing. `deploy.sh`
   runs the migrations on the server from the staged copy before any file
   moves, so a migration must leave the previous commit's code working.
 - ~~**Composer.**~~ **Done: yes**, with Phinx as its first dependency. Every
@@ -526,7 +523,8 @@ attribute.
   "Sessions" below. ~~The hash is still in six places; that is the schema's,
   and it does not reach the browser.~~ **It is in one place now, and the round holds no credential
   at all.** The address, the hash and the admin flag moved to an `account`
-  table in a database of its own, `mb_accounts`, which outlasts a round, and
+  table that outlasts a round (in a database of its own, `mb_accounts`, until
+  every round moved into one database and it followed), and
   `user.account_id` links each kingdom to its account. Then the 386
   `WHERE email=? AND pw=?` filters became `WHERE userid=?` — 365 of them in one
   mechanical pass, since every one ended its parameters with `$email, $pw` —

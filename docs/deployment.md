@@ -82,7 +82,7 @@ PHP's CLI follows it, so Apache's symlink rules never come into it.
 
 ## Configuration
 
-The app reads `MB_DB_HOST`, `MB_DB_NAME`, `MB_ACCOUNTS_DB_NAME`, `MB_DB_USER`,
+The app reads `MB_DB_HOST`, `MB_DB_NAME`, `MB_DB_USER`,
 `MB_DB_PASS` and `MB_REPORT_QUERIES` through `getenv()`. Locally Docker sets
 them. On the host there are two copies, because the web server and cron do not
 share an environment:
@@ -104,7 +104,7 @@ All in `deploy/`, run from the repo root in Git Bash.
   SAPI, whether `SetEnv` reaches `getenv()`, whether `php_flag` is honoured,
   the ini values the app needs (`short_open_tag` above all — about 70 files
   open with `<?`), and, once `~/.mb-env` exists, the MySQL version, its
-  default `sql_mode` and whether the two databases exist. It writes one
+  default `sql_mode` and whether the database exists. It writes one
   randomly named directory into `public_html` and deletes it on exit.
   `MB_PROBE_AUTH=user:pass` once the site is protected.
 
@@ -127,8 +127,10 @@ All in `deploy/`, run from the repo root in Git Bash.
 
 1. ~~Blocker 1: the suite green on MySQL 8.4.~~ Done.
 2. Site Tools > Security > Protected URLs: protect `/`.
-3. Site Tools > Site > MySQL: two databases (round and accounts), one user
-   with all privileges on both.
+3. ~~Site Tools > Site > MySQL: one database and one user with all
+   privileges on it.~~ Done 2026-10-18, both labelled `medievalbattles`
+   (Site Tools generates their names; they go in `MB_DB_NAME` and
+   `MB_DB_USER`).
 4. Install `public_html/.htaccess` and `~/.mb-env` from the templates.
 5. `bash deploy/probe.sh` — check every answer, especially `getenv`,
    `short_open_tag`, `pdo_mysql` and `sql_mode`.

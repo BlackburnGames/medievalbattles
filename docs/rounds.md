@@ -66,8 +66,8 @@ databases it allows, and would make every schema change a loop over live
 rounds.
 
 ```
-mb_accounts          account, round, round_result
-mbv6                 user, military, research, ... — each with round_id
+one database         account, round, round_result,
+                     user, military, research, ... — each with round_id
 ```
 
 **How a request knows its round.** Login chooses the round — the account's
@@ -78,9 +78,11 @@ page asks; none, and the player goes to the round list. The session keeps
 rounds — so the ~390 queries that already say `WHERE userid=?` are
 round-safe as they stand. The tick runs once per running round.
 
-Whether the accounts fold into the round database is still open; with one
-round database there is little reason to keep them apart, but nothing forces
-it, and moving them is a migration either way.
+The accounts share it (decided 2026-10-18). They had a database of their own,
+`mb_accounts`, while each round was going to be one; with one database for
+every round there was nothing left to keep them apart for, and one database
+is one thing to create on the host, one connection and one schema to
+migrate.
 
 What it buys:
 
@@ -105,7 +107,7 @@ What it costs, and the guard:
   the filter in one place rather than at each site, and makes the audit a
   backstop.
 - **An ended round no longer archives as a unit.** Its results are in
-  `mb_accounts.round_result` either way; its raw rows are deleted by
+  `round_result` either way; its raw rows are deleted by
   `round_id` when no longer wanted.
 
 The rejected design, one database per round, is in this file's history
@@ -158,7 +160,7 @@ fingerprint of the account's address and hash:
 ## Administration
 
 - **`account.admin` replaces `user.admin`.** `mb_admin_require()` reads it
-  from `mb_accounts` on every request, as it reads `user.admin` now, so
+  from the `account` table on every request, as it read `user.admin`, so
   revoking still takes effect on the next click. An admin doesn't need a
   kingdom in any round.
 - **The admin area acts on one round at a time**, chosen in the area. Its
@@ -169,7 +171,7 @@ fingerprint of the account's address and hash:
     and `game_info`.
   - `start <round>` and `end <round>` move the status. `end` stops the tick
     (`game_info.tick = 'no'`), writes every kingdom's round result to
-    `mb_accounts`, and marks the round ended. After that, the pages refuse
+    `round_result`, and marks the round ended. After that, the pages refuse
     writes to it.
   - Deleting an ended round's rows is a separate, explicit command. It is
     never a side effect of opening the next round.
@@ -207,11 +209,11 @@ fingerprint of the account's address and hash:
    `app/include/kingdom.php` holds signup's starting rolls and inserts, and
    `mb_kingdom_reset()` returns a kingdom to them. `tests/newgame.php`
    compares each reset kingdom against a twin signed up afterwards.
-2. ~~**Accounts.**~~ **Done.** `mb_accounts` holds the `account` table
-   (`db/accounts.sql`, `app/include/accounts.php`). Login, signup, the
-   session and `mb_admin_require()` use it; `user.admin` is gone, and
-   `bin/accounts-migrate.php` moves an existing world over. There is still
-   exactly one round database.
+2. ~~**Accounts.**~~ **Done.** The `account` table (`db.sql`,
+   `app/include/accounts.php`) — first in a database of its own,
+   `mb_accounts`, and since 2026-10-18 beside the round's tables. Login,
+   signup, the session and `mb_admin_require()` use it; `user.admin` is gone,
+   and `bin/accounts-migrate.php` moves an existing world over.
 
    The golden masters didn't move except where they had to: the tick golden
    was re-accepted with only its `pw` values, the dropped `user.admin` and

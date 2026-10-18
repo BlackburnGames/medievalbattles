@@ -13,10 +13,11 @@
 # PHP version (Site Tools > Devs > PHP Manager writes this line too).
 AddHandler application/x-httpd-php83 .php .php5 .php4 .php3
 
-# Read by app/include/connect.php and app/include/accounts.php.
+# Read by mb_db() (app/include/db.php). The database and user are the ones
+# made in Site Tools > Site > MySQL (labelled "medievalbattles"); their names
+# are generated.
 SetEnv MB_DB_HOST localhost
-SetEnv MB_DB_NAME CHANGEME_round_db
-SetEnv MB_ACCOUNTS_DB_NAME CHANGEME_accounts_db
+SetEnv MB_DB_NAME CHANGEME_database
 SetEnv MB_DB_USER CHANGEME_user
 SetEnv MB_DB_PASS CHANGEME_password
 SetEnv MB_REPORT_QUERIES 1

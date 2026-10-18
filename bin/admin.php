@@ -32,7 +32,7 @@ function mb_admin_cli_ename($db, $account_id)
 }
 
 if ($command === 'list') {
-    $r = mysqli_query(mb_accounts_db(), "SELECT account_id, email FROM account WHERE admin = 1 ORDER BY account_id");
+    $r = mysqli_query(mb_db(), "SELECT account_id, email FROM account WHERE admin = 1 ORDER BY account_id");
     $n = 0;
     while ($row = mysqli_fetch_assoc($r)) {
         echo "{$row['account_id']}\t{$row['email']}\t" . mb_admin_cli_ename($db, $row['account_id']) . "\n";

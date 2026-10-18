@@ -1,7 +1,7 @@
 <?php
 /**
  * Who may use the admin area: a logged-in player whose account is flagged
- * `account.admin`, in the accounts database (include/accounts.php).
+ * `account.admin`, in the `account` table (include/accounts.php).
  *
  * Until Phase 3 nothing gated the area at all -- adminlogin.php compared a
  * hardcoded `mako` / `quickshot` and printed a link, and no page checked
@@ -41,7 +41,7 @@ if (!function_exists('mb_admin_logged_in')) {
             return false;
         }
 
-        // The flag is the account's, in the accounts database, not the
+        // The flag is the account's, in the `account` table, not the
         // kingdom's -- an administrator stays one from round to round.
         $account = mb_account_get($mb_account_id);
 

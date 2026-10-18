@@ -1,3 +1,7 @@
+== account (3 rows) ==
+  account_id=1 | email=tester@example.com | handle=Tester | pw=16d7a4fca7442dda3ad93c9a726597e4 | admin=1 | signup_comp_id=seed | created=2003-01-01 00:00:00 | verified_at=2003-01-01 00:00:00 | verify_code=16d7a4fca7442dda3ad93c9a726597e4
+  account_id=2 | email=idle@example.com | handle=Idler | pw=$2y$10$zwzsLaBoYCYRMC8wR2Df7eJT1lrq6IjnsIHKElvgu9rGzrSxwyoEW | admin=0 | signup_comp_id=seed | created=2003-01-01 00:00:00 | verified_at=2003-01-01 00:00:00 | verify_code=c1572d05424d0ecb2a65ec6a82aeacbf
+  account_id=3 | email=poor@example.com | handle=Pauper | pw=3afc79b597f88a72528e864cf81856d2 | admin=0 | signup_comp_id=seed | created=2003-01-01 00:00:00 | verified_at=2003-01-01 00:00:00 | verify_code=3afc79b597f88a72528e864cf81856d2
 == barter (3 rows) ==
   seller=IdleBaron | type=Recruit | amount=25 | cost=150 | barterid=2 | userid=2 | method=iron | page=guild | guild=Testguild
   seller=PoorSerf | type=Land | amount=10 | cost=2000 | barterid=1 | userid=3 | method=gp | page= | guild=

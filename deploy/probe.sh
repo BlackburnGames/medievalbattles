@@ -72,7 +72,7 @@ echo "== mysql"
 if [ -r "$HOME/.mb-env" ]; then
     set -a; . "$HOME/.mb-env"; set +a
     MYSQL_PWD="$MB_DB_PASS" mysql -h "$MB_DB_HOST" -u "$MB_DB_USER" -N -e \
-        "SELECT CONCAT('version        ', @@version); SELECT CONCAT('sql_mode       ', @@GLOBAL.sql_mode); SELECT CONCAT('database       ', schema_name) FROM information_schema.schemata WHERE schema_name IN ('$MB_DB_NAME', '$MB_ACCOUNTS_DB_NAME');"
+        "SELECT CONCAT('version        ', @@version); SELECT CONCAT('sql_mode       ', @@GLOBAL.sql_mode); SELECT CONCAT('database       ', schema_name) FROM information_schema.schemata WHERE schema_name = '$MB_DB_NAME';"
 else
     echo "(skipped: no ~/.mb-env yet)"
 fi

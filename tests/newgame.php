@@ -15,7 +15,7 @@
  * rolls dice for, which must fall in signup's ranges. A column added later
  * that the reset forgets fails here without this file being touched.
  *
- * The wipes delete kingdoms, not accounts, which live in the accounts database
+ * The wipes delete kingdoms, not accounts, which live in their own table
  * and outlast the round. So it also checks that the player whose kingdom went
  * keeps the account, is told at login that it has no kingdom, and gets a new
  * one by signing up again -- with its own password, and not with another.
@@ -80,10 +80,10 @@ function rowsFor($db, $table, $userid)
 }
 
 /** How many kingdoms the account with this address has: the round holds no address. */
-function kingdomsOf($db, $adb, $email)
+function kingdomsOf($db, $email)
 {
-    $row = mysqli_fetch_row(mysqli_query($adb, "SELECT account_id FROM account WHERE email = '"
-        . mysqli_real_escape_string($adb, $email) . "'"));
+    $row = mysqli_fetch_row(mysqli_query($db, "SELECT account_id FROM account WHERE email = '"
+        . mysqli_real_escape_string($db, $email) . "'"));
     return $row ? countWhere($db, "SELECT count(*) FROM user WHERE account_id = " . (int) $row[0]) : 0;
 }
 
@@ -97,9 +97,9 @@ foreach ($WIPES as $wipe => $form) {
     loadFixture($db);
 
     $ids = implode(',', array_keys($ADMINS));
-    // The flag is the account's, in the accounts database.
+    // The flag is the account's, not the kingdom's.
     foreach ($ADMINS as $a) {
-        mysqli_query($adb, "UPDATE account SET admin = 1 WHERE email = '" . mysqli_real_escape_string($adb, $a['email']) . "'");
+        mysqli_query($db, "UPDATE account SET admin = 1 WHERE email = '" . mysqli_real_escape_string($db, $a['email']) . "'");
     }
     foreach ($ADMINS as $id => $a) {
         mysqli_query($db, "UPDATE user SET class = '" . mysqli_real_escape_string($db, $a['class'])
@@ -125,11 +125,11 @@ foreach ($WIPES as $wipe => $form) {
         fail("$wipe: $d");
     }
 
-    if (kingdomsOf($db, $adb, $NOT_ADMIN) !== 0) {
+    if (kingdomsOf($db, $NOT_ADMIN) !== 0) {
         fail("$wipe: $NOT_ADMIN, not an admin, kept its kingdom");
     }
     // The kingdom, not the account: accounts outlast a round.
-    if (countWhere($adb, "SELECT count(*) FROM account WHERE email = '$NOT_ADMIN'") !== 1) {
+    if (countWhere($db, "SELECT count(*) FROM account WHERE email = '$NOT_ADMIN'") !== 1) {
         fail("$wipe: $NOT_ADMIN's account was deleted with its kingdom");
     }
     if (countWhere($db, "SELECT count(*) FROM barter WHERE userid IN ($ids)") !== 0) {
@@ -218,15 +218,15 @@ foreach ($WIPES as $wipe => $form) {
     $rejoin = array('signup' => 1, 'email' => $NOT_ADMIN, 'cemail' => $NOT_ADMIN, 'pw' => 'wrong', 'cpw' => 'wrong',
         'handle' => 'Ignored On Rejoin', 'ename' => 'Returned Serf', 'race' => 'Giant', 'class' => 'Ranger', 'msn' => '', 'aim' => '');
     $back->post('/checksignup.php', $rejoin);
-    if (kingdomsOf($db, $adb, $NOT_ADMIN) !== 0) {
+    if (kingdomsOf($db, $NOT_ADMIN) !== 0) {
         fail("$wipe: signup gave $NOT_ADMIN's address a kingdom without its password");
     }
     $rejoin['pw'] = $rejoin['cpw'] = 'pass3';
     $back->post('/checksignup.php', $rejoin);
-    if (kingdomsOf($db, $adb, $NOT_ADMIN) !== 1) {
+    if (kingdomsOf($db, $NOT_ADMIN) !== 1) {
         fail("$wipe: $NOT_ADMIN could not sign up again with its own password");
     }
-    if (countWhere($adb, "SELECT count(*) FROM account WHERE email = '$NOT_ADMIN'") !== 1) {
+    if (countWhere($db, "SELECT count(*) FROM account WHERE email = '$NOT_ADMIN'") !== 1) {
         fail("$wipe: signing up again made $NOT_ADMIN a second account");
     }
     $back = new MbClient($BASE);

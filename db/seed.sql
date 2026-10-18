@@ -11,14 +11,13 @@
 --   idle@example.com   / pass2
 --   poor@example.com   / pass3
 --
--- Neither the addresses nor the passwords are in this file. They belong to the
--- accounts, which live in a database of their own -- db/accounts.sql and
--- db/accounts-seed.sql -- because an account outlasts a round and this world
--- does not. Each kingdom names its account by `user.account_id`, and the game
--- finds a kingdom by its userid.
+-- The addresses and the passwords are not on the kingdoms. They belong to the
+-- accounts, at the end of this file, because an account outlasts a round and
+-- this world does not. Each kingdom names its account by `user.account_id`,
+-- and the game finds a kingdom by its userid.
 --
--- Whether an account has confirmed its address is the account's too:
--- db/accounts-seed.sql marks all three verified.
+-- Whether an account has confirmed its address is the account's too: all
+-- three are marked verified below.
 --
 -- User ids are deliberately 1-3. The tick loops from 0 to max(userid) rather
 -- than over the rows that exist, so its cost is driven by the highest id, not
@@ -188,4 +187,31 @@ UPDATE `settlement` SET members = 1, setname = 'Poorhaven' WHERE setid = 2;
 UPDATE `game_info` SET tick = 'no';
 
 -- The primary tester is the admin account. The flag is the account's, not the
--- kingdom's, so it is set in db/accounts-seed.sql.
+-- kingdom's, so it is set on the account, below.
+
+-- The fixture's three accounts, beside the kingdoms above.
+--
+--   tester@example.com / test1234   (an administrator)
+--   idle@example.com   / pass2
+--   poor@example.com   / pass3
+--
+-- Two hash formats on purpose, because there are two live code paths. idle@
+-- carries a bcrypt hash, which is what include/password.php writes now.
+-- tester@ and poor@ keep the unsalted MD5 the game stored until Phase 3, so
+-- every crawl exercises checklogin.php's legacy verify and the rehash that
+-- follows it. Deleting the MD5 rows would delete the only coverage that path
+-- has.
+--
+-- Account ids match the kingdoms' userids only because both were made in the
+-- same order. Nothing relies on it: the link is `user.account_id`, which
+-- this file sets to these ids.
+--
+-- Re-runnable: each load clears its own rows first.
+
+DELETE FROM `account` WHERE account_id IN (1, 2, 3);
+
+-- All three verified, as the round's emailvalidate rows used to say.
+INSERT INTO `account` (account_id, email, handle, pw, admin, signup_comp_id, created, verified_at, verify_code) VALUES
+  (1, 'tester@example.com', 'Tester', '16d7a4fca7442dda3ad93c9a726597e4', 1, 'seed', '2003-01-01 00:00:00', '2003-01-01 00:00:00', '16d7a4fca7442dda3ad93c9a726597e4'),
+  (2, 'idle@example.com',   'Idler',  '$2y$10$zwzsLaBoYCYRMC8wR2Df7eJT1lrq6IjnsIHKElvgu9rGzrSxwyoEW', 0, 'seed', '2003-01-01 00:00:00', '2003-01-01 00:00:00', 'c1572d05424d0ecb2a65ec6a82aeacbf'),
+  (3, 'poor@example.com',   'Pauper', '3afc79b597f88a72528e864cf81856d2', 0, 'seed', '2003-01-01 00:00:00', '2003-01-01 00:00:00', '3afc79b597f88a72528e864cf81856d2');

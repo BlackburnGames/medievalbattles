@@ -31,16 +31,6 @@ if (!$db) {
 require_once __DIR__ . '/../../app/include/db.php';
 mb_db_session($db);
 
-// The accounts database, beside the round: docs/rounds.md. Only loadFixture()
-// uses it; nothing here snapshots it, because no action moves an account.
-$adb = @mysqli_connect($host, $user, $pass,
-    getenv('MB_ACCOUNTS_DB_NAME') ? getenv('MB_ACCOUNTS_DB_NAME') : 'mb_accounts');
-if (!$adb) {
-    fwrite(STDERR, "Cannot connect to the accounts database: " . mysqli_connect_error() . "\n");
-    exit(2);
-}
-mb_db_session($adb);
-
 /*
  * Columns left out of the comparison, all of them wall-clock. `pw` used to be
  * one too, because the login before each scenario rehashed the tester's MD5
@@ -176,11 +166,10 @@ function runScenarios(array $scenarios, $fields = null)
  */
 function loadFixture($db)
 {
-    global $adb;
+    // The accounts with it, being in the same database: an account left over
+    // from a scenario -- a signup, an address change -- would otherwise log
+    // into the next one's kingdoms.
     loadDatabase($db, array(__DIR__ . '/../../db.sql', __DIR__ . '/../../db/seed.sql'));
-    // The accounts too: an account left over from a scenario -- a signup, an
-    // address change -- would otherwise log into the next one's kingdoms.
-    loadDatabase($adb, array(__DIR__ . '/../../db/accounts.sql', __DIR__ . '/../../db/accounts-seed.sql'));
 }
 
 /** Drop every table in a database and load these files into it. */

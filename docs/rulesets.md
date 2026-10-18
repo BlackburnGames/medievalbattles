@@ -152,7 +152,7 @@ Running another ruleset means opening a new round. It is not an admin toggle.
 
 **Accounts are shared across worlds.** This was going to be "accounts belong
 to a world", with one signup per ruleset. [rounds.md](rounds.md) replaces
-that: an account lives in a shared `mb_accounts` database, and each round
+that: an account is its own row, shared by every round, and each round
 holds at most one kingdom of that account. That design is what lets
 a reset stop deleting players.
 

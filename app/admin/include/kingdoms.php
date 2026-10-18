@@ -4,7 +4,7 @@
  * address in place of the account id.
  *
  * The listings used to select `user.email` and let MySQL sort by it. The round
- * holds no address now -- it is the account's, in the accounts database -- so
+ * holds no address now -- it is the account's, in the `account` table -- so
  * the address is filled in from there and the rows are sorted here instead,
  * case-insensitively, as the old ORDER BY's collation did.
  *

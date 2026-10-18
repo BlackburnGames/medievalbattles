@@ -28,14 +28,15 @@ The reference material lives in `docs/`. Read the relevant one before working in
 | [docs/rounds.md](docs/rounds.md) | Touching accounts, signup, login, `newgame.php` or anything that resets the world — permanent accounts are built; rounds themselves are design only |
 | [docs/v7-design-notes.md](docs/v7-design-notes.md) | Reference only — it describes a **different, unbuilt game**. Never answer a question about game behaviour from it. |
 
-Four things load-bearing enough to repeat here:
+The things load-bearing enough to repeat here:
 
 - **`mb_db_result()`'s column-0 fallback is deliberate**, not defensive. Resolving field names strictly returns null across signup, login and the guild code, and has already silently disabled the entire game tick once. Read the trap writeup in [docs/porting-notes.md](docs/porting-notes.md) before changing it.
 - **`tests/known-issues.txt`, `tests/register-globals.txt`, `tests/broken-queries.txt`, `tests/sql-injection.txt`, `tests/sql-injection-stored.txt`, `tests/xss.txt` and `tests/xss-stored.txt` may only ever shrink.** They are ratchets, and the last six double as Phase 3 bug lists. Regenerate with `--accept` on the matching script (`--stored --accept` for the two stored lists). The four injection and output lists are all **empty**, and they stay that way only if new queries bind their values with `mb_query($db, $sql, $params)` — `tests/unbound-queries.txt` is empty too, and fails on any query that builds its SQL out of values — and new output goes through `mb_h()` / `mb_attr()` — including values read back from the database. All four are per-file, so moving a query or an echo into an include away from its source clears the entry without fixing anything, and a value a shared include loads (`$empireguild`, `$ename`) is invisible to them: escape it anyway.
-- **The kingdom is `$userid`, and the round holds no credential.** `app/include/session.php` sets `$userid` (a string, as `functions.php` always produced it — the guild-leader check compares it with `===`) and nearly every query filters `WHERE userid=?`. The address and the password hash live once, on the account, in the separate `mb_accounts` database (`app/include/accounts.php`); a kingdom belongs to its account by `user.account_id`. `$email` is the account's address, for showing and mailing only — never filter on it. `$pw` no longer exists. A password change is one `UPDATE` through `mb_password_store()`, an address change one through `mb_account_set_email()`, and each must call `mb_session_rotate()` or the session that made it is logged out with the others. See [docs/rounds.md](docs/rounds.md).
+- **The kingdom is `$userid`, and the round holds no credential.** `app/include/session.php` sets `$userid` (a string, as `functions.php` always produced it — the guild-leader check compares it with `===`) and nearly every query filters `WHERE userid=?`. The address and the password hash live once, on the account, in the `account` table beside the round's (`app/include/accounts.php`); a kingdom belongs to its account by `user.account_id`. `$email` is the account's address, for showing and mailing only — never filter on it. `$pw` no longer exists. A password change is one `UPDATE` through `mb_password_store()`, an address change one through `mb_account_set_email()`, and each must call `mb_session_rotate()` or the session that made it is logged out with the others. See [docs/rounds.md](docs/rounds.md).
 - **`connect.php` reports query errors as warnings, not exceptions**, and the crawl and the tick both fail on one. Going further to `MYSQLI_REPORT_STRICT` needs the ~1300 call sites to check their return values first. `bash tests/query-audit.sh` regenerates the combined inventory.
 - **`app/include/gamedata.php` is the only place a game value may be written**, and every value carries a `file:line` citation. Change a cited engine line and the citation must change with it.
-- **A schema change is two edits: a Phinx migration and the same change to `db.sql` or `db/accounts.sql`.** The fixture is built from the schema files and never migrated; a real database is built by `bin/migrate.php` from the baselines up. `tests/migrations.sh` fails until the two agree. Never edit a baseline (`db/migrations/*/20261018000000_baseline.*`) — it is history. Migrations run before the new code on deploy, so one must leave the previous commit's code working.
+- **One database, one connection.** The world and the accounts share `MB_DB_NAME`; `mb_db()` (`app/include/db.php`) is the connection, and `connect.php`'s `$db` is it.
+- **A schema change is two edits: a Phinx migration and the same change to `db.sql`.** The fixture is built from `db.sql` and never migrated; a real database is built by `bin/migrate.php` from the baseline up. `tests/migrations.sh` fails until the two agree. Never edit the baseline (`db/migrations/20261018000000_baseline.*`) once a real database has run it — it is history. Migrations run before the new code on deploy, so one must leave the previous commit's code working.
 
 ## Commands
 
@@ -43,13 +44,13 @@ Four things load-bearing enough to repeat here:
 docker compose up -d --build     # start the stack on PHP 8.3; app on http://127.0.0.1:8080
 docker compose logs -f web       # PHP errors always go to stderr, whatever display_errors says
 bash tests/run-all.sh            # full suite (tick + combat golden masters, smoke crawl, audits)
-bash tests/reset-db.sh           # restore the fixture world (both databases: mbv6 and mb_accounts)
+bash tests/reset-db.sh           # restore the fixture world (mbv6, accounts included)
 docker compose exec web composer install -d /repo        # install vendor/ (Phinx) into the mounted repo
-docker compose exec web php /repo/bin/migrate.php status # migrations, both databases (also: migrate, create <Name> round|accounts)
-bash tests/migrations.sh         # db.sql and the migrations build the same databases
+docker compose exec web php /repo/bin/migrate.php status # migrations (also: migrate, create <Name>)
+bash tests/migrations.sh         # db.sql and the migrations build the same database
 ```
 
-The database volume is `dbdata84`; the 5.7 stack's `dbdata` cannot be opened by 8.4 and is no longer used. MySQL runs its init scripts only on an empty volume, so after a schema change run `bash tests/reset-db.sh`. A world from before the accounts database existed is moved over with `docker compose exec web php /repo/bin/accounts-migrate.php`, which keeps its players.
+The database volume is `dbdata84`; the 5.7 stack's `dbdata` cannot be opened by 8.4 and is no longer used. MySQL runs its init scripts only on an empty volume, so after a schema change run `bash tests/reset-db.sh`. A world from before accounts existed is moved over with `docker compose exec web php /repo/bin/accounts-migrate.php`, which keeps its players.
 
 PHP 5.6 is **no longer a per-change gate**. It was the Phase 2 port's proof
 that behaviour did not move, and the shared golden master now does that on
@@ -84,6 +85,6 @@ docker compose exec -w /repo web php update.php
 
 Fixture logins are `tester@example.com` / `test1234` (plus `idle@` / `pass2`, `poor@` / `pass3`).
 
-The admin area is `http://127.0.0.1:8080/admin/`. There is no admin password: an administrator is an account with `account.admin` set (in `mb_accounts`), logged into the game as usual — the fixture's is `tester@`. Grant and revoke from the command line: `docker compose exec web php /repo/bin/admin.php list | grant <email> | revoke <email>`. A new signup is unverified and held at the activation gate; local mail goes nowhere, so confirm it with `bin/admin.php verify <email>`. See `app/admin/include/auth.php`.
+The admin area is `http://127.0.0.1:8080/admin/`. There is no admin password: an administrator is an account with `account.admin` set, logged into the game as usual — the fixture's is `tester@`. Grant and revoke from the command line: `docker compose exec web php /repo/bin/admin.php list | grant <email> | revoke <email>`. A new signup is unverified and held at the activation gate; local mail goes nowhere, so confirm it with `bin/admin.php verify <email>`. See `app/admin/include/auth.php`.
 
 **On Windows, prefix `docker compose exec` with `MSYS_NO_PATHCONV=1`** when passing container paths, or Git Bash rewrites `/repo/...` into a Windows path and the command fails. The scripts in `tests/` already set it.

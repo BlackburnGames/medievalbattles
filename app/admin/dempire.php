@@ -27,7 +27,7 @@ else	{
 	// The empire name is typed into the form, and the address and settlement id
 	// are read back out of the row it names -- so all three reach the DELETEs
 	// below, and the last of them removes the kingdom. Not the account: that
-	// lives in the accounts database and outlasts the round, and its owner can
+	// lives in the `account` table and outlasts the round, and its owner can
 	// sign up again for a new kingdom with the same address and password.
 
 	//SELECTING SETID

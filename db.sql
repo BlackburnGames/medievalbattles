@@ -688,8 +688,8 @@ CREATE TABLE `user` (
   `barterclock` int(3) NOT NULL default '336',
   `current_comp_id` varchar(255) NOT NULL default '',
   `signup_comp_id` varchar(255) NOT NULL default '',
-  -- The account this kingdom belongs to, in the accounts database
-  -- (db/accounts.sql). The round holds no address or password of its own.
+  -- The account this kingdom belongs to (the `account` table, below). The
+  -- round holds no address or password of its own.
   `account_id` int unsigned NOT NULL default '0',
   PRIMARY KEY  (`userid`),
   KEY `account_id` (`account_id`)
@@ -699,4 +699,46 @@ CREATE TABLE `user` (
 # Dumping data for table `user`
 #
 
+# --------------------------------------------------------
 
+#
+# Table structure for table `account`
+#
+-- Who a player is, kept apart from what they played: the one table that
+-- outlasts every round, so that ending one never has to delete a login. See
+-- docs/rounds.md, "The model". It had a database of its own while each round
+-- was going to be one.
+--
+-- An account is linked to its kingdom by `user.account_id`. The round's
+-- tables hold neither the address nor the password: the game finds a kingdom
+-- by its userid, and each of these exists once, here.
+
+CREATE TABLE `account` (
+  `account_id` int unsigned NOT NULL AUTO_INCREMENT,
+  -- mb_valid_email() refuses anything longer than this column.
+  `email` varchar(254) NOT NULL,
+  -- The player's public name, the same in every round. Rankings and round
+  -- history show the kingdom's name, not this (docs/rounds.md). Chosen at
+  -- signup, unique ignoring case, held to the empire-name rule by
+  -- mb_valid_handle(). Never the address, which is private.
+  `handle` varchar(25) NOT NULL,
+  -- bcrypt, or the legacy unsalted MD5 that checklogin.php rehashes on the
+  -- way through. Bound in every query that touches it, never interpolated.
+  `pw` varchar(255) NOT NULL,
+  -- May use app/admin/. Granted from the command line: bin/admin.php.
+  `admin` tinyint(1) NOT NULL DEFAULT 0,
+  -- The browser id index.php issued when the account was made, as the
+  -- round's `user.signup_comp_id` records it for that kingdom.
+  `signup_comp_id` varchar(255) NOT NULL DEFAULT '',
+  `created` datetime NOT NULL,
+  -- When the address was confirmed by following the mailed link; NULL until
+  -- then, and the game's pages refuse an unverified account. It lived in the
+  -- round's `emailvalidate` table, keyed by userid, which meant confirming an
+  -- address once per round and losing the confirmation with the kingdom.
+  `verified_at` datetime NULL DEFAULT NULL,
+  -- The code the link carries: 32 hex characters, compared with hash_equals().
+  `verify_code` varchar(64) NOT NULL DEFAULT '',
+  PRIMARY KEY (`account_id`),
+  UNIQUE KEY `email` (`email`),
+  UNIQUE KEY `handle` (`handle`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -206,11 +206,9 @@ $host = getenv('MB_DB_HOST') ? getenv('MB_DB_HOST') : 'db';
 $dbu  = getenv('MB_DB_USER') ? getenv('MB_DB_USER') : 'mb';
 $dbp  = getenv('MB_DB_PASS') ? getenv('MB_DB_PASS') : 'mb';
 $round    = mysqli_connect($host, $dbu, $dbp, getenv('MB_DB_NAME') ? getenv('MB_DB_NAME') : 'mbv6');
-$accounts = mysqli_connect($host, $dbu, $dbp, getenv('MB_ACCOUNTS_DB_NAME') ? getenv('MB_ACCOUNTS_DB_NAME') : 'mb_accounts');
 mb_db_session($round);
-mb_db_session($accounts);
-$qEmail = "'" . mysqli_real_escape_string($accounts, $EMAIL) . "'";
-$row = mysqli_fetch_assoc(mysqli_query($accounts, "SELECT * FROM account WHERE email = $qEmail"));
+$qEmail = "'" . mysqli_real_escape_string($round, $EMAIL) . "'";
+$row = mysqli_fetch_assoc(mysqli_query($round, "SELECT * FROM account WHERE email = $qEmail"));
 $aid = (int) $row['account_id'];
 $kid = (int) mysqli_fetch_row(mysqli_query($round, "SELECT userid FROM user WHERE account_id = $aid"))[0];
 check('the fixture account has a kingdom', $kid > 0);
@@ -223,20 +221,20 @@ mysqli_query($round, "UPDATE user SET account_id = $aid WHERE userid = $kid");
 
 $s = login();
 check('...a session logged in to begin with', loggedIn($s));
-mysqli_query($accounts, "DELETE FROM account WHERE account_id = $aid");
+mysqli_query($round, "DELETE FROM account WHERE account_id = $aid");
 check('a session whose account is gone is ended', !loggedIn($s));
-mysqli_query($accounts, "INSERT INTO account (account_id, email, pw, admin, signup_comp_id, created) VALUES ("
-    . "$aid, $qEmail, '" . mysqli_real_escape_string($accounts, $row['pw']) . "', "
-    . (int) $row['admin'] . ", '" . mysqli_real_escape_string($accounts, $row['signup_comp_id']) . "', '{$row['created']}')");
+mysqli_query($round, "INSERT INTO account (account_id, email, pw, admin, signup_comp_id, created) VALUES ("
+    . "$aid, $qEmail, '" . mysqli_real_escape_string($round, $row['pw']) . "', "
+    . (int) $row['admin'] . ", '" . mysqli_real_escape_string($round, $row['signup_comp_id']) . "', '{$row['created']}')");
 
 // The address is part of the fingerprint, so a change made from another
 // session -- here, straight to the row -- ends this one, as a password
 // change does.
 $s = login();
 check('...a session logged in to begin with', loggedIn($s));
-mysqli_query($accounts, "UPDATE account SET email = 'moved@example.com' WHERE account_id = $aid");
+mysqli_query($round, "UPDATE account SET email = 'moved@example.com' WHERE account_id = $aid");
 check('a session whose account moved to another address is ended', !loggedIn($s));
-mysqli_query($accounts, "UPDATE account SET email = $qEmail WHERE account_id = $aid");
+mysqli_query($round, "UPDATE account SET email = $qEmail WHERE account_id = $aid");
 
 /** Replace an integer value in a session file, keeping PHP's serialization valid. */
 function setIntInSession($sid, $name, $value)

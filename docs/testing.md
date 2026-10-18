@@ -428,15 +428,15 @@ resets the database before it.
 
 ### `tests/migrations.sh`
 
-The fixture is built from `db.sql` and `db/accounts.sql`; a real database is
-built by the migrations in `db/migrations/` (`bin/migrate.php`). This builds
-each of the two databases both ways, in scratch databases beside the fixture
+The fixture is built from `db.sql`; a real database is built by the
+migrations in `db/migrations/` (`bin/migrate.php`). This builds the database
+both ways, in scratch databases beside the fixture
 (`mbmig_*`, dropped afterwards), dumps them with `tests/schema-dump.php` —
 every `CREATE TABLE` without its `AUTO_INCREMENT` counter, and every row,
 sorted — and fails on any difference. Then it runs the migrations again,
 which must change nothing. `phinxlog` is the one table it ignores.
 
-So a schema change is two edits, a migration and the schema file, and this
+So a schema change is two edits, a migration and `db.sql`, and this
 fails until they agree. Changing a `varchar(255)` to `varchar(254)` in
 `db.sql` alone fails it, on both runs.
 
@@ -481,10 +481,11 @@ restarts the container twice; run it by hand after touching request handling.
   whole database. It must drop *all*
   tables, not just the 22 in `db.sql`, because the app creates per-settlement
   tables (`setmain<id>`, `setmsgs<id>`) at runtime.
-- **There are two databases, and both are reset.** `reset-db.sh` and the
-  golden harness's `loadFixture()` reload the accounts database alongside the
-  round. An account left over from an earlier run — a signup, a moved address
-  — would otherwise log into the next run's kingdoms.
+- **The accounts are reset with the world.** They share its database, so
+  `reset-db.sh` and the golden harness's `loadFixture()` reload them with
+  everything else. An account left over from an earlier run — a signup, a
+  moved address — would otherwise log into the next run's kingdoms. The tick
+  golden dumps them too, which pins that a tick leaves every account alone.
 - **Fixture user ids are deliberately 1–3**: the tick loops from 0 to
   `max(userid)` rather than over existing rows, so high ids make every run
   crawl.
@@ -607,7 +608,7 @@ the resource raid behind it with none, and its news assertion fails.
 untidiness.** `idle@` is bcrypt — what `app/include/password.php` writes now —
 while `tester@` and `poor@` keep the unsalted MD5 the game stored until Phase 3,
 so every run drives both arms of `mb_password_verify()` *and* the rehash that
-follows a legacy login. The hashes are in `db/accounts-seed.sql`, because the
+follows a legacy login. The hashes are on the accounts in `db/seed.sql`, because the
 password is the account's; the round holds no credential at all, so the
 rehash moves no round row and the tick golden master is the same on every
 run. Deleting the MD5 rows would delete the only coverage that path

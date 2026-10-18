@@ -5,8 +5,7 @@
 #           ssh siteground-mb 'chmod 600 ~/.mb-env'
 # then edit the values to match public_html/.htaccess.
 MB_DB_HOST=localhost
-MB_DB_NAME=CHANGEME_round_db
-MB_ACCOUNTS_DB_NAME=CHANGEME_accounts_db
+MB_DB_NAME=CHANGEME_database
 MB_DB_USER=CHANGEME_user
 MB_DB_PASS=CHANGEME_password
 MB_REPORT_QUERIES=1

@@ -219,3 +219,46 @@ if (!function_exists('mb_db_session')) {
         mysqli_query($link, "SET SESSION sql_mode = 'NO_ENGINE_SUBSTITUTION'");
     }
 }
+
+if (!function_exists('mb_db')) {
+    /**
+     * The database connection, opened once per request.
+     *
+     * One database holds everything -- the round's tables and the accounts
+     * beside them (docs/rounds.md, "Where a round lives") -- so there is one
+     * connection, and connect.php's $db is this. Code that is not at page
+     * scope, where $db is not in reach, asks for it here: the accounts in
+     * include/accounts.php, and the session check before connect.php is
+     * loaded.
+     *
+     * A failure stops the request with a 500: a page that cannot reach the
+     * database cannot tell who is asking, and must not carry on as though
+     * nobody is.
+     *
+     * @return mysqli
+     */
+    function mb_db()
+    {
+        static $link = null;
+        if ($link instanceof mysqli) {
+            return $link;
+        }
+
+        $name = getenv('MB_DB_NAME') ? getenv('MB_DB_NAME') : 'mbv6';
+        $host = getenv('MB_DB_HOST') ? getenv('MB_DB_HOST') : '127.0.0.1';
+        $user = getenv('MB_DB_USER') ? getenv('MB_DB_USER') : 'mb';
+        $pass = getenv('MB_DB_PASS') ? getenv('MB_DB_PASS') : 'mb';
+
+        $link = @mysqli_connect($host, $user, $pass, $name);
+        if (!$link) {
+            if (!headers_sent()) {
+                header('Content-Type: text/plain', true, 500);
+            }
+            echo "Error: Unable to connect to database.\n";
+            echo mysqli_connect_error() . "\n";
+            exit;
+        }
+        mb_db_session($link);
+        return $link;
+    }
+}

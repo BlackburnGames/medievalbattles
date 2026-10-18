@@ -41,7 +41,7 @@ else	{
 	}
 
 
-	// The address is the owner's, from the accounts database.
+	// The address is the owner's, from the `account` table.
 	$evu_acct = $evu ? mb_account_get($evu['account_id']) : null;
 	$evu_email = $evu_acct ? $evu_acct['email'] : '';
 

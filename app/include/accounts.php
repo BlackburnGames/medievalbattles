@@ -1,62 +1,24 @@
 <?php
 /**
- * Accounts: who a player is, kept in a database of its own.
+ * Accounts: who a player is, in the `account` table beside the round's.
  *
  * One `user` row used to be both who you are -- the address, the password
  * hash, the admin flag -- and what you played this round. So a round could not
  * end without deleting the login along with the kingdom, and that is what both
- * world wipes did. docs/rounds.md splits the two, and this is the first half:
- * the account lives in the accounts database (db/accounts.sql), beside the
- * round, and outlasts it.
+ * world wipes did. docs/rounds.md splits the two: the account is its own row,
+ * which outlasts the round. (It had a database of its own while each round
+ * was going to be one; with every round in one database, it shares it.)
  *
  * The round is linked to the account by `user.account_id`, and holds neither
  * the address nor the password: an address can change, and an ended round
  * would keep whichever it had. The game finds a kingdom by its userid, and the
  * address and the password each exist in exactly one row, here.
  *
- * The connection is opened on first use rather than with connect.php's, since
- * most requests that need it are logged in and the session check asks for it
- * once; the pages that never touch an account never connect.
+ * Its queries run on mb_db(), the one connection, which these functions reach
+ * from any scope -- the session check calls them before connect.php is loaded.
  */
 
 require_once __DIR__ . '/db.php';
-
-if (!function_exists('mb_accounts_db')) {
-    /**
-     * The accounts database's connection, opened once per request.
-     *
-     * The same server and user as the round's, and a different database:
-     * MB_ACCOUNTS_DB_NAME, as MB_DB_NAME names the round. A failure stops the
-     * request the way connect.php's does, since a page that cannot tell who
-     * is asking cannot safely carry on as though nobody is.
-     *
-     * @return mysqli
-     */
-    function mb_accounts_db()
-    {
-        static $adb = null;
-        if ($adb instanceof mysqli) {
-            return $adb;
-        }
-
-        $name = getenv('MB_ACCOUNTS_DB_NAME') ? getenv('MB_ACCOUNTS_DB_NAME') : 'mb_accounts';
-        $host = getenv('MB_DB_HOST') ? getenv('MB_DB_HOST') : '127.0.0.1';
-        $user = getenv('MB_DB_USER') ? getenv('MB_DB_USER') : 'mb';
-        $pass = getenv('MB_DB_PASS') ? getenv('MB_DB_PASS') : 'mb';
-
-        $adb = @mysqli_connect($host, $user, $pass, $name);
-        if (!$adb) {
-            if (!headers_sent()) {
-                header('Content-Type: text/plain', true, 500);
-            }
-            echo "Error: Unable to connect to the accounts database.\n";
-            echo mysqli_connect_error() . "\n";
-            exit;
-        }
-        mb_db_session($adb);
-        return $adb;
-    }
-}
 
 if (!function_exists('mb_account_find')) {
     /**
@@ -66,7 +28,7 @@ if (!function_exists('mb_account_find')) {
      */
     function mb_account_find($email)
     {
-        $r = mb_query(mb_accounts_db(),
+        $r = mb_query(mb_db(),
             "SELECT account_id, email, handle, pw, admin, verified_at, verify_code, created FROM account WHERE email=?", array((string) $email));
         $row = $r ? mysqli_fetch_assoc($r) : null;
         return $row ? $row : null;
@@ -81,7 +43,7 @@ if (!function_exists('mb_account_get')) {
      */
     function mb_account_get($account_id)
     {
-        $r = mb_query(mb_accounts_db(),
+        $r = mb_query(mb_db(),
             "SELECT account_id, email, handle, pw, admin, verified_at, verify_code, created FROM account WHERE account_id=?", array((int) $account_id));
         $row = $r ? mysqli_fetch_assoc($r) : null;
         return $row ? $row : null;
@@ -104,7 +66,7 @@ if (!function_exists('mb_account_emails')) {
         }
         $marks = implode(',', array_fill(0, count($ids), '?'));
         $emails = array();
-        $r = mb_query(mb_accounts_db(), "SELECT account_id, email FROM account WHERE account_id IN ($marks)", $ids); // mb-unbound-ok: one placeholder per id
+        $r = mb_query(mb_db(), "SELECT account_id, email FROM account WHERE account_id IN ($marks)", $ids); // mb-unbound-ok: one placeholder per id
         while ($r && ($row = mysqli_fetch_row($r))) {
             $emails[(int) $row[0]] = $row[1];
         }
@@ -116,7 +78,7 @@ if (!function_exists('mb_account_handle_taken')) {
     /** Whether another account already has this public name, ignoring case. */
     function mb_account_handle_taken($handle)
     {
-        $r = mb_query(mb_accounts_db(), "SELECT 1 FROM account WHERE handle=?", array((string) $handle));
+        $r = mb_query(mb_db(), "SELECT 1 FROM account WHERE handle=?", array((string) $handle));
         return $r && mysqli_fetch_row($r);
     }
 }
@@ -131,7 +93,7 @@ if (!function_exists('mb_account_create')) {
      */
     function mb_account_create($email, $handle, $hash, $computer_id)
     {
-        $adb = mb_accounts_db();
+        $adb = mb_db();
         mb_query($adb, "INSERT INTO account (email, handle, pw, signup_comp_id, created, verify_code) VALUES (?, ?, ?, ?, NOW(), ?)",
             array((string) $email, (string) $handle, (string) $hash, (string) $computer_id, bin2hex(random_bytes(16))));
         return (int) mysqli_insert_id($adb);
@@ -168,7 +130,7 @@ if (!function_exists('mb_account_verify')) {
             || !hash_equals($account['verify_code'], $code)) {
             return false;
         }
-        mb_query(mb_accounts_db(), "UPDATE account SET verified_at=NOW() WHERE account_id=? AND verified_at IS NULL",
+        mb_query(mb_db(), "UPDATE account SET verified_at=NOW() WHERE account_id=? AND verified_at IS NULL",
             array((int) $account_id));
         return true;
     }
@@ -178,7 +140,7 @@ if (!function_exists('mb_account_mark_verified')) {
     /** Verify an account by hand, for bin/admin.php -- local mail goes nowhere. */
     function mb_account_mark_verified($account_id)
     {
-        mb_query(mb_accounts_db(), "UPDATE account SET verified_at=NOW() WHERE account_id=? AND verified_at IS NULL",
+        mb_query(mb_db(), "UPDATE account SET verified_at=NOW() WHERE account_id=? AND verified_at IS NULL",
             array((int) $account_id));
     }
 }
@@ -186,7 +148,7 @@ if (!function_exists('mb_account_mark_verified')) {
 if (!function_exists('mb_account_set_email')) {
     function mb_account_set_email($account_id, $email)
     {
-        mb_query(mb_accounts_db(), "UPDATE account SET email=? WHERE account_id=?",
+        mb_query(mb_db(), "UPDATE account SET email=? WHERE account_id=?",
             array((string) $email, (int) $account_id));
     }
 }
@@ -194,7 +156,7 @@ if (!function_exists('mb_account_set_email')) {
 if (!function_exists('mb_account_set_admin')) {
     function mb_account_set_admin($account_id, $admin)
     {
-        mb_query(mb_accounts_db(), "UPDATE account SET admin=? WHERE account_id=?",
+        mb_query(mb_db(), "UPDATE account SET admin=? WHERE account_id=?",
             array($admin ? 1 : 0, (int) $account_id));
     }
 }
@@ -206,7 +168,7 @@ if (!function_exists('mb_account_delete')) {
      */
     function mb_account_delete($account_id)
     {
-        mb_query(mb_accounts_db(), "DELETE FROM account WHERE account_id=?", array((int) $account_id));
+        mb_query(mb_db(), "DELETE FROM account WHERE account_id=?", array((int) $account_id));
     }
 }
 
@@ -220,7 +182,7 @@ if (!function_exists('mb_account_admin_ids')) {
     function mb_account_admin_ids()
     {
         $ids = array();
-        $r = mb_query(mb_accounts_db(), "SELECT account_id FROM account WHERE admin <> 0 ORDER BY account_id");
+        $r = mb_query(mb_db(), "SELECT account_id FROM account WHERE admin <> 0 ORDER BY account_id");
         while ($r && ($row = mysqli_fetch_row($r))) {
             $ids[] = (int) $row[0];
         }
