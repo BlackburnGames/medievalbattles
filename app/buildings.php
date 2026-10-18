@@ -113,12 +113,12 @@ if(!IsSet($update)) {
   elseif($Ihrs > 20)  { $Ihrs = ((20 / $adv_constr) * $constr_mod); }
 
 If($Hhrs > 20)  { $Hhrs = ((20 / $adv_constr) * $constr_mod);  }
-If($Bhrs > 20)  { $Bhrs = ((20 / $adv_const) * $constr_mod);   }
-If($Fhrs > 20)  { $Fhrs = ((20 / $adv_const) * $constr_mod);    }
-If($Whrs > 20)   {  $Whrs = ((20 / $adv_const) * $constr_mod);  }
-If($Lhrs > 20)  { $Lhrs = ((20 / $adv_const) * $constr_mod);   }
-If($Ghrs > 20)  { $Ghrs = ((20 / $adv_const) * $constr_mod);   }
-If($Ihrs > 20)  { $Ihrs = ((20 / $adv_const) * $constr_mod);   }
+If($Bhrs > 20)  { $Bhrs = ((20 / $adv_constr) * $constr_mod);   }
+If($Fhrs > 20)  { $Fhrs = ((20 / $adv_constr) * $constr_mod);    }
+If($Whrs > 20)   {  $Whrs = ((20 / $adv_constr) * $constr_mod);  }
+If($Lhrs > 20)  { $Lhrs = ((20 / $adv_constr) * $constr_mod);   }
+If($Ghrs > 20)  { $Ghrs = ((20 / $adv_constr) * $constr_mod);   }
+If($Ihrs > 20)  { $Ihrs = ((20 / $adv_constr) * $constr_mod);   }
 
   mysqli_query($db, "UPDATE buildings SET Hhrs ='$Hhrs' WHERE email='$email' AND pw='$pw'");
   mysqli_query($db, "UPDATE buildings SET Bhrs ='$Bhrs' WHERE email='$email' AND pw='$pw'");
