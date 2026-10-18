@@ -342,7 +342,7 @@ This email is automated. Your reply will not be recieved.";
   // Not the sages you hold: military.scientists is the unit's pre-rename
   // column and nothing writes it, so only sages assigned to the first fourteen
   // projects score. See docs/modernization.md.
-  $scientist_exp = (($mil['scientists'] + $res['r1'] + $res['r2'] + $res['r3'] + $res['r4'] + $res['r5'] + $res['r6'] + $res['r7'] + $res['r8'] + $res['r9'] + $res['r10'] + $res['r11'] + $res['r12'] + $res['r13'] + $res['r14'] + $res['r15'] + $res['r16'] + $res['r17'] + $res['r18']) * $XP['Sage']);
+  $sage_exp = (($mil['sages'] + $res['r1'] + $res['r2'] + $res['r3'] + $res['r4'] + $res['r5'] + $res['r6'] + $res['r7'] + $res['r8'] + $res['r9'] + $res['r10'] + $res['r11'] + $res['r12'] + $res['r13'] + $res['r14'] + $res['r15'] + $res['r16'] + $res['r17'] + $res['r18']) * $XP['Sage']);
   $explorer_exp = (($mil['explorers'] + $explore['expland'] + $explore['expmt']) * 10);
   $thief_exp = $mil['thieves'] * 10;
   $land_exp = $user['land'] * $XP['Land'];
@@ -353,7 +353,7 @@ This email is automated. Your reply will not be recieved.";
   $golem_exp = $mil['golem'] * 30;
   $irongolem_exp = $mil['irongolem'] * 35;
 
-  $xprc_units = $warrior_exp + $wizard_exp + $priest_exp + $archer_exp + $thief_exp + $explorer_exp + $dog_exp + $scientist_exp + $land_exp + $mountain_exp + $suicide_exp + $catapult_exp + $recruits_exp + $golem_exp + $irongolem_exp;
+  $xprc_units = $warrior_exp + $wizard_exp + $priest_exp + $archer_exp + $thief_exp + $explorer_exp + $dog_exp + $sage_exp + $land_exp + $mountain_exp + $suicide_exp + $catapult_exp + $recruits_exp + $golem_exp + $irongolem_exp;
 
   //  calculate all weapons
   if($mil['warriorwep'] == 0) { $warrior_weapon = 0;  } // dagger

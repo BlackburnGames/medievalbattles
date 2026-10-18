@@ -478,6 +478,17 @@ attribute.
   divided by null: on 8.3 a blank page with the gold already spent and the
   timer never written, on 5.6 a timer of 0, which the tick never builds.
 
+  **`$GAMEDATA['quirks']` is empty.** The last five went the way the combat
+  quirks did, each pinned by a golden scenario before it was fixed. Two
+  decisions are worth keeping: the explore page's Angel and Demon rates were
+  taken as the design and the tick applies them, and the Scepter of Zakarum's
+  power is the 6 the 2003 manual listed. Fixing them turned up more that had
+  never been recorded — mountains explored at the land price, a tick that
+  divided by zero for any empire under 23 land, sages on Animation who could
+  never be recalled, and held sages scoring nothing — and those are fixed too.
+  The tick golden master was re-accepted twice for it, for the score and
+  nothing else.
+
   **The order forms did not work on 8.3, and pinning construction is how that
   came out.** `tests/actions-golden.php` is the combat harness pointed at
   build orders, written so the Advanced Construction quirk could be fixed
@@ -816,15 +827,15 @@ attribute.
   claim this work exists to replace with a check, so they wait for a fixture
   that holds them, which means re-accepting the golden on purpose.
 
-  Inverting the Sage weight surfaced a disagreement, recorded here rather than
-  as a quirk. The manual says a sage is worth 10 points, and the tester holds
-  eight, but the score never counts the sages you hold: it reads
-  `military.scientists`, the unit's pre-rename column, which nothing writes —
-  the same orphan the barter's Scientist landed in, below — plus the sages
-  *assigned* to the first fourteen projects. Of the tester's 5,880 points, 50
-  are sages, from the five on Fireball; the eight in reserve score nothing, and
-  the two on Advanced Farming score nothing either, which is the existing quirk.
-  Nothing here changed that.
+  Inverting the Sage weight surfaced a disagreement, and it is fixed now. The
+  manual says a sage is worth 10 points, and the tester holds eight, but the
+  score never counted the sages you hold: it read `military.scientists`, the
+  unit's pre-rename column, which nothing writes — the same orphan the barter's
+  Scientist landed in, below — plus the sages *assigned* to the first fourteen
+  projects. Of the tester's 5,880 points, 50 were sages, from the five on
+  Fireball; the eight in reserve and the two on Advanced Farming scored
+  nothing. The score counts the sages held and those on all eighteen projects
+  now, and the tester's 5,980 includes all fifteen.
 
   **Of the race and class modifiers, two are definitions: the Demon's gold and
   iron deltas.** Lowering either from 0.5 to 0.45 fails the run — the idle

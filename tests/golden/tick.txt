@@ -19,7 +19,7 @@
 == game_info (1 row) ==
   lastset=0 | tick=no | last_comp_id=998
 == guild (1 row) ==
-  gname=Testguild | cpw= | strength=10375 | gid=1 | datemade=<CLOCK> | info=A guild used by the test fixtures. | flag= | owner=1 | mem=2 | notice=None
+  gname=Testguild | cpw= | strength=10455 | gid=1 | datemade=<CLOCK> | info=A guild used by the test fixtures. | flag= | owner=1 | mem=2 | notice=None
 == guildmsgs (1 row) ==
   messageid=1 | name=IdleBaron | host=localhost | topic=Guild orders | topicid=1 | message=Understood. | datestamp=<VOLATILE>
 == guildnews (0 rows) ==
@@ -58,8 +58,8 @@
   members=0 | setname=None | setpic= | setnotice=Welcome to Medieval Battles | setid=9 | setstrength=0
   members=0 | setname=None | setpic= | setnotice=Welcome to Medieval Battles | setid=10 | setstrength=0
   members=1 | setname=Poorhaven | setpic= | setnotice=Welcome to Medieval Battles | setid=2 | setstrength=3130
-  members=2 | setname=Testhold | setpic= | setnotice=Welcome to Medieval Battles | setid=1 | setstrength=10375
+  members=2 | setname=Testhold | setpic= | setnotice=Welcome to Medieval Battles | setid=1 | setstrength=10455
 == user (3 rows) ==
   email=idle@example.com | pw=$2y$10$zwzsLaBoYCYRMC8wR2Df7eJT1lrq6IjnsIHKElvgu9rGzrSxwyoEW | ename=IdleBaron | race=Demon | class=Cleric | gp=142500 | iron=6322 | lumber=3100 | exp=4475 | food=1525 | land=250 | mts=200 | setid=1 | csnum=1 | userid=2 | online=0 | sl=no | vote=0 | votefor=None | exp2=0 | aim= | mno=0 | nno=0 | fleets=4 | msn= | ip= | lastlog=<VOLATILE> | safemode=0 | lastlogin=<VOLATILE> | countdown=1 | guild=Testguild | barterclock=0 | current_comp_id= | signup_comp_id=seed
   email=poor@example.com | pw=3afc79b597f88a72528e864cf81856d2 | ename=PoorSerf | race=Giant | class=Ranger | gp=300 | iron=2 | lumber=0 | exp=3130 | food=1 | land=103 | mts=102 | setid=2 | csnum=2 | userid=3 | online=0 | sl= | vote=0 | votefor=None | exp2=0 | aim= | mno=0 | nno=0 | fleets=4 | msn= | ip= | lastlog=<VOLATILE> | safemode=0 | lastlogin=<VOLATILE> | countdown=335 | guild=None | barterclock=335 | current_comp_id= | signup_comp_id=seed
-  email=tester@example.com | pw=16d7a4fca7442dda3ad93c9a726597e4 | ename=TestLord | race=Human | class=Warrior | gp=315000 | iron=5097 | lumber=4000 | exp=5900 | food=1525 | land=250 | mts=200 | setid=1 | csnum=1 | userid=1 | online=0 | sl=yes | vote=0 | votefor=None | exp2=0 | aim= | mno=0 | nno=0 | fleets=3 | msn= | ip= | lastlog=<VOLATILE> | safemode=0 | lastlogin=<VOLATILE> | countdown=335 | guild=Testguild | barterclock=0 | current_comp_id= | signup_comp_id=seed
+  email=tester@example.com | pw=16d7a4fca7442dda3ad93c9a726597e4 | ename=TestLord | race=Human | class=Warrior | gp=315000 | iron=5097 | lumber=4000 | exp=5980 | food=1525 | land=250 | mts=200 | setid=1 | csnum=1 | userid=1 | online=0 | sl=yes | vote=0 | votefor=None | exp2=0 | aim= | mno=0 | nno=0 | fleets=3 | msn= | ip= | lastlog=<VOLATILE> | safemode=0 | lastlogin=<VOLATILE> | countdown=335 | guild=Testguild | barterclock=0 | current_comp_id= | signup_comp_id=seed
