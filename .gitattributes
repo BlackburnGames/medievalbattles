@@ -1,3 +1,9 @@
+# LF everywhere, on every platform. Git for Windows ships core.autocrlf=true,
+# which checked most files out as CRLF while every edit wrote LF -- a working
+# tree of both, and an "LF will be replaced by CRLF" warning on each commit.
+# The code runs in a Linux container, so LF is the only ending it ever sees.
+* text=auto eol=lf
+
 # The dev stack runs in Linux containers and the helper scripts run under bash.
 # Without this, a clone on Windows gets CRLF and the shell scripts fail with
 # "\r: command not found", while Docker build files break more obscurely.
