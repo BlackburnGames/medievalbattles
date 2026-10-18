@@ -49,10 +49,11 @@ A `dbdata` volume made before the accounts database existed has no `mb_accounts`
 
 PHP 5.6 is **no longer a per-change gate**. It was the Phase 2 port's proof
 that behaviour did not move, and the shared golden master now does that on
-8.3 alone. The image stays buildable for one question — was this bug there in
-2003, or did the port introduce it? — and is to be frozen at a tagged commit
-the first time Phase 3 needs syntax 5.6 cannot parse. Until then new code need
-not avoid it, but say so in the commit when it does:
+8.3 alone. It is **frozen at the tag `php5.6-freeze`** (`03b9158`), the last
+commit that runs on 5.6 — the full suite passes there on 5.6.40 — because the
+next one calls `random_bytes()`. `main` no longer runs on 5.6 and new code need
+not try. The tag stays buildable for one question — was this bug there in
+2003, or did the port introduce it? Check it out in a separate worktree and:
 
 ```bash
 docker compose build --build-arg PHP_VERSION=5.6-apache web && docker compose up -d web
