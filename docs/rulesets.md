@@ -121,22 +121,23 @@ from the v7 design change behaviour, so they're flags in
 
 ## Which ruleset a world runs
 
-**A world is a database** — or was; [rounds.md](rounds.md), "Where a round
-lives", reopens it, because the host cannot create a database from a script.
-`MB_DB_NAME` already chooses one, and every query in the codebase already goes
-through the one connection `connect.php` opens, so a second world as a second
-database needs no `world_id` in any query. The alternative is a `round_id`
-filter on the round-wide queries, which rounds.md weighs. Either way the
-ruleset is recorded with the round, as below.
+**A world is a round**, and every round shares one database with a
+`round_id` ([rounds.md](rounds.md), "Where a round lives" — decided
+2026-10-18, because the host cannot create a database from a script). An
+earlier draft of this section made each world its own database, so that
+`world_id` never reached a query; the host ruled that out.
 
-**The world's database records its ruleset**, in a new `game_info.ruleset`
-column, not in the environment. The pages and the tick have to agree, and a
-deploy typo must not be able to boot a classic world under modern rules. Since
-the database holds the world, it says what the world is.
+**The world records its ruleset**, in a new `game_info.ruleset` column, not
+in the environment. `game_info` is per-round — it gains a `round_id` like
+every other round table — so the column is the round's ruleset. The pages and
+the tick have to agree, and a deploy typo must not be able to boot a classic
+world under modern rules. Since the round's rows hold the world, they say
+what the world is.
 
 That changes the load order. `connect.php` requires `gamedata.php` *before* it
 connects today, because `$GAMEDATA` doesn't depend on anything. The loader has
-to run after the connection opens, read `game_info.ruleset`, and only then
+to run after the connection opens and the round is known, read
+`game_info.ruleset`, and only then
 build `$GAMEDATA`. Everything that reads `$GAMEDATA` already includes
 `connect.php`, so the readers don't change.
 
@@ -147,13 +148,12 @@ under the wrong rules can't be undone.
 
 **A world's ruleset is fixed for the length of a round.** Changing it
 mid-round changes the rules under players who planned for the old ones.
-Running another ruleset means opening a new round, which creates a new world
-database. It is not an admin toggle.
+Running another ruleset means opening a new round. It is not an admin toggle.
 
 **Accounts are shared across worlds.** This was going to be "accounts belong
 to a world", with one signup per ruleset. [rounds.md](rounds.md) replaces
-that: an account lives in a shared `mb_accounts` database, and each world
-database holds that account's kingdom for one round. That design is what lets
+that: an account lives in a shared `mb_accounts` database, and each round
+holds at most one kingdom of that account. That design is what lets
 a reset stop deleting players.
 
 ## Testing

@@ -25,9 +25,10 @@ the one that can quietly break the game.
      2026-10-18), but an alias or table name in a query would break unquoted.
      `check` has already bitten once on 5.7 (activation; see
      modernization.md).
-   - **MyISAM.** Every table in `db.sql` is `ENGINE=MyISAM`. 8.4 still has
-     it, but loading the schema on the host is the first real check that
-     SiteGround allows it.
+   - **MyISAM.** Every table in `db.sql` is `ENGINE=MyISAM`. They move to
+     InnoDB with the 8.4 work (modernization.md), which settles whether
+     SiteGround allows MyISAM by not needing it — but makes row order
+     without an `ORDER BY` a thing the goldens can catch.
    - **Removed features**: `utf8` now means `utf8mb3` and warns, the old
      `PASSWORD()`, implicit `GROUP BY` sorting, integer display widths, and
      the query cache.

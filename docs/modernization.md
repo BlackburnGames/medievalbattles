@@ -37,9 +37,12 @@ emptied down to the one disabled block that remains.
 
 ## Phase 3 — the structural and security rewrite
 
-In progress. The known work, in no committed order:
+In progress. The known work, in no committed order beyond the first two —
+MySQL 8.4, then schema migrations (decided 2026-10-18, with Composer and
+Phinx for the migrations, InnoDB for the tables, and one database with a
+`round_id` for rounds, [rounds.md](rounds.md)):
 
-- **MySQL 8.4 — critical, and a gate on deploying anywhere.** The host
+- **MySQL 8.4 — critical, a gate on deploying anywhere, and first.** The host
   ([deployment.md](deployment.md)) runs MySQL 8.4; the local stack and so
   every golden master, crawl and audit run on 5.7. Nothing yet shows the
   code works on the server it is going to. The work: move the `db` service
@@ -48,37 +51,45 @@ In progress. The known work, in no committed order:
   default is strict), create the databases as `utf8mb4_unicode_ci`, and run
   the suite. Whatever it finds is a Phase 3 bug. The specific risks are
   listed under Blockers in deployment.md.
-- **Schema migrations — next, because the two items around it need them.**
-  The schema is one hand-edited `db.sql`, and every change so far has been
-  made by editing it and reloading the fixture. That stops working at the
-  first deploy: a live database cannot be dropped and reloaded, and moving to
-  MySQL 8.4 is itself a set of schema changes on a running server. And if
-  rounds are separate databases ([rounds.md](rounds.md), "Where a round
-  lives"), every live round needs the same change applied, which by hand is a
-  missed round waiting to happen.
 
-  The work: numbered migration files, a table recording which have run, and a
-  runner that applies the rest — to the accounts database and to every round
-  that `mb_accounts.round` lists as live. Phinx or Doctrine Migrations would
-  do, or about a hundred lines of our own if Composer stays out (below).
-  `db.sql` stays as the fresh-install schema, and a test holds the two to
-  account: a database built from `db.sql` and one built by running every
-  migration must dump identically.
-- **Composer — a decision, not a task.** The game has no dependencies and
-  CLAUDE.md says so as a fact. Every library that would help from here — a
-  migration runner, a query builder, a mailer that does more than `mail()` —
-  arrives through Composer, and the host has it. Adding it is small: a
-  `composer.json`, `vendor/` out of the repository, and `deploy/` running
-  `composer install --no-dev`. The cost is a dependency to keep current,
-  which is the trade to make knowingly rather than one library at a time.
+  It comes before migrations because nothing is deployed: until the first
+  deploy the schema can still be fixed in `db.sql` and the fixture reloaded,
+  and the first migration then baselines a schema already right for 8.4.
+
+  **The tables move from MyISAM to InnoDB with it.** InnoDB is what lets the
+  tick run as one transaction later, and what a host is sure to allow. The
+  risk is order: a `SELECT` without `ORDER BY` returns rows in whatever order
+  the engine likes, and InnoDB's (primary key) is not MyISAM's (insertion,
+  with holes refilled). Where a golden moves for that reason, the fix is an
+  `ORDER BY` that states the order the page meant, not a re-accept.
+- **Schema migrations — next after 8.4.** The schema is one hand-edited
+  `db.sql`, and every change so far has been made by editing it and
+  reloading the fixture. That stops working at the first deploy: a live
+  database cannot be dropped and reloaded, and step 3 of rounds.md — a
+  `round_id` on every round table — is the first change that has to reach a
+  running one.
+
+  The work: Phinx (below) with one environment per database, the round and
+  `mb_accounts`; a first migration that is today's schema, so a fresh
+  install and a live one start from the same point; and `deploy/` running
+  `phinx migrate` after the files land. `db.sql` stays as the fixture's
+  schema, and a test holds the two to account: a database built from
+  `db.sql` and one built by running every migration must dump identically.
+- **Composer — decided: yes.** The game has no dependencies, and every
+  library that would help from here — the migration runner, a query builder
+  later, a mailer that does more than `mail()` — arrives through Composer,
+  and the host has it. Phinx is the first. Adding it: a `composer.json` and
+  `composer.lock`, `vendor/` out of the repository, the image running
+  `composer install`, and `deploy/` running `composer install --no-dev`
+  before it syncs. The cost is a dependency to keep current, made knowingly
+  once rather than one library at a time. `vendor/` is outside `app/`, so
+  nothing in it is ever served.
 - **A data-access layer, grown a page at a time.** About 1300 queries sit
   inline in 133 procedural files. Binding their values closed injection, but
   each page still knows the schema, and a cross-cutting rule has to be
   applied at every site — the email/pw credential was 386 of them. The next
-  such rule is the round: in the one-database design every round-wide query
-  needs a `round_id` filter, and in the multi-database design something has
-  to own which connection a query runs on. Either is one change in a layer
-  and hundreds without one.
+  such rule is the round: every round-wide query needs a `round_id` filter,
+  which is one change in a layer and hundreds without one.
 
   So queries move behind named functions — `mb_kingdom_get($userid)`,
   `mb_round_kingdoms()`, `mb_settlement_members($setid)` — as Phase 3
