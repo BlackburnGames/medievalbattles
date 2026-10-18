@@ -127,16 +127,20 @@ if (!function_exists('mb_barter_move_stock')) {
 			return true;
 		}
 
-		$where = " WHERE email=" . mb_sql_str($db, $email) . " AND pw=" . mb_sql_str($db, $pw);
-		$q_delta = mb_sql_int($delta);
+		$delta = (int) $delta;
 
 		foreach ($MB_BARTER_STOCK[$type] as $i => $slot) {
 			list($table, $column, $global) = $slot;
 
-			// The first slot gates a sale; see $MB_BARTER_STOCK.
-			$guard = ($i === 0 && $delta < 0) ? " AND $column >= " . mb_sql_int(-$delta) : '';
-			mysqli_query($db, "UPDATE $table SET $column = $column + $q_delta" . $where . $guard);
-			if ($guard !== '' && mysqli_affected_rows($db) !== 1) {
+			// The first slot gates a sale; see $MB_BARTER_STOCK. Table and
+			// column come from that fixed table, never from the request.
+			$guarded = $i === 0 && $delta < 0;
+			if ($guarded) {
+				mb_query($db, "UPDATE $table SET $column = $column + ? WHERE email=? AND pw=? AND $column >= ?", array($delta, $email, $pw, -$delta)); // mb-unbound-ok: names from $MB_BARTER_STOCK
+			} else {
+				mb_query($db, "UPDATE $table SET $column = $column + ? WHERE email=? AND pw=?", array($delta, $email, $pw)); // mb-unbound-ok: names from $MB_BARTER_STOCK
+			}
+			if ($guarded && mysqli_affected_rows($db) !== 1) {
 				return false;
 			}
 
@@ -184,10 +188,13 @@ else	{
 	// only `page != 'guild'` and guild_barter.php only `page = 'guild'`, but
 	// both buy handlers matched on barterid alone. Each page sells only what
 	// it lists now.
-	$q_bid  = mb_sql_int($bid);
-	$mb_scope = $mb_guild_board ? "page='guild'" : "page != 'guild'";
+	// Which board: (page='guild') is 1 on the guild board's rows and 0 on the
+	// others', and NULL -- matching neither -- where page is NULL, exactly as
+	// "page='guild'" and "page != 'guild'" did.
+	$bid = (int) $bid;
+	$mb_on_guild_board = $mb_guild_board ? 1 : 0;
 
-	$barter_query = mysqli_query($db, "SELECT * FROM barter WHERE barterid=$q_bid AND $mb_scope");
+	$barter_query = mb_query($db, "SELECT * FROM barter WHERE barterid=? AND (page='guild') = ?", array($bid, $mb_on_guild_board));
 	$barter_row   = mysqli_fetch_array($barter_query);
 
 	if(!$barter_row)	 {
@@ -203,9 +210,9 @@ else	{
 		$b_userid = $barter_row['userid'];
 		$b_guild  = $barter_row['guild'];
 
-	$q_b_userid = mb_sql_int($b_userid);
+	$b_userid = (int) $b_userid;
 
-	$barter_user_query = mysqli_query($db, "SELECT * FROM user WHERE userid=$q_b_userid");
+	$barter_user_query = mb_query($db, "SELECT * FROM user WHERE userid=?", array($b_userid));
 	$barter_user = mysqli_fetch_array($barter_user_query);
 		$tsetid     = $barter_user['setid'];
 
@@ -239,22 +246,21 @@ else	{
 	//   3. only then move anything, all of it relative to what is there now.
 	//
 	// A buyer who loses the claim at 2 is refunded what 1 took.
-	$q_where_me = " WHERE email=" . mb_sql_str($db, $email) . " AND pw=" . mb_sql_str($db, $pw);
-	$q_cost     = mb_sql_int($b_cost);
+	$b_cost = (int) $b_cost;
 	// A column name, so it cannot be quoted: a literal on each side, never the
 	// stored method itself.
 	if ($b_meth == 'gp') { $mb_col = 'gp'; } else { $mb_col = 'iron'; }
 
-	mysqli_query($db, "UPDATE user SET $mb_col = $mb_col - $q_cost" . $q_where_me . " AND $mb_col >= $q_cost");
+	mb_query($db, "UPDATE user SET $mb_col = $mb_col - ? WHERE email=? AND pw=? AND $mb_col >= ?", array($b_cost, $email, $pw, $b_cost)); // mb-unbound-ok: $mb_col is 'gp' or 'iron'
 	if (mysqli_affected_rows($db) !== 1)	{
 		if ($mb_col == 'gp')	{	echo"<font class=yellow><div align=center>Not enough gold!</div></font><br><br>";	}
 		else	{	echo"<font class=yellow><div align=center>Not enough iron!</div></font><br><br>";	}
 		die();
 	}
 
-	mysqli_query($db, "DELETE FROM barter WHERE barterid=$q_bid AND $mb_scope");
+	mb_query($db, "DELETE FROM barter WHERE barterid=? AND (page='guild') = ?", array($bid, $mb_on_guild_board));
 	if (mysqli_affected_rows($db) !== 1)	{
-		mysqli_query($db, "UPDATE user SET $mb_col = $mb_col + $q_cost" . $q_where_me);
+		mb_query($db, "UPDATE user SET $mb_col = $mb_col + ? WHERE email=? AND pw=?", array($b_cost, $email, $pw)); // mb-unbound-ok: $mb_col is 'gp' or 'iron'
 		echo"<font class=yellow><div align=center>There is no such barter.</font></div>";
 		include($mb_panel);
 		die();
@@ -264,7 +270,7 @@ else	{
 	// each of the ten unit branches -- forty UPDATEs that differed only in which
 	// `if` they were written in.
 	mb_barter_move_stock($db, $b_type, $b_amount);
-	mysqli_query($db, "UPDATE user SET $mb_col = $mb_col + $q_cost WHERE userid=$q_b_userid");
+	mb_query($db, "UPDATE user SET $mb_col = $mb_col + ? WHERE userid=?", array($b_cost, $b_userid)); // mb-unbound-ok: $mb_col is 'gp' or 'iron'
 
 	// The news lines are built from stored columns -- the seller's empire name
 	// and settlement id, and the type and method they picked when they listed
@@ -278,11 +284,11 @@ else	{
 	$their_news = "$ename ($setid) has bought $b_amount $b_type(s) for $c_cost $b_meth";
 	$your_news  = "You have bought $b_amount $b_type(s) for $c_cost $b_meth from $b_seller ($tsetid)";
 
-	mb_news_emp($db, "$clock", 'yellow', $their_news, $q_b_userid);
+	mb_news_emp($db, "$clock", 'yellow', $their_news, $b_userid);
 	mb_news_emp($db, "$clock", 'yellow', $your_news, $userid);
 
 	// The unread-news counters, relative for the same reason as the rest.
-	mysqli_query($db, "UPDATE user SET nno = nno + 1 WHERE userid=$q_b_userid");
+	mb_query($db, "UPDATE user SET nno = nno + 1 WHERE userid=?", array($b_userid));
 	mb_query($db, "UPDATE user SET nno = nno + 1 WHERE userid=?", array((int) $userid));
 	echo"<font class=yellow><div align=center>You have bartered with " . mb_h($b_seller) . ".<br><br></font></div>";
 	include($mb_panel);
@@ -405,8 +411,8 @@ else	{
 	// Not scoped to this board on purpose: the ownership check below is the one
 	// that matters, and a listing is refunded to whoever put it up whichever
 	// page they cancel it from.
-	$q_bid = mb_sql_int($bid);
-	$barter_query = mysqli_query($db, "SELECT * FROM barter WHERE barterid=$q_bid");
+	$bid = (int) $bid;
+	$barter_query = mb_query($db, "SELECT * FROM barter WHERE barterid=?", array($bid));
 	$barter_row = mysqli_fetch_array($barter_query);
 
 	if(!$barter_row)	 {
@@ -422,7 +428,7 @@ else	{
 	// Claimed before it is refunded, as a sale is: two cancels in flight, or a
 	// cancel racing a buyer, used to refund the seller and hand the buyer the
 	// same units. Whichever DELETE lands first owns the listing.
-	mysqli_query($db, "DELETE FROM barter WHERE barterid=$q_bid AND userid=" . mb_sql_int($userid));
+	mb_query($db, "DELETE FROM barter WHERE barterid=? AND userid=?", array($bid, (int) $userid));
 	if (mysqli_affected_rows($db) !== 1)	{
 		echo"<font class=yellow><div align=center>There is no such barter.</font></div>";
 		die();

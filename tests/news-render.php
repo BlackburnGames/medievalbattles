@@ -82,9 +82,9 @@ function check($label, $condition, $detail = '')
 function cleanup($db)
 {
     global $SCRATCH_USERID, $SCRATCH_SETID, $SCRATCH_GID;
-    mysqli_query($db, "DELETE FROM empnews WHERE yourid=" . mb_sql_int($SCRATCH_USERID));
-    mysqli_query($db, "DELETE FROM setnews WHERE setid="  . mb_sql_int($SCRATCH_SETID));
-    mysqli_query($db, "DELETE FROM guildnews WHERE gid="  . mb_sql_str($db, $SCRATCH_GID));
+    mb_query($db, "DELETE FROM empnews WHERE yourid=?", array((int) $SCRATCH_USERID));
+    mb_query($db, "DELETE FROM setnews WHERE setid=?", array((int) $SCRATCH_SETID));
+    mb_query($db, "DELETE FROM guildnews WHERE gid=?", array((string) $SCRATCH_GID));
 }
 
 cleanup($db);
@@ -113,16 +113,16 @@ mb_news_guild($db, '1/1/03, 12:00am', 'blue', $guildText, $SCRATCH_GID, 1);
  * still wrapped around it is the thing being removed.
  */
 $rows = array(
-    'empnews'   => array("SELECT news, class FROM empnews WHERE yourid=" . mb_sql_int($SCRATCH_USERID), $empText, 'yellow'),
-    'setnews'   => array("SELECT news, class FROM setnews WHERE setid=" . mb_sql_int($SCRATCH_SETID), $setText, 'lg'),
-    'guildnews' => array("SELECT news, class FROM guildnews WHERE gid=" . mb_sql_str($db, $SCRATCH_GID), $guildText, 'blue'),
+    'empnews'   => array("SELECT news, class FROM empnews WHERE yourid=?", array((int) $SCRATCH_USERID), $empText, 'yellow'),
+    'setnews'   => array("SELECT news, class FROM setnews WHERE setid=?", array((int) $SCRATCH_SETID), $setText, 'lg'),
+    'guildnews' => array("SELECT news, class FROM guildnews WHERE gid=?", array((string) $SCRATCH_GID), $guildText, 'blue'),
 );
 
 $stored = array();
 foreach ($rows as $table => $spec) {
-    list($sql, $expectText, $expectClass) = $spec;
+    list($sql, $params, $expectText, $expectClass) = $spec;
 
-    $result = mysqli_query($db, $sql);
+    $result = mb_query($db, $sql, $params);
     $row = $result ? mysqli_fetch_assoc($result) : null;
 
     if (!check("$table: the writer filed a row", $row !== null, mysqli_error($db))) {

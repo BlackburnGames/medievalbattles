@@ -137,8 +137,8 @@ if (!function_exists('mb_attr')) {
     /**
      * An attribute value, escaped AND quoted, ready to interpolate.
      *
-     * The quotes are part of what this returns, exactly as with mb_sql_str(),
-     * and for the same reason: an unquoted attribute is the one case where
+     * The quotes are part of what this returns, deliberately: an unquoted
+     * attribute is the one case where
      * escaping alone does not close the hole. This codebase writes almost every
      * attribute bare --
      *

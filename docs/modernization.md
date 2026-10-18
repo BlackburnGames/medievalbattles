@@ -98,7 +98,7 @@ In progress. The known work, in no committed order:
   every site can be checked by a suite that proves behaviour did not move;
   rewriting 1300 interpolations into bind calls in one go cannot.
 
-  **Most of it is done: 696 unbound queries down to 135.**
+  **Done: 696 unbound queries down to none.**
   `mb_query($db, $sql, $params)` in `app/include/db.php` takes `?`
   placeholders and a list of values, so no call site writes a value into SQL
   by hand. The audit reads its SQL argument as a sink like `mysqli_query()`'s
@@ -123,9 +123,19 @@ In progress. The known work, in no committed order:
   bare value it bound was reviewed, and that review is why it no longer binds
   one in a `SET` or in arithmetic: MySQL computes with a quoted `'2.5'` as a
   double and a bare `2.5` as an exact decimal, and `ROUND()` of the two can
-  differ. The 135 left are those, statements held in a variable, names built
-  from variables, and a few escaped variables whose source the tool could not
-  pin down — for converting by hand.
+  differ. A second pass bound those through `mb_num()`, which tells
+  `mb_query()` to write a checked number bare, as interpolation did — and
+  `ROUND(5 * 0.5)` is 3 that way and 2 quoted, which is the whole reason. It
+  also inlined statements built in a variable on the line before.
+
+  The last 26 were converted by hand. Where SQL genuinely needs a name in it —
+  a table from a literal list, combat's return-slot columns `war1`–`war4`, the
+  barter's `gp` or `iron` — the values are bound and the line carries
+  `// mb-unbound-ok: <why>`, which the audit honours, so every exception is
+  visible where it is made. The barter's choice of board became
+  `(page='guild') = ?` instead, so that SQL is fully literal. `mb_sql_str()`
+  and `mb_sql_int()` had no callers left and are retired; a value reaches SQL
+  through `mb_query()`'s params and nowhere else.
 
   The last 36 were not a random 36, and none of the three groups was closed by
   escaping alone:

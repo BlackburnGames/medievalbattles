@@ -46,8 +46,6 @@ if (!IsSet($change)) {
 
   include("include/connect.php");
 
-  $q_cred = "email=" . mb_sql_str($db, $email) . " AND pw=" . mb_sql_str($db, $pw);
-
   // The counts move relative to what is stored -- vote = vote - 1 -- where they
   // used to be read, adjusted and written back, which loses a vote whenever two
   // members change theirs at once.
@@ -66,7 +64,7 @@ if (!IsSet($change)) {
 
       //  take the vote back from the old empire and set votefor to none
       mb_query($db, "UPDATE user SET vote = vote - 1 WHERE ename=? AND vote > 0", array($votefor));
-      mysqli_query($db, "UPDATE user SET votefor='None' WHERE $q_cred");
+      mb_query($db, "UPDATE user SET votefor='None' WHERE email=? AND pw=?", array($email, $pw));
 
       mb_settlement_elect($db, $setid);
 
@@ -92,7 +90,7 @@ if (!IsSet($change)) {
     if($votefor != 'None')  {
       mb_query($db, "UPDATE user SET vote = vote - 1 WHERE ename=? AND vote > 0", array($votefor));
     }
-    mysqli_query($db, "UPDATE user SET votefor=" . mb_sql_str($db, $fename) . " WHERE $q_cred");
+    mb_query($db, "UPDATE user SET votefor=? WHERE email=? AND pw=?", array($fename, $email, $pw));
     mb_query($db, "UPDATE user SET vote = vote + 1 WHERE userid=?", array((int) $empvalue));
 
     mb_settlement_elect($db, $setid);

@@ -10,62 +10,13 @@
  * reaches.
  */
 
-if (!function_exists('mb_sql_str')) {
-    /**
-     * A string literal, escaped and quoted, ready to interpolate.
-     *
-     * The quotes are part of what this returns, deliberately. Every one of the
-     * ~1300 queries in this codebase is a double-quoted string with variables
-     * dropped into it, so the natural conversion of
-     *
-     *     "... WHERE ename='$name'"
-     *
-     * is to lift the value out of the string rather than leave the quotes
-     * behind for the next reader to get wrong:
-     *
-     *     "... WHERE ename=" . mb_sql_str($db, $name)
-     *
-     * Prepared statements are better, and mb_query() below is how new and
-     * converted queries bind their values. This closed the hole at every site
-     * of the ~1300 without moving any behaviour, which is the property the
-     * characterization suite can check; the sites move to mb_query() a page at
-     * a time.
-     *
-     * @param mysqli $db
-     * @param mixed  $value cast to string, so null becomes '' as interpolation did
-     * @return string including the surrounding single quotes
-     */
-    function mb_sql_str($db, $value)
-    {
-        return "'" . mysqli_real_escape_string($db, (string) $value) . "'";
-    }
-}
-
-if (!function_exists('mb_sql_int')) {
-    /**
-     * An integer literal, ready to interpolate outside quotes.
-     *
-     * Escaping does nothing for "... WHERE topicid=$topicid": the payload never
-     * needs a quote to break out, because there is no quote to break out of.
-     * Numeric parameters have to be cast instead, which is what this is for.
-     *
-     * PHP's own cast is the whole implementation -- (int)"5 OR 1=1" is 5 and
-     * (int)"" is 0. The value of having a function is that the audit can see
-     * it: tests/sql-injection-audit.php treats a call to this as the fix, so
-     * every converted site drops off the worklist.
-     *
-     * Note 0 for a parameter that was not sent, where interpolating null used
-     * to emit nothing and leave MySQL with a syntax error. A query that matches
-     * no rows is the better of the two, and neither ever matched anything.
-     *
-     * @param mixed $value
-     * @return string
-     */
-    function mb_sql_int($value)
-    {
-        return (string) (int) $value;
-    }
-}
+/*
+ * mb_sql_str() and mb_sql_int() lived here: an escaped, quoted string literal
+ * and a cast integer, for dropping into an interpolated query. They closed the
+ * injection audit's 161 entries without moving any behaviour, and every query
+ * they were used in has since moved to mb_query(), so they are gone. A value
+ * goes into SQL through mb_query()'s params and nowhere else.
+ */
 
 if (!function_exists('mb_query')) {
     /**
@@ -161,7 +112,7 @@ if (!function_exists('mb_query')) {
             $sql = $out;
         }
 
-        return mysqli_query($db, $sql);
+        return mysqli_query($db, $sql); // mb-unbound-ok: the values substituted above
     }
 }
 

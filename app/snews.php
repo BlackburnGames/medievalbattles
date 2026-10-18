@@ -1,8 +1,7 @@
 <?php include("include/igtop.php");?>
 
 <?	
-	$SN_query = ("SELECT setid FROM setnews WHERE setid='$setid'");
-	$SN_result = mysqli_query($db, $SN_query);
+	$SN_result = mb_query($db, "SELECT setid FROM setnews WHERE setid=?", array($setid));
 	$SN_check = mysqli_fetch_array($SN_result); 
 		if($SN_check[0] == "" OR $SN_check[0] == 0)
 			{echo"<div align=center><font class=yellow>Your settlement does not have any news to display.</font></div>";die();}

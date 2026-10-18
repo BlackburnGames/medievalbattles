@@ -138,7 +138,7 @@ if (!function_exists('mb_password_store')) {
     function mb_password_store($db, $email, $oldHash, $newHash)
     {
         foreach (array('user', 'buildings', 'military', 'research', 'returntbl', 'explore') as $table) {
-            mb_query($db, "UPDATE $table SET pw=? WHERE email=? AND pw=?", array($newHash, $email, $oldHash));
+            mb_query($db, "UPDATE $table SET pw=? WHERE email=? AND pw=?", array($newHash, $email, $oldHash)); // mb-unbound-ok: table names from a literal list
         }
     }
 }

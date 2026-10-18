@@ -9,7 +9,9 @@ $empvalue   = mb_input('empvalue');
 // against what you own. See include/attack/defANDoff.php.
 	
 		
-$tfleets = $fleets;
+// The return slot, 1 to 4. The column names below -- war1..war4, time1..time4
+// and the rest -- are built from it, so it is an int and nothing else.
+$tfleets = (int) $fleets;
 if($TIME_1 == 0)	{	$tfleets = 1;	}
 if($TIME_2 == 0)	{	$tfleets = 2;	}
 if($TIME_3 == 0)	{	$tfleets = 3;	}
@@ -36,7 +38,7 @@ if($uwarrior > 0)	{
 	if($subwar < 0)	{	$subwar = 0;	}
 		$subwar = round($subwar);
 		$warcol = "war" . "$tfleets";
-	mysqli_query($db, "UPDATE returntbl SET $warcol='$subwar' WHERE email='$email' AND pw='$pw'");
+	mb_query($db, "UPDATE returntbl SET $warcol=? WHERE email=? AND pw=?", array($subwar, $email, $pw)); // mb-unbound-ok: column from a return slot, 1-4
 	$warriors = $warriors - $uwarrior;
 	mb_query($db, "UPDATE military SET warriors=? WHERE email=? AND pw=?", array($warriors, $email, $pw));
 }
@@ -45,7 +47,7 @@ if($uwizard > 0)	{
 	if($subwiz < 0)	 {	$subwiz = 0;	}
 		$subwiz = round($subwiz);
 		$wizcol = "wiz" . "$tfleets";
-	mysqli_query($db, "UPDATE returntbl SET $wizcol='$subwiz' WHERE email='$email' AND pw='$pw'");
+	mb_query($db, "UPDATE returntbl SET $wizcol=? WHERE email=? AND pw=?", array($subwiz, $email, $pw)); // mb-unbound-ok: column from a return slot, 1-4
 	$wizards = $wizards - $uwizard;
 	mb_query($db, "UPDATE military SET wizards=? WHERE email=? AND pw=?", array($wizards, $email, $pw));
 }
@@ -54,7 +56,7 @@ if($upriest > 0)	{
 	if($subpri < 0)	{	$subpri = 0;	}
 		$subpri = round($subpri);
 		$pricol = "pri" . "$tfleets";
-	mysqli_query($db, "UPDATE returntbl SET $pricol='$subpri' WHERE email='$email' AND pw='$pw'");
+	mb_query($db, "UPDATE returntbl SET $pricol=? WHERE email=? AND pw=?", array($subpri, $email, $pw)); // mb-unbound-ok: column from a return slot, 1-4
 	$priests = $priests - $upriest;
 	mb_query($db, "UPDATE military SET priests=? WHERE email=? AND pw=?", array($priests, $email, $pw));
 }
@@ -63,7 +65,7 @@ if($uarcher > 0)	{
 	if($subarch < 0)	{	$subarch = 0;	}
 		$subarch = round($subarch);
 		$archcol = "arch" . "$tfleets";
-	mysqli_query($db, "UPDATE returntbl SET $archcol='$subarch' WHERE email='$email' AND pw='$pw'");
+	mb_query($db, "UPDATE returntbl SET $archcol=? WHERE email=? AND pw=?", array($subarch, $email, $pw)); // mb-unbound-ok: column from a return slot, 1-4
 	$archers = $archers - $uarcher;
 	mb_query($db, "UPDATE military SET archers=? WHERE email=? AND pw=?", array($archers, $email, $pw));
 }
@@ -72,7 +74,7 @@ if($ugolem > 0)	{
 	if($subgolem < 0)	{	$subgolem = 0;	}
 		$subgolem = round($subgolem);
 		$golemcol = "golem" . "$tfleets";
-	mysqli_query($db, "UPDATE returntbl SET $golemcol='$subgolem' WHERE email='$email' AND pw='$pw'");
+	mb_query($db, "UPDATE returntbl SET $golemcol=? WHERE email=? AND pw=?", array($subgolem, $email, $pw)); // mb-unbound-ok: column from a return slot, 1-4
 	$golem = $golem - $ugolem;
 	mb_query($db, "UPDATE military SET golem=? WHERE email=? AND pw=?", array($golem, $email, $pw));
 }
@@ -81,7 +83,7 @@ if($uirongolem > 0)	{
 	if($subirongolem < 0)	{	$subirongolem = 0;	}
 		$subirongolem = round($subirongolem);
 		$irongolemcol = "irongolem" . "$tfleets";
-	mysqli_query($db, "UPDATE returntbl SET $irongolemcol='$subirongolem' WHERE email='$email' AND pw='$pw'");
+	mb_query($db, "UPDATE returntbl SET $irongolemcol=? WHERE email=? AND pw=?", array($subirongolem, $email, $pw)); // mb-unbound-ok: column from a return slot, 1-4
 	$irongolem = $irongolem - $uirongolem;
 	mb_query($db, "UPDATE military SET irongolem=? WHERE email=? AND pw=?", array($irongolem, $email, $pw));
 }
@@ -105,7 +107,7 @@ if($race == 'Night Elf')	{
 }
 
 $returning = "time" . "$tfleets";
-mysqli_query($db, "UPDATE returntbl SET $returning='$R_time' WHERE email='$email' AND pw='$pw'");
+mb_query($db, "UPDATE returntbl SET $returning=? WHERE email=? AND pw=?", array($R_time, $email, $pw)); // mb-unbound-ok: column from a return slot, 1-4
 mb_query($db, "UPDATE user SET fleets = fleets - 1 WHERE email=? AND pw=?", array($email, $pw));
 
 ############################

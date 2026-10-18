@@ -1,14 +1,3 @@
 # Unbound queries per file -- see tests/unbound-queries-audit.php.
 # A file's count may only FALL. Regenerate with --accept after converting
 # queries to mb_query().
-app/admin/gameconfig.php	1
-app/functions.php	5
-app/govt.php	2
-app/include/S_WEP.php	3
-app/include/attack/calculations.php	7
-app/include/barter_handler.php	10
-app/include/db.php	1
-app/include/empire.php	1
-app/include/password.php	1
-app/preferences.php	8
-app/snews.php	1

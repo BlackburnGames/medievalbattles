@@ -26,10 +26,14 @@
  * Each finding records the context the variable lands in, because it decides
  * the fix:
  *
- *   quoted     "... WHERE name='$x'"   -- escaping is enough; mb_sql_str()
+ *   quoted     "... WHERE name='$x'"   -- escaping would be enough
  *   unquoted   "... WHERE id=$x"       -- escaping is USELESS, because the
  *                                          payload needs no quote to break
- *                                          out. Must be cast; mb_sql_int()
+ *                                          out; it would have to be cast
+ *
+ * Either way the fix is the same now: mb_query() with the value in its
+ * params. mb_sql_str() and mb_sql_int(), which did the escaping and casting,
+ * are retired.
  *
  * Two limits, both deliberate:
  *
@@ -210,11 +214,7 @@ exit(mb_ratchet(array(
     'label'    => 'unescaped request input in queries',
     'pass'     => 'no new unescaped request input in queries.',
     'fail'     => 'new unescaped interpolation(s)',
-    'advice'   => "Bind it: mb_query(\$db, \"... WHERE x=?\", array(\$x)). Where a query
-"
-                . "is not converted yet, quote it with mb_sql_str(), or cast it with
-"
-                . "mb_sql_int() outside quotes. See app/include/db.php.
+    'advice'   => "Bind it: mb_query(\$db, \"... WHERE x=?\", array(\$x)). See app/include/db.php.
 ",
     'format'   => 'mb_sql_entry',
 )));

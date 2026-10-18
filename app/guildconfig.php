@@ -17,14 +17,6 @@ $remp    = mb_input('remp');
 
 include("include/igtop.php");
 
-// Both name a row in `user`, and every query below matches on one of them.
-// Cast once here rather than at each of the thirteen sites -- and after
-// igtop.php, which is what pulls in connect.php and with it mb_sql_int(). The
-// raw values are still read further down by the 'ns' and self-kick checks,
-// which compare strings.
-$q_auserid = mb_sql_int($auserid);
-$q_remp    = mb_sql_int($remp);
-
 // are they a guild leader?
 	$guild_owner_result = mb_query($db, "SELECT owner FROM guild WHERE owner=?", array($userid));
 	$guild_owner = mysqli_fetch_array($guild_owner_result);
@@ -89,7 +81,7 @@ else	{
 	}
 	elseif($current_guild['guild'] == 'None')	{
 		mb_query($db, "UPDATE user SET guild=? WHERE userid=?", array($guild_info['gname'], (int) $auserid));
-		mb_news_emp($db, "$clock", 'blue', "You were accepted into $guild_info[gname].", $q_auserid);
+		mb_news_emp($db, "$clock", 'blue', "You were accepted into $guild_info[gname].", (int) $auserid);
 
 		$Guild_MaxID = mysqli_query($db, "SELECT max(gnid) FROM guildnews");
 			$mgnid = mb_db_result($Guild_MaxID, "mgnid");
@@ -133,7 +125,7 @@ else	{
 	}
 
 	if(($current_guild['guild'] == 'None') OR ($current_guild['guild'] != 'None'))	 {
-		mb_news_emp($db, "$clock", 'blue', "You were rejected from $guild_info[gname].", $q_auserid);
+		mb_news_emp($db, "$clock", 'blue', "You were rejected from $guild_info[gname].", (int) $auserid);
 		mb_query($db, "DELETE FROM guildrequests WHERE applicant=? AND gl_userid=?", array((int) $auserid, $userid));
 
 		echo "<div align=center><font class=yellow><b>" . mb_h($applicant_ename['ename']) . " has been rejected from the guild!</b></font></div>";
@@ -199,7 +191,7 @@ else	{
 		mb_query($db, "UPDATE user SET guild='None' WHERE userid=?", array((int) $remp));
 		mb_query($db, "UPDATE guild SET mem=? WHERE owner=?", array((int) $new_mem, $userid));	
 		mb_query($db, "DELETE FROM barter WHERE seller=? AND guild=?", array($empire_info[0], $empireguild));
-		mb_news_emp($db, "$clock", 'blue', "You were removed from $guild_info[gname].", $q_remp);
+		mb_news_emp($db, "$clock", 'blue', "You were removed from $guild_info[gname].", (int) $remp);
 		mb_news_guild($db, "$clock", 'blue', "$empire_info[0] has been removed from the guild.", $guild_info['gid'], 0);
 
 		echo"<div align=center><font class=yellow>" . mb_h($empire_info[0]) . " has been removed from your guild.</font></div>";

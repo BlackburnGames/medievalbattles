@@ -30,10 +30,10 @@ include("include/igtop.php");
  * this, which escapes the twenty in this file, because a page that lets you
  * change the value should not be relying on a rule enforced somewhere else.
  *
- * Recomputed after the address changes, below -- the AIM and MSN updates that
- * follow it filter on the new one.
+ * The queries below bind $email and $pw with mb_query(), so the AIM and MSN
+ * updates after an address change filter on the new address by reading
+ * $email after it is reassigned.
  */
-$q_cred = "email=" . mb_sql_str($db, $email) . " AND pw=" . mb_sql_str($db, $pw);
 
 if(!IsSet($empnews))	{
 	echo "<div align=center><a href=preferences.php?empnews=true>Delete Empire News</a>";
@@ -143,26 +143,19 @@ else	{
 	// htmlspecialchars() used to stand in for escaping here, and whether it
 	// stopped a quote reaching MySQL depended on the PHP version -- ENT_QUOTES
 	// only became the default in 8.1, so single quotes survived it on the 5.6
-	// image this suite also runs against. The escaping is explicit now, and
+	// image this suite also runs against. The values are bound now, and
 	// mb_valid_email() above has already refused every character it was
-	// standing between MySQL and.
-	$q_newemail = mb_sql_str($db, $newemail);
-	mysqli_query($db, "UPDATE user SET email=$q_newemail WHERE $q_cred") or die(mysqli_error($db));
-	mysqli_query($db, "UPDATE buildings SET email=$q_newemail WHERE $q_cred") or die(mysqli_error($db));
- 	mysqli_query($db, "UPDATE military SET email=$q_newemail WHERE $q_cred") or die(mysqli_error($db));
- 	mysqli_query($db, "UPDATE research SET email=$q_newemail WHERE $q_cred") or die(mysqli_error($db));
- 	mysqli_query($db, "UPDATE returntbl SET email=$q_newemail WHERE $q_cred") or die(mysqli_error($db));
- 	mysqli_query($db, "UPDATE explore SET email=$q_newemail WHERE $q_cred") or die(mysqli_error($db));
+	// standing between MySQL and. The table names are a literal list.
+	foreach (array('user', 'buildings', 'military', 'research', 'returntbl', 'explore') as $table) {
+		mb_query($db, "UPDATE $table SET email=? WHERE email=? AND pw=?", array($newemail, $email, $pw)) or die(mysqli_error($db)); // mb-unbound-ok: table names from a literal list
+	}
 	$email = $newemail;
 	mb_session_rotate($email, $pw);
 
 	// The six UPDATEs above have just moved the account onto the new address,
-	// so anything after this point has to filter on that one.
-	$q_cred = "email=" . mb_sql_str($db, $email) . " AND pw=" . mb_sql_str($db, $pw);
-
-	// update aim and msn
-	mysqli_query($db, "UPDATE user SET aim=" . mb_sql_str($db, $newaim) . " WHERE $q_cred");
-	mysqli_query($db, "UPDATE user SET msn=" . mb_sql_str($db, $newmsn) . " WHERE $q_cred");
+	// and $email now holds it, so these filter on that one.
+	mb_query($db, "UPDATE user SET aim=? WHERE email=? AND pw=?", array($newaim, $email, $pw));
+	mb_query($db, "UPDATE user SET msn=? WHERE email=? AND pw=?", array($newmsn, $email, $pw));
 		
 	$email = $newemail;
 	$msn = $newmsn;

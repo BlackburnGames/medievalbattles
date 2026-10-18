@@ -65,7 +65,7 @@ if (!function_exists('mb_empire_remove')) {
 		mb_query($db, "UPDATE settlement SET members = members - 1 WHERE setid=? AND members > 0", array((int) $row['setid']));
 
 		foreach (array('user', 'military', 'buildings', 'research', 'returntbl', 'explore', 'emailvalidate') as $table) {
-			mb_query($db, "DELETE FROM $table WHERE userid=?", array($userid));
+			mb_query($db, "DELETE FROM $table WHERE userid=?", array($userid)); // mb-unbound-ok: table names from a literal list
 		}
 
 		// Its vote is gone and so are the votes cast for it, and it may have been

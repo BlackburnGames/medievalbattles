@@ -42,7 +42,7 @@ $MB_STORED_CALLS = array(
  * takes this list and adds to it rather than keeping its own.
  */
 $MB_SANITIZERS = array(
-    'mb_sql_str', 'mb_sql_int', 'mysqli_real_escape_string',
+    'mysqli_real_escape_string',
     'intval', 'floatval', 'round', 'floor', 'ceil', 'abs',
     'count', 'sizeof', 'strlen', 'rand', 'mt_rand', 'md5', 'sha1',
 );
@@ -113,8 +113,8 @@ function mb_is_arithmetic(array $t, $i)
  * cast in front of it?
  *
  * Deliberately crude: it looks for the nearest enclosing call, so
- * mb_sql_str($db, trim($x)) counts and so does (int) $x, but
- * "prefix" . $x . mb_sql_str($y) does not launder $x. Over-reporting is the
+ * htmlspecialchars(trim($x)) counts and so does (int) $x, but
+ * "prefix" . $x . intval($y) does not launder $x. Over-reporting is the
  * safe direction for an audit whose job is to be shrunk to zero.
  */
 function mb_is_sanitized(array $t, $i, $start, array $names)

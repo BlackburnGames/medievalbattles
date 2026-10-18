@@ -116,7 +116,7 @@ if (IsSet($action)) {
 		echo "<b>No such action.</b><br><br>";
 	} else {
 		foreach ($MB_ADMIN_ACTIONS[$action]['statements'] as $sql) {
-			mysqli_query($db, $sql) or die(mysqli_error($db));
+			mysqli_query($db, $sql) or die(mysqli_error($db)); // mb-unbound-ok: fixed statements from $MB_ADMIN_ACTIONS
 		}
 		echo "<b>" . htmlspecialchars($MB_ADMIN_ACTIONS[$action]['label']) . "</b>: done.<br><br>";
 	}

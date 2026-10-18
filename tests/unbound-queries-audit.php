@@ -108,6 +108,16 @@ function mb_unbound_calls($src)
                 break;
             }
         }
+        // An exception made on purpose and said so, on the call's line or the
+        // line above: "// mb-unbound-ok: <why>". For SQL whose variable part
+        // is a name from a literal list, or a statement from a fixed table.
+        $lines = explode("\n", $src);
+        $ln = $t[$i][2];
+        $here = isset($lines[$ln - 1]) ? $lines[$ln - 1] : '';
+        $above = isset($lines[$ln - 2]) ? $lines[$ln - 2] : '';
+        if ($hasValue && (preg_match('/mb-unbound-ok:\s*\S/', $here) || preg_match('/^\s*\/\/\s*mb-unbound-ok:\s*\S/', $above))) {
+            $hasValue = false;
+        }
         if ($hasValue) {
             $text = '';
             foreach ($sql as $x) {

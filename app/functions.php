@@ -41,8 +41,7 @@ if($login == 1 && $pw != "" && $email !="") {
 	$res = mysqli_fetch_array($res_query);
 
 	// select user items
-	$user_query = "SELECT * FROM user WHERE email='$email' AND pw= '$pw'";
-	$user_query = $db->query($user_query) or die("Error: " . mysqli_error($db));
+	$user_query = mb_query($db, "SELECT * FROM user WHERE email=? AND pw=?", array($email, $pw)) or die("Error: " . mysqli_error($db));
 	$user = mysqli_fetch_array($user_query);
 
 	$setid = $user['setid'];
@@ -70,8 +69,7 @@ if($login == 1 && $pw != "" && $email !="") {
 	$barter_clock = $user['barterclock'];
 
 // select buildings items
-$buildings_query = "SELECT * FROM buildings WHERE email='$email' AND pw= '$pw'";
-$buildings_query = $db->query($buildings_query) or die("Error: " . mysqli_error($db));
+$buildings_query = mb_query($db, "SELECT * FROM buildings WHERE email=? AND pw=?", array($email, $pw)) or die("Error: " . mysqli_error($db));
 $buildings = mysqli_fetch_array($buildings_query);
 
 	$home = $buildings['home'];
@@ -101,8 +99,7 @@ $buildings = mysqli_fetch_array($buildings_query);
 	$Ihrs = $buildings['Ihrs'];
 
 // select military items
-$military_query = "SELECT * FROM military WHERE email='$email' AND pw= '$pw'";
-$military_query = $db->query($military_query) or die("Error: " . mysqli_error($db));
+$military_query = mb_query($db, "SELECT * FROM military WHERE email=? AND pw=?", array($email, $pw)) or die("Error: " . mysqli_error($db));
 $military = mysqli_fetch_array($military_query);
 
 	## current unit x
@@ -163,8 +160,7 @@ $military = mysqli_fetch_array($military_query);
 		$dbirongolem = $military['dbirongolem'];
 
 //	select explore items
-$explore_query = "SELECT * FROM explore WHERE email='$email' AND pw= '$pw'";
-$explore_query = $db->query($explore_query) or die("Error: " . mysqli_error($db));
+$explore_query = mb_query($db, "SELECT * FROM explore WHERE email=? AND pw=?", array($email, $pw)) or die("Error: " . mysqli_error($db));
 $explore = mysqli_fetch_array($explore_query);
 
 	$expland = $explore['expland'];
@@ -173,8 +169,7 @@ $explore = mysqli_fetch_array($explore_query);
 	$mthrs = $explore['mthrs'];
 
 //	select data from return table
-$return_query = "SELECT * FROM returntbl WHERE email='$email' AND pw= '$pw'";
-$return_query = $db->query($return_query) or die("Error: " . mysqli_error($db));
+$return_query = mb_query($db, "SELECT * FROM returntbl WHERE email=? AND pw=?", array($email, $pw)) or die("Error: " . mysqli_error($db));
 $return = mysqli_fetch_array($return_query);
 	## party 1
 		$war1 = $return['war1'];		$WAR_1 = $return['war1'];

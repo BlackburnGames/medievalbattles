@@ -104,7 +104,10 @@ array. The baseline, `tests/unbound-queries.txt`, holds a count per file rather
 than a list of entries, so the comparison is its own: a file may have fewer
 than its baseline, never more, and a file the baseline does not list may have
 none. `--list <file>` prints each call; `--accept` lowers the baseline after a
-conversion. It scans `update.php` as well as `app/`.
+conversion. It scans `update.php` as well as `app/`. It is at **zero**, so any
+query built from values fails it. A deliberate exception — SQL that needs a
+table or column name, from a literal list — carries
+`// mb-unbound-ok: <why>` on its line or the line above, and is not counted.
 
 `tools/bind-queries.php` does most conversions. It rewrites a call only when
 every value in it is unambiguously a value, and reports the rest with the
