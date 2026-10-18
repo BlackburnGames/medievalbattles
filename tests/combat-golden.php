@@ -149,7 +149,7 @@ $SCENARIOS = array(
         'name'  => 'land-win-guild-news',
         'why'   => 'Both sides in a guild, so the four guild news lines are filed as well as the settlement ones.',
         'setup' => array($strong, $defenders, $defenderStats,
-            "INSERT INTO guild (gname, cpw, strength, gid, datemade, info, owner, mem, notice) VALUES ('Rivalguild', '', 0, 2, '1/1/03, 12:00am', '', '3', 1, 'None')",
+            "INSERT INTO guild (gname, cpw, strength, gid, datemade, info, owner, mem, notice, round_id) VALUES ('Rivalguild', '', 0, 2, '1/1/03, 12:00am', '', '3', 1, 'None', 1)",
             set('user', $D, array('guild' => 'Rivalguild'))),
         'requests' => array(array('attack.php', array('empvalue' => $D, 'uwarrior' => 300))),
     ),

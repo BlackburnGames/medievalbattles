@@ -1,8 +1,10 @@
 # Rounds and accounts
 
 **Status: partly built.** Steps 1, 2 and 5 under "Order of work" are done:
-permanent accounts in their own database, and a round that holds neither the
-address nor the password. Rounds themselves — step 3 on — are design only. This
+permanent accounts beside the round's tables, and a round that holds neither the
+address nor the password. Step 3 is under way: the `round` table exists and
+every round table carries a `round_id`, but nothing filters on it yet and there
+is only ever round 1. The rest of rounds is design only. This
 records how the game is meant to end a round and start the next one without
 deleting its players, and the decisions that shape it.
 
@@ -251,8 +253,41 @@ fingerprint of the account's address and hash:
      column width. A longer one would be silently truncated on insert and
      could never log in; an apostrophe, refused while addresses were
      interpolated, is allowed again.
-3. **Rounds.** Add the `round` and `round_result` tables and `bin/round.php`.
-   Make the round list, join and history pages. Retire `newgame.php`.
+3. **Rounds.** In four slices, each committed green:
+
+   1. ~~**The schema.**~~ **Done.** The `round` table, and a `round_id` with
+      an index on the eighteen tables a round owns, by a migration that makes
+      the world it finds round 1, running. A fresh install starts the same.
+      No query filters on it yet; the goldens moved by the column alone,
+      checked by diffing old against new with `round_id=1` stripped.
+
+      **Ids stay unique across rounds.** `userid`, `setid`, `gid`, `mid`,
+      `sid`, `gnid`, `barterid` and the forum ids are each issued once and
+      never reused by a later round, so a query that filters on one is
+      already confined to its round — the reasoning that made the ~390
+      `WHERE userid=?` queries round-safe, extended to the rest. It also
+      keeps the per-settlement tables made at runtime (`setmain<id>`) apart.
+      What it costs: a later round's settlements are numbered on from the
+      last round's, so a player's first may be settlement 11. A per-round
+      display number can come later if that matters.
+
+      **A row takes its round from its owner, in the INSERT.** A kingdom's
+      buildings, military, research, explore and return rows from its `user`
+      row; a message from its recipient's; empire news from the kingdom's;
+      settlement news and forum posts from the settlement's; guild news from
+      the guild's; a guild, its threads and requests from the player's. So
+      no page passes a round along, and a row whose owner is gone is not
+      written at all. A new kingdom joins its settlement's round. `round_id`
+      has no default, so a forgotten one fails under a strict session.
+   2. **The filter.** An audit that fails any query on a round table that
+      filters on none of those ids or on `round_id`, and the queries it
+      finds: the tick's whole-table updates, the rankings and listings,
+      lookups by kingdom or guild name (a name can recur in a later round),
+      signup's settlement choice and the admin pages. A second, ended round
+      in the fixture that the tick and every admin action must leave alone.
+   3. **Ending one.** `round_result`, and `bin/round.php open` and `end`.
+   4. **The pages.** The round list, join and history. Retire `newgame.php`
+      and signup's doubling as join.
 4. **Concurrent rounds.** The session chooses among running rounds, and the
    tick runs once per round. This lands with, or after, the ruleset loader
    from [rulesets.md](rulesets.md), since two rounds at once is how classic

@@ -121,9 +121,10 @@ if (!function_exists('mb_kingdom_seed')) {
 	/**
 	 * Write a kingdom's buildings, military, research, explore and return rows.
 	 *
-	 * Everything but the user row, which signup inserts and a reset updates.
-	 * Each is keyed by userid alone; the email and password-hash copies these
-	 * tables used to carry are gone.
+	 * Everything but the user row, which signup inserts and a reset updates,
+	 * and which must exist first: each row is keyed by userid alone and takes
+	 * its round from it. The email and password-hash copies these tables used
+	 * to carry are gone.
 	 *
 	 * @param array $start  what mb_kingdom_start() returned
 	 */
@@ -133,19 +134,19 @@ if (!function_exists('mb_kingdom_seed')) {
 		$m = $start['military'];
 		$r = $start['research'];
 
-		mb_query($db, "INSERT INTO buildings (home, barrack, farm, wp, gm, im, aland, amts, userid)
-			VALUES ('50', '50', '50', '0', '50', '50', '100', '100', ?)", array($userid));
+		mb_query($db, "INSERT INTO buildings (home, barrack, farm, wp, gm, im, aland, amts, userid, round_id)
+			SELECT '50', '50', '50', '0', '50', '50', '100', '100', userid, round_id FROM user WHERE userid=?", array($userid));
 
-		mb_query($db, "INSERT INTO military (civ, recruits, warriors, wizards, priests, maxciv, userid, warpower, warspeedw, cweapon, wizpower, wizspeeds, cspell, pripower, prispeedw, cstaff, cbow, archspeedw, archpower, wararmor, wizarmor, priarmor, wardef, wizdef, pridef, warspeeda, wizspeeda, prispeeda, archers, suicide)
-			VALUES (?, ?, ?, ?, ?, ?, ?, '2', '6','Dagger', '3', '4', 'Magic Missile', '2', '4', 'Quarterstaff', 'Bow', '4', '2', 'Studded Leather', 'Robe', 'Leather', '1', '1', '2', '0', '0', '1', ?, ?)",
-			array($m['civ'], $m['recruits'], $m['warriors'], $m['wizards'], $m['priests'], $m['maxciv'], $userid, $m['archers'], $m['suicide']));
+		mb_query($db, "INSERT INTO military (civ, recruits, warriors, wizards, priests, maxciv, userid, warpower, warspeedw, cweapon, wizpower, wizspeeds, cspell, pripower, prispeedw, cstaff, cbow, archspeedw, archpower, wararmor, wizarmor, priarmor, wardef, wizdef, pridef, warspeeda, wizspeeda, prispeeda, archers, suicide, round_id)
+			SELECT ?, ?, ?, ?, ?, ?, userid, '2', '6','Dagger', '3', '4', 'Magic Missile', '2', '4', 'Quarterstaff', 'Bow', '4', '2', 'Studded Leather', 'Robe', 'Leather', '1', '1', '2', '0', '0', '1', ?, ?, round_id FROM user WHERE userid=?",
+			array($m['civ'], $m['recruits'], $m['warriors'], $m['wizards'], $m['priests'], $m['maxciv'], $m['archers'], $m['suicide'], $userid));
 
-		mb_query($db, "INSERT INTO research (userid, r1pts, r13pts, r14pts)
-			VALUES (?, ?, ?, ?)", array($userid, $r['r1pts'], $r['r13pts'], $r['r14pts']));
+		mb_query($db, "INSERT INTO research (userid, r1pts, r13pts, r14pts, round_id)
+			SELECT userid, ?, ?, ?, round_id FROM user WHERE userid=?", array($r['r1pts'], $r['r13pts'], $r['r14pts'], $userid));
 
-		mb_query($db, "INSERT INTO explore (userid) VALUES (?)", array($userid));
+		mb_query($db, "INSERT INTO explore (userid, round_id) SELECT userid, round_id FROM user WHERE userid=?", array($userid));
 
-		mb_query($db, "INSERT INTO returntbl (userid) VALUES (?)", array($userid));
+		mb_query($db, "INSERT INTO returntbl (userid, round_id) SELECT userid, round_id FROM user WHERE userid=?", array($userid));
 	}
 }
 

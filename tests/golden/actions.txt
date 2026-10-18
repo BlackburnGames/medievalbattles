@@ -178,7 +178,7 @@
 > inputpostsg.php addtopic=1 topic=Orders message=Hold
   HTTP 302
   says: <no game page>
-  + guildthreads topicid=3 | name=TestLord | host= | topic=Orders | lastpost=<CLOCK> | lastposter=TestLord | replies=0 | message=Hold | guildname=Test guild
+  + guildthreads topicid=3 | name=TestLord | host= | topic=Orders | lastpost=<CLOCK> | lastposter=TestLord | replies=0 | message=Hold | guildname=Test guild | round_id=1
 
 ### guild-leader-thread-view
 # The guild leader thread view, where deleting a post or replying on the leader board lands. It read a per-guild table from an older schema and showed only an error.

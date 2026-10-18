@@ -394,7 +394,7 @@ else	{
 	$mb_page  = $mb_guild_board ? 'guild' : '';
 	$mb_guild = $mb_guild_board ? $empireguild : '';
 
-	mb_query($db, "INSERT INTO barter (seller, cost, type, amount, barterid, userid, method, page, guild)	VALUES	(?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($ename, (int) $cost, $type, (int) $amount, (int) $maxbid, $userid, $method, $mb_page, $mb_guild));
+	mb_query($db, "INSERT INTO barter (seller, cost, type, amount, barterid, userid, method, page, guild, round_id) SELECT ?, ?, ?, ?, ?, userid, ?, ?, ?, round_id FROM user WHERE userid=?", array($ename, (int) $cost, $type, (int) $amount, (int) $maxbid, $method, $mb_page, $mb_guild, $userid));
 
 	echo "<font class=yellow><div align=center>Your barter has been placed.</font></div><br><br>";
 	die();

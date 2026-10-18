@@ -54,7 +54,8 @@ require_once __DIR__ . '/../app/include/news.php';
  */
 $SCRATCH_USERID = 999001;
 $SCRATCH_SETID  = 999001;
-$SCRATCH_GID    = 'mb-news-render-test';
+// guild.gid is a number, though guildnews.gid is a varchar.
+$SCRATCH_GID    = '999001';
 
 /*
  * An empire name is the value that reaches every one of the 51 sentences, and
@@ -85,9 +86,22 @@ function cleanup($db)
     mb_query($db, "DELETE FROM empnews WHERE yourid=?", array((int) $SCRATCH_USERID));
     mb_query($db, "DELETE FROM setnews WHERE setid=?", array((int) $SCRATCH_SETID));
     mb_query($db, "DELETE FROM guildnews WHERE gid=?", array((string) $SCRATCH_GID));
+    mb_query($db, "DELETE FROM user WHERE userid=?", array((int) $SCRATCH_USERID));
+    mb_query($db, "DELETE FROM settlement WHERE setid=?", array((int) $SCRATCH_SETID));
+    mb_query($db, "DELETE FROM guild WHERE gid=?", array((int) $SCRATCH_GID));
+    // The scratch setid moved the counter; put it back, so the next round's
+    // settlements are numbered on from the real ones.
+    mysqli_query($db, "ALTER TABLE settlement AUTO_INCREMENT = 1");
 }
 
 cleanup($db);
+
+// The rows the news is filed against. Each writer takes the line's round from
+// its owner -- the kingdom, the settlement, the guild -- and files nothing for
+// one that does not exist.
+mb_query($db, "INSERT INTO user (ename, userid, round_id) VALUES ('News Test', ?, 1)", array((int) $SCRATCH_USERID));
+mb_query($db, "INSERT INTO settlement (setid, round_id) VALUES (?, 1)", array((int) $SCRATCH_SETID));
+mb_query($db, "INSERT INTO guild (gname, gid, info, round_id) VALUES ('News Test', ?, '', 1)", array((int) $SCRATCH_GID));
 
 /*
  * The three writers, each given the shape of line its real call sites write.

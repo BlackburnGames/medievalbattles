@@ -84,7 +84,8 @@ if (!function_exists('mb_news_emp')) {
      */
     function mb_news_emp($db, $date, $class, $text, $userid)
     {
-        mb_query($db, "INSERT INTO empnews (date, news, class, yourid) VALUES (?, ?, ?, ?)",
+        // In the kingdom's round; a kingdom that no longer exists gets none.
+        mb_query($db, "INSERT INTO empnews (date, news, class, yourid, round_id) SELECT ?, ?, ?, userid, round_id FROM user WHERE userid=?",
             array($date, $text, $class, (int) $userid));
     }
 }
@@ -100,8 +101,8 @@ if (!function_exists('mb_news_set')) {
      */
     function mb_news_set($db, $date, $class, $text, $setid, $sid)
     {
-        mb_query($db, "INSERT INTO setnews (date, news, class, setid, sid) VALUES (?, ?, ?, ?, ?)",
-            array($date, $text, $class, (int) $setid, (int) $sid));
+        mb_query($db, "INSERT INTO setnews (date, news, class, setid, sid, round_id) SELECT ?, ?, ?, setid, ?, round_id FROM settlement WHERE setid=?",
+            array($date, $text, $class, (int) $sid, (int) $setid));
     }
 }
 
@@ -109,7 +110,7 @@ if (!function_exists('mb_news_guild')) {
     /** File a line of guild news. $gid is a varchar column, so it is bound as a string. */
     function mb_news_guild($db, $date, $class, $text, $gid, $gnid)
     {
-        mb_query($db, "INSERT INTO guildnews (date, news, class, gid, gnid) VALUES (?, ?, ?, ?, ?)",
-            array($date, $text, $class, (string) $gid, (int) $gnid));
+        mb_query($db, "INSERT INTO guildnews (date, news, class, gid, gnid, round_id) SELECT ?, ?, ?, ?, ?, round_id FROM guild WHERE gid=?",
+            array($date, $text, $class, (string) $gid, (int) $gnid, (string) $gid));
     }
 }

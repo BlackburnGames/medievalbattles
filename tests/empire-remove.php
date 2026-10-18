@@ -102,15 +102,15 @@ foreach (array(
     $VOTER   => array('Voter Empire',  'None',  'Gone Empire',  0),
     $OTHERGL => array('Other Leader',  "$GNAME-other", 'Votee Empire', 0),
 ) as $id => $r) {
-    q($db, "INSERT INTO user (ename, userid, setid, guild, votefor, vote)
-            VALUES ('$r[0]', $id, $SETID, '$r[1]', '$r[2]', $r[3])");
+    q($db, "INSERT INTO user (ename, userid, setid, guild, votefor, vote, round_id)
+            VALUES ('$r[0]', $id, $SETID, '$r[1]', '$r[2]', $r[3], 1)");
 }
 foreach (array('military', 'buildings', 'research', 'returntbl', 'explore') as $t) {
-    q($db, "INSERT INTO $t (userid) VALUES ($GONE)");
+    q($db, "INSERT INTO $t (userid, round_id) VALUES ($GONE, 1)");
 }
-q($db, "INSERT INTO guild (gname, owner, mem) VALUES ('$GNAME', '$GONE', 2), ('$GNAME-other', '$OTHERGL', 1)");
-q($db, "INSERT INTO guildrequests (applicant, gl_userid) VALUES ('$GONE', '$OTHERGL'), ('$MEMBER', '$GONE')");
-q($db, "INSERT INTO settlement (setid, setname, members) VALUES ($SETID, 'Removal Test', 5)");
+q($db, "INSERT INTO guild (gname, owner, mem, round_id) VALUES ('$GNAME', '$GONE', 2, 1), ('$GNAME-other', '$OTHERGL', 1, 1)");
+q($db, "INSERT INTO guildrequests (applicant, gl_userid, round_id) VALUES ('$GONE', '$OTHERGL', 1), ('$MEMBER', '$GONE', 1)");
+q($db, "INSERT INTO settlement (setid, setname, members, round_id) VALUES ($SETID, 'Removal Test', 5, 1)");
 q($db, "UPDATE user SET sl = IF(userid=$GONE, 'yes', 'no') WHERE setid=$SETID");
 
 // --- Removing nobody first: it must touch nothing. ---

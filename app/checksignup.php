@@ -159,9 +159,10 @@ if ($signup) {
     $start = mb_kingdom_start($race, $class);
     $u = $start['user'];
 
-    mb_query($db, "INSERT INTO user (ename, msn, aim, gp, iron, exp, food, land, mts, setid, class, userid, race, safemode, signup_comp_id, account_id)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-      array($ename, $msn, $aim, $u['gp'], $u['iron'], $u['exp'], $u['food'], $u['land'], $u['mts'], (int) $snum, $class, (int) $newbuserid, $race, $u['safemode'], $computer_id, $account_id));
+    // The kingdom joins its settlement's round.
+    mb_query($db, "INSERT INTO user (ename, msn, aim, gp, iron, exp, food, land, mts, setid, class, userid, race, safemode, signup_comp_id, account_id, round_id)
+      SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, setid, ?, ?, ?, ?, ?, ?, round_id FROM settlement WHERE setid=?",
+      array($ename, $msn, $aim, $u['gp'], $u['iron'], $u['exp'], $u['food'], $u['land'], $u['mts'], $class, (int) $newbuserid, $race, $u['safemode'], $computer_id, $account_id, (int) $snum));
 
     mb_kingdom_seed($db, $newbuserid, $start);
 

@@ -34,41 +34,39 @@ DELETE FROM `explore`       WHERE userid IN (1, 2, 3);
 
 -- safemode 0 on the primary tester so combat and tick paths are reachable;
 -- user 2 keeps a low countdown to exercise the inactivity branch of the tick.
-INSERT INTO `user`
-  (ename, race, class, gp, iron, lumber, exp, food, land, mts,
-   setid, csnum, userid, online, safemode, countdown, guild, lastlogin, signup_comp_id, account_id)
+INSERT INTO `user` (ename, race, class, gp, iron, lumber, exp, food, land, mts,
+   setid, csnum, userid, online, safemode, countdown, guild, lastlogin, signup_comp_id, account_id, round_id)
 VALUES
-  ('TestLord',  'Human', 'Warrior', 300000, 5000, 4000, 1000, 1500, 250, 200, 1, 1, 1, 0, 0,  336, 'None', '1/1/03, 12:00am', 'seed', 1),  -- fleets set below
-  ('IdleBaron', 'Demon', 'Cleric',  120000, 6200, 3100,  400, 1500, 250, 200, 1, 1, 2, 0, 0,    2, 'None', '1/1/03, 12:00am', 'seed', 2),
-  ('PoorSerf',  'Giant', 'Ranger',       0,    0,    0,    0,    0, 250, 200, 2, 2, 3, 0, 0,  336, 'None', '1/1/03, 12:00am', 'seed', 3);
+  ('TestLord',  'Human', 'Warrior', 300000, 5000, 4000, 1000, 1500, 250, 200, 1, 1, 1, 0, 0,  336, 'None', '1/1/03, 12:00am', 'seed', 1, 1),  -- fleets set below
+  ('IdleBaron', 'Demon', 'Cleric',  120000, 6200, 3100,  400, 1500, 250, 200, 1, 1, 2, 0, 0,    2, 'None', '1/1/03, 12:00am', 'seed', 2, 1),
+  ('PoorSerf',  'Giant', 'Ranger',       0,    0,    0,    0,    0, 250, 200, 2, 2, 3, 0, 0,  336, 'None', '1/1/03, 12:00am', 'seed', 3, 1);
 
-INSERT INTO `buildings` (home, barrack, farm, wp, gm, im, aland, amts, userid) VALUES
-  (50, 50, 50, 0, 50, 50, 100, 100, 1),
-  (50, 50, 50, 0, 50, 50, 100, 100, 2),
-  (1,  1,  1, 0,  1,  1, 100, 100, 3);
+INSERT INTO `buildings` (home, barrack, farm, wp, gm, im, aland, amts, userid, round_id) VALUES
+  (50, 50, 50, 0, 50, 50, 100, 100, 1, 1),
+  (50, 50, 50, 0, 50, 50, 100, 100, 2, 1),
+  (1,  1,  1, 0,  1,  1, 100, 100, 3, 1);
 
-INSERT INTO `military`
-  (civ, recruits, warriors, wizards, priests, maxciv, userid, warpower,
+INSERT INTO `military` (civ, recruits, warriors, wizards, priests, maxciv, userid, warpower,
    warspeedw, cweapon, wizpower, wizspeeds, cspell, pripower, prispeedw, cstaff,
    cbow, archspeedw, archpower, wararmor, wizarmor, priarmor, wardef, wizdef,
 -- `sages` on the primary tester, so the barter board can trade one. The unit
 -- is called a Sage everywhere current -- functions.php reads military.sages
 -- into $sages -- while `military.scientists` is what it was called before the
 -- rename and is now written by nothing.
-   pridef, warspeeda, wizspeeda, prispeeda, archers, suicide, sages)
+   pridef, warspeeda, wizspeeda, prispeeda, archers, suicide, sages, round_id)
 VALUES
-  (1200, 200, 3, 3, 3, 200, 1, 2, 6, 'Dagger', 3, 4, 'Magic Missile', 2, 4, 'Quarterstaff', 'Bow', 4, 2, 'Studded Leather', 'Robe', 'Leather', 1, 1, 2, 0, 0, 1, 0, 0, 8),
-  (1300, 250, 5, 0, 5, 300, 2, 2, 6, 'Dagger', 3, 4, 'Magic Missile', 2, 4, 'Quarterstaff', 'Bow', 4, 2, 'Studded Leather', 'Robe', 'Leather', 1, 1, 2, 0, 0, 1, 0, 0, 0),
-  (0,   0, 0, 0, 0, 100, 3, 2, 6, 'Dagger', 3, 4, 'Magic Missile', 2, 4, 'Quarterstaff', 'Bow', 4, 2, 'Studded Leather', 'Robe', 'Leather', 1, 1, 2, 0, 0, 1, 5, 0, 0);
+  (1200, 200, 3, 3, 3, 200, 1, 2, 6, 'Dagger', 3, 4, 'Magic Missile', 2, 4, 'Quarterstaff', 'Bow', 4, 2, 'Studded Leather', 'Robe', 'Leather', 1, 1, 2, 0, 0, 1, 0, 0, 8, 1),
+  (1300, 250, 5, 0, 5, 300, 2, 2, 6, 'Dagger', 3, 4, 'Magic Missile', 2, 4, 'Quarterstaff', 'Bow', 4, 2, 'Studded Leather', 'Robe', 'Leather', 1, 1, 2, 0, 0, 1, 0, 0, 0, 1),
+  (0,   0, 0, 0, 0, 100, 3, 2, 6, 'Dagger', 3, 4, 'Magic Missile', 2, 4, 'Quarterstaff', 'Bow', 4, 2, 'Studded Leather', 'Robe', 'Leather', 1, 1, 2, 0, 0, 1, 5, 0, 0, 1);
 
 -- r1/r15 are sages ASSIGNED to a project; r1pts/r15pts are the points they have
 -- accumulated. The primary tester has both kinds so the tick's research step is
 -- covered: without an assigned sage the UPDATE writes nothing observable, which
 -- is how the schema being four columns short went unnoticed for the whole port.
-INSERT INTO `research` (userid, r1, r15, r1pts, r13pts, r14pts) VALUES
-  (1, 5, 2, 0, 0, 0),
-  (2, 0, 0, 0, 0, 0),
-  (3, 0, 0, 0, 125000, 0);
+INSERT INTO `research` (userid, r1, r15, r1pts, r13pts, r14pts, round_id) VALUES
+  (1, 5, 2, 0, 0, 0, 1),
+  (2, 0, 0, 0, 0, 0, 1),
+  (3, 0, 0, 0, 125000, 0, 1);
 
 -- An army in the field, so the tick's return path is exercised.
 --
@@ -77,10 +75,10 @@ INSERT INTO `research` (userid, r1, r15, r1pts, r13pts, r14pts) VALUES
 -- have its timer decremented. Golems are included deliberately -- they are the
 -- reason both of those statements used to fail.
 DELETE FROM `returntbl` WHERE userid IN (1, 2, 3);
-INSERT INTO `returntbl` (userid, war1, wiz1, pri1, arch1, golem1, irongolem1, time1, war2, golem2, time2) VALUES
-  (1, 40, 2, 1, 3, 2, 1, 1, 25, 1, 3),
-  (2,  0, 0, 0, 0, 0, 0, 0,  0, 0, 0),
-  (3,  0, 0, 0, 0, 0, 0, 0,  0, 0, 0);
+INSERT INTO `returntbl` (userid, war1, wiz1, pri1, arch1, golem1, irongolem1, time1, war2, golem2, time2, round_id) VALUES
+  (1, 40, 2, 1, 3, 2, 1, 1, 25, 1, 3, 1),
+  (2,  0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 1),
+  (3,  0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 1);
 
 -- user.fleets counts generals still AVAILABLE, not armies in the field: sending
 -- an army decrements it and update.php:180 gives one back per army that lands.
@@ -88,10 +86,10 @@ INSERT INTO `returntbl` (userid, war1, wiz1, pri1, arch1, golem1, irongolem1, ti
 -- the tester a fifth general on a roster of four.
 UPDATE `user` SET fleets = 2 WHERE userid = 1;
 
-INSERT INTO `explore` (userid) VALUES
-  (1),
-  (2),
-  (3);
+INSERT INTO `explore` (userid, round_id) VALUES
+  (1, 1),
+  (2, 1),
+  (3, 1);
 
 -- A guild exists so the guild and guild-forum pages are reachable. Without
 -- membership the crawler cannot enter roughly ten scripts at all, and they
@@ -104,8 +102,8 @@ INSERT INTO `explore` (userid) VALUES
 -- leader, and silently hid gl-forum, gl-topic, gl-inputposts, gl-delposts and
 -- guildconfig from the crawl.
 DELETE FROM `guild` WHERE gid = 1;
-INSERT INTO `guild` (gname, cpw, strength, gid, datemade, info, owner, mem, notice) VALUES
-  ('Testguild', '', 0, 1, '1/1/03, 12:00am', 'A guild used by the test fixtures.', '1', 2, 'None');
+INSERT INTO `guild` (gname, cpw, strength, gid, datemade, info, owner, mem, notice, round_id) VALUES
+  ('Testguild', '', 0, 1, '1/1/03, 12:00am', 'A guild used by the test fixtures.', '1', 2, 'None', 1);
 
 UPDATE `user` SET guild = 'Testguild' WHERE userid IN (1, 2);
 
@@ -131,27 +129,27 @@ DELETE FROM `setforumsmsgs`  WHERE setid = 1;
 DELETE FROM `guildthreads`   WHERE guildname = 'Testguild';
 DELETE FROM `guildmsgs`      WHERE topicid IN (1, 2);
 
-INSERT INTO `setforums` (setid, topicid, name, topic, lastpost, lastposter, replies, message, datestamp) VALUES
-  (1, 1, 'TestLord',  'Settlement muster',  '1/1/03, 12:00am', 'IdleBaron', 1, 'Who is holding the north wall?', '1/1/03, 12:00am'),
-  (1, 2, 'IdleBaron', 'Grain prices again', '1/1/03, 12:00am', 'IdleBaron', 0, 'The mill is charging double.',   '1/1/03, 12:00am');
+INSERT INTO `setforums` (setid, topicid, name, topic, lastpost, lastposter, replies, message, datestamp, round_id) VALUES
+  (1, 1, 'TestLord',  'Settlement muster',  '1/1/03, 12:00am', 'IdleBaron', 1, 'Who is holding the north wall?', '1/1/03, 12:00am', 1),
+  (1, 2, 'IdleBaron', 'Grain prices again', '1/1/03, 12:00am', 'IdleBaron', 0, 'The mill is charging double.',   '1/1/03, 12:00am', 1);
 
-INSERT INTO `setforumsmsgs` (setid, messageid, name, topic, topicid, message, datestamp) VALUES
-  (1, 1, 'IdleBaron', 'Settlement muster', 1, 'I will take the watch.', '1/1/03, 12:00am');
+INSERT INTO `setforumsmsgs` (setid, messageid, name, topic, topicid, message, datestamp, round_id) VALUES
+  (1, 1, 'IdleBaron', 'Settlement muster', 1, 'I will take the watch.', '1/1/03, 12:00am', 1);
 
-INSERT INTO `guildthreads` (topicid, name, host, topic, lastpost, lastposter, replies, message, datestamp, guildname) VALUES
-  (1, 'TestLord',  'localhost', 'Guild orders',   '1/1/03, 12:00am', 'IdleBaron', 1, 'Muster at dawn.',        '1/1/03, 12:00am', 'Testguild'),
-  (2, 'IdleBaron', 'localhost', 'Recruiting', '1/1/03, 12:00am', 'IdleBaron', 0, 'We have two open slots.', '1/1/03, 12:00am', 'Testguild');
+INSERT INTO `guildthreads` (topicid, name, host, topic, lastpost, lastposter, replies, message, datestamp, guildname, round_id) VALUES
+  (1, 'TestLord',  'localhost', 'Guild orders',   '1/1/03, 12:00am', 'IdleBaron', 1, 'Muster at dawn.',        '1/1/03, 12:00am', 'Testguild', 1),
+  (2, 'IdleBaron', 'localhost', 'Recruiting', '1/1/03, 12:00am', 'IdleBaron', 0, 'We have two open slots.', '1/1/03, 12:00am', 'Testguild', 1);
 
-INSERT INTO `guildmsgs` (messageid, name, host, topic, topicid, message, datestamp) VALUES
-  (1, 'IdleBaron', 'localhost', 'Guild orders', 1, 'Understood.', '1/1/03, 12:00am');
+INSERT INTO `guildmsgs` (messageid, name, host, topic, topicid, message, datestamp, round_id) VALUES
+  (1, 'IdleBaron', 'localhost', 'Guild orders', 1, 'Understood.', '1/1/03, 12:00am', 1);
 
 -- A message in the primary tester's inbox. vmessages.php was reachable before
 -- this but rendered an empty table: `messages` starts empty, so the loop that
 -- draws each message -- and runs two more queries per row on the sender's name
 -- -- never executed once in the whole crawl.
 DELETE FROM `messages` WHERE yourid = 1;
-INSERT INTO `messages` (origin, datesent, message, yourid, mid, age) VALUES
-  ('IdleBaron', '1/1/03, 12:00am', 'Care to trade iron for gold?', 1, 1, 0);
+INSERT INTO `messages` (origin, datesent, message, yourid, mid, age, round_id) VALUES
+  ('IdleBaron', '1/1/03, 12:00am', 'Care to trade iron for gold?', 1, 1, 0, 1);
 
 -- The barter boards.
 --
@@ -173,10 +171,10 @@ UPDATE `user` SET barterclock = 336 WHERE userid = 3;
 --
 -- barterid 1-3 are fixed so the crawl visits stable URLs; the add form derives
 -- the next id from max(barterid), so anything it posts lands at 4 and up.
-INSERT INTO `barter` (seller, cost, type, amount, barterid, userid, method, page, guild) VALUES
-  ('PoorSerf',  2000, 'Land',    10, 1, 3, 'gp',   '',      ''),
-  ('IdleBaron',  150, 'Recruit', 25, 2, 2, 'iron', 'guild', 'Testguild'),
-  ('TestLord',   500, 'Warrior',  1, 3, 1, 'gp',   '',      '');
+INSERT INTO `barter` (seller, cost, type, amount, barterid, userid, method, page, guild, round_id) VALUES
+  ('PoorSerf',  2000, 'Land',    10, 1, 3, 'gp',   '',      '', 1),
+  ('IdleBaron',  150, 'Recruit', 25, 2, 2, 'iron', 'guild', 'Testguild', 1),
+  ('TestLord',   500, 'Warrior',  1, 3, 1, 'gp',   '',      '', 1);
 
 -- Settlements 1 and 2 now hold the seeded users.
 UPDATE `settlement` SET members = 2, setname = 'Testhold'  WHERE setid = 1;

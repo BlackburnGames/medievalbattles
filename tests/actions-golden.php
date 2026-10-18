@@ -197,7 +197,7 @@ $SCENARIOS[] = array(
 $twoGuilds = array(
     "UPDATE guild SET gname='Test guild' WHERE gid=1",
     "UPDATE user SET guild='Test guild' WHERE guild='Testguild'",
-    "INSERT INTO guild (gname, cpw, strength, gid, datemade, info, owner, mem, notice) VALUES ('Testguild', '', 0, 2, '', '', '3', 1, 'None')",
+    "INSERT INTO guild (gname, cpw, strength, gid, datemade, info, owner, mem, notice, round_id) VALUES ('Testguild', '', 0, 2, '', '', '3', 1, 'None', 1)",
     "UPDATE user SET guild='Testguild' WHERE userid=3",
 );
 $SCENARIOS[] = array(

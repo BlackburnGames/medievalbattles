@@ -43,7 +43,7 @@ if ($addtopic) {
 	// was stamped with the empty string and displayed a blank date ever after.
 	// The reply below, and both branches of sl-input.posts.php writing the same
 	// two tables, have always used $clock.
-	$result = mb_query($db, "INSERT INTO setforums (setid, name, topic, replies, message, datestamp)	VALUES (?, ?, ?, ?, ?, ?)", array((int) $setid, $ename, $topic, $replies, $message, $clock));
+	$result = mb_query($db, "INSERT INTO setforums (setid, name, topic, replies, message, datestamp, round_id) SELECT setid, ?, ?, ?, ?, ?, round_id FROM settlement WHERE setid=?", array($ename, $topic, $replies, $message, $clock, (int) $setid));
 
 	$topic_lastpost = mb_query($db, "UPDATE setforums SET lastpost=? WHERE topic=? AND setid=?", array($clock, $topic, (int) $setid));
 	$topic_lastposter = mb_query($db, "UPDATE setforums SET lastposter=? WHERE topic=? AND setid=?", array($ename, $topic, (int) $setid));
@@ -68,7 +68,7 @@ elseif ($addreply) {
 	// successful INSERT that is mysqli_query($db, "1") -- a syntax error; on a
 	// failed one it is the empty string, which is a fatal on PHP 8. It also
 	// reset the insert id that $lastid reads. The second call is gone.
-	$result1 = mb_query($db, "INSERT INTO setforumsmsgs (setid, name, topic, topicid, message, datestamp)	 VALUES (?, ?, ?, ?, ?, ?)", array((int) $setid, $ename, $topic, (int) $topicid, $message, $clock));
+	$result1 = mb_query($db, "INSERT INTO setforumsmsgs (setid, name, topic, topicid, message, datestamp, round_id) SELECT setid, ?, ?, ?, ?, ?, round_id FROM settlement WHERE setid=?", array($ename, $topic, (int) $topicid, $message, $clock, (int) $setid));
 	$lastid = mysqli_insert_id($db);
 
 	$reply_lastpost = mb_query($db, "UPDATE setforums SET lastpost=? WHERE topicid=? AND setid=?", array($clock, (int) $topicid, (int) $setid));

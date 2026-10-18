@@ -48,7 +48,7 @@ else	{
 
 		$umessage = "[b]Sent by Guild Center:[/b]  " . $umessage;
 
-		mb_query($db, "INSERT INTO messages (origin, datesent, yourid, message, mid)		VALUES	(?, ?, ?, ?, ?) ", array($ename, $clock, (int) $owner, $umessage, (int) $ymid));
+		mb_query($db, "INSERT INTO messages (origin, datesent, yourid, message, mid, round_id) SELECT ?, ?, userid, ?, ?, round_id FROM user WHERE userid=?", array($ename, $clock, $umessage, (int) $ymid, (int) $owner));
 	
 		echo "<div align=center><font class=yellow><b>Your message has been sent to the Guild Leader of " . mb_h($g_name) . ".</b></font></div></center>";
 		unset($_SESSION['gid']);
@@ -93,7 +93,7 @@ if($request == 'yes')	{
 		die();
 	}
 	else	{
-		mb_query($db, "INSERT INTO guildrequests (applicant, gl_userid)		VALUES	(?, ?) ", array($userid, $guild_info['owner']));
+		mb_query($db, "INSERT INTO guildrequests (applicant, gl_userid, round_id) SELECT userid, ?, round_id FROM user WHERE userid=?", array($guild_info['owner'], $userid));
 		echo "<div align=center><font class=yellow><b>Your request to join <u>" . mb_h($guild_info['gname']) . "</u> has been sent.</b></font></div>";	
 	}	
 }
@@ -229,7 +229,7 @@ else	{
 		$new_gid = $mgid + 1;
 
 		include("include/connect.php");
-		mb_query($db, "INSERT INTO guild (gname, info, gid, datemade, cpw, owner)	 VALUES	(?, ?, ?, ?, ?, ?) ", array($creating_guild_name, $info, $new_gid, $clock, $cpw, $userid));
+		mb_query($db, "INSERT INTO guild (gname, info, gid, datemade, cpw, owner, round_id) SELECT ?, ?, ?, ?, ?, ?, round_id FROM user WHERE userid=?", array($creating_guild_name, $info, $new_gid, $clock, $cpw, $userid, $userid));
 		mb_query($db, "UPDATE user SET guild=? WHERE userid=?", array($creating_guild_name, $userid));
 		mb_query($db, "DELETE FROM guildrequests WHERE applicant=?", array($userid));
 						

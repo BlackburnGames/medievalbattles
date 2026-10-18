@@ -49,7 +49,7 @@ else	{
 		// Stored as typed; mb_rich() renders it. See include/html.php.
 
 		mb_query($db, "UPDATE user SET mno=? WHERE userid=?", array($thenum, (int) $empvalue));
-		mb_query($db, "INSERT INTO messages (origin, datesent, yourid, message, mid)		VALUES	(?, ?, ?, ?, ?) ", array($ename, $clock, (int) $empvalue, $umessage, (int) $ymid));
+		mb_query($db, "INSERT INTO messages (origin, datesent, yourid, message, mid, round_id) SELECT ?, ?, userid, ?, ?, round_id FROM user WHERE userid=?", array($ename, $clock, $umessage, (int) $ymid, (int) $empvalue));
 	
 		echo"<div align=center><font class=yellow>Your message has been sent to " . mb_h($empireattacked) . ".</font></div></center>";
 		include("include/S_MESS.php"); 

@@ -40,7 +40,7 @@ mb_forum_require_sl($sl);
 
 if ($addtopic) {
 	$replies = 0;   // a new topic has none
-	$result = mb_query($db, "INSERT INTO setforums (setid, name, topic, replies, message, datestamp)	VALUES (?, ?, ?, ?, ?, ?)", array((int) $setid, $ename, $topic, $replies, $message, $clock));
+	$result = mb_query($db, "INSERT INTO setforums (setid, name, topic, replies, message, datestamp, round_id) SELECT setid, ?, ?, ?, ?, ?, round_id FROM settlement WHERE setid=?", array($ename, $topic, $replies, $message, $clock, (int) $setid));
 
 	$topic_lastpost = mb_query($db, "UPDATE setforums SET lastpost=? WHERE topic=? AND setid=?", array($clock, $topic, (int) $setid));
 	$topic_lastposter = mb_query($db, "UPDATE setforums SET lastposter=? WHERE topic=? AND setid=?", array($ename, $topic, (int) $setid));
@@ -53,7 +53,7 @@ elseif ($addreply) {
 
 	// See input.posts.php: the INSERT was being run twice, the second time with
 	// its own return value as the query string.
-	$result1 = mb_query($db, "INSERT INTO setforumsmsgs (setid, name, topic, topicid, message, datestamp)	 VALUES (?, ?, ?, ?, ?, ?)", array((int) $setid, $ename, $topic, (int) $topicid, $message, $clock));
+	$result1 = mb_query($db, "INSERT INTO setforumsmsgs (setid, name, topic, topicid, message, datestamp, round_id) SELECT setid, ?, ?, ?, ?, ?, round_id FROM settlement WHERE setid=?", array($ename, $topic, (int) $topicid, $message, $clock, (int) $setid));
 	$lastid = mysqli_insert_id($db);
 
 	$reply_lastpost = mb_query($db, "UPDATE setforums SET lastpost=? WHERE topicid=? AND setid=?", array($clock, (int) $topicid, (int) $setid));

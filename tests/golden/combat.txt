@@ -5,13 +5,13 @@
   says: You have conquered 25 land from PoorSerf(2)! Your losses: 4 warriors 6 wizards 3 priests
     buildings [1] aland 100 -> 125
     buildings [3] aland 10 -> 0, home 5 -> 3, barrack 5 -> 3, farm 5 -> 3, wp 3 -> 1, lmill 2 -> 0, dhome 3 -> 0, dfarm 2 -> 0
-  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
-  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
+  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3 | round_id=1
+  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1 | round_id=1
     military [1] warriors 300 -> 0, wizards 100 -> 0, priests 50 -> 0
     military [3] warriors 20 -> 19, wizards 10 -> 8, priests 10 -> 9, archers 5 -> 4
     returntbl [1] war4 0 -> 296, wiz4 0 -> 94, pri4 0 -> 47, time4 0 -> 6
-  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
-  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
+  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0 | round_id=1
+  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0 | round_id=1
     user [1] land 250 -> 275, fleets 2 -> 1
     user [3] land 250 -> 225, nno 0 -> 1
 
@@ -22,13 +22,13 @@
   says: You have conquered 25 land from PoorSerf(2)! Your losses: 12700 warriors 16933 wizards 7937 priests 10583 archers 635 golems 508 iron golems
     buildings [1] aland 100 -> 125
     buildings [3] aland 10 -> 0, home 5 -> 3, barrack 5 -> 3, farm 5 -> 3, wp 2000 -> 1998, lmill 2 -> 0, dhome 3 -> 0, dfarm 2 -> 0
-  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
-  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
+  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3 | round_id=1
+  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1 | round_id=1
     military [1] warriors 600000 -> 0, wizards 200000 -> 0, priests 100000 -> 0, archers 50000 -> 0, golem 900 -> 0, irongolem 900 -> 0
     military [3] warriors 200000 -> 198443, wizards 50000 -> 45849, priests 50000 -> 48054, archers 30000 -> 27406, catapult 5000 -> 4815, golem 2000 -> 1844, irongolem 1000 -> 875
     returntbl [1] war4 0 -> 587300, wiz4 0 -> 183067, pri4 0 -> 92063, arch4 0 -> 39417, golem4 0 -> 265, irongolem4 0 -> 392, time4 0 -> 25
-  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
-  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
+  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0 | round_id=1
+  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0 | round_id=1
     user [1] land 250 -> 275, fleets 2 -> 1
     user [3] land 250 -> 225, nno 0 -> 1
 
@@ -37,12 +37,12 @@
 
 > attack.php attack=1 empvalue=3 uwarrior=3
   says: We have failed to attack PoorSerf(2)! Your losses: 3 warriors
-  + empnews news=We have successfully defended our empire against TestLord (1) | class=yellow | yourid=3
-  + guildnews news=TestLord (1) failed to attack PoorSerf (2) for land | class=yellow | gnid=1 | age=0 | gid=1
+  + empnews news=We have successfully defended our empire against TestLord (1) | class=yellow | yourid=3 | round_id=1
+  + guildnews news=TestLord (1) failed to attack PoorSerf (2) for land | class=yellow | gnid=1 | age=0 | gid=1 | round_id=1
     military [1] warriors 3 -> 0
     returntbl [1] time4 0 -> 6
-  + setnews news=PoorSerf (2) successfully defended their land against TestLord (1) | class=orange | setid=2 | sid=1 | age=0
-  + setnews news=TestLord (1) failed to attack PoorSerf (2) for land | class=yellow | setid=1 | sid=1 | age=0
+  + setnews news=PoorSerf (2) successfully defended their land against TestLord (1) | class=orange | setid=2 | sid=1 | age=0 | round_id=1
+  + setnews news=TestLord (1) failed to attack PoorSerf (2) for land | class=yellow | setid=1 | sid=1 | age=0 | round_id=1
     user [1] fleets 2 -> 1
     user [3] nno 0 -> 1
 
@@ -53,13 +53,13 @@
   says: You have conquered 10 land from PoorSerf(2)! Your losses: 4 warriors
     buildings [1] aland 100 -> 110
     buildings [3] aland 100 -> 90
-  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 10 land | class=yellow | yourid=3
-  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 10 land | class=yellow | gnid=1 | age=0 | gid=1
+  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 10 land | class=yellow | yourid=3 | round_id=1
+  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 10 land | class=yellow | gnid=1 | age=0 | gid=1 | round_id=1
     military [1] warriors 300 -> 0
     military [3] wizards 10 -> 9, priests 10 -> 9, archers 5 -> 4
     returntbl [1] war4 0 -> 296, time4 0 -> 6
-  + setnews news=PoorSerf (2) lost 10 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
-  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 10 land | class=yellow | setid=1 | sid=0 | age=0
+  + setnews news=PoorSerf (2) lost 10 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0 | round_id=1
+  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 10 land | class=yellow | setid=1 | sid=0 | age=0 | round_id=1
     user [1] land 250 -> 260, fleets 2 -> 1
     user [3] land 50 -> 40, nno 0 -> 1
 
@@ -71,16 +71,16 @@
     buildings [1] aland 100 -> 108
   - buildings [3]
   - explore [3]
-  + guildnews news=TestLord (1) gained 8 land and destroyed PoorSerf (2) [i]Medieval style[/i] | class=yellow | gnid=1 | age=0 | gid=1
+  + guildnews news=TestLord (1) gained 8 land and destroyed PoorSerf (2) [i]Medieval style[/i] | class=yellow | gnid=1 | age=0 | gid=1 | round_id=1
     military [1] warriors 300 -> 0
   - military [3]
   - research [3]
     returntbl [1] war4 0 -> 296, time4 0 -> 6
   - returntbl [3]
-  + setnews news=PoorSerf (2) was destroyed by TestLord (1) [i]Medieval style[/i] | class=lg | setid=2 | sid=2 | age=0
-  + setnews news=TestLord (1) gained 8 land and destroyed PoorSerf (2) [i]Medieval style[/i] | class=yellow | setid=1 | sid=1 | age=0
-  - settlement members=1 | setname=Poorhaven | setpic= | setnotice=Welcome to Medieval Battles | setid=2 | setstrength=0
-  + settlement members=0 | setname=Poorhaven | setpic= | setnotice=Welcome to Medieval Battles | setid=2 | setstrength=0
+  + setnews news=PoorSerf (2) was destroyed by TestLord (1) [i]Medieval style[/i] | class=lg | setid=2 | sid=2 | age=0 | round_id=1
+  + setnews news=TestLord (1) gained 8 land and destroyed PoorSerf (2) [i]Medieval style[/i] | class=yellow | setid=1 | sid=1 | age=0 | round_id=1
+  - settlement members=1 | setname=Poorhaven | setpic= | setnotice=Welcome to Medieval Battles | setid=2 | setstrength=0 | round_id=1
+  + settlement members=0 | setname=Poorhaven | setpic= | setnotice=Welcome to Medieval Battles | setid=2 | setstrength=0 | round_id=1
     user [1] land 250 -> 258, fleets 2 -> 1
   - user [3]
 
@@ -91,13 +91,13 @@
   says: You have conquered 25 land from PoorSerf(2)! Your losses: 4 warriors
     buildings [1] aland 100 -> 125
     buildings [3] aland 4 -> 0, home 3 -> 0, barrack 3 -> 0
-  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
-  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
+  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3 | round_id=1
+  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1 | round_id=1
     military [1] warriors 300 -> 0
     military [3] wizards 10 -> 9, priests 10 -> 9, archers 5 -> 4
     returntbl [1] war4 0 -> 296, time4 0 -> 6
-  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
-  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
+  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0 | round_id=1
+  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0 | round_id=1
     user [1] land 250 -> 275, fleets 2 -> 1
     user [3] land 250 -> 225, nno 0 -> 1
 
@@ -108,14 +108,14 @@
   says: You have conquered 25 land from PoorSerf(2)! Your losses: 4 warriors
     buildings [1] aland 100 -> 125
     buildings [3] aland 100 -> 75
-  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
-  + guildnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | gnid=2 | age=0 | gid=2
-  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
+  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3 | round_id=1
+  + guildnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | gnid=2 | age=0 | gid=2 | round_id=1
+  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1 | round_id=1
     military [1] warriors 300 -> 0
     military [3] wizards 10 -> 9, priests 10 -> 9, archers 5 -> 4
     returntbl [1] war4 0 -> 296, time4 0 -> 6
-  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
-  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
+  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0 | round_id=1
+  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0 | round_id=1
     user [1] land 250 -> 275, fleets 2 -> 1
     user [3] land 250 -> 225, nno 0 -> 1
 
@@ -124,23 +124,23 @@
 
 > attack.php attack=1 empvalue=3 uwarrior=100
   says: We have failed to attack PoorSerf(2)! Your losses: 4 warriors
-  + empnews news=We have successfully defended our empire against TestLord (1) | class=yellow | yourid=3
-  + guildnews news=TestLord (1) failed to attack PoorSerf (2) for land | class=yellow | gnid=1 | age=0 | gid=1
+  + empnews news=We have successfully defended our empire against TestLord (1) | class=yellow | yourid=3 | round_id=1
+  + guildnews news=TestLord (1) failed to attack PoorSerf (2) for land | class=yellow | gnid=1 | age=0 | gid=1 | round_id=1
     military [1] warriors 300 -> 200
     returntbl [1] war4 0 -> 96, time4 0 -> 6
-  + setnews news=PoorSerf (2) successfully defended their land against TestLord (1) | class=orange | setid=2 | sid=1 | age=0
-  + setnews news=TestLord (1) failed to attack PoorSerf (2) for land | class=yellow | setid=1 | sid=1 | age=0
+  + setnews news=PoorSerf (2) successfully defended their land against TestLord (1) | class=orange | setid=2 | sid=1 | age=0 | round_id=1
+  + setnews news=TestLord (1) failed to attack PoorSerf (2) for land | class=yellow | setid=1 | sid=1 | age=0 | round_id=1
     user [1] fleets 2 -> 1
     user [3] nno 0 -> 1
 
 > attack.php attack=1 empvalue=3 uwarrior=100
   says: We have failed to attack PoorSerf(2)! Your losses: 4 warriors
-  + empnews news=We have successfully defended our empire against TestLord (1) | class=yellow | yourid=3
-  + guildnews news=TestLord (1) failed to attack PoorSerf (2) for land | class=yellow | gnid=2 | age=0 | gid=1
+  + empnews news=We have successfully defended our empire against TestLord (1) | class=yellow | yourid=3 | round_id=1
+  + guildnews news=TestLord (1) failed to attack PoorSerf (2) for land | class=yellow | gnid=2 | age=0 | gid=1 | round_id=1
     military [1] warriors 200 -> 100
     returntbl [1] war3 0 -> 96, time3 0 -> 6
-  + setnews news=PoorSerf (2) successfully defended their land against TestLord (1) | class=orange | setid=2 | sid=2 | age=0
-  + setnews news=TestLord (1) failed to attack PoorSerf (2) for land | class=yellow | setid=1 | sid=2 | age=0
+  + setnews news=PoorSerf (2) successfully defended their land against TestLord (1) | class=orange | setid=2 | sid=2 | age=0 | round_id=1
+  + setnews news=TestLord (1) failed to attack PoorSerf (2) for land | class=yellow | setid=1 | sid=2 | age=0 | round_id=1
     user [1] fleets 1 -> 0
     user [3] nno 1 -> 2
 
@@ -155,12 +155,12 @@
   says: You have conquered 25 land from PoorSerf(2)! Your losses: 0 warrior
     buildings [1] aland 100 -> 125
     buildings [3] aland 100 -> 75
-  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
-  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
+  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3 | round_id=1
+  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1 | round_id=1
     military [1] warriors 300 -> 290
     returntbl [1] war4 0 -> 10, time4 0 -> 6
-  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
-  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
+  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0 | round_id=1
+  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0 | round_id=1
     user [1] land 250 -> 275, fleets 2 -> 1
     user [3] land 250 -> 225, nno 0 -> 1
 
@@ -169,13 +169,13 @@
 
 > attackr.php attack=1 empvalue=3 uwarrior=300
   says: Success! You have managed to gain 800 gold pieces, 400 iron, 267 lumber, and 80 civilians from PoorSerf(2)! Your losses: 4 warriors
-  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 800 gold pieces, 400 iron, 267 lumber, and 80 civilians. | class=yellow | yourid=3
-  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) for resources | class=yellow | gnid=0 | age=0 | gid=1
+  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 800 gold pieces, 400 iron, 267 lumber, and 80 civilians. | class=yellow | yourid=3 | round_id=1
+  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) for resources | class=yellow | gnid=0 | age=0 | gid=1 | round_id=1
     military [1] warriors 300 -> 0, civ 1200 -> 1280
     military [3] wizards 10 -> 9, priests 10 -> 9, archers 5 -> 4, civ 1000 -> 920
     returntbl [1] war4 0 -> 296, time4 0 -> 6
-  + setnews news=PoorSerf (2) lost resources to TestLord (1) | class=lg | setid=2 | sid=0 | age=0
-  + setnews news=TestLord (1) successfully attacked PoorSerf (2) for resources | class=yellow | setid=1 | sid=0 | age=0
+  + setnews news=PoorSerf (2) lost resources to TestLord (1) | class=lg | setid=2 | sid=0 | age=0 | round_id=1
+  + setnews news=TestLord (1) successfully attacked PoorSerf (2) for resources | class=yellow | setid=1 | sid=0 | age=0 | round_id=1
     user [1] gp 300000 -> 300800, iron 5000 -> 5400, lumber 4000 -> 4267, fleets 2 -> 1
     user [3] gp 10000 -> 9200, iron 5000 -> 4600, lumber 3333 -> 3066, nno 0 -> 1
 
@@ -184,13 +184,13 @@
 
 > attackr.php attack=1 empvalue=3 uwarrior=300
   says: Success! You have managed to gain 0 gold pieces, 8 iron, 0 lumber, and 0 civilians from PoorSerf(2)! Your losses: 4 warriors
-  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 0 gold pieces, 8 iron, 0 lumber, and 0 civilians. | class=yellow | yourid=3
-  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) for resources | class=yellow | gnid=0 | age=0 | gid=1
+  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 0 gold pieces, 8 iron, 0 lumber, and 0 civilians. | class=yellow | yourid=3 | round_id=1
+  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) for resources | class=yellow | gnid=0 | age=0 | gid=1 | round_id=1
     military [1] warriors 300 -> 0
     military [3] wizards 10 -> 9, priests 10 -> 9, archers 5 -> 4
     returntbl [1] war4 0 -> 296, time4 0 -> 6
-  + setnews news=PoorSerf (2) lost resources to TestLord (1) | class=lg | setid=2 | sid=0 | age=0
-  + setnews news=TestLord (1) successfully attacked PoorSerf (2) for resources | class=yellow | setid=1 | sid=0 | age=0
+  + setnews news=PoorSerf (2) lost resources to TestLord (1) | class=lg | setid=2 | sid=0 | age=0 | round_id=1
+  + setnews news=TestLord (1) successfully attacked PoorSerf (2) for resources | class=yellow | setid=1 | sid=0 | age=0 | round_id=1
     user [1] iron 5000 -> 5008, fleets 2 -> 1
     user [3] iron 100 -> 92, nno 0 -> 1
 
@@ -199,12 +199,12 @@
 
 > attackr.php attack=1 empvalue=3 uwarrior=3
   says: You have failed to attack PoorSerf! Your losses: 3 warriors
-  + empnews news=We have successfully defended our empire against TestLord (1) | class=yellow | yourid=3
-  + guildnews news=TestLord (1) failed to attack PoorSerf (2) for resources | class=yellow | gnid=0 | age=0 | gid=1
+  + empnews news=We have successfully defended our empire against TestLord (1) | class=yellow | yourid=3 | round_id=1
+  + guildnews news=TestLord (1) failed to attack PoorSerf (2) for resources | class=yellow | gnid=0 | age=0 | gid=1 | round_id=1
     military [1] warriors 3 -> 0
     returntbl [1] time4 0 -> 6
-  + setnews news=PoorSerf (2) successfully defended their resources against TestLord (1) | class=orange | setid=2 | sid=0 | age=0
-  + setnews news=TestLord (1) failed to attack PoorSerf (2) for resources | class=yellow | setid=1 | sid=0 | age=0
+  + setnews news=PoorSerf (2) successfully defended their resources against TestLord (1) | class=orange | setid=2 | sid=0 | age=0 | round_id=1
+  + setnews news=TestLord (1) failed to attack PoorSerf (2) for resources | class=yellow | setid=1 | sid=0 | age=0 | round_id=1
     user [1] fleets 2 -> 1
     user [3] nno 0 -> 1
 
@@ -215,13 +215,13 @@
   says: You have conquered 20 mountains from PoorSerf (2)! Your losses: 4 warriors
     buildings [1] amts 100 -> 120
     buildings [3] amts 5 -> 0, gm 10 -> 4, im 10 -> 5, dgm 2 -> 0, dim 2 -> 0
-  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 20 mountains | class=yellow | yourid=3
-  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 20 mountains | class=yellow | gnid=0 | age=0 | gid=1
+  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 20 mountains | class=yellow | yourid=3 | round_id=1
+  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 20 mountains | class=yellow | gnid=0 | age=0 | gid=1 | round_id=1
     military [1] warriors 300 -> 0
     military [3] wizards 10 -> 9, priests 10 -> 9, archers 5 -> 4
     returntbl [1] war4 0 -> 296, time4 0 -> 6
-  + setnews news=PoorSerf (2) lost 20 mountains to TestLord (1) | class=lg | setid=2 | sid=0 | age=0
-  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 20 mountains | class=yellow | setid=1 | sid=0 | age=0
+  + setnews news=PoorSerf (2) lost 20 mountains to TestLord (1) | class=lg | setid=2 | sid=0 | age=0 | round_id=1
+  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 20 mountains | class=yellow | setid=1 | sid=0 | age=0 | round_id=1
     user [1] mts 200 -> 220, exp2 0 -> 100, fleets 2 -> 1
     user [3] mts 200 -> 180, nno 0 -> 1
 
@@ -232,13 +232,13 @@
   says: You have conquered 20 mountains from PoorSerf (2)! Your losses: 4 warriors
     buildings [1] amts 100 -> 120
     buildings [3] gm 5 -> 0, im 5 -> 0
-  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 20 mountains | class=yellow | yourid=3
-  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 20 mountains | class=yellow | gnid=0 | age=0 | gid=1
+  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 20 mountains | class=yellow | yourid=3 | round_id=1
+  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 20 mountains | class=yellow | gnid=0 | age=0 | gid=1 | round_id=1
     military [1] warriors 300 -> 0
     military [3] wizards 10 -> 9, priests 10 -> 9, archers 5 -> 4
     returntbl [1] war4 0 -> 296, time4 0 -> 6
-  + setnews news=PoorSerf (2) lost 20 mountains to TestLord (1) | class=lg | setid=2 | sid=0 | age=0
-  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 20 mountains | class=yellow | setid=1 | sid=0 | age=0
+  + setnews news=PoorSerf (2) lost 20 mountains to TestLord (1) | class=lg | setid=2 | sid=0 | age=0 | round_id=1
+  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 20 mountains | class=yellow | setid=1 | sid=0 | age=0 | round_id=1
     user [1] mts 200 -> 220, exp2 0 -> 100, fleets 2 -> 1
     user [3] mts 200 -> 180, nno 0 -> 1
 
@@ -247,12 +247,12 @@
 
 > attackm.php attack=1 empvalue=3 uwarrior=3
   says: You have failed to attack PoorSerf! Your losses: 3 warriors
-  + empnews news=We have successfully defended our empire against TestLord (1) | class=yellow | yourid=3
-  + guildnews news=TestLord (1) failed to attack PoorSerf (2) for mountains | class=yellow | gnid=0 | age=0 | gid=1
+  + empnews news=We have successfully defended our empire against TestLord (1) | class=yellow | yourid=3 | round_id=1
+  + guildnews news=TestLord (1) failed to attack PoorSerf (2) for mountains | class=yellow | gnid=0 | age=0 | gid=1 | round_id=1
     military [1] warriors 3 -> 0
     returntbl [1] time4 0 -> 6
-  + setnews news=PoorSerf (2) successfully defended their mountains against TestLord (1) | class=orange | setid=2 | sid=0 | age=0
-  + setnews news=TestLord (1) failed to attack PoorSerf (2) for mountains | class=yellow | setid=1 | sid=0 | age=0
+  + setnews news=PoorSerf (2) successfully defended their mountains against TestLord (1) | class=orange | setid=2 | sid=0 | age=0 | round_id=1
+  + setnews news=TestLord (1) failed to attack PoorSerf (2) for mountains | class=yellow | setid=1 | sid=0 | age=0 | round_id=1
     user [1] fleets 2 -> 1
     user [3] nno 0 -> 1
 
@@ -270,13 +270,13 @@
   says: You have conquered 25 land from PoorSerf(2)! Your losses: 4 warriors 0 golem
     buildings [1] aland 100 -> 125
     buildings [3] aland 100 -> 75
-  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
-  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
+  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3 | round_id=1
+  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1 | round_id=1
     military [1] warriors 300 -> 0, golem 40 -> 0
     military [3] warriors 20 -> 18, wizards 10 -> 6, priests 10 -> 8, archers 5 -> 2
     returntbl [1] war4 0 -> 296, golem4 0 -> 40, time4 0 -> 20
-  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
-  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
+  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0 | round_id=1
+  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0 | round_id=1
     user [1] land 250 -> 275, fleets 2 -> 1
     user [3] land 250 -> 225, nno 0 -> 1
 
@@ -287,13 +287,13 @@
   says: You have conquered 25 land from PoorSerf(2)! Your losses: 4 warriors 3 archers 0 iron golem
     buildings [1] aland 100 -> 125
     buildings [3] aland 100 -> 75
-  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
-  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
+  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3 | round_id=1
+  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1 | round_id=1
     military [1] warriors 300 -> 0, archers 30 -> 0, irongolem 20 -> 0
     military [3] warriors 20 -> 19, wizards 10 -> 7, priests 10 -> 9, archers 5 -> 3
     returntbl [1] war4 0 -> 296, arch4 0 -> 27, irongolem4 0 -> 20, time4 0 -> 25
-  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
-  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
+  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0 | round_id=1
+  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0 | round_id=1
     user [1] land 250 -> 275, fleets 2 -> 1
     user [3] land 250 -> 225, nno 0 -> 1
 
@@ -304,13 +304,13 @@
   says: You have conquered 25 land from PoorSerf(2)! Your losses: 4 warriors 3 archers
     buildings [1] aland 100 -> 125
     buildings [3] aland 100 -> 75
-  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
-  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
+  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3 | round_id=1
+  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1 | round_id=1
     military [1] warriors 300 -> 0, archers 30 -> 0
     military [3] wizards 10 -> 9, priests 10 -> 9, archers 5 -> 4
     returntbl [1] war4 0 -> 296, arch4 0 -> 27, time4 0 -> 6
-  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
-  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
+  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0 | round_id=1
+  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0 | round_id=1
     user [1] land 250 -> 275, fleets 2 -> 1
     user [3] land 250 -> 225, nno 0 -> 1
 
@@ -321,13 +321,13 @@
   says: You have conquered 25 land from PoorSerf(2)! Your losses: 4 warriors 0 iron golem
     buildings [1] aland 100 -> 125
     buildings [3] aland 100 -> 75
-  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
-  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
+  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3 | round_id=1
+  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1 | round_id=1
     military [1] warriors 300 -> 0, irongolem 20 -> 0
     military [3] warriors 20 -> 19, wizards 10 -> 7, priests 10 -> 9, archers 5 -> 3
     returntbl [1] war4 0 -> 296, irongolem4 0 -> 20, time4 0 -> 25
-  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
-  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
+  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0 | round_id=1
+  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0 | round_id=1
     user [1] land 250 -> 275, fleets 2 -> 1
     user [3] land 250 -> 225, nno 0 -> 1
 
@@ -342,13 +342,13 @@
   says: You have conquered 25 land from PoorSerf(2)! Your losses: 4 warriors 0 golem
     buildings [1] aland 100 -> 125
     buildings [3] aland 100 -> 75
-  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
-  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
+  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3 | round_id=1
+  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1 | round_id=1
     military [1] warriors 300 -> 0, golem 2000 -> 1500
     military [3] warriors 20 -> 6, wizards 10 -> 0, priests 10 -> 0, archers 5 -> 0, catapult 2 -> 0, golem 2 -> 1, irongolem 1 -> 0
     returntbl [1] war4 0 -> 296, golem4 0 -> 500, time4 0 -> 20
-  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
-  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
+  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0 | round_id=1
+  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0 | round_id=1
     user [1] land 250 -> 275, fleets 2 -> 1
     user [3] land 250 -> 225, nno 0 -> 1
 
@@ -359,13 +359,13 @@
   says: You have conquered 25 land from PoorSerf(2)! Your losses: 0 warrior
     buildings [1] aland 100 -> 125
     buildings [3] aland 100 -> 75
-  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
-  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
+  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3 | round_id=1
+  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1 | round_id=1
     military [1] warriors 300 -> 0
     military [3] warriors 5 -> 4, wizards 2 -> 0
     returntbl [1] war4 0 -> 300, time4 0 -> 6
-  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
-  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
+  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0 | round_id=1
+  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0 | round_id=1
     user [1] land 250 -> 275, fleets 2 -> 1
     user [3] land 250 -> 225, nno 0 -> 1
 
@@ -376,13 +376,13 @@
   says: You have conquered 25 land from PoorSerf(2)! Your losses: 4 warriors
     buildings [1] aland 100 -> 125
     buildings [3] aland 10 -> 0, home 5 -> 3, barrack 5 -> 3, farm 5 -> 3, wp 3 -> 1, lmill 2 -> 0, dhome 3 -> 0, dfarm 2 -> 0
-  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
-  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
+  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3 | round_id=1
+  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1 | round_id=1
     military [1] warriors 300 -> 0
     military [3] warriors 20 -> 19, wizards 10 -> 9, priests 10 -> 9, archers 5 -> 4
     returntbl [1] war4 0 -> 296, time4 0 -> 6
-  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
-  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
+  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0 | round_id=1
+  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0 | round_id=1
     user [1] land 250 -> 275, fleets 2 -> 1
     user [3] land 250 -> 225, nno 0 -> 1
 
@@ -393,13 +393,13 @@
   says: You have conquered 25 land from PoorSerf(2)! Your losses: 4 warriors 5 wizards
     buildings [1] aland 100 -> 125
     buildings [3] aland 100 -> 75
-  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
-  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
+  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3 | round_id=1
+  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1 | round_id=1
     military [1] warriors 300 -> 0, wizards 100 -> 0
     military [3] warriors 20 -> 19, wizards 10 -> 8, priests 10 -> 9, archers 5 -> 4
     returntbl [1] war4 0 -> 296, wiz4 0 -> 95, time4 0 -> 4
-  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
-  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
+  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0 | round_id=1
+  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0 | round_id=1
     user [1] land 250 -> 275, fleets 2 -> 1
     user [3] land 250 -> 225, nno 0 -> 1
 
@@ -410,13 +410,13 @@
   says: You have conquered 25 land from PoorSerf(2)! Your losses: 4 warriors 5 wizards
     buildings [1] aland 100 -> 125
     buildings [3] aland 100 -> 75
-  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
-  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
+  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3 | round_id=1
+  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1 | round_id=1
     military [1] warriors 300 -> 0, wizards 100 -> 0
     military [3] warriors 20 -> 19, wizards 10 -> 8, priests 10 -> 9, archers 5 -> 4
     returntbl [1] war4 0 -> 296, wiz4 0 -> 95, time4 0 -> 4
-  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
-  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
+  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0 | round_id=1
+  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0 | round_id=1
     user [1] land 250 -> 275, fleets 2 -> 1
     user [3] land 250 -> 225, nno 0 -> 1
 
@@ -446,7 +446,7 @@
 
 > scattack.php suicideatk=1 empvalue=3 send=40 toatk=civ
   says: You have successfully suicided on the empire of PoorSerf (2). You killed 80 Civilian(s) and 0 Thieve(s).
-  + empnews news=TestLord (1) has sucessfully suicided on your empire. You lost 80 Civilian(s) and 0 Thieve(s). | class=yellow | yourid=3
+  + empnews news=TestLord (1) has sucessfully suicided on your empire. You lost 80 Civilian(s) and 0 Thieve(s). | class=yellow | yourid=3 | round_id=1
     military [1] suicide 50 -> 10
     military [3] civ 300 -> 220
     user [3] nno 0 -> 1
@@ -456,7 +456,7 @@
 
 > scattack.php suicideatk=1 empvalue=3 send=40 toatk=thieve
   says: You have successfully suicided on the empire of PoorSerf (2). You killed 0 Civilian(s) and 30 Thieve(s).
-  + empnews news=TestLord (1) has sucessfully suicided on your empire. You lost 0 Civilian(s) and 30 Thieve(s). | class=yellow | yourid=3
+  + empnews news=TestLord (1) has sucessfully suicided on your empire. You lost 0 Civilian(s) and 30 Thieve(s). | class=yellow | yourid=3 | round_id=1
     military [1] suicide 50 -> 10
     military [3] thieves 30 -> 0
     user [3] nno 0 -> 1
@@ -468,13 +468,13 @@
   says: You have conquered 25 land from PoorSerf(2)! Your losses: 12700 warriors 10583 archers
     buildings [1] aland 100 -> 125
     buildings [3] aland 10 -> 0, home 5 -> 3, barrack 5 -> 3, farm 5 -> 3, wp 2000 -> 1998, lmill 2 -> 0, dhome 3 -> 0, dfarm 2 -> 0
-  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
-  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
+  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3 | round_id=1
+  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1 | round_id=1
     military [1] warriors 600000 -> 0, archers 50000 -> 0
     military [3] warriors 200000 -> 199025, wizards 50000 -> 47400, priests 50000 -> 48781, archers 30000 -> 28375, catapult 5000 -> 4884, golem 2000 -> 1903, irongolem 1000 -> 922
     returntbl [1] war4 0 -> 587300, arch4 0 -> 39417, time4 0 -> 6
-  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
-  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
+  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0 | round_id=1
+  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0 | round_id=1
     user [1] land 250 -> 275, fleets 2 -> 1
     user [3] land 250 -> 225, nno 0 -> 1
 
@@ -485,13 +485,13 @@
   says: You have conquered 25 land from PoorSerf(2)! Your losses: 12700 warriors 10583 archers
     buildings [1] aland 100 -> 125
     buildings [3] aland 10 -> 0, home 5 -> 3, barrack 5 -> 3, farm 5 -> 3, wp 2000 -> 1998, lmill 2 -> 0, dhome 3 -> 0, dfarm 2 -> 0
-  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
-  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
+  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3 | round_id=1
+  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1 | round_id=1
     military [1] warriors 600000 -> 0, archers 50000 -> 0
     military [3] warriors 200000 -> 199071, wizards 50000 -> 47524, priests 50000 -> 48839, archers 30000 -> 28452, catapult 5000 -> 4889, golem 2000 -> 1907, irongolem 1000 -> 926
     returntbl [1] war4 0 -> 587300, arch4 0 -> 39417, time4 0 -> 6
-  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
-  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
+  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0 | round_id=1
+  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0 | round_id=1
     user [1] land 250 -> 275, fleets 2 -> 1
     user [3] land 250 -> 225, nno 0 -> 1
 
@@ -502,13 +502,13 @@
   says: You have conquered 25 land from PoorSerf(2)! Your losses: 12700 warriors 10583 archers
     buildings [1] aland 100 -> 125
     buildings [3] aland 10 -> 0, home 5 -> 3, barrack 5 -> 3, farm 5 -> 3, wp 2000 -> 1998, lmill 2 -> 0, dhome 3 -> 0, dfarm 2 -> 0
-  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
-  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
+  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3 | round_id=1
+  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1 | round_id=1
     military [1] warriors 600000 -> 0, archers 50000 -> 0
     military [3] warriors 200000 -> 199071, wizards 50000 -> 47524, priests 50000 -> 48839, archers 30000 -> 28452, catapult 5000 -> 4889, golem 2000 -> 1907, irongolem 1000 -> 926
     returntbl [1] war4 0 -> 587300, arch4 0 -> 39417, time4 0 -> 6
-  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
-  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
+  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0 | round_id=1
+  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0 | round_id=1
     user [1] land 250 -> 275, fleets 2 -> 1
     user [3] land 250 -> 225, nno 0 -> 1
 
@@ -517,13 +517,13 @@
 
 > attack.php attack=1 empvalue=3 uwarrior=600000 uarcher=50000
   says: We have failed to attack PoorSerf(2)! Your losses: 12700 warriors 10583 archers
-  + empnews news=We have successfully defended our empire against TestLord (1) | class=yellow | yourid=3
-  + guildnews news=TestLord (1) failed to attack PoorSerf (2) for land | class=yellow | gnid=1 | age=0 | gid=1
+  + empnews news=We have successfully defended our empire against TestLord (1) | class=yellow | yourid=3 | round_id=1
+  + guildnews news=TestLord (1) failed to attack PoorSerf (2) for land | class=yellow | gnid=1 | age=0 | gid=1 | round_id=1
     military [1] warriors 600000 -> 0, archers 50000 -> 0
     military [3] warriors 200000 -> 199118, wizards 50000 -> 47648, priests 50000 -> 48897, archers 30000 -> 28530, catapult 5000 -> 4895, golem 2000 -> 1912, irongolem 1000 -> 929
     returntbl [1] war4 0 -> 587300, arch4 0 -> 39417, time4 0 -> 6
-  + setnews news=PoorSerf (2) successfully defended their land against TestLord (1) | class=orange | setid=2 | sid=1 | age=0
-  + setnews news=TestLord (1) failed to attack PoorSerf (2) for land | class=yellow | setid=1 | sid=1 | age=0
+  + setnews news=PoorSerf (2) successfully defended their land against TestLord (1) | class=orange | setid=2 | sid=1 | age=0 | round_id=1
+  + setnews news=TestLord (1) failed to attack PoorSerf (2) for land | class=yellow | setid=1 | sid=1 | age=0 | round_id=1
     user [1] fleets 2 -> 1
     user [3] nno 0 -> 1
 
@@ -532,13 +532,13 @@
 
 > attack.php attack=1 empvalue=3 uwarrior=600000 uarcher=50000
   says: We have failed to attack PoorSerf(2)! Your losses: 12700 warriors 10583 archers
-  + empnews news=We have successfully defended our empire against TestLord (1) | class=yellow | yourid=3
-  + guildnews news=TestLord (1) failed to attack PoorSerf (2) for land | class=yellow | gnid=1 | age=0 | gid=1
+  + empnews news=We have successfully defended our empire against TestLord (1) | class=yellow | yourid=3 | round_id=1
+  + guildnews news=TestLord (1) failed to attack PoorSerf (2) for land | class=yellow | gnid=1 | age=0 | gid=1 | round_id=1
     military [1] warriors 600000 -> 0, archers 50000 -> 0
     military [3] warriors 200000 -> 199118, wizards 50000 -> 47648, priests 50000 -> 48897, archers 30000 -> 28530, catapult 5000 -> 4895, golem 2000 -> 1912, irongolem 1000 -> 929
     returntbl [1] war4 0 -> 587300, arch4 0 -> 39417, time4 0 -> 6
-  + setnews news=PoorSerf (2) successfully defended their land against TestLord (1) | class=orange | setid=2 | sid=1 | age=0
-  + setnews news=TestLord (1) failed to attack PoorSerf (2) for land | class=yellow | setid=1 | sid=1 | age=0
+  + setnews news=PoorSerf (2) successfully defended their land against TestLord (1) | class=orange | setid=2 | sid=1 | age=0 | round_id=1
+  + setnews news=TestLord (1) failed to attack PoorSerf (2) for land | class=yellow | setid=1 | sid=1 | age=0 | round_id=1
     user [1] fleets 2 -> 1
     user [3] nno 0 -> 1
 
@@ -547,13 +547,13 @@
 
 > attack.php attack=1 empvalue=3 uwarrior=600000 uarcher=50000
   says: We have failed to attack PoorSerf(2)! Your losses: 12700 warriors 10583 archers
-  + empnews news=We have successfully defended our empire against TestLord (1) | class=yellow | yourid=3
-  + guildnews news=TestLord (1) failed to attack PoorSerf (2) for land | class=yellow | gnid=1 | age=0 | gid=1
+  + empnews news=We have successfully defended our empire against TestLord (1) | class=yellow | yourid=3 | round_id=1
+  + guildnews news=TestLord (1) failed to attack PoorSerf (2) for land | class=yellow | gnid=1 | age=0 | gid=1 | round_id=1
     military [1] warriors 600000 -> 0, archers 50000 -> 0
     military [3] warriors 200000 -> 199257, wizards 50000 -> 48019, priests 50000 -> 49071, archers 30000 -> 28762, catapult 5000 -> 4912, golem 2000 -> 1926, irongolem 1000 -> 941
     returntbl [1] war4 0 -> 587300, arch4 0 -> 39417, time4 0 -> 6
-  + setnews news=PoorSerf (2) successfully defended their land against TestLord (1) | class=orange | setid=2 | sid=1 | age=0
-  + setnews news=TestLord (1) failed to attack PoorSerf (2) for land | class=yellow | setid=1 | sid=1 | age=0
+  + setnews news=PoorSerf (2) successfully defended their land against TestLord (1) | class=orange | setid=2 | sid=1 | age=0 | round_id=1
+  + setnews news=TestLord (1) failed to attack PoorSerf (2) for land | class=yellow | setid=1 | sid=1 | age=0 | round_id=1
     user [1] fleets 2 -> 1
     user [3] nno 0 -> 1
 
@@ -564,13 +564,13 @@
   says: You have conquered 25 land from PoorSerf(2)! Your losses: 12700 warriors 10583 archers
     buildings [1] aland 100 -> 125
     buildings [3] aland 10 -> 0, home 5 -> 3, barrack 5 -> 3, farm 5 -> 3, wp 2000 -> 1998, lmill 2 -> 0, dhome 3 -> 0, dfarm 2 -> 0
-  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
-  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
+  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3 | round_id=1
+  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1 | round_id=1
     military [1] warriors 600000 -> 0, archers 50000 -> 0
     military [3] warriors 200000 -> 199025, wizards 50000 -> 47400, priests 50000 -> 48781, archers 30000 -> 28375, catapult 5000 -> 4884, golem 2000 -> 1903, irongolem 1000 -> 922
     returntbl [1] war4 0 -> 587300, arch4 0 -> 39417, time4 0 -> 6
-  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
-  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
+  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0 | round_id=1
+  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0 | round_id=1
     user [1] land 250 -> 275, fleets 2 -> 1
     user [3] land 250 -> 225, nno 0 -> 1
 
@@ -581,13 +581,13 @@
   says: You have conquered 25 land from PoorSerf(2)! Your losses: 12700 warriors 10583 archers
     buildings [1] aland 100 -> 125
     buildings [3] aland 10 -> 0, home 5 -> 3, barrack 5 -> 3, farm 5 -> 3, wp 2000 -> 1998, lmill 2 -> 0, dhome 3 -> 0, dfarm 2 -> 0
-  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
-  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
+  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3 | round_id=1
+  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1 | round_id=1
     military [1] warriors 600000 -> 0, archers 50000 -> 0
     military [3] warriors 200000 -> 198839, wizards 50000 -> 46905, priests 50000 -> 48549, archers 30000 -> 28065, catapult 5000 -> 4862, golem 2000 -> 1884, irongolem 1000 -> 907
     returntbl [1] war4 0 -> 587300, arch4 0 -> 39417, time4 0 -> 6
-  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
-  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
+  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0 | round_id=1
+  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0 | round_id=1
     user [1] land 250 -> 275, fleets 2 -> 1
     user [3] land 250 -> 225, nno 0 -> 1
 
@@ -598,13 +598,13 @@
   says: You have conquered 25 land from PoorSerf(2)! Your losses: 12700 warriors 10583 archers
     buildings [1] aland 100 -> 125
     buildings [3] aland 10 -> 0, home 5 -> 3, barrack 5 -> 3, farm 5 -> 3, wp 2000 -> 1998, lmill 2 -> 0, dhome 3 -> 0, dfarm 2 -> 0
-  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
-  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
+  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3 | round_id=1
+  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1 | round_id=1
     military [1] warriors 600000 -> 0, archers 50000 -> 0
     military [3] warriors 200000 -> 198979, wizards 50000 -> 47276, priests 50000 -> 48723, archers 30000 -> 28298, catapult 5000 -> 4878, golem 2000 -> 1898, irongolem 1000 -> 918
     returntbl [1] war4 0 -> 587300, arch4 0 -> 39417, time4 0 -> 6
-  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
-  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
+  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0 | round_id=1
+  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0 | round_id=1
     user [1] land 250 -> 275, fleets 2 -> 1
     user [3] land 250 -> 225, nno 0 -> 1
 

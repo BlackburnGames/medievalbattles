@@ -104,7 +104,7 @@ foreach ($WIPES as $wipe => $form) {
     foreach ($ADMINS as $id => $a) {
         mysqli_query($db, "UPDATE user SET class = '" . mysqli_real_escape_string($db, $a['class'])
             . "', guild = 'Old Guild', vote = 3, sl = 'yes' WHERE userid = $id");
-        mysqli_query($db, "INSERT INTO empnews (yourid) VALUES ($id)");
+        mysqli_query($db, "INSERT INTO empnews (yourid, round_id) VALUES ($id, 1)");
     }
 
     // The state a reset has to clear, present to begin with -- or a pass

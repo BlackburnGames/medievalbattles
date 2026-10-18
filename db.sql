@@ -14,7 +14,10 @@ CREATE TABLE `barter` (
   `userid` bigint(255) NOT NULL default '0',
   `method` varchar(255) NOT NULL default 'gp',
   `page` varchar(255) NOT NULL default '',
-  `guild` varchar(255) NOT NULL default ''
+  `guild` varchar(255) NOT NULL default '',
+  -- The round this row belongs to (the `round` table, below).
+  `round_id` int unsigned NOT NULL,
+  KEY `round_id` (`round_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
@@ -56,7 +59,10 @@ CREATE TABLE `buildings` (
   `Ghrs` bigint(255) NOT NULL default '0',
   `Ihrs` bigint(255) NOT NULL default '0',
   `userid` bigint(255) NOT NULL default '0',
-  KEY `userid` (`userid`)
+  KEY `userid` (`userid`),
+  -- The round this row belongs to (the `round` table, below).
+  `round_id` int unsigned NOT NULL,
+  KEY `round_id` (`round_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
@@ -77,7 +83,10 @@ CREATE TABLE `empnews` (
   `date` varchar(255) NOT NULL default '',
   `news` blob NOT NULL,
   `class` varchar(16) NOT NULL default 'yellow',
-  `yourid` bigint(255) NOT NULL default '0'
+  `yourid` bigint(255) NOT NULL default '0',
+  -- The round this row belongs to (the `round` table, below).
+  `round_id` int unsigned NOT NULL,
+  KEY `round_id` (`round_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
@@ -100,7 +109,10 @@ CREATE TABLE `explore` (
   `expmt` bigint(20) NOT NULL default '0',
   `landhrs` bigint(255) NOT NULL default '0',
   `mthrs` bigint(255) NOT NULL default '0',
-  KEY `userid` (`userid`)
+  KEY `userid` (`userid`),
+  -- The round this row belongs to (the `round` table, below).
+  `round_id` int unsigned NOT NULL,
+  KEY `round_id` (`round_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
@@ -169,7 +181,10 @@ CREATE TABLE `guild` (
   `flag` varchar(255) NOT NULL default '',
   `owner` varchar(255) NOT NULL default '',
   `mem` bigint(20) NOT NULL default '0',
-  `notice` varchar(255) NOT NULL default 'None'
+  `notice` varchar(255) NOT NULL default 'None',
+  -- The round this row belongs to (the `round` table, below).
+  `round_id` int unsigned NOT NULL,
+  KEY `round_id` (`round_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
@@ -193,7 +208,10 @@ CREATE TABLE `guildmsgs` (
   `topicid` smallint(6) NOT NULL default '0',
   `message` text NOT NULL,
   `datestamp` varchar(20) NOT NULL default '',
-  PRIMARY KEY  (`messageid`)
+  PRIMARY KEY  (`messageid`),
+  -- The round this row belongs to (the `round` table, below).
+  `round_id` int unsigned NOT NULL,
+  KEY `round_id` (`round_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
@@ -215,7 +233,10 @@ CREATE TABLE `guildnews` (
   `class` varchar(16) NOT NULL default 'yellow',
   `gnid` bigint(255) NOT NULL default '0',
   `age` bigint(255) NOT NULL default '0',
-  `gid` varchar(225) NOT NULL default ''
+  `gid` varchar(225) NOT NULL default '',
+  -- The round this row belongs to (the `round` table, below).
+  `round_id` int unsigned NOT NULL,
+  KEY `round_id` (`round_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
@@ -234,7 +255,10 @@ CREATE TABLE `guildnews` (
 
 CREATE TABLE `guildrequests` (
   `applicant` varchar(255) NOT NULL default '',
-  `gl_userid` varchar(255) NOT NULL default ''
+  `gl_userid` varchar(255) NOT NULL default '',
+  -- The round this row belongs to (the `round` table, below).
+  `round_id` int unsigned NOT NULL,
+  KEY `round_id` (`round_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
@@ -262,7 +286,10 @@ CREATE TABLE `guildthreads` (
   `message` text NOT NULL,
   `datestamp` varchar(20) NOT NULL default '',
   `guildname` varchar(100) NOT NULL default '',
-  PRIMARY KEY  (`topicid`)
+  PRIMARY KEY  (`topicid`),
+  -- The round this row belongs to (the `round` table, below).
+  `round_id` int unsigned NOT NULL,
+  KEY `round_id` (`round_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
@@ -302,7 +329,10 @@ CREATE TABLE `messages` (
   `message` blob NOT NULL,
   `yourid` bigint(255) NOT NULL default '0',
   `mid` bigint(255) NOT NULL default '0',
-  `age` bigint(255) NOT NULL default '0'
+  `age` bigint(255) NOT NULL default '0',
+  -- The round this row belongs to (the `round` table, below).
+  `round_id` int unsigned NOT NULL,
+  KEY `round_id` (`round_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
@@ -419,7 +449,10 @@ CREATE TABLE `military` (
   `dbgolem` bigint(255) NOT NULL default '0',
   `irongolem` bigint(255) NOT NULL default '0',
   `dbirongolem` bigint(255) NOT NULL default '0',
-  KEY `userid` (`userid`)
+  KEY `userid` (`userid`),
+  -- The round this row belongs to (the `round` table, below).
+  `round_id` int unsigned NOT NULL,
+  KEY `round_id` (`round_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
@@ -481,7 +514,10 @@ CREATE TABLE `research` (
   `r16pts` bigint(255) NOT NULL default '0',
   `r17pts` bigint(255) NOT NULL default '0',
   `r18pts` bigint(255) NOT NULL default '0',
-  KEY `userid` (`userid`)
+  KEY `userid` (`userid`),
+  -- The round this row belongs to (the `round` table, below).
+  `round_id` int unsigned NOT NULL,
+  KEY `round_id` (`round_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
@@ -537,7 +573,10 @@ CREATE TABLE `returntbl` (
   `time4` bigint(255) NOT NULL default '0',
   `dogs` bigint(255) NOT NULL default '0',
   `dogtime` bigint(255) NOT NULL default '0',
-  KEY `userid` (`userid`)
+  KEY `userid` (`userid`),
+  -- The round this row belongs to (the `round` table, below).
+  `round_id` int unsigned NOT NULL,
+  KEY `round_id` (`round_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
@@ -564,7 +603,10 @@ CREATE TABLE `setforums` (
   `replies` smallint(6) NOT NULL default '0',
   `message` blob NOT NULL,
   `datestamp` varchar(20) NOT NULL default '',
-  PRIMARY KEY  (`topicid`)
+  PRIMARY KEY  (`topicid`),
+  -- The round this row belongs to (the `round` table, below).
+  `round_id` int unsigned NOT NULL,
+  KEY `round_id` (`round_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
@@ -589,7 +631,10 @@ CREATE TABLE `setforumsmsgs` (
   `topicid` smallint(6) NOT NULL default '0',
   `message` text NOT NULL,
   `datestamp` varchar(20) NOT NULL default '',
-  PRIMARY KEY  (`messageid`)
+  PRIMARY KEY  (`messageid`),
+  -- The round this row belongs to (the `round` table, below).
+  `round_id` int unsigned NOT NULL,
+  KEY `round_id` (`round_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
@@ -612,7 +657,10 @@ CREATE TABLE `setnews` (
   `class` varchar(16) NOT NULL default 'yellow',
   `setid` bigint(255) NOT NULL default '0',
   `sid` bigint(255) NOT NULL default '0',
-  `age` bigint(255) NOT NULL default '0'
+  `age` bigint(255) NOT NULL default '0',
+  -- The round this row belongs to (the `round` table, below).
+  `round_id` int unsigned NOT NULL,
+  KEY `round_id` (`round_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
@@ -636,14 +684,18 @@ CREATE TABLE `settlement` (
   `setnotice` varchar(255) NOT NULL default 'Welcome to Medieval Battles',
   `setid` bigint(255) NOT NULL auto_increment,
   `setstrength` bigint(255) NOT NULL default '0',
-  PRIMARY KEY  (`setid`)
+  PRIMARY KEY  (`setid`),
+  -- The round this row belongs to (the `round` table, below).
+  `round_id` int unsigned NOT NULL,
+  KEY `round_id` (`round_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
 # Insert data for table `settlement`
 #
 
-INSERT INTO settlement () VALUES (), (), (), (), (), (), (), (), (), ();
+-- Round 1's ten, as the baseline seeded them before rounds existed.
+INSERT INTO settlement (round_id) VALUES (1), (1), (1), (1), (1), (1), (1), (1), (1), (1);
 
 
 # --------------------------------------------------------
@@ -692,7 +744,10 @@ CREATE TABLE `user` (
   -- round holds no address or password of its own.
   `account_id` int unsigned NOT NULL default '0',
   PRIMARY KEY  (`userid`),
-  KEY `account_id` (`account_id`)
+  KEY `account_id` (`account_id`),
+  -- The round this row belongs to (the `round` table, below).
+  `round_id` int unsigned NOT NULL,
+  KEY `round_id` (`round_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
@@ -742,3 +797,36 @@ CREATE TABLE `account` (
   UNIQUE KEY `email` (`email`),
   UNIQUE KEY `handle` (`handle`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+# --------------------------------------------------------
+
+#
+# Table structure for table `round`
+#
+-- A round of the game: a world that starts, runs and ends, while the accounts
+-- outlast it. Every table above whose rows belong to one -- the kingdom and
+-- everything hanging off it, settlements, guilds, messages and news --
+-- carries its `round_id`. See docs/rounds.md, "Where a round lives".
+--
+-- Ids issued across rounds stay unique: userid, setid, gid and the rest are
+-- never reused by a later round, so a query that filters on one of them is
+-- already confined to its round. A query that does not -- a ranking, a
+-- listing, the tick's whole-table updates, a lookup by name -- filters on
+-- round_id.
+
+CREATE TABLE `round` (
+  `round_id` int unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(64) NOT NULL,
+  -- Which rules the round plays by (docs/rulesets.md). Only 'classic' exists.
+  `ruleset` varchar(32) NOT NULL DEFAULT 'classic',
+  -- 'open' takes signups but does not tick; 'running' ticks; 'ended' is
+  -- history. One round runs at a time until docs/rounds.md step 4.
+  `status` enum('open','running','ended') NOT NULL DEFAULT 'open',
+  `started_at` datetime NULL DEFAULT NULL,
+  `ended_at` datetime NULL DEFAULT NULL,
+  PRIMARY KEY (`round_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- A fresh install starts with round 1 running, as the migration makes the
+-- world it finds into round 1.
+INSERT INTO `round` (round_id, name, status) VALUES (1, 'Round 1', 'running');

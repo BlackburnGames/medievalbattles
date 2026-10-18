@@ -36,7 +36,7 @@ mb_forum_require_gl($db, $userid, $empireguild);
 if ($addtopic) {
 
 	$replies = "0";
-	$result = mb_query($db, "INSERT INTO guildthreads (name, topic, replies, message, datestamp, guildname) VALUES (?, ?, ?, ?, ?, ?)", array($ename, $topic, $replies, $message, $clock, $empireguild));
+	$result = mb_query($db, "INSERT INTO guildthreads (name, topic, replies, message, datestamp, guildname, round_id) SELECT ?, ?, ?, ?, ?, ?, round_id FROM user WHERE userid=?", array($ename, $topic, $replies, $message, $clock, $empireguild, $userid));
 
 	$result4 = mb_query($db, "UPDATE guildthreads SET lastpost=? WHERE topic=? AND guildname = ?", array($clock, $topic, $empireguild));
 
@@ -58,7 +58,7 @@ elseif ($addreply) {
 	// names. Every statement in this branch matched on the id alone.
 	mb_forum_require_guild_thread($db, $topicid, $empireguild);
 
-	$result1 = mb_query($db, "INSERT INTO guildmsgs (name, topic, topicid, message, datestamp) VALUES (?, ?, ?, ?, ?)", array($ename, $topic, (int) $topicid, $message, $clock));
+	$result1 = mb_query($db, "INSERT INTO guildmsgs (name, topic, topicid, message, datestamp, round_id) SELECT ?, ?, ?, ?, ?, round_id FROM user WHERE userid=?", array($ename, $topic, (int) $topicid, $message, $clock, $userid));
 	$lastid = mysqli_insert_id($db);
 
 	$result5 = mb_query($db, "UPDATE guildthreads SET lastpost=? WHERE topicid=?", array($clock, (int) $topicid));

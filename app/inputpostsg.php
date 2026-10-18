@@ -31,7 +31,7 @@ mb_forum_require_guild($empireguild);
 
 if ($addtopic) {
 
-	$result = mb_query($db, "INSERT INTO guildthreads (name, topic, message, datestamp, guildname)		VALUES (?, ?, ?, ?, ?)", array($ename, $topic, $message, $clock, $empireguild));
+	$result = mb_query($db, "INSERT INTO guildthreads (name, topic, message, datestamp, guildname, round_id) SELECT ?, ?, ?, ?, ?, round_id FROM user WHERE userid=?", array($ename, $topic, $message, $clock, $empireguild, $userid));
 
 	$result4 = mb_query($db, "UPDATE guildthreads SET lastpost=? WHERE topic=? AND guildname = ?", array($clock, $topic, $empireguild));
 	$result6 = mb_query($db, "UPDATE guildthreads SET lastposter=? WHERE topic=? AND guildname = ?", array($ename, $topic, $empireguild));
@@ -49,7 +49,7 @@ elseif ($addreply) {
 
 	// See input.posts.php: the INSERT was being run twice, the second time with
 	// its own return value as the query string.
-	$result1 = mb_query($db, "INSERT INTO guildmsgs (name, topic, topicid, message, datestamp)	VALUES (?, ?, ?, ?, ?)", array($ename, $topic, (int) $topicid, $message, $clock));
+	$result1 = mb_query($db, "INSERT INTO guildmsgs (name, topic, topicid, message, datestamp, round_id) SELECT ?, ?, ?, ?, ?, round_id FROM user WHERE userid=?", array($ename, $topic, (int) $topicid, $message, $clock, $userid));
 	$lastid = mysqli_insert_id($db);
 
 	$result5 = mb_query($db, "UPDATE guildthreads SET lastpost=? WHERE topicid=?", array($clock, (int) $topicid));
