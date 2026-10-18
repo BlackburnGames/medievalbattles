@@ -50,3 +50,22 @@ if (!function_exists('mb_input')) {
         return $default;
     }
 }
+
+if (!function_exists('mb_count')) {
+    /**
+     * A number of things typed into an order form, as a whole number: the
+     * thousands separators stripped, and a box left blank counting as none.
+     *
+     * PHP 5 read a blank box as 0 wherever it met a number. PHP 8 does not:
+     * `"" + ""` throws, and `"" < 0` is true -- it compares the strings "" and
+     * "0" -- so every "you can't send negative or 0" check refused any order
+     * that left a box empty, which is nearly every order a form sends.
+     *
+     * @param  mixed $value the raw request value, null when it was not sent
+     * @return int
+     */
+    function mb_count($value)
+    {
+        return (int) str_replace(',', '', (string) $value);
+    }
+}

@@ -73,6 +73,11 @@ if(!IsSet($trains))  {
 else  {
 
   include("include/nexplode.php");
+  // nexplode.php leaves these four as text, for equip.php's weapon names.
+  $uwarrior = mb_count($uwarrior);
+  $uwizard = mb_count($uwizard);
+  $upriest = mb_count($upriest);
+  $uarcher = mb_count($uarcher);
 
   $totalunits =  $twarriors + $twizards + $tpriests + $tarchers + $dbwar2 + $dbwar + $dbwiz2 + $dbwiz + $dbpri2 + $dbpri + $dbarch2 + $dbarch;
   $barrack_cap = $barrack * 50;

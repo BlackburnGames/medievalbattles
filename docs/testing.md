@@ -6,8 +6,8 @@ masters catch and unit tests would not.
 
 ## The suite
 
-`bash tests/run-all.sh` runs the tick and combat golden masters, the smoke
-crawl and the `register_globals` audit.
+`bash tests/run-all.sh` runs the tick, combat and actions golden masters, the
+smoke crawl and the `register_globals` audit.
 
 ### `tests/tick-golden.sh`
 
@@ -66,6 +66,26 @@ opcache with `revalidate_freq=2`, so Apache keeps serving the file it cached
 for up to two seconds after a change. An edit followed at once by a test run
 can pass against the old code. This matters for scripted mutation checks, not
 for an ordinary edit-then-test cycle.
+
+### `tests/actions-golden.sh`
+
+The combat golden master's harness pointed at the orders an empire gives
+itself: construction so far, plus every order form submitted once. The
+machinery the two share is `tests/lib/golden.php` and `tests/lib/golden.sh` —
+fixture reload, login, snapshot and diff, and the compare-or-accept wrapper —
+so a third would be a scenario list and nothing else. Golden file
+`tests/golden/actions.txt`; `php tests/actions-golden.php <name>` runs one
+scenario, and the same review rule and `quirk-` convention apply.
+
+**The `blank-boxes-` scenarios submit each form as a browser does**, one box
+filled and every other box sent as `""`. That is not the same request as
+leaving the other fields out, and it is the one that matters: PHP 8 does not
+read `""` as 0, so `"" < 0` is true and `"" + ""` throws. When this file was
+written, every one of those forms refused the order as negative or died, and
+the build page died even with the other fields left out — nobody on 8.3 could
+build anything without filling in all seven boxes. The crawl could not see it
+because it follows links and never fills a form in. `mb_count()` is the fix;
+see `app/include/request.php`.
 
 ### `tests/smoke.php`
 

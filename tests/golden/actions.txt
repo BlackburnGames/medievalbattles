@@ -3,16 +3,18 @@
 
 > buildings.php update=1 uhome=5
   says: [ Demolish ]
-  php:  Fatal error: Uncaught TypeError: Unsupported operand types: string + string (buildings.php)
-  (no change)
+  says: Your orders have been carried out.
+    buildings [1] aland 100 -> 95, dhome 0 -> 5, Hhrs 0 -> 5
+    user [1] gp 300000 -> 295500, exp2 0 -> 40
 
 ### build-capped-queue
 # A queue of 20 or more takes 20 ticks.
 
 > buildings.php update=1 ufarm=25
   says: [ Demolish ]
-  php:  Fatal error: Uncaught TypeError: Unsupported operand types: string + string (buildings.php)
-  (no change)
+  says: Your orders have been carried out.
+    buildings [1] aland 100 -> 75, dfarm 0 -> 25, Fhrs 0 -> 20
+    user [1] gp 300000 -> 277500, exp2 0 -> 200
 
 ### build-every-type
 # All seven timers, each its own queue.
@@ -28,63 +30,70 @@
 
 > buildings.php update=1 uhome=3
   says: [ Demolish ]
-  php:  Fatal error: Uncaught TypeError: Unsupported operand types: string + string (buildings.php)
-  (no change)
+  says: Your orders have been carried out.
+    buildings [1] aland 100 -> 97, dhome 6 -> 9, Hhrs 6 -> 9
+    user [1] gp 300000 -> 297180, exp2 0 -> 24
 
 ### build-onto-queue-capped
 # Adding to a running queue never takes it past 20 ticks.
 
 > buildings.php update=1 uhome=10
   says: [ Demolish ]
-  php:  Fatal error: Uncaught TypeError: Unsupported operand types: string + string (buildings.php)
-  (no change)
+  says: Your orders have been carried out.
+    buildings [1] aland 100 -> 90, dhome 15 -> 25, Hhrs 15 -> 20
+    user [1] gp 300000 -> 290400, exp2 0 -> 80
 
 ### quirk-advanced-construction
 # QUIRK: Advanced Construction divides the timer by 0.5, doubling it, and applies itself again to every queue already running -- the farms, which this order does not touch, double too.
 
 > buildings.php update=1 uhome=5
   says: [ Demolish ]
-  php:  Fatal error: Uncaught TypeError: Unsupported operand types: string + string (buildings.php)
-  (no change)
+  says: Your orders have been carried out.
+    buildings [1] aland 100 -> 95, dhome 0 -> 5, Hhrs 0 -> 10, Fhrs 4 -> 8
+    user [1] gp 300000 -> 295420, exp2 0 -> 40
 
 ### quirk-advanced-construction-capped
 # QUIRK: the cap scales with the modifier, so Advanced Construction caps a queue at 40.
 
 > buildings.php update=1 uhome=25
   says: [ Demolish ]
-  php:  Fatal error: Uncaught TypeError: Unsupported operand types: string + string (buildings.php)
-  (no change)
+  says: Your orders have been carried out.
+    buildings [1] aland 100 -> 75, dhome 0 -> 25, Hhrs 0 -> 40
+    user [1] gp 300000 -> 277500, exp2 0 -> 200
 
 ### quirk-night-elf-requeue
 # QUIRK: Night Elves build at half speed, and every order doubles every queue already running again -- the homes under way and the farms the order does not touch.
 
 > buildings.php update=1 uhome=3
   says: [ Demolish ]
-  php:  Fatal error: Uncaught TypeError: Unsupported operand types: string + string (buildings.php)
-  (no change)
+  says: Your orders have been carried out.
+    buildings [1] aland 100 -> 97, dhome 6 -> 9, Hhrs 12 -> 40, Fhrs 4 -> 8
+    user [1] gp 300000 -> 297180, exp2 0 -> 24
 
 ### night-elf-capped
 # A Night Elf queue caps at 40 ticks, twice the usual 20.
 
 > buildings.php update=1 uhome=25
   says: [ Demolish ]
-  php:  Fatal error: Uncaught TypeError: Unsupported operand types: string + string (buildings.php)
-  (no change)
+  says: Your orders have been carried out.
+    buildings [1] aland 100 -> 75, dhome 0 -> 25, Hhrs 0 -> 40
+    user [1] gp 300000 -> 277500, exp2 0 -> 200
 
 ### quirk-night-elf-advanced-construction
 # QUIRK: a Night Elf with Advanced Construction, both modifiers on one queue. Meant to cancel; today they compound to four times.
 
 > buildings.php update=1 uhome=5
   says: [ Demolish ]
-  php:  Fatal error: Uncaught TypeError: Unsupported operand types: string + string (buildings.php)
-  (no change)
+  says: Your orders have been carried out.
+    buildings [1] aland 100 -> 95, dhome 0 -> 5, Hhrs 0 -> 20
+    user [1] gp 300000 -> 295500, exp2 0 -> 40
 
 ### refused-negative
 # A negative count is refused.
 
 > buildings.php update=1 uhome=-1
   says: [ Demolish ]
-  php:  Fatal error: Uncaught TypeError: Unsupported operand types: string + string (buildings.php)
+  says: You can't build negative or 0 buildings.
   (no change)
 
 ### refused-no-land
@@ -92,7 +101,7 @@
 
 > buildings.php update=1 uhome=101
   says: [ Demolish ]
-  php:  Fatal error: Uncaught TypeError: Unsupported operand types: string + string (buildings.php)
+  says: Not enough land!
   (no change)
 
 ### refused-lumber-mill-without-archery
@@ -108,15 +117,16 @@
 
 > buildings.php update=1 uhome=2 ubarrack= ufarm= uwp= ugm= uim=
   says: [ Demolish ]
-  php:  Fatal error: Uncaught TypeError: Unsupported operand types: string + string (buildings.php)
-  (no change)
+  says: Your orders have been carried out.
+    buildings [1] aland 100 -> 98, dhome 0 -> 2, Hhrs 0 -> 2
+    user [1] gp 300000 -> 298200, exp2 0 -> 16
 
 ### blank-boxes-dbuildings-uhome
 # dbuildings.php with uhome filled in and every other box empty, as a browser sends it.
 
 > dbuildings.php update=1 uhome=2 ubarrack= ufarm= uwp= ugm= uim=
-  says: You cannot demolish negative or 0 buildings.
-  (no change)
+  says: Your orders have been carried out.
+    buildings [1] aland 100 -> 102, home 50 -> 48
 
 ### blank-boxes-military-urecruit
 # military.php with urecruit filled in and every other box empty, as a browser sends it.
@@ -130,49 +140,56 @@
 # military.php with uwarrior filled in and every other box empty, as a browser sends it.
 
 > military.php trains=1 usage= uthief= uexplorer= uwarrior=2 uwizard= upriest=
-  says: You can't train negative or no units!
-  (no change)
+  says: Your orders have been carried out.
+    military [1] dbwar2 0 -> 2, recruits 200 -> 198
+    user [1] gp 300000 -> 298890
 
 ### blank-boxes-disband-uwarrior
 # disband.php with uwarrior filled in and every other box empty, as a browser sends it.
 
 > disband.php trains=1 usage= uexplorer= uthief= uwarrior=1 uwizard= upriest=
   says:  [ Disband ]  [ Equip ]  [ Construct Weapon ]  [ Construct Armor ]
-  says: You can't disband negative or 0 units!
-  (no change)
+  says: The specified units have been disbanded.
+    military [1] warriors 3 -> 2, recruits 200 -> 201
+    user [1] gp 300000 -> 299800
 
 ### blank-boxes-explore-exploreland
 # explore.php with exploreland filled in and every other box empty, as a browser sends it.
 
 > explore.php explore=1 exploreland=20 exploremt=
-  says: You can not send negative or 0 explorers.
-  (no change)
+  says: You have successfully sent your explorer(s).
+    explore [1] expland 0 -> 20
+    military [1] explorers 50 -> 30
 
 ### blank-boxes-cexplore-cexploreland
 # cexplore.php with cexploreland filled in and every other box empty, as a browser sends it.
 
 > cexplore.php cancel=1 cexploreland=5 cexploremt=
-  says: You can not cancel negative or 0 explorers.
-  (no change)
+  says: You have successfully cancelled your explorers(s).
+    explore [1] expland 20 -> 15
+    military [1] explorers 0 -> 5
 
 ### blank-boxes-research-ur1
 # research.php with ur1 filled in and every other box empty, as a browser sends it.
 
 > research.php first=1 ur1=1 ur2= ur3= ur4= ur5= ur6= ur7= ur11= ur12= ur15= ur16= ur13= ur14= ur17= ur18=
-  php:  Fatal error: Uncaught TypeError: Unsupported operand types: string + string (research.php)
-  (no change)
+  says: [ Cancel Sages ] You have successfully sent your sage(s) to research.
+    military [1] sages 8 -> 7
+    research [1] r1 5 -> 6
 
 ### blank-boxes-cresearch-ur1
 # cresearch.php with ur1 filled in and every other box empty, as a browser sends it.
 
 > cresearch.php first=1 ur1=1 ur2= ur3= ur4= ur5= ur6= ur7= ur11= ur12= ur15= ur16= ur13= ur14= ur17= ur18=
-  says: [ Send Sages ] You cannot cancel negative or 0 sages.
-  (no change)
+  says: [ Send Sages ] You have successfully cancelled your sages.
+    military [1] sages 8 -> 9
+    research [1] r1 5 -> 4
 
 ### blank-boxes-animate-ugolem
 # animate.php with ugolem filled in and every other box empty, as a browser sends it.
 
 > animate.php trains=1 ugolem=1 uirongolem=
-  says: You can't train negative or no units!
-  (no change)
+  says: Your orders have been carried out.
+    military [1] wizards 3 -> 1, dbgolem 0 -> 1
+    user [1] gp 300000 -> 294998
 

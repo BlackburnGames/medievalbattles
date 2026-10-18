@@ -112,6 +112,18 @@ after that the prepend is nothing but the `display_errors` switch, which stays.
   tick. **Never let local runs deliver mail.**
 - A literal `?>` inside a `//` comment terminates PHP mode and dumps the rest of
   the file to the page. Avoid writing it in comments.
+- **A blank form box is not 0 on PHP 8.** PHP 5 read `""` as 0 wherever it met
+  a number; PHP 8 throws on `"" + ""` and answers true to `"" < 0`, comparing
+  the strings `""` and `"0"`. Every order form sends its empty boxes as `""`,
+  so on 8.3 every "you can't send negative or 0" check refused any order that
+  did not fill in every box, and the build and research pages died outright.
+  The suite reported nothing for the whole port, because nothing in it ever
+  filled a form in. A count read from the request goes through `mb_count()`
+  now (`app/include/request.php`), which `nexplode.php` applies to every count
+  it strips. Four names stay text because `equip.php` sends weapon names under
+  them, so the pages that count `$uwarrior`, `$uwizard`, `$upriest` and
+  `$uarcher` cast them themselves. The `blank-boxes-` scenarios in
+  `tests/actions-golden.php` submit each form the way a browser does.
 
 ## Fixed once — do not regress
 

@@ -25,6 +25,11 @@ if(!IsSet($trains))	 {
 else	{
 
 	include("include/nexplode.php");
+	// nexplode.php leaves these four as text, for equip.php's weapon names.
+	$uwarrior = mb_count($uwarrior);
+	$uwizard = mb_count($uwizard);
+	$upriest = mb_count($upriest);
+	$uarcher = mb_count($uarcher);
 
 	if($uarcher > 0 AND $res['r13pts'] < 125000)	{
 		echo"<div align=center><font class=yellow>You do not have Archers!</font></div>"; 
