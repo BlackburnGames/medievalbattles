@@ -403,6 +403,12 @@ foreach (array(
 // died dividing by zero in calculations.php; on 5.6 it spent a general.
 forumRefuses($tester, 'attack.php', array('attack' => 1, 'empvalue' => 3),
     'did not send anything', 'app/attack.php: the empty-army check is not a comparison');
+// The self-target check scattack.php never had. The tester is in a guild, so
+// the guild check used to answer for them; a guildless empire could suicide on
+// itself. The message is what tells the two refusals apart.
+forumRefuses($tester, 'scattack.php',
+    array('suicideatk' => 1, 'empvalue' => 1, 'send' => 1, 'toatk' => 'civ'),
+    'attack your ownself', 'app/scattack.php: no check that the target is not the attacker');
 
 foreach (array(
     // The land attack, won: three warriors at power 2 and three wizards at

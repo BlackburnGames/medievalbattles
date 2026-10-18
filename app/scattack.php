@@ -60,6 +60,14 @@ else	{
 		include("include/attack/scattack.php");
 		die();
 	}
+	// The check the three army pages make and this one never did. The guild
+	// check below stopped a guild member, so the gap was a guildless empire
+	// suiciding on itself.
+	elseif($evu['ename'] === $ename)	{
+		echo"<div align=center><font class=yellow>You cannot attack your ownself!</font></div>";
+		include("include/attack/scattack.php");
+		die();
+	}
 	elseif($evu['safemode'] > 0)	{
 		echo"<div align=center><font class=yellow>You can't attack someone who's in safe mode!</font></div>";
 		include("include/attack/scattack.php");
