@@ -3,9 +3,10 @@
 **Status: partly built.** Steps 1, 2 and 5 under "Order of work" are done:
 permanent accounts beside the round's tables, and a round that holds neither the
 address nor the password. Step 3 is under way: the `round` table exists, every
-round table carries a `round_id`, and every query on one is confined to a
-round — but there is only ever round 1, and no way yet to end it or open
-another. The rest of rounds is design only. This
+round table carries a `round_id`, every query on one is confined to a
+round, and `bin/round.php` ends a round into its results and opens, starts
+and ends the next. What is left of it is the players' side: the round list,
+join and history pages. This
 records how the game is meant to end a round and start the next one without
 deleting its players, and the decisions that shape it.
 
@@ -51,7 +52,9 @@ Split the two:
   ended), and start and end times.
 - **A round result** is a snapshot of each kingdom, taken when its round ends:
   kingdom name, race, class, settlement, guild, final land, mountains,
-  experience and ranks, plus each settlement's and guild's final strength.
+  experience (`exp`, the networth) and place. A settlement's or a guild's
+  final strength is the sum of its kingdoms' `exp`, as the tick computes it,
+  so it is derived from the rows rather than stored beside them.
   This is the history. It stays small and outlives the round's own data.
 
 A reset becomes "end this round, open the next one". Nothing is deleted, nobody
@@ -309,7 +312,25 @@ fingerprint of the account's address and hash:
       votes were safe already, being held to the player's settlement, and a
       guild request is held to its applicant and leader. The isolation test
       aims each at the ended round and requires a refusal.
-   3. **Ending one.** `round_result`, and `bin/round.php open` and `end`.
+   3. ~~**Ending one.**~~ **Done.** `round_result` (a migration and
+      `db.sql`), and `bin/round.php list | open <name> | start | end` over
+      `mb_round_open()`, `mb_round_start()` and `mb_round_end()`
+      (`app/include/rounds.php`). `open` refuses while a round is in play,
+      and seeds as many settlements as the last round had, numbered on from
+      its. `end` writes a result per kingdom, placed by `exp` with a tie to
+      the earlier signup, and marks the round ended, in one transaction.
+      Nothing is deleted.
+
+      **A session ends with its round.** The session's kingdom check joins
+      the round and refuses an ended one, so a player cannot play on in
+      history; the account logs in again and is told it has no kingdom, and
+      signs up into the next round once it opens — under the same kingdom
+      name if it likes. `tests/rounds.php` drives the whole life: end round
+      1, the results, the ended session, the refused signup and idle tick,
+      round 2 opened, joined, logged into, left alone by the tick until
+      started and advanced once it is, with round 1's rows unmoved
+      throughout. The tick golden moved only by the empty `round_result`
+      table appearing in its dump.
    4. **The pages.** The round list, join and history. Retire `newgame.php`
       and signup's doubling as join.
 4. **Concurrent rounds.** The session chooses among running rounds, and the

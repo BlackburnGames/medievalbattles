@@ -220,6 +220,9 @@ $round_id      = 0;
  * wipe used to leave its session "logged in" and render every page empty,
  * because every query matched nothing. It is logged out instead.
  *
+ * And its round must still be in play: when a round ends, every session in it
+ * ends with it, rather than playing on in history.
+ *
  * The kingdom's round comes back with it, as $round_id: the round every page
  * that lists, ranks or looks a name up confines itself to (docs/rounds.md).
  * It is the kingdom's, not the newest round's, so a page never shows a
@@ -236,7 +239,8 @@ if ($userid > 0 && $mb_account_id > 0 && empty($GLOBALS['mb_session_checked'])) 
 	$mb_ok = $mb_account && hash_equals(mb_account_fingerprint($mb_account), $mb_fp);
 	if ($mb_ok) {
 		require_once __DIR__ . '/connect.php';
-		$mb_r = mb_query($db, "SELECT round_id FROM user WHERE userid=? AND account_id=?", array($userid, $mb_account_id));
+		$mb_r = mb_query($db, "SELECT u.round_id FROM user u JOIN `round` r ON r.round_id = u.round_id
+			WHERE u.userid=? AND u.account_id=? AND r.status <> 'ended'", array($userid, $mb_account_id));
 		$mb_row = $mb_r ? mysqli_fetch_row($mb_r) : null;
 		$mb_ok = (bool) $mb_row;
 	}

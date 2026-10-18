@@ -82,6 +82,14 @@ if ! docker compose exec -T web php /repo/tests/round-isolation.php; then
   status=1
 fi
 
+# A round ended into its results, and the next opened, joined, started and
+# ticked alone, through bin/round.php. Reloads the schema likewise.
+echo
+echo "=== round lifecycle ==="
+if ! docker compose exec -T web php /repo/tests/rounds.php; then
+  status=1
+fi
+
 # Concurrent requests against one barter listing. Needs the fixture's listings,
 # which the crawl consumes, so it gets a fresh database of its own.
 echo

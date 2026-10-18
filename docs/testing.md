@@ -193,6 +193,17 @@ or the pass proves nothing. With one tick filter removed it fails on round 2's
 message, a barter purchase and the guild forum at round 2's kingdom, listing
 and thread, and each page must refuse. Reloads the schema.
 
+### `tests/rounds.php`
+
+A round's life through `bin/round.php`, from the fixture's round 1: what the
+command refuses (opening while a round is in play, starting none, ending
+twice); ending round 1 into a result per kingdom, placed by `exp`; the round 1
+session ended with it, the account still able to log in and told it has no
+kingdom, signup refused and the tick idle; round 2 opened with settlements
+11-20, joined by signup under the old kingdom name, and logged into; the tick
+leaving round 2 alone while it is open and advancing it once started, with
+round 1's rows unchanged throughout. Reloads the schema.
+
 ### `tests/smoke.php`
 
 Crawls every reachable page, failing on any PHP fatal, parse error or warning

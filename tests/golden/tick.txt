@@ -44,6 +44,7 @@
   userid=3 | war1=0 | war2=0 | war3=0 | war4=0 | wiz1=0 | wiz2=0 | wiz3=0 | wiz4=0 | pri1=0 | pri2=0 | pri3=0 | pri4=0 | arch1=0 | arch2=0 | arch3=0 | arch4=0 | golem1=0 | golem2=0 | golem3=0 | golem4=0 | irongolem1=0 | irongolem2=0 | irongolem3=0 | irongolem4=0 | time1=0 | time2=0 | time3=0 | time4=0 | dogs=0 | dogtime=0 | round_id=1
 == round (1 row) ==
   round_id=1 | name=Round 1 | ruleset=classic | status=running | started_at=<NULL> | ended_at=<NULL>
+== round_result (0 rows) ==
 == setforums (2 rows) ==
   setid=1 | topicid=1 | name=TestLord | topic=Settlement muster | lastpost=<CLOCK> | lastposter=IdleBaron | replies=1 | message=Who is holding the north wall? | datestamp=<VOLATILE> | round_id=1
   setid=1 | topicid=2 | name=IdleBaron | topic=Grain prices again | lastpost=<CLOCK> | lastposter=IdleBaron | replies=0 | message=The mill is charging double. | datestamp=<VOLATILE> | round_id=1

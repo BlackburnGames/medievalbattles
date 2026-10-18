@@ -830,3 +830,40 @@ CREATE TABLE `round` (
 -- A fresh install starts with round 1 running, as the migration makes the
 -- world it finds into round 1.
 INSERT INTO `round` (round_id, name, status) VALUES (1, 'Round 1', 'running');
+
+# --------------------------------------------------------
+
+#
+# Table structure for table `round_result`
+#
+-- Each kingdom as it stood when its round ended: the history, written by
+-- mb_round_end() (app/include/rounds.php). It is small and outlives the
+-- round's own rows, which may be deleted by round_id once nothing wants more
+-- than this.
+--
+-- Ranked by `exp`, which despite its name is the tick's networth
+-- (docs/rounds.md). Land, mountains, settlement and guild are kept so the
+-- other rankings can be rebuilt; a settlement's or a guild's strength is the
+-- sum of its rows' `exp`, as the tick computes it. The kingdom's name, not
+-- the account's handle, is what a round is remembered by; `account_id` lets
+-- a player's own history list their kingdoms.
+
+CREATE TABLE `round_result` (
+  `round_id` int unsigned NOT NULL,
+  `userid` bigint NOT NULL,
+  `account_id` int unsigned NOT NULL,
+  `ename` varchar(255) NOT NULL,
+  `race` varchar(255) NOT NULL,
+  `class` varchar(255) NOT NULL,
+  `setid` bigint NOT NULL,
+  -- The settlement's name then; settlements are renamed by their leaders.
+  `setname` varchar(255) NOT NULL,
+  `guild` varchar(255) NOT NULL,
+  `land` bigint NOT NULL,
+  `mts` bigint NOT NULL,
+  `exp` bigint NOT NULL,
+  -- 1 for the highest exp; ties go to the lower userid, the earlier signup.
+  `place` int unsigned NOT NULL,
+  PRIMARY KEY (`round_id`, `userid`),
+  KEY `account_id` (`account_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
