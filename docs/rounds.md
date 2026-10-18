@@ -13,18 +13,19 @@ buildings, explore, return, barter and empire-news row whose `userid` is gone.
 The player's login goes with the kingdom. Coming back for the next round means
 signing up again, and nothing records that the account ever played.
 
-**Administrators are not reset at all.** Since administrators became flagged
-player accounts, both wipes keep them. The child rows are deleted only
+**Administrators were not reset at all.** Since administrators became flagged
+player accounts, both wipes keep them. The child rows were deleted only
 `WHERE userid NOT IN (SELECT userid FROM user)`, so an admin's research,
-military and buildings rows survive along with the `user` row: gold, iron,
+military and buildings rows survived along with the `user` row: gold, iron,
 lumber, food, land, experience, `countdown` and `safemode`, plus explores and
-returns still in flight. `newgame.php` clears only guild, vote, votefor and
-leadership. An admin starts round two with their round-one kingdom, and
-everyone else starts from nothing. That is a fairness bug. It gets an interim
-fix of its own (see "Order of work"), separate from this design.
+returns still in flight. An admin started round two with their round-one
+kingdom while everyone else started from nothing. The interim fix (step 1
+under "Order of work") resets them now, but the wipe is still a wipe.
 
-**`game_info` is not reset either.** `lastset`, `tick` and `last_comp_id`
-carry over, and the settlements are renamed in place rather than rebuilt.
+`game_info` correctly carries over. `tick` is the flag for a tick in
+progress, and `last_comp_id` is the counter that issues computer ids.
+Resetting the counter would reissue ids that existing accounts already hold,
+which breaks multi-account detection.
 
 The underlying problem is that one row, `user`, is both *who you are* (email,
 password hash, the admin flag) and *what you played this round* (race, class,
@@ -144,9 +145,10 @@ values anyway, and a converted query should filter on the session's `userid`.
 When none of them read `email` or `pw` any more, both columns leave the round
 schema.
 
-There is no email change in the game today. If one is added, it has to update
-`email` in every live round database as well as the account, until those
-columns are gone.
+`preferences.php` lets a player change their email, with its own six
+`UPDATE`s (`preferences.php:150`). Until the `email` columns leave the round
+schema, that change has to update the account and the kingdom rows in every
+live round database.
 
 ## The player's path
 
@@ -213,12 +215,10 @@ columns are gone.
 
 ## Order of work
 
-1. **Interim: make `newgame.php` reset administrators' kingdoms.** Set their
-   `user` game columns back to signup values, re-seed their child rows from
-   signup's `INSERT`s, delete their explores and returns, and reset
-   `game_info`. The world-wipe tests in [testing.md](testing.md) hold it to
-   account. This is worth doing on its own, because the rest is several
-   changes away.
+1. ~~**Interim: reset administrators' kingdoms in both wipes.**~~ **Done.**
+   `app/include/kingdom.php` holds signup's starting rolls and inserts, and
+   `mb_kingdom_reset()` returns a kingdom to them. `tests/newgame.php`
+   compares each reset kingdom against a twin signed up afterwards.
 2. **Accounts.** Add `mb_accounts` with the `account` table. Login, signup,
    the session and `mb_admin_require()` move to it. The kingdom key replaces
    the hash in the round database. There is still exactly one round database,

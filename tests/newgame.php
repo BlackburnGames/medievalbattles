@@ -1,0 +1,195 @@
+<?php
+/**
+ * A new game starts the administrators over too.
+ *
+ * Both world wipes -- admin/newgame.php and gameconfig.php's account wipe --
+ * keep administrator accounts, and they used to keep their kingdoms with
+ * them: each table was cleared only of rows whose account was gone, so an
+ * admin went into the next round with the last one's gold, research, army,
+ * returns in flight and barter offers. include/kingdom.php resets them now.
+ *
+ * "Reset" means "as signup would make it", and this holds it to exactly that
+ * rather than to a list of expected values. After each wipe it signs up a twin
+ * of every admin -- same race and class, through checksignup.php -- and every
+ * column of every kingdom table must match the twin's, except the ones signup
+ * rolls dice for, which must fall in signup's ranges. A column added later
+ * that the reset forgets fails here without this file being touched.
+ *
+ * It reloads the schema before each wipe and after, so it destroys whatever
+ * world it runs against and leaves the fixture behind.
+ *
+ *   docker compose exec -T web php /repo/tests/newgame.php
+ */
+
+require_once __DIR__ . '/lib/golden.php';
+
+// Each wipe, as the request that runs it.
+$WIPES = array(
+    'admin/newgame.php'            => array(),
+    'admin/gameconfig.php accounts' => array('action' => 'accounts'),
+);
+
+// The fixture's admins, given a class signup offers -- tester@'s "Warrior"
+// is not one, and a twin has to be signed up as the same class -- and a
+// second admin who is a Cleric, whose rolls differ.
+$ADMINS = array(
+    1 => array('email' => 'tester@example.com', 'race' => 'Human', 'class' => 'Fighter'),
+    2 => array('email' => 'idle@example.com',   'race' => 'Demon', 'class' => 'Cleric'),
+);
+$NOT_ADMIN = 'poor@example.com';
+
+// Who an account is, which a reset keeps; and the columns signup rolls dice
+// for, checked against its ranges below instead of against the twin.
+$IDENTITY = array('email', 'pw', 'userid', 'ename', 'race', 'class', 'setid', 'csnum', 'aim',
+    'msn', 'ip', 'lastlog', 'lastlogin', 'current_comp_id', 'signup_comp_id', 'admin');
+$ROLLED = array(
+    'user'     => array('gp', 'iron'),
+    'military' => array('civ', 'recruits', 'warriors', 'wizards', 'priests', 'maxciv', 'archers', 'suicide'),
+);
+// include/kingdom.php's ranges. gp is two rolls concatenated, so its bounds
+// are the smallest and largest strings the pair can make.
+$RANGES = array(
+    'default' => array('gp' => array(2500, 350999), 'iron' => array(4000, 6000),
+        'civ' => array(1000, 1250), 'recruits' => array(150, 250), 'maxciv' => array(100, 250)),
+    'Cleric'  => array('gp' => array(3500, 450999), 'iron' => array(6000, 7500),
+        'civ' => array(1200, 1400), 'recruits' => array(200, 300), 'maxciv' => array(250, 350)),
+);
+$TABLES = array('user', 'buildings', 'military', 'research', 'explore', 'returntbl');
+
+$failures = 0;
+function fail($msg)
+{
+    global $failures;
+    echo "FAIL: $msg\n";
+    $failures++;
+}
+
+function rowsFor($db, $table, $userid)
+{
+    $rows = array();
+    $r = mysqli_query($db, "SELECT * FROM `$table` WHERE userid = " . (int) $userid);
+    while ($row = mysqli_fetch_assoc($r)) {
+        $rows[] = $row;
+    }
+    return $rows;
+}
+
+function countWhere($db, $sql)
+{
+    $row = mysqli_fetch_row(mysqli_query($db, $sql));
+    return (int) $row[0];
+}
+
+foreach ($WIPES as $wipe => $form) {
+    loadFixture($db);
+
+    $ids = implode(',', array_keys($ADMINS));
+    mysqli_query($db, "UPDATE user SET admin = 1 WHERE userid IN ($ids)");
+    foreach ($ADMINS as $id => $a) {
+        mysqli_query($db, "UPDATE user SET class = '" . mysqli_real_escape_string($db, $a['class'])
+            . "', guild = 'Old Guild', vote = 3, sl = 'yes' WHERE userid = $id");
+        mysqli_query($db, "INSERT INTO empnews (yourid) VALUES ($id)");
+    }
+
+    // The state a reset has to clear, present to begin with -- or a pass
+    // proves nothing.
+    if (countWhere($db, "SELECT count(*) FROM returntbl WHERE userid = 1 AND war1 > 0") === 0
+        || countWhere($db, "SELECT count(*) FROM barter WHERE userid = 1") === 0) {
+        fail("$wipe: the fixture no longer gives tester@ returns in flight and a barter offer; this test needs both");
+    }
+
+    $admin = login($BASE, 'tester@example.com', 'test1234');
+    $path = strtok($wipe, ' ');
+    $body = $admin->post('/' . $path, $form);
+    if ($admin->lastStatus !== 200) {
+        fail("$wipe: HTTP {$admin->lastStatus}");
+        continue;
+    }
+    foreach (diagnostics($body) as $d) {
+        fail("$wipe: $d");
+    }
+
+    if (countWhere($db, "SELECT count(*) FROM user WHERE email = '$NOT_ADMIN'") !== 0) {
+        fail("$wipe: $NOT_ADMIN, not an admin, was not deleted");
+    }
+    if (countWhere($db, "SELECT count(*) FROM barter WHERE userid IN ($ids)") !== 0) {
+        fail("$wipe: an admin's barter offers survived");
+    }
+    if (countWhere($db, "SELECT count(*) FROM empnews WHERE yourid IN ($ids)") !== 0) {
+        fail("$wipe: an admin's empire news survived");
+    }
+    $members = countWhere($db, "SELECT sum(members) FROM settlement");
+    if ($members !== count($ADMINS)) {
+        fail("$wipe: the settlements count $members members, should be " . count($ADMINS));
+    }
+
+    // Twins. Signup refuses a second account from an address already on a
+    // row, and tester@ just logged in from this one.
+    mysqli_query($db, "UPDATE user SET ip = ''");
+    foreach ($ADMINS as $id => $a) {
+        $twinEmail = "twin$id@example.com";
+        $client = new MbClient($BASE);
+        $client->get('/index.php');
+        $client->post('/checksignup.php', array(
+            'signup' => 1, 'email' => $twinEmail, 'cemail' => $twinEmail, 'pw' => 'pass1234', 'cpw' => 'pass1234',
+            'ename' => "Twin $id", 'race' => $a['race'], 'class' => $a['class'], 'msn' => '', 'aim' => '',
+        ));
+        $twinRow = mysqli_fetch_row(mysqli_query($db, "SELECT userid FROM user WHERE email = '$twinEmail'"));
+        if (!$twinRow) {
+            fail("$wipe: could not sign up a twin for {$a['email']}");
+            continue;
+        }
+        $twin = (int) $twinRow[0];
+        $label = "$wipe: {$a['email']}";
+        $ranges = isset($RANGES[$a['class']]) ? $RANGES[$a['class']] : $RANGES['default'];
+
+        foreach ($TABLES as $table) {
+            $mine = rowsFor($db, $table, $id);
+            $theirs = rowsFor($db, $table, $twin);
+            if (count($mine) !== 1) {
+                fail("$label: " . count($mine) . " $table rows, should be 1");
+                continue;
+            }
+            $mine = $mine[0];
+            $theirs = $theirs[0];
+            $rolled = isset($ROLLED[$table]) ? $ROLLED[$table] : array();
+            $wrong = 0;
+            foreach ($mine as $column => $value) {
+                if (in_array($column, $IDENTITY, true)) {
+                    continue;
+                }
+                if (in_array($column, $rolled, true)) {
+                    if (isset($ranges[$column])
+                        && ($value < $ranges[$column][0] || $value > $ranges[$column][1])) {
+                        fail("$label: $table.$column is $value, outside signup's {$ranges[$column][0]}-{$ranges[$column][1]}");
+                        $wrong++;
+                    }
+                    continue;
+                }
+                if ((string) $value !== (string) $theirs[$column]) {
+                    fail("$label: $table.$column is $value, signup gives {$theirs[$column]}");
+                    $wrong++;
+                }
+            }
+            if (!$wrong) {
+                echo "ok: $label: $table is as signup makes it\n";
+            }
+        }
+    }
+
+    // The account is kept, so its password still works.
+    $again = new MbClient($BASE);
+    $again->get('/index.php');
+    $again->post('/checklogin.php', array('email' => 'tester@example.com', 'pw' => 'test1234', 'login' => 'Login'));
+    if ($again->lastStatus !== 302) {
+        fail("$wipe: tester@ cannot log in afterwards (HTTP {$again->lastStatus})");
+    }
+}
+
+loadFixture($db);
+
+if ($failures) {
+    echo "FAIL: $failures problem(s) with the administrators' reset.\n";
+    exit(1);
+}
+echo "PASS: both world wipes start the administrators over as signup would.\n";

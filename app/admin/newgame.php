@@ -9,6 +9,9 @@ include("include/auth.php");
 mb_admin_require();
 
 include("include/connect.php");
+// mb_kingdom_reset_admins(). This page runs from app/admin/, so the shared
+// include is reached by path rather than by the CWD.
+require_once __DIR__ . '/../include/kingdom.php';
 
 mysqli_query($db, "DELETE FROM emailvalidate");
 echo "<div align=center><b>All validation codes have been deleted from the database.</b></div>";
@@ -47,9 +50,13 @@ mysqli_query($db, "UPDATE settlement SET setpic=''") or die(mysqli_error($db));
 mysqli_query($db, "UPDATE settlement SET members='0'") or die(mysqli_error($db));
 mysqli_query($db, "UPDATE settlement SET setnotice='Welcome to Medieval Battles'") or die(mysqli_error($db));
 mysqli_query($db, "UPDATE settlement SET setstrength='0'") or die(mysqli_error($db));
-// The administrators who are left belong to no guild now, hold no votes and
-// lead nothing, and are still counted in their settlements.
-mysqli_query($db, "UPDATE user SET guild='None', vote=0, votefor='None', sl=''") or die(mysqli_error($db));
+// The administrators' kingdoms start the new game as everyone else's will:
+// as signup would make them, in the settlement they were in -- which is still
+// counted. They used to keep everything but their guild, votes and
+// leadership, because every table above is cleared only of rows whose
+// account is gone.
+$mb_reset = mb_kingdom_reset_admins($db);
 mysqli_query($db, "UPDATE settlement s SET members=(SELECT count(*) FROM user u WHERE u.setid=s.setid)") or die(mysqli_error($db));
 echo "<div align=center><b>All settlement-related items have been deleted from the database.</b></div>";
+echo "<div align=center><b>" . (int) $mb_reset . " administrator kingdom(s) have been reset to their starting state.</b></div>";
 ?>

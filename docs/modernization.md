@@ -760,13 +760,17 @@ attribute.
   votes and leadership with everyone else's and recounts the settlements, and
   an admin account cannot be deleted by name from the page — revoke it first.
 
-  **That left the admins' kingdoms un-reset.** Both wipes delete child rows
-  only where their `userid` is gone, so an administrator keeps their
-  resources, land, research, military, buildings and in-flight explores into
-  the next round, while everyone else starts over. It needs an interim fix.
-  The real answer is that a reset shouldn't delete accounts at all:
-  [rounds.md](rounds.md) designs permanent accounts, one database per round,
-  and round results as history.
+  **That left the admins' kingdoms un-reset**, and that's fixed now. Both
+  wipes deleted child rows only where their `userid` was gone, so an
+  administrator kept their resources, land, research, military, buildings and
+  in-flight explores into the next round, while everyone else started over.
+  `app/include/kingdom.php` now holds signup's starting rolls and inserts,
+  moved out of `checksignup.php`, and `mb_kingdom_reset_admins()` uses them to
+  put each admin's kingdom back to what signup would make it. Both wipes call
+  it, and `tests/newgame.php` checks the result against a real signup. That is
+  the interim fix. The real answer is that a reset shouldn't delete accounts
+  at all: [rounds.md](rounds.md) designs permanent accounts, one database per
+  round, and round results as history.
 
   This does not make the area safe to expose. What is behind the gate still
   interpolates, still echoes raw, and still deletes the world from one link.

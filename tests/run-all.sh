@@ -66,6 +66,14 @@ if ! docker compose exec -T web php /repo/tests/signup.php; then
   status=1
 fi
 
+# Both world wipes put the administrators' kingdoms back to what signup makes,
+# checked against a twin signed up after each. Reloads the schema likewise.
+echo
+echo "=== new game resets administrators ==="
+if ! docker compose exec -T web php /repo/tests/newgame.php; then
+  status=1
+fi
+
 # Concurrent requests against one barter listing. Needs the fixture's listings,
 # which the crawl consumes, so it gets a fresh database of its own.
 echo

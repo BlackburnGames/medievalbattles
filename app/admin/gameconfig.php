@@ -88,9 +88,13 @@ $MB_ADMIN_ACTIONS = array(
 	// Administrators are player accounts, so deleting every account used to
 	// delete the admin running it, who was then locked out of this page. Admin
 	// accounts are kept, and the other tables are cleared of every row whose
-	// empire is gone rather than emptied.
+	// empire is gone rather than emptied. That kept the admins' kingdoms too,
+	// mid-game, so 'then' puts them back to their starting state -- see
+	// include/kingdom.php -- and the settlements are recounted, since signup
+	// places new empires by their member counts.
 	'accounts' => array(
-		'label'      => 'Delete every account except administrators',
+		'label'      => 'Delete every account except administrators, and reset theirs',
+		'then'       => 'mb_kingdom_reset_admins',
 		'statements' => array(
 			'DELETE FROM user WHERE admin = 0',
 			'DELETE FROM buildings WHERE userid NOT IN (SELECT userid FROM user)',
@@ -101,6 +105,7 @@ $MB_ADMIN_ACTIONS = array(
 			'DELETE FROM barter WHERE userid NOT IN (SELECT userid FROM user)',
 			'DELETE FROM empnews WHERE yourid NOT IN (SELECT userid FROM user)',
 			'DELETE FROM emailvalidate WHERE userid NOT IN (SELECT userid FROM user)',
+			'UPDATE settlement s SET members=(SELECT count(*) FROM user u WHERE u.setid=s.setid)',
 		),
 	),
 );
@@ -117,6 +122,11 @@ if (IsSet($action)) {
 	} else {
 		foreach ($MB_ADMIN_ACTIONS[$action]['statements'] as $sql) {
 			mysqli_query($db, $sql) or die(mysqli_error($db)); // mb-unbound-ok: fixed statements from $MB_ADMIN_ACTIONS
+		}
+		// A fixed function name from the list, never request input.
+		if (isset($MB_ADMIN_ACTIONS[$action]['then'])) {
+			require_once __DIR__ . '/../include/kingdom.php';
+			call_user_func($MB_ADMIN_ACTIONS[$action]['then'], $db);
 		}
 		echo "<b>" . htmlspecialchars($MB_ADMIN_ACTIONS[$action]['label']) . "</b>: done.<br><br>";
 	}

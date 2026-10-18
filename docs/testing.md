@@ -139,6 +139,23 @@ range where signup rolls dice. It found the Night Elf's Archery being taken
 back by the Ranger check two lines below it. Reloads the schema before and
 after.
 
+### `tests/newgame.php`
+
+Both world wipes, `admin/newgame.php` and gameconfig's account wipe, keep
+administrator accounts, and this checks that they start the administrators'
+kingdoms over. It makes tester@ and idle@ admins, runs each wipe as tester@,
+then signs up a twin of each admin (same race and class) through
+`checksignup.php`. Every column of `user`, `buildings`, `military`,
+`research`, `explore` and `returntbl` must match the twin's, except who the
+account is and the columns signup rolls dice for, which are held to signup's
+ranges instead. Comparing against a real signup rather than a list of
+expected values means a column added later that the reset forgets fails here
+untouched. It also checks that the non-admin is gone, the admins' barter
+offers and empire news are gone, the settlements are recounted, and tester@
+can still log in. With the reset disabled it fails on lumber, research,
+returns in flight, safemode and barter, which is the bug it was written for.
+Reloads the schema before each wipe and after.
+
 ### `tests/smoke.php`
 
 Crawls every reachable page, failing on any PHP fatal, parse error or warning

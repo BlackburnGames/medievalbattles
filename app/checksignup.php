@@ -1,6 +1,8 @@
 <?php
 // mb_valid_email(), shared with preferences.php and include/session.php.
 require_once __DIR__ . '/include/credentials.php';
+// mb_kingdom_start() and mb_kingdom_seed(): what a new empire starts with.
+require_once __DIR__ . '/include/kingdom.php';
 
 $signup = $_POST['signup'];
 
@@ -135,67 +137,16 @@ if ($signup) {
     // INSERTs below write it, because `pw` is denormalized across six tables.
     $pw = mb_password_hash($pw);
 
-    $part1 = rand(250, 350);
-    $part2 = rand(000, 999);
-
-    $gp = "$part1" . "$part2";
-    $iron = rand(4000, 6000);
-    $civ = rand(1000, 1250);
-    $recruits = rand(150, 250);
-    $war = rand(1,5);
-    $wiz = rand(1,5);
-    $pri = rand(1,5);
-    $maxciv = rand(100,250);
-
-    if($class == "Cleric")  {
-      $part1 = rand(350, 450);
-      $part2 = rand(000, 999);
-
-      $gp = "$part1" . "$part2";
-      $iron = rand(6000, 7500);
-      $civ = rand(1200, 1400);
-      $recruits = rand(200, 300);
-      $war = rand(4,10);
-      $wiz = rand(4,10);
-      $pri = rand(4,10);
-      $maxciv = rand(250,350);
-    }
-
-  // No archers and no Archery unless the race or the class grants them. The
-  // Ranger check used to reset Archery with an else, after the Night Elf had
-  // been granted it, so a Night Elf of any other class got archers it could
-  // not field.
-    $arch = 0;
-    $r13pts = 0;
-
-  // race advantages and disadvantages
-    if($race == 'Giant')   {  $wiz = 0; $pri = 0;  }
-    if($race == 'Demon')   {  $pri = 0;  }
-    if($race == 'Night Elf')   {  $arch = rand(4, 10);  $r13pts  = 125000;   }
-
-  // class advantages and disadvantages
-    if($class == 'Ranger')  { $arch = rand(4, 10);  $r13pts = 125000; $wiz = 0; }
-    if($class == 'Warlock') { $r1pts = 50000; }
-      else  { $r1pts = 0; }
-    if($class == 'Insurrectionist') { $suicide = rand(10, 20);  $r14pts = 125000; $wiz = 0; }
-      else  { $suicide  = 0;  $r14pts = 0;  }
+  // What the empire starts with is include/kingdom.php's, shared with the
+  // reset a new game runs on the administrators' kingdoms.
+    $start = mb_kingdom_start($race, $class);
+    $u = $start['user'];
 
     mb_query($db, "INSERT INTO user (email,  pw, ename, msn, aim, gp, iron, exp, food, land, mts, setid, class, userid, race, safemode, signup_comp_id)
-      VALUES (?, ?, ?, ?, ?, ?, ?, '0', '1500', '250', '200', ?, ?, ?, ?, '48', ?)",
-      array($email, $pw, $ename, $msn, $aim, $gp, $iron, (int) $snum, $class, (int) $newbuserid, $race, $computer_id));
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      array($email, $pw, $ename, $msn, $aim, $u['gp'], $u['iron'], $u['exp'], $u['food'], $u['land'], $u['mts'], (int) $snum, $class, (int) $newbuserid, $race, $u['safemode'], $computer_id));
 
-    mb_query($db, "INSERT INTO buildings (email, pw, home, barrack, farm, wp, gm, im, aland, amts, userid)
-      VALUES (?, ?, '50', '50', '50', '0', '50', '50', '100', '100', ?)", array($email, $pw, (int) $newbuserid));
-
-    mb_query($db, "INSERT INTO military (email, pw, civ, recruits, warriors, wizards, priests, maxciv, userid, warpower, warspeedw, cweapon, wizpower, wizspeeds, cspell, pripower, prispeedw, cstaff, cbow, archspeedw, archpower, wararmor, wizarmor, priarmor, wardef, wizdef, pridef, warspeeda, wizspeeda, prispeeda, archers, suicide)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, '2', '6','Dagger', '3', '4', 'Magic Missile', '2', '4', 'Quarterstaff', 'Bow', '4', '2', 'Studded Leather', 'Robe', 'Leather', '1', '1', '2', '0', '0', '1', ?, ?)",
-      array($email, $pw, (int) $civ, (int) $recruits, (int) $war, (int) $wiz, (int) $pri, (int) $maxciv, (int) $newbuserid, (int) $arch, (int) $suicide));
-
-    mb_query($db, "INSERT INTO research (email, pw, userid, r1pts, r13pts, r14pts)
-      VALUES (?, ?, ?, ?, ?, ?)", array($email, $pw, (int) $newbuserid, (int) $r1pts, (int) $r13pts, (int) $r14pts));
-
-    mb_query($db, "INSERT INTO explore (email, pw, userid)
-      VALUES (?, ?, ?)", array($email, $pw, (int) $newbuserid));
+    mb_kingdom_seed($db, $newbuserid, $email, $pw, $start);
 
     $selectempire = mb_query($db, "SELECT setid FROM user WHERE email=? AND pw=?", array($email, $pw));
     $semp = mb_db_result($selectempire,"semp");
@@ -203,7 +154,6 @@ if ($signup) {
     include("include/clock.php");
 
     mb_news_set($db, "$clock", 'red', "$ename has joined the settlement", $snum, 0);
-    mb_query($db, "INSERT INTO returntbl (email, pw, userid) VALUES (?, ?, ?)", array($email, $pw, (int) $newbuserid));
 
     echo "Thank you for signing up for Medieval Battles. You are in settlement " . mb_h($snum) . ".<br>Your login information and activation code has been emailed to you.<br><br><a href=index.php>You can login now here</a>";
 
