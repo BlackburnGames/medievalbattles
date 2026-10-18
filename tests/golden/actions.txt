@@ -197,6 +197,13 @@ Deprecated:  number_format(): Passing>
   says: You are not a Guild Leader.
   (no change)
 
+### settlement-leader-thread-view-refused
+# A member who does not lead the settlement is refused the leader thread view. It asked only for membership.
+
+> sl-topic.php topicid=1
+  says: You are not Settlement Leader.
+  (no change)
+
 ### explore-human
 # An empire of race Human exploring, at its own rate -- the tick applied only the Human one, and gave the Angel, the Demon and the Giant 13 land. Mountains are priced on its 200 mountains; they were priced on its 1,000 land, and 100 explorers found 2.
 

@@ -232,6 +232,14 @@ $SCENARIOS[] = array(
     'requests' => array(array('gl-topic.php', array('topicid' => 1))),
 );
 
+$SCENARIOS[] = array(
+    'name'  => 'settlement-leader-thread-view-refused',
+    'why'   => 'A member who does not lead the settlement is refused the leader thread view. It asked only for membership.',
+    'login' => array('idle@example.com', 'pass2'),
+    'setup' => array(),
+    'requests' => array(array('sl-topic.php', array('topicid' => 1))),
+);
+
 /*
  * Explorers in the field, and one tick. At 1,000 land every exploring rate
  * needs a different number of explorers per land -- 40 for a Human at 0.8, 42

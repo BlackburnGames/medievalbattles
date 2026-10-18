@@ -37,7 +37,7 @@
 function mb_forum_require_sl($sl)
 {
 	if ($sl != 'yes') {
-		echo "<center><b class=yellow>You are not Settlement Leader.</b>";
+		echo "<div align=center><font class=yellow>You are not Settlement Leader.</font></div>";
 		die();
 	}
 }

@@ -10,6 +10,13 @@ include("include/igtop.php");
 include("common.php");
 include("include/connect.php");
 
+// The leader's view of a thread, with a Delete link on each reply. It asked
+// only that the caller be in the settlement, so a member saw links that
+// sl-delposts.php would refuse; topic.php is the members' view of the same
+// thread. Leader only, as sl-forum.php is.
+include("include/forum_guard.php");
+mb_forum_require_sl($sl);
+
 $result= mysqli_query($db, "SELECT topicid, setid FROM setforums WHERE setid='$setid' AND topicid='$topicid'") or die("Error! " . mysqli_error($db));
 $settlement_check = mysqli_fetch_array($result);
 
