@@ -263,13 +263,22 @@
     user [1] land 250 -> 275, fleets 2 -> 1
     user [3] land 250 -> 225, nno 0 -> 1
 
-### quirk-archers-without-armour
-# QUIRK: archer hit points are archdef x 120, and signup leaves archdef 0 until archer armour is bought. PHP 8 makes the division fatal, part-way through sending the army.
+### archers-without-armour
+# Signup leaves archdef 0 until archer armour is bought, and archer hit points are archdef x 120. Unarmoured archers now defend at 1, as a defender's do; the division by zero was fatal on PHP 8, part-way through sending the army.
 
 > attack.php attack=1 empvalue=3 uwarrior=300 uarcher=30
-  php:  Fatal error: Uncaught DivisionByZeroError: Division by zero (include/attack/calculations.php)
-    military [1] warriors 300 -> 0
-    returntbl [1] war4 0 -> 297
+  says: You have conquered 25 land from PoorSerf(2)! Your losses: 3 warriors 2 archers
+    buildings [1] aland 100 -> 125
+    buildings [3] aland 100 -> 75
+  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
+  + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
+    military [1] warriors 300 -> 0, archers 30 -> 0
+    military [3] wizards 10 -> 9, priests 10 -> 9, archers 5 -> 4
+    returntbl [1] war4 0 -> 297, arch4 0 -> 28, time4 0 -> 6
+  + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
+  + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
+    user [1] land 250 -> 275, fleets 2 -> 1
+    user [3] land 250 -> 225, nno 0 -> 1
 
 ### quirk-iron-golems-alone
 # QUIRK: with no archers in the attack the iron golems' return UPDATE names no column, fails, and the golems are lost.
@@ -289,23 +298,22 @@
     user [1] land 250 -> 275, fleets 2 -> 1
     user [3] land 250 -> 225, nno 0 -> 1
 
-### quirk-golems-in-thousands
-# QUIRK: functions.php formats the golem counts with thousands separators and nexplode.php never strips them, so 2,000 golems is the string "2,000". Sending 500 is refused by a string comparison; sending 1,500 passes it, and the stock is then reckoned as 2 - 1,500.
+### golems-in-thousands
+# Golem counts past 1,000, which functions.php formats as "2,000". One more than owned is refused and 500 leaves 1,500. Until nexplode.php stripped them, 500 of 2,000 was refused by a string comparison and 1,500 left a stock of 2 - 1,500.
 
-> attack.php attack=1 empvalue=3 uwarrior=300 ugolem=500
+> attack.php attack=1 empvalue=3 ugolem=2001
   says: You cannot send that many units into combat.
   (no change)
 
-> attack.php attack=1 empvalue=3 uwarrior=300 ugolem=1500
-  says: You have conquered 25 land from PoorSerf(2)! Your losses: 3 warriors 1500 golems
-  php:  Warning: A non-numeric value encountered (include/attack/calculations.php)
+> attack.php attack=1 empvalue=3 uwarrior=300 ugolem=500
+  says: You have conquered 25 land from PoorSerf(2)! Your losses: 3 warriors -97 golem
     buildings [1] aland 100 -> 125
     buildings [3] aland 100 -> 75
   + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 25 land | class=yellow | yourid=3
   + guildnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | gnid=1 | age=0 | gid=1
-    military [1] warriors 300 -> 0, golem 2000 -> -1498
-    military [3] warriors 20 -> 0, wizards 10 -> 0, priests 10 -> 0, archers 5 -> 0, catapult 2 -> 0, golem 2 -> 0, irongolem 1 -> 0
-    returntbl [1] war4 0 -> 297, time4 0 -> 20
+    military [1] warriors 300 -> 0, golem 2000 -> 1500
+    military [3] warriors 20 -> 6, wizards 10 -> 0, priests 10 -> 0, archers 5 -> 0, catapult 2 -> 0, golem 2 -> 1, irongolem 1 -> 0
+    returntbl [1] war4 0 -> 297, golem4 0 -> 597, time4 0 -> 20
   + setnews news=PoorSerf (2) lost 25 land to TestLord (1) | class=lg | setid=2 | sid=2 | age=0
   + setnews news=TestLord (1) successfully attacked PoorSerf (2) and gained 25 land | class=yellow | setid=1 | sid=0 | age=0
     user [1] land 250 -> 275, fleets 2 -> 1

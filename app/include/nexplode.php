@@ -62,12 +62,19 @@ $dbpri = implode("", explode(",", $dbpri));
 $dbpri2 = implode("", explode(",", $dbpri2));
 $dbarch = implode("", explode(",", $dbarch));
 $dbarch2 = implode("", explode(",", $dbarch2));
+// functions.php formats the golem counts with the rest, and they were never
+// stripped: at 1,000 an attack compared "2,000" with the number sent as a
+// string, and the training pages added new golems to the "1" of "1,234".
+$golem = implode("", explode(",", $golem));
+$irongolem = implode("", explode(",", $irongolem));
+$dbgolem = implode("", explode(",", $dbgolem));
+$dbirongolem = implode("", explode(",", $dbirongolem));
 $explorers = implode("", explode(",", $explorers));
 $thieves = implode("", explode(",", $thieves));
 $sages = implode("", explode(",", $sages));
 $dbexplorer = implode("", explode(",", $dbexplorer));
 $dbthief = implode("", explode(",", $dbthief));
-$dbssage = implode("", explode(",", $dbsage));
+$dbsage = implode("", explode(",", $dbsage));
 $aexplorers = implode("", explode(",", $aexplorers));
 $tsages = implode("", explode(",", $tsages));
 $texplorers = implode("", explode(",", $texplorers));

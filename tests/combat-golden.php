@@ -133,11 +133,11 @@ $bigDefence = array(
                    'golem' => 2000, 'irongolem' => 1000, 'catapult' => 5000)),
     $defenderStats, landLayout($D), set('buildings', $D, array('wp' => 2000)),
 );
-// Golems under 1,000, because at 1,000 the attacker's own count stops being a
-// number (see quirk-golems-in-thousands); the defender's is read raw.
+// Golems under 1,000, which is where the attacker's count used to stop being
+// a number; golems-in-thousands covers past it.
 $bigAttackers = array('warriors' => 600000, 'wizards' => 200000, 'priests' => 100000, 'archers' => 50000,
                       'golem' => 900, 'irongolem' => 900);
-// Archers need Archery and archer armour (see quirk-archers-without-armour),
+// Archers need Archery, and armour so they are not archers-without-armour,
 // golems need both Animations.
 $bigAttack = array(army($A, $bigAttackers), researched($A, array(13, 17, 18)), set('military', $A, array('archdef' => 1)));
 $send = function (array $units) {
@@ -269,8 +269,8 @@ $SCENARIOS = array(
         'requests' => array(array('attack.php', array('empvalue' => $D, 'uwarrior' => 300, 'uarcher' => 30, 'uirongolem' => 20))),
     ),
     array(
-        'name'  => 'quirk-archers-without-armour',
-        'why'   => 'QUIRK: archer hit points are archdef x 120, and signup leaves archdef 0 until archer armour is bought. PHP 8 makes the division fatal, part-way through sending the army.',
+        'name'  => 'archers-without-armour',
+        'why'   => 'Signup leaves archdef 0 until archer armour is bought, and archer hit points are archdef x 120. Unarmoured archers now defend at 1, as a defender\'s do; the division by zero was fatal on PHP 8, part-way through sending the army.',
         'setup' => array(army($A, array('warriors' => 300, 'archers' => 30)), researched($A, array(13)),
             $defenders, $defenderStats),
         'requests' => array(array('attack.php', array('empvalue' => $D, 'uwarrior' => 300, 'uarcher' => 30))),
@@ -283,13 +283,13 @@ $SCENARIOS = array(
         'requests' => array(array('attack.php', array('empvalue' => $D, 'uwarrior' => 300, 'uirongolem' => 20))),
     ),
     array(
-        'name'  => 'quirk-golems-in-thousands',
-        'why'   => 'QUIRK: functions.php formats the golem counts with thousands separators and nexplode.php never strips them, so 2,000 golems is the string "2,000". Sending 500 is refused by a string comparison; sending 1,500 passes it, and the stock is then reckoned as 2 - 1,500.',
+        'name'  => 'golems-in-thousands',
+        'why'   => 'Golem counts past 1,000, which functions.php formats as "2,000". One more than owned is refused and 500 leaves 1,500. Until nexplode.php stripped them, 500 of 2,000 was refused by a string comparison and 1,500 left a stock of 2 - 1,500.',
         'setup' => array(army($A, array('warriors' => 300, 'golem' => 2000)), researched($A, array(17)),
             $defenders, $defenderStats),
         'requests' => array(
+            array('attack.php', array('empvalue' => $D, 'ugolem' => 2001)),
             array('attack.php', array('empvalue' => $D, 'uwarrior' => 300, 'ugolem' => 500)),
-            array('attack.php', array('empvalue' => $D, 'uwarrior' => 300, 'ugolem' => 1500)),
         ),
     ),
     array(

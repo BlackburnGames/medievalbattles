@@ -16,7 +16,7 @@ if($TIME_3 == 0)	{	$tfleets = 3;	}
 if($TIME_4 == 0)	{	$tfleets = 4;	}
 		
 $warhp = $wardef * 100;
-$archhp = $archdef * 120;
+$archhp = ($archdef == 0 ? 1 : $archdef) * 120;	// unarmoured archers defend at 1, as the defender's do below
 $prihp = $pridef * 80;
 $wizhp = $wizdef * 75;
 $golemhp = $wizdef * 100;
