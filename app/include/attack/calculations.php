@@ -21,13 +21,7 @@ $prihp = $pridef * 80;
 $wizhp = $wizdef * 75;
 $golemhp = $wizdef * 100;
 $irongolemhp = $wizdef * 100;
-
-// Counts the unit types sent, to share the defender's power between them -- or
-// would, but it is an elseif chain, so it is 1 for any army at all and every
-// type sent takes the defender's whole power as losses. The defender's side
-// below counts with plain ifs. That is the combat formula; only the zero it
-// starts from is new.
-$u_tally = 0;
+$u_tally = 0;	// an elseif chain, so always 1: each type takes the whole blow. Formula, not port.
 if($uwarrior > 0)	{	$u_tally = $u_tally + 1;	 }
 elseif($uwizard > 0)	{	$u_tally = $u_tally + 1;	 }
 elseif($upriest > 0)	{	$u_tally = $u_tally + 1;	 }
@@ -126,7 +120,6 @@ $evprihp = 80 * $evm['pridef'];
 $evwizhp = 75 * $evm['wizdef'];
 $evgolemhp = 100 * 20;
 $evirongolemhp = 100 * 25;
-
 $evtally = 0;
 if($evm['warriors'] > 0)	{	$evtally = $evtally + 1;	 }
 if($evm['wizards'] > 0)	{	$evtally = $evtally + 1;	 }
