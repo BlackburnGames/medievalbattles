@@ -109,8 +109,8 @@ else
 	}
 	else	{
 			 
-		$asages = $asages + ($ur1 + $ur2 + $ur3 + $ur4 + $ur5 + $ur6 + $ur7 + $ur8 + $ur9 + $ur10 + $ur11 + $ur12 + $ur13 + $ur14 + $ur15 + $ur16);
-		$sages = $sages + ($ur1 + $ur2 + $ur3 + $ur4 + $ur5 + $ur6 + $ur7 + $ur8 + $ur9 + $ur10 + $ur11 + $ur12 + $ur13 + $ur14 + $ur15 + $ur16);
+		$asages = $asages + ($ur1 + $ur2 + $ur3 + $ur4 + $ur5 + $ur6 + $ur7 + $ur8 + $ur9 + $ur10 + $ur11 + $ur12 + $ur13 + $ur14 + $ur15 + $ur16 + $ur17 + $ur18);
+		$sages = $sages + ($ur1 + $ur2 + $ur3 + $ur4 + $ur5 + $ur6 + $ur7 + $ur8 + $ur9 + $ur10 + $ur11 + $ur12 + $ur13 + $ur14 + $ur15 + $ur16 + $ur17 + $ur18);
 		$r1 = $res['r1'] - $ur1;
 		$r2 = $res['r2'] - $ur2;
     	$r3 = $res['r3'] - $ur3;
@@ -127,6 +127,8 @@ else
 		$r14 = $res['r14'] - $ur14;
 		$r15 = $res['r15'] - $ur15;
 		$r16 = $res['r16'] - $ur16;
+		$r17 = $res['r17'] - $ur17;
+		$r18 = $res['r18'] - $ur18;
 
 	 	mysqli_query($db, "UPDATE military SET sages='$sages' WHERE email='$email' AND pw='$pw'");
 	  	mysqli_query($db, "UPDATE research SET r1='$r1' WHERE email='$email' AND pw='$pw'");
@@ -145,6 +147,8 @@ else
 		mysqli_query($db, "UPDATE research SET r14='$r14' WHERE email='$email' AND pw='$pw'");
 		mysqli_query($db, "UPDATE research SET r15='$r15' WHERE email='$email' AND pw='$pw'");
 		mysqli_query($db, "UPDATE research SET r16='$r16' WHERE email='$email' AND pw='$pw'");
+		mysqli_query($db, "UPDATE research SET r17='$r17' WHERE email='$email' AND pw='$pw'");
+		mysqli_query($db, "UPDATE research SET r18='$r18' WHERE email='$email' AND pw='$pw'");
 
 		echo "<div align=center><font class=yellow>You have successfully cancelled your sages.</font></div>";
 		include("include/S_CRES.php");

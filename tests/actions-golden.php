@@ -183,8 +183,8 @@ $SCENARIOS[] = array(
     'requests' => array(array('cresearch.php', array('first' => 1, 'ur1' => 2))),
 );
 $SCENARIOS[] = array(
-    'name'  => 'quirk-cancel-animation-sages',
-    'why'   => 'QUIRK: sages on Animation cannot be recalled. The page says they were, and nothing moves.',
+    'name'  => 'cancel-animation-sages',
+    'why'   => 'Sages on Animation come home like any others. The page recalled from the first sixteen projects only, said it had worked, and moved nothing.',
     'setup' => array(set('research', $T, array('r17' => 3))),
     'requests' => array(array('cresearch.php', array('first' => 1, 'ur17' => 2))),
 );

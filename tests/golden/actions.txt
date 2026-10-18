@@ -150,12 +150,13 @@
     military [1] sages 8 -> 10
     research [1] r1 5 -> 3
 
-### quirk-cancel-animation-sages
-# QUIRK: sages on Animation cannot be recalled. The page says they were, and nothing moves.
+### cancel-animation-sages
+# Sages on Animation come home like any others. The page recalled from the first sixteen projects only, said it had worked, and moved nothing.
 
 > cresearch.php first=1 ur17=2
   says: [ Send Sages ] You have successfully cancelled your sages.
-  (no change)
+    military [1] sages 8 -> 10
+    research [1] r17 3 -> 1
 
 ### explore-human
 # An empire of race Human exploring, at its own rate -- the tick applied only the Human one, and gave the Angel, the Demon and the Giant 13 land. Mountains are priced on its 200 mountains; they were priced on its 1,000 land, and 100 explorers found 2.

@@ -627,7 +627,7 @@ Attacking does not itself award points. Everyone has a floor of
 
 <p>Medieval Battles was written in 2003 and this manual is generated from the code as
 it actually runs, not from what the code was meant to do. Where the two differ, the
-tables above describe real behaviour. These are the differences worth knowing about:</p>
+tables above describe real behaviour<?php if ($GAMEDATA['quirks']) { ?>. These are the differences worth knowing about:</p>
 
 <div class="warn">
 	<ul>
@@ -636,6 +636,9 @@ tables above describe real behaviour. These are the differences worth knowing ab
 <?php } ?>
 	</ul>
 </div>
+<?php } else { ?>, and none is known to differ: every quirk found in the 2003 code has been
+fixed.</p>
+<?php } ?>
 
 <div id="footer">
 	Generated from the game engine. Every figure on this page is defined in

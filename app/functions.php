@@ -237,7 +237,7 @@ $return = mysqli_fetch_array($return_query);
 
 	$asages = $sages;
 	$aexplorers = $explorers;
-	$tsages = $sages + $res['r1'] + $res['r2'] + $res['r3'] + $res['r4'] + $res['r5'] + $res['r6'] + $res['r7'] + $res['r8'] + $res['r9'] + $res['r10'] + $res['r11'] + $res['r12'] + $res['r13'] + $res['r14'] + $res['r15'] + $res['r16'];
+	$tsages = $sages + $res['r1'] + $res['r2'] + $res['r3'] + $res['r4'] + $res['r5'] + $res['r6'] + $res['r7'] + $res['r8'] + $res['r9'] + $res['r10'] + $res['r11'] + $res['r12'] + $res['r13'] + $res['r14'] + $res['r15'] + $res['r16'] + $res['r17'] + $res['r18'];
 	$texplorers = $explorers + $expland + $expmt;
 
 	$warriorc_bonus = 1;

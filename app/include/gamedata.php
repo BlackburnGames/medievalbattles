@@ -452,5 +452,4 @@ $GAMEDATA['exp_values'] = array(
  * truth and so Phase 3 has a checklist.
  * ------------------------------------------------------------------ */
 $GAMEDATA['quirks'] = array(
-    'Sage accounting disagrees with itself about how many research projects there are. Points accrue across all eighteen, the assigned-sage totals on the status and research screens count the first sixteen, and your score counts only the first fourteen -- so a sage on Animation or Advanced Animation is invisible to both totals, and one on Advanced Farming or Advanced Construction is invisible to your score. Worse, the cancel page recalls from the first sixteen only: a sage sent to Animation or Advanced Animation can never come back, though the page says it has. (update.php:247 vs functions.php:240 and cresearch.php:112 vs update.php:345)',
 );
