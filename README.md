@@ -10,7 +10,7 @@ historical and educational purposes.
 
 > **Do not expose this to a network.** The modernization has bound every
 > query's values and escaped every output, but the app has not been reviewed
-> as a whole for exposure — there is no login throttling, for one. The Docker
+> as a whole for exposure. The Docker
 > ports bind to `127.0.0.1` on purpose — leave them that way.
 
 You need Docker with Compose v2 or newer. Nothing else — there is no PHP,

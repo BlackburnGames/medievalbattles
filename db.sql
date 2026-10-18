@@ -867,3 +867,25 @@ CREATE TABLE `round_result` (
   PRIMARY KEY (`round_id`, `userid`),
   KEY `account_id` (`account_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+# --------------------------------------------------------
+
+#
+# Table structure for table `login_failure`
+#
+-- One row per failed login, for throttling: app/include/throttle.php refuses
+-- an address, or an IP, that has failed too often lately. Rows older than a
+-- day are swept on each new failure. Not a round's: logins are the account's.
+
+CREATE TABLE `login_failure` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  -- As typed, lowercased: an address that has no account is throttled the
+  -- same as one that has, so the refusal says nothing about which exist.
+  `email` varchar(254) NOT NULL,
+  -- IPv6 at its longest.
+  `ip` varchar(45) NOT NULL,
+  `at` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `email_at` (`email`, `at`),
+  KEY `ip_at` (`ip`, `at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

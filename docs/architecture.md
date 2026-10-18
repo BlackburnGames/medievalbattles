@@ -80,7 +80,12 @@ included, starts there.
 The hash is **bcrypt** as of Phase 3 — `app/include/password.php`, pinned to
 `PASSWORD_BCRYPT`. Accounts still holding the old unsalted MD5 verify once and
 are rehashed in place by `checklogin.php`. Login verifies against the account,
-then looks the kingdom up by `account_id` in the current round. An account
+then looks the kingdom up by `account_id` in the current round.
+
+Before any of that, `app/include/throttle.php` refuses an address with five
+failed logins in the last fifteen minutes, or an IP with twenty, whether or not
+the address has an account and before its password is looked at. Failures are
+rows in `login_failure`; a right password clears its address's. An account
 with none there is logged in all the same, with no kingdom in its session, and
 sent to `rounds.php`: the round to join, its own history and past rounds'
 leaders. `join.php` makes the kingdom and logs it in. Signup makes only the

@@ -74,6 +74,14 @@ if ! docker compose exec -T web php /repo/tests/round-isolation.php; then
   status=1
 fi
 
+# Wrong passwords, refused past a limit per address and per IP. Reloads the
+# schema: every request here comes from one address.
+echo
+echo "=== login throttling ==="
+if ! docker compose exec -T web php /repo/tests/login-throttle.php; then
+  status=1
+fi
+
 # A round ended into its results, and the next opened, joined, started and
 # ticked alone, through bin/round.php. Reloads the schema likewise.
 echo

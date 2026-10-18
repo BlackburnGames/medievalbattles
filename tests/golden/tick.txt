@@ -28,6 +28,7 @@
   topicid=1 | name=TestLord | host=localhost | topic=Guild orders | lastpost=<CLOCK> | lastposter=IdleBaron | replies=1 | message=Muster at dawn. | datestamp=<VOLATILE> | guildname=Testguild | round_id=1
   topicid=2 | name=IdleBaron | host=localhost | topic=Recruiting | lastpost=<CLOCK> | lastposter=IdleBaron | replies=0 | message=We have two open slots. | datestamp=<VOLATILE> | guildname=Testguild | round_id=1
 == ip_addresses (0 rows) ==
+== login_failure (0 rows) ==
 == messages (1 row) ==
   origin=IdleBaron | datesent=<CLOCK> | message=Care to trade iron for gold? | yourid=1 | mid=1 | age=1 | round_id=1
 == military (3 rows) ==

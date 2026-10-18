@@ -195,6 +195,15 @@ not end round 2 without its box ticked, does with it, still admits the
 administrator whose kingdom ended, opens round 3, and refuses a player. Last,
 deleting an account keeps its results, anonymized. Reloads the schema.
 
+### `tests/login-throttle.php`
+
+Five wrong passwords for an address and the right one is refused; another
+address from the same machine still logs in; once the failures age past the
+window the right password works and clears them; an address with no account
+is refused in the same words; twenty failures from one IP refuse every address
+from it. Every request in the suite comes from one address, so it reloads the
+schema before and after — what it leaves behind would refuse the next test.
+
 ### `tests/smoke.php`
 
 Crawls every reachable page, failing on any PHP fatal, parse error or warning

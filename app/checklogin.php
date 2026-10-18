@@ -27,6 +27,18 @@ include("include/connect.php");
 include("include/clock.php");
 // mb_valid_email(), the same rule checksignup.php and preferences.php apply.
 require_once __DIR__ . '/include/credentials.php';
+// How many wrong passwords an address or an IP may try: include/throttle.php.
+require_once __DIR__ . '/include/throttle.php';
+$mb_ip = isset($_SERVER['REMOTE_ADDR']) ? (string) $_SERVER['REMOTE_ADDR'] : '';
+
+// Before the password is looked at, so a guesser past the limit learns
+// nothing from the answer -- not even whether the guess was right.
+if (mb_login_throttled($db, $email, $mb_ip)) {
+	unset($_SESSION['login'], $_SESSION['userid'], $_SESSION['mb_account'], $_SESSION['mb_account_fp']);
+	echo "Too many failed logins. Wait " . (int) MB_LOGIN_WINDOW . " minutes and try again.<br>";
+	echo "<a href=index.php>Login again.</a>";
+	exit();
+}
 
 /*
  * The address is checked before it is used, not after.
@@ -37,6 +49,7 @@ require_once __DIR__ . '/include/credentials.php';
  * that could not have matched an account anyway, and costs one query less.
  */
 if (!mb_valid_email($email)) {
+	mb_login_failed($db, $email, $mb_ip);
 	unset($_SESSION['login'], $_SESSION['userid'], $_SESSION['mb_account'], $_SESSION['mb_account_fp']);
 	echo "Your email or password is incorrect.<br>";
 	echo "<a href=index.php>Login again.</a>";
@@ -52,6 +65,7 @@ $account = mb_account_find($email);
 $stored = $account ? $account['pw'] : '';
 
 if ($account && mb_password_verify($plain_pw, $stored)) {
+	mb_login_succeeded($db, $email);
 	/*
 	 * Upgrade an md5 account in place. One row, in the `account` table; the
 	 * round never held a copy of the hash after this change, so nothing in it
@@ -95,6 +109,7 @@ if ($account && mb_password_verify($plain_pw, $stored)) {
 	header("Location: main.php?pageid=news");
 	exit();
 } else {
+	mb_login_failed($db, $email, $mb_ip);
 	unset($_SESSION['login'], $_SESSION['userid'], $_SESSION['mb_account'], $_SESSION['mb_account_fp']);
 	echo "Your email or password is incorrect.<br>";
 	echo "<a href=index.php>Login again.</a>";
