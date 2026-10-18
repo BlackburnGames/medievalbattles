@@ -41,7 +41,8 @@ else	{
 		include("include/disband_table.php");
 		die();
 	}
-	elseif($upriest > 0 AND $class == 'Demon')	{
+	// Demon is a race, not a class; as $class this could never be true.
+	elseif($upriest > 0 AND $race == 'Demon')	{
 		echo"<div align=center><font class=yellow>You do not have Priests!</div></font>";
 		include("include/disband_table.php");
 		die();

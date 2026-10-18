@@ -219,6 +219,9 @@ else	{
 	elseif($iron < $b_cost AND $b_meth == 'iron')	 {	echo"<font class=yellow><div align=center>Not enough iron!</div></font><br><br>";	die();	 }
 	elseif($race == 'Giant' AND $b_type == 'Wizard')	{	echo"<font class=yellow><div align=center>Giants can't possess Wizards!</div></font><br><br>";	 die();	}
 	elseif($race == 'Giant'  AND $b_type == 'Priest')	{	echo"<font class=yellow><div align=center>Giants can't possess Priests</div></font><br><br>";	die();	 }
+//	military.php will not train a Demon a priest and every attack page refuses to
+//	send one, so neither may this sell one.
+	elseif($race == 'Demon' AND $b_type == 'Priest')	{	echo"<font class=yellow><div align=center>Demons can't possess Priests!</div></font><br><br>";	die();	 }
 	elseif($class == 'Ranger' AND $b_type == 'Wizard')	{	echo"<font class=yellow><div align=center>Rangers can't possess Wizards!</div></font><br><br>";	die();	 }
 	elseif($res['r13pts'] < 125000 AND $b_type == 'Archer')	{echo"<font class=yellow><div align=center>You must research Archery for Archers.<br><br></div></font>";	die();	 }
 

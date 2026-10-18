@@ -95,8 +95,10 @@ else	{
 		include("include/attack/table.php");
 		die();
 	}
-	elseif($race == 'Giant' AND $upriest > 0)	{
-		echo"<div align=center><font class=yellow>Being that you are a Giant, you cannot attack with priests.</div></font>";
+	// This was a second copy of the Giant check above, so Demons were never
+	// asked -- and the barter board would sell them priests to bring.
+	elseif($race == 'Demon' AND $upriest > 0)	{
+		echo"<div align=center><font class=yellow>Being that you are a Demon, you cannot attack with priests.</div></font>";
 		include("include/attack/ldrop.php");
 		include("include/attack/table.php");
 		die();

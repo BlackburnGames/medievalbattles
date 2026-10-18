@@ -92,7 +92,7 @@ else	{
 		die();
 	}
 	elseif($race == 'Demon' AND $upriest > 0)	{
-		echo"<div align=center><font class=yellow>Being that you are a Giant, you cannot attack with priests.</div></font>";
+		echo"<div align=center><font class=yellow>Being that you are a Demon, you cannot attack with priests.</div></font>";
 		include("include/attack/ldrop.php");
 		include("include/attack/table.php");
 		die();
