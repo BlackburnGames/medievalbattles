@@ -1,6 +1,6 @@
 <?php
 /**
- * What an email address and a password hash are allowed to be.
+ * What an email address, a password hash and an empire name are allowed to be.
  *
  * This exists because of one entry on tests/sql-injection.txt that could not be
  * fixed where it was reported. preferences.php lets a player choose a new
@@ -88,5 +88,31 @@ if (!function_exists('mb_valid_email')) {
         }
 
         return filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
+    }
+}
+
+if (!function_exists('mb_valid_ename')) {
+    /**
+     * An empire name is not a credential, but it travels like one. It is read
+     * back out of `user` on every page and interpolated bare -- forty-odd
+     * "WHERE ename='$ename'" sites, the votes in govt.php and attack.php, the
+     * login bookkeeping in checklogin.php -- and nothing escapes it there.
+     *
+     * Until checksignup.php escaped its INSERT, a name containing a quote or a
+     * backslash broke that statement, so no such name could ever be stored and
+     * those sites were safe by accident. Escaping the INSERT removes the
+     * accident, so the rule has to be stated instead. Signup is the only writer:
+     * nothing in the game renames an empire.
+     *
+     * A positive charset for the same reason as the address above, and 25 to
+     * match the form's maxlength.
+     *
+     * @param  mixed $value
+     * @return bool
+     */
+    function mb_valid_ename($value)
+    {
+        return is_string($value)
+            && preg_match('/^[A-Za-z0-9](?:[A-Za-z0-9 ._\-]{0,23}[A-Za-z0-9._\-])?$/', $value) === 1;
     }
 }

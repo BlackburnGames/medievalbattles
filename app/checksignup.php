@@ -40,11 +40,17 @@ if ($signup) {
     $msn = strip_tags($msn);
     $aim = strip_tags($aim);
     $email = strip_tags($email);
+  // Escaped once, here, for every query below. The address in particular is
+  // queried before mb_valid_email() has looked at it, so nothing can lean on
+  // the rule further down.
+    $q_email = mb_sql_str($db, $email);
+    $q_ename = mb_sql_str($db, $ename);
+    $q_ip    = mb_sql_str($db, $ipaddress);
   //  email already in the database?
-    $emresult = $db->query("SELECT email FROM user WHERE email='$email'");
+    $emresult = $db->query("SELECT email FROM user WHERE email=$q_email");
     $emnamecheck = mysqli_fetch_array($emresult);
   // empire name already in the database?
-    $eresult = $db->query("SELECT ename FROM user WHERE ename='$ename'");
+    $eresult = $db->query("SELECT ename FROM user WHERE ename=$q_ename");
     $enamecheck = mysqli_fetch_array($eresult);
   //  dropcase of empire name and email
     $ename1 = strtolower($ename);
@@ -52,7 +58,7 @@ if ($signup) {
     $email1 = strtolower($email);
     $emnamecheck1 = strtolower($emnamecheck[0]);
   //  are they a multi?
-    $ip_query = $db->query("SELECT count(userid) FROM user WHERE ip='$ipaddress'");
+    $ip_query = $db->query("SELECT count(userid) FROM user WHERE ip=$q_ip");
     $check_ip = mb_db_result($ip_query, "check_ip");
 
   if($enamecheck1 == $ename1 AND $ename != "")  { echo mb_h($ename) . " is already being used!"; die();   }
@@ -66,6 +72,14 @@ if ($signup) {
   elseif($class == 'ns')  { echo "You must have a class to play the game!"; die();   }
   elseif($race == 'ns') { echo "You must have a race to play the game!";  die();   }
   elseif($ename == "")  { echo "You must have an empire name to play the game!";  die();   }
+  // include/credentials.php says why: the name is interpolated bare on every
+  // page once it is stored, and this is the only place it is ever written.
+  elseif (!mb_valid_ename($ename)) { echo "Empire names may use letters, numbers, spaces and . _ - only, up to 25 characters!";  die();   }
+  // The two drop-downs, held to what they offer. Both are stored and then
+  // compared against literals all over the engine, so a value the form never
+  // offered makes an empire that no race or class rule recognises.
+  elseif (!isset($GAMEDATA['races'][$race]))   { echo "That race doesn't exist!";  die();   }
+  elseif (!isset($GAMEDATA['classes'][$class])) { echo "That class doesn't exist!";  die();   }
   elseif($noplayers >= 450) { echo "Game is full! Try again later!";  die();   }
   elseif (($email == "") and ($cemail == "")) { echo "You must have an email to play!"; die();   }
   elseif ($email != $cemail)  { echo "Emails don't match!"; die();   }
@@ -121,6 +135,14 @@ if ($signup) {
     // Hashed here, once, after every comparison that needed the plaintext. Six
     // INSERTs below write it, because `pw` is denormalized across six tables.
     $pw = mb_password_hash($pw);
+    // Bcrypt's alphabet carries no SQL meaning, so escaping the hash changes
+    // nothing it writes -- it is done so these queries read like every other
+    // one here, rather than asking the reader to know that.
+    $q_pw    = mb_sql_str($db, $pw);
+    $q_msn   = mb_sql_str($db, $msn);
+    $q_aim   = mb_sql_str($db, $aim);
+    $q_race  = mb_sql_str($db, $race);
+    $q_class = mb_sql_str($db, $class);
 
     $part1 = rand(250, 350);
     $part2 = rand(000, 999);
@@ -162,27 +184,27 @@ if ($signup) {
       else  { $suicide  = 0;  $r14pts = 0;  }
 
     $db->query("INSERT INTO user (email,  pw, ename, msn, aim, gp, iron, exp, food, land, mts, setid, class, userid, race, safemode, signup_comp_id)
-      VALUES ('$email', '$pw', '$ename', '$msn', '$aim', '$gp', '$iron', '0', '1500', '250', '200', '$snum', '$class', '$newbuserid', '$race', '48', '$computer_id') ");
+      VALUES ($q_email, $q_pw, $q_ename, $q_msn, $q_aim, '$gp', '$iron', '0', '1500', '250', '200', '$snum', $q_class, '$newbuserid', $q_race, '48', '$computer_id') ");
 
     $db->query("INSERT INTO buildings (email, pw, home, barrack, farm, wp, gm, im, aland, amts, userid)
-      VALUES ('$email', '$pw', '50', '50', '50', '0', '50', '50', '100', '100', '$newbuserid') ");
+      VALUES ($q_email, $q_pw,'50', '50', '50', '0', '50', '50', '100', '100', '$newbuserid') ");
 
     $db->query("INSERT INTO military (email, pw, civ, recruits, warriors, wizards, priests, maxciv, userid, warpower, warspeedw, cweapon, wizpower, wizspeeds, cspell, pripower, prispeedw, cstaff, cbow, archspeedw, archpower, wararmor, wizarmor, priarmor, wardef, wizdef, pridef, warspeeda, wizspeeda, prispeeda, archers, suicide)
-      VALUES ('$email', '$pw', '$civ', '$recruits', '$war', '$wiz', '$pri', '$maxciv', '$newbuserid', '2', '6','Dagger', '3', '4', 'Magic Missile', '2', '4', 'Quarterstaff', 'Bow', '4', '2', 'Studded Leather', 'Robe', 'Leather', '1', '1', '2', '0', '0', '1', '$arch', '$suicide') ");
+      VALUES ($q_email, $q_pw,'$civ', '$recruits', '$war', '$wiz', '$pri', '$maxciv', '$newbuserid', '2', '6','Dagger', '3', '4', 'Magic Missile', '2', '4', 'Quarterstaff', 'Bow', '4', '2', 'Studded Leather', 'Robe', 'Leather', '1', '1', '2', '0', '0', '1', '$arch', '$suicide') ");
 
     $db->query("INSERT INTO research (email, pw, userid, r1pts, r13pts, r14pts)
-      VALUES ('$email', '$pw', '$newbuserid', '$r1pts', '$r13pts', '$r14pts') ");
+      VALUES ($q_email, $q_pw,'$newbuserid', '$r1pts', '$r13pts', '$r14pts') ");
 
     $db->query("INSERT INTO explore (email, pw, userid)
-      VALUES ('$email', '$pw', '$newbuserid') ");
+      VALUES ($q_email, $q_pw,'$newbuserid') ");
 
-    $selectempire = $db->query("SELECT setid FROM user WHERE email='$email' AND pw='$pw'");
+    $selectempire = $db->query("SELECT setid FROM user WHERE email=$q_email AND pw=$q_pw");
     $semp = mb_db_result($selectempire,"semp");
 
     include("include/clock.php");
 
     mb_news_set($db, "$clock", 'red', "$ename has joined the settlement", $snum, 0);
-    $db->query("INSERT INTO returntbl (email, pw, userid)   VALUES ('$email', '$pw', '$newbuserid') ");
+    $db->query("INSERT INTO returntbl (email, pw, userid)   VALUES ($q_email, $q_pw,'$newbuserid') ");
 
     echo "Thank you for signing up for Medieval Battles. You are in settlement " . mb_h($snum) . ".<br>Your login information and activation code has been emailed to you.<br><br><a href=index.php>You can login now here</a>";
 
