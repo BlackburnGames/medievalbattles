@@ -452,5 +452,4 @@ $GAMEDATA['exp_values'] = array(
  * truth and so Phase 3 has a checklist.
  * ------------------------------------------------------------------ */
 $GAMEDATA['quirks'] = array(
-    'The thread view for guild leaders, where deleting a post or replying on the leader board takes you, reads a per-guild table from an older version of the game and shows only an error. (gl-topic.php:34)',
 );
