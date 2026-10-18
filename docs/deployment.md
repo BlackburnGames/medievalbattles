@@ -6,41 +6,34 @@ the scripts exist; the blockers below come first.
 
 ## Blockers
 
-These stand between the code as it is and a server that runs it. The first is
-the one that can quietly break the game.
+These stand between the code as it is and a server that runs it. The first was
+the one that could quietly break the game, and is resolved.
 
-1. **MySQL 8.4 in production, 5.7 under test — critical.** The host runs
-   MySQL 8.4.10. `docker-compose.yml` runs `mysql:5.7`, so every golden
-   master, the crawl and every audit have only ever proved the code against a
-   server it will not run on. 8.0 changed enough to matter here:
+1. ~~**MySQL 8.4 in production, 5.7 under test.**~~ **Resolved.** The host
+   runs MySQL 8.4.10, and so does `docker-compose.yml`, with the server's
+   defaults left as the host's are: strict `sql_mode`,
+   `utf8mb4_0900_ai_ci`. What 8.0 changed, and where each now stands:
 
-   - **Default `sql_mode`.** Locally the server is started with
-     `--sql-mode=NO_ENGINE_SUBSTITUTION` because the 2003 queries fail under
+   - **Default `sql_mode`.** The 2003 queries fail under
      `STRICT_TRANS_TABLES` (partial `INSERT`s) and `ONLY_FULL_GROUP_BY`
-     (aggregates). On shared hosting the global mode cannot be changed, so
-     the connection has to set it — `SET SESSION sql_mode = ...` in
-     `connect.php` and `accounts.php`, right after `mysqli_set_charset()`.
+     (aggregates), and a shared host's global mode cannot be changed, so
+     every connection sets `NO_ENGINE_SUBSTITUTION` for itself
+     (`mb_db_session()`, `app/include/db.php`).
    - **New reserved words** (`RANK`, `GROUPS`, `SYSTEM`, `ROWS`, `OVER`,
      `LEAD`, `CUME_DIST`, ...). No column in `db.sql` uses one (checked
-     2026-10-18), but an alias or table name in a query would break unquoted.
-     `check` has already bitten once on 5.7 (activation; see
-     modernization.md).
-   - **MyISAM.** Every table in `db.sql` is `ENGINE=MyISAM`. They move to
-     InnoDB with the 8.4 work (modernization.md), which settles whether
-     SiteGround allows MyISAM by not needing it — but makes row order
-     without an `ORDER BY` a thing the goldens can catch.
+     2026-10-18), and no query the suite reaches broke on one. A page it
+     cannot reach still could.
+   - **MyISAM.** Every table is InnoDB now, so whether SiteGround allows
+     MyISAM no longer matters.
    - **Removed features**: `utf8` now means `utf8mb3` and warns, the old
      `PASSWORD()`, implicit `GROUP BY` sorting, integer display widths, and
-     the query cache.
-   - **Collation**: 8.x defaults to `utf8mb4_0900_ai_ci`. The local server
-     uses `utf8mb4_unicode_ci`; mixing them in a join or comparison is an
-     "Illegal mix of collations" error. The databases should be created with
-     `utf8mb4_unicode_ci` explicitly, or the schema should name it.
+     the query cache. The suite found none in use.
+   - **Collation**: every table names `utf8mb4_unicode_ci`, and every
+     connection asks for it, so the server's `utf8mb4_0900_ai_ci` default
+     never meets the schema's in a comparison.
 
-   The fix is to move the local `db` service to `mysql:8.4`, set the mode in
-   the connection rather than on the server command line, and run the whole
-   suite. Anything it finds is a Phase 3 bug. Until the suite is green on 8.4
-   the game must not be deployed.
+   The full suite passes on 8.4 with every golden master untouched (see
+   modernization.md).
 
 2. **The tick mails a hardcoded address** (`update.php`, "Sending email to
    Mako") on every run — the original author's. Locally `sendmail_path` is
@@ -132,7 +125,7 @@ All in `deploy/`, run from the repo root in Git Bash.
 
 ## First deploy, in order
 
-1. Blocker 1: the suite green on MySQL 8.4.
+1. ~~Blocker 1: the suite green on MySQL 8.4.~~ Done.
 2. Site Tools > Security > Protected URLs: protect `/`.
 3. Site Tools > Site > MySQL: two databases (round and accounts), one user
    with all privileges on both.

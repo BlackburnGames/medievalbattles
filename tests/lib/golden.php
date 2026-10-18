@@ -28,7 +28,8 @@ if (!$db) {
     fwrite(STDERR, "Cannot connect: " . mysqli_connect_error() . "\n");
     exit(2);
 }
-mysqli_set_charset($db, 'utf8mb4');
+require_once __DIR__ . '/../../app/include/db.php';
+mb_db_session($db);
 
 // The accounts database, beside the round: docs/rounds.md. Only loadFixture()
 // uses it; nothing here snapshots it, because no action moves an account.
@@ -38,7 +39,7 @@ if (!$adb) {
     fwrite(STDERR, "Cannot connect to the accounts database: " . mysqli_connect_error() . "\n");
     exit(2);
 }
-mysqli_set_charset($adb, 'utf8mb4');
+mb_db_session($adb);
 
 /*
  * Columns left out of the comparison, all of them wall-clock. `pw` used to be

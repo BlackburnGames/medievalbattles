@@ -462,8 +462,9 @@ restarts the container twice; run it by hand after touching request handling.
 
 ## Constraints worth knowing before changing the harness
 
-- **MyISAM has no transactions**, so there is no rollback isolation —
-  `reset-db.sh` drops and reloads the whole database. It must drop *all*
+- **There is no rollback isolation** — the tables are InnoDB now, but the
+  app and the tick commit as they go, so `reset-db.sh` drops and reloads the
+  whole database. It must drop *all*
   tables, not just the 22 in `db.sql`, because the app creates per-settlement
   tables (`setmain<id>`, `setmsgs<id>`) at runtime.
 - **There are two databases, and both are reset.** `reset-db.sh` and the

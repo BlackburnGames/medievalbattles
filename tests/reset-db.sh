@@ -3,8 +3,8 @@
 #
 # Drops and recreates the schema rather than truncating, because the app
 # creates per-settlement tables at runtime ("setmain<id>", "setmsgs<id>") that
-# are not in db.sql and would otherwise leak between runs. MyISAM has no
-# transactions, so a full reload is the only reliable isolation available.
+# are not in db.sql and would otherwise leak between runs. The app commits as
+# it goes, so a full reload is the only reliable isolation available.
 #
 # Two databases: the round (mbv6) and the accounts beside it (mb_accounts),
 # which outlast a round -- see docs/rounds.md. Both are dropped, so an account

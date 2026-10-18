@@ -188,3 +188,34 @@ if (!function_exists('mb_db_result')) {
         return array_key_exists(0, $data) ? $data[0] : null;
     }
 }
+
+if (!function_exists('mb_db_session')) {
+    /**
+     * Put a fresh connection into the mode this code was written for.
+     *
+     * Every connection the app opens -- the round's in connect.php, the
+     * accounts' in accounts.php -- comes through here, because on the host
+     * the server's own settings are not ours to change (docs/deployment.md).
+     * MySQL 8.4's default sql_mode is strict, and the 2003 queries fail under
+     * it: STRICT_TRANS_TABLES rejects their partial INSERTs and
+     * ONLY_FULL_GROUP_BY their aggregates. So the session asks for what the
+     * local server used to be started with, NO_ENGINE_SUBSTITUTION alone.
+     * Tightening it is a Phase 3 bug list of its own, not a side effect of
+     * changing servers.
+     *
+     * The collation is named for the same reason. 8.x's default for utf8mb4
+     * is utf8mb4_0900_ai_ci, the schema's is utf8mb4_unicode_ci, and a string
+     * literal compared with a column in one and a variable in the other is an
+     * "Illegal mix of collations". set_charset() still comes first: it is
+     * what tells the client library the character set real_escape_string()
+     * escapes for.
+     *
+     * @param mysqli $link
+     */
+    function mb_db_session($link)
+    {
+        mysqli_set_charset($link, 'utf8mb4');
+        mysqli_query($link, "SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci");
+        mysqli_query($link, "SET SESSION sql_mode = 'NO_ENGINE_SUBSTITUTION'");
+    }
+}

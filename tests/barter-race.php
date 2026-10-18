@@ -46,6 +46,8 @@ if (!$db) {
     fwrite(STDERR, "Cannot connect: " . mysqli_connect_error() . "\n");
     exit(2);
 }
+require_once __DIR__ . '/../app/include/db.php';
+mb_db_session($db);
 
 $SESSIONS = 12;
 $failed   = 0;

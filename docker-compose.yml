@@ -6,14 +6,12 @@
 
 services:
   db:
-    image: mysql:5.7
-    command:
-      # The 2003 schema and queries do not survive MySQL's modern defaults:
-      # STRICT_TRANS_TABLES rejects the partial INSERTs the app does, and
-      # ONLY_FULL_GROUP_BY rejects its aggregate queries.
-      - --sql-mode=NO_ENGINE_SUBSTITUTION
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_unicode_ci
+    # The host's version (docs/deployment.md), with the host's defaults: a
+    # strict sql_mode and utf8mb4_0900_ai_ci. Nothing is set on the command
+    # line, because nothing can be on a shared host -- each connection asks
+    # for the mode and collation it needs (mb_db_session(), app/include/db.php)
+    # and the schema names its own, so this server proves they do.
+    image: mysql:8.4
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: mbv6
@@ -27,7 +25,10 @@ services:
       # The accounts database, which outlasts a round: docs/rounds.md.
       - ./docker/db/accounts.sh:/docker-entrypoint-initdb.d/03-accounts.sh:ro
       - ./db:/mb-db:ro
-      - dbdata:/var/lib/mysql
+      # Not the 5.7 stack's "dbdata": 8.4 cannot open a 5.7 data directory in
+      # place, so it starts from its own volume and init scripts. Remove the old
+      # one with "docker volume rm" once nothing in it is wanted.
+      - dbdata84:/var/lib/mysql
     ports:
       - "127.0.0.1:3307:3306"
     healthcheck:
@@ -67,4 +68,4 @@ services:
       - "127.0.0.1:8080:80"
 
 volumes:
-  dbdata:
+  dbdata84:

@@ -42,26 +42,27 @@ MySQL 8.4, then schema migrations (decided 2026-10-18, with Composer and
 Phinx for the migrations, InnoDB for the tables, and one database with a
 `round_id` for rounds, [rounds.md](rounds.md)):
 
-- **MySQL 8.4 — critical, a gate on deploying anywhere, and first.** The host
-  ([deployment.md](deployment.md)) runs MySQL 8.4; the local stack and so
-  every golden master, crawl and audit run on 5.7. Nothing yet shows the
-  code works on the server it is going to. The work: move the `db` service
-  to `mysql:8.4`, set `sql_mode` per connection in `connect.php` and
-  `accounts.php` (a shared host's global mode cannot be changed, and 8.x's
-  default is strict), create the databases as `utf8mb4_unicode_ci`, and run
-  the suite. Whatever it finds is a Phase 3 bug. The specific risks are
-  listed under Blockers in deployment.md.
+- ~~**MySQL 8.4.**~~ **Done.** The host ([deployment.md](deployment.md))
+  runs MySQL 8.4, and so now does the local stack: `mysql:8.4` with none of
+  its defaults overridden, so the server is strict and `utf8mb4_0900_ai_ci`
+  as the host's is. Each connection asks for what the code needs instead —
+  `mb_db_session()` (`app/include/db.php`) sets `NO_ENGINE_SUBSTITUTION` and
+  `utf8mb4_unicode_ci`, for the round's connection, the accounts' and the
+  tests' own — and every table names its collation.
 
-  It comes before migrations because nothing is deployed: until the first
-  deploy the schema can still be fixed in `db.sql` and the fixture reloaded,
-  and the first migration then baselines a schema already right for 8.4.
-
-  **The tables move from MyISAM to InnoDB with it.** InnoDB is what lets the
+  **The tables moved from MyISAM to InnoDB with it.** InnoDB is what lets the
   tick run as one transaction later, and what a host is sure to allow. The
-  risk is order: a `SELECT` without `ORDER BY` returns rows in whatever order
-  the engine likes, and InnoDB's (primary key) is not MyISAM's (insertion,
-  with holes refilled). Where a golden moves for that reason, the fix is an
-  `ORDER BY` that states the order the page meant, not a re-accept.
+  risk was order: a `SELECT` without `ORDER BY` returns rows as the engine
+  likes, and InnoDB's (primary key) is not MyISAM's (insertion, with holes
+  refilled). Where a golden moves for that reason, the fix is an `ORDER BY`
+  that states the order the page meant, not a re-accept.
+
+  None did. The full suite passed on 8.4 and InnoDB with every golden
+  untouched, and the PHP warnings it raised — the crawl's and the harnesses'
+  — were the same, message for message and count for count, as a run on
+  5.7 and MyISAM. It came before migrations because nothing was deployed, so
+  the schema could still be fixed in `db.sql`; the first migration
+  baselines a schema already right for 8.4.
 - **Schema migrations — next after 8.4.** The schema is one hand-edited
   `db.sql`, and every change so far has been made by editing it and
   reloading the fixture. That stops working at the first deploy: a live
@@ -1106,7 +1107,8 @@ buys of one listing let between five and twelve through, and paid the seller
 for several; cancels refunded the same way, and listing could put the same
 hundred archers up twice.
 
-The tables are MyISAM, so there is no transaction to reach for. What there is
+The tables were MyISAM then, so there was no transaction to reach for (they
+are InnoDB now). What there is
 instead is that one statement is atomic and says how many rows it touched, so
 each branch now **claims before it moves**: the payment is taken only
 `AND gp >= cost`, the listing is claimed by deleting it and checking that one

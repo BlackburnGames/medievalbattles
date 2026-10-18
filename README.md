@@ -20,7 +20,7 @@ MySQL or Composer install required on the host.
 docker compose up -d --build
 ```
 
-That builds a PHP 8.3 + Apache container and a MySQL 5.7 container, and loads
+That builds a PHP 8.3 + Apache container and a MySQL 8.4 container, and loads
 the schema plus a small deterministic test world on first start.
 
 Then open:

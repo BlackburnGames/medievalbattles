@@ -121,7 +121,8 @@ It is HTTP-invokable with no authentication.
 
 ## Schema
 
-`db.sql`: 22 MyISAM tables, almost no indexes, no charset declared, types
+`db.sql`: 22 tables, InnoDB and `utf8mb4_unicode_ci` since the move to
+MySQL 8.4 (MyISAM with no charset declared before it), almost no indexes, types
 nearly all `bigint(255)`/`varchar(255)`. It is **not schema-only** — it seeds
 the `game_info` row and ten empty settlements. `db/seed.sql` adds the
 deterministic test world on top. The accounts database is `db/accounts.sql`

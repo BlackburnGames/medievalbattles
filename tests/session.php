@@ -207,6 +207,8 @@ $dbu  = getenv('MB_DB_USER') ? getenv('MB_DB_USER') : 'mb';
 $dbp  = getenv('MB_DB_PASS') ? getenv('MB_DB_PASS') : 'mb';
 $round    = mysqli_connect($host, $dbu, $dbp, getenv('MB_DB_NAME') ? getenv('MB_DB_NAME') : 'mbv6');
 $accounts = mysqli_connect($host, $dbu, $dbp, getenv('MB_ACCOUNTS_DB_NAME') ? getenv('MB_ACCOUNTS_DB_NAME') : 'mb_accounts');
+mb_db_session($round);
+mb_db_session($accounts);
 $qEmail = "'" . mysqli_real_escape_string($accounts, $EMAIL) . "'";
 $row = mysqli_fetch_assoc(mysqli_query($accounts, "SELECT * FROM account WHERE email = $qEmail"));
 $aid = (int) $row['account_id'];

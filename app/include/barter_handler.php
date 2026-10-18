@@ -237,9 +237,10 @@ else	{
 	// both find the row, both pass every check, and both be handed the units --
 	// the DELETE that ended the listing never said whether it had removed
 	// anything, and the payments wrote absolute balances computed from the
-	// figures read above. The tables are MyISAM, so there is no transaction to
-	// reach for; what there is, is that each statement is atomic and reports
-	// how many rows it touched. So the order is:
+	// figures read above. The tables were MyISAM when this was written, so there
+	// was no transaction to reach for (they are InnoDB now, and one would do;
+	// this order is still right without it). What there is, is that each
+	// statement is atomic and reports how many rows it touched. So the order is:
 	//
 	//   1. take the payment, only if the buyer still has it;
 	//   2. claim the listing by deleting it -- exactly one request can;

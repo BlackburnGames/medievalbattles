@@ -23,7 +23,7 @@ The reference material lives in `docs/`. Read the relevant one before working in
 | [docs/porting-notes.md](docs/porting-notes.md) | Touching data access, error handling or the Docker image |
 | [docs/game-manual.md](docs/game-manual.md) | Changing any game value or engine formula |
 | [docs/modernization.md](docs/modernization.md) | Deciding what to work on next |
-| [docs/deployment.md](docs/deployment.md) | Touching `deploy/`, the host, or anything that assumes MySQL 5.7 — production is 8.4 |
+| [docs/deployment.md](docs/deployment.md) | Touching `deploy/`, the host, or the host — production and the local stack are both MySQL 8.4 |
 | [docs/rulesets.md](docs/rulesets.md) | Changing gameplay, or moving a value into `gamedata.php` — design for running classic and modern rules side by side, not yet built |
 | [docs/rounds.md](docs/rounds.md) | Touching accounts, signup, login, `newgame.php` or anything that resets the world — permanent accounts are built; rounds themselves are design only |
 | [docs/v7-design-notes.md](docs/v7-design-notes.md) | Reference only — it describes a **different, unbuilt game**. Never answer a question about game behaviour from it. |
@@ -45,7 +45,7 @@ bash tests/run-all.sh            # full suite (tick + combat golden masters, smo
 bash tests/reset-db.sh           # restore the fixture world (both databases: mbv6 and mb_accounts)
 ```
 
-A `dbdata` volume made before the accounts database existed has no `mb_accounts`, and every login fails until `bash tests/reset-db.sh` creates it (MySQL runs its init scripts only on an empty volume). A real world is moved over with `docker compose exec web php /repo/bin/accounts-migrate.php` instead, which keeps its players.
+The database volume is `dbdata84`; the 5.7 stack's `dbdata` cannot be opened by 8.4 and is no longer used. MySQL runs its init scripts only on an empty volume, so after a schema change run `bash tests/reset-db.sh`. A real world is moved over with `docker compose exec web php /repo/bin/accounts-migrate.php` instead, which keeps its players.
 
 PHP 5.6 is **no longer a per-change gate**. It was the Phase 2 port's proof
 that behaviour did not move, and the shared golden master now does that on

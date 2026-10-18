@@ -15,7 +15,7 @@ CREATE TABLE `barter` (
   `method` varchar(255) NOT NULL default 'gp',
   `page` varchar(255) NOT NULL default '',
   `guild` varchar(255) NOT NULL default ''
-) ENGINE=MyISAM;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
 # Dumping data for table `barter`
@@ -57,7 +57,7 @@ CREATE TABLE `buildings` (
   `Ihrs` bigint(255) NOT NULL default '0',
   `userid` bigint(255) NOT NULL default '0',
   KEY `userid` (`userid`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
 # Dumping data for table `buildings`
@@ -78,7 +78,7 @@ CREATE TABLE `empnews` (
   `news` blob NOT NULL,
   `class` varchar(16) NOT NULL default 'yellow',
   `yourid` bigint(255) NOT NULL default '0'
-) ENGINE=MyISAM;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
 # Dumping data for table `empnews`
@@ -101,7 +101,7 @@ CREATE TABLE `explore` (
   `landhrs` bigint(255) NOT NULL default '0',
   `mthrs` bigint(255) NOT NULL default '0',
   KEY `userid` (`userid`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
 # Dumping data for table `explore`
@@ -120,7 +120,7 @@ CREATE TABLE `explore` (
 CREATE TABLE `friends` (
   `useremail` varchar(200) NOT NULL default '0',
   `friendid` int(11) NOT NULL default '0'
-) ENGINE=MyISAM;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
 # Dumping data for table `friends`
@@ -139,7 +139,7 @@ CREATE TABLE `game_info` (
   `lastset` bigint(255) NOT NULL default '0',
   `tick` varchar(255) NOT NULL default '',
   `last_comp_id` varchar(255) NOT NULL default '0'
-) ENGINE=MyISAM;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
 # Dumping data for table `game_info`
@@ -170,7 +170,7 @@ CREATE TABLE `guild` (
   `owner` varchar(255) NOT NULL default '',
   `mem` bigint(20) NOT NULL default '0',
   `notice` varchar(255) NOT NULL default 'None'
-) ENGINE=MyISAM;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
 # Dumping data for table `guild`
@@ -194,7 +194,7 @@ CREATE TABLE `guildmsgs` (
   `message` text NOT NULL,
   `datestamp` varchar(20) NOT NULL default '',
   PRIMARY KEY  (`messageid`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
 # Dumping data for table `guildmsgs`
@@ -216,7 +216,7 @@ CREATE TABLE `guildnews` (
   `gnid` bigint(255) NOT NULL default '0',
   `age` bigint(255) NOT NULL default '0',
   `gid` varchar(225) NOT NULL default ''
-) ENGINE=MyISAM;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
 # Dumping data for table `guildnews`
@@ -235,7 +235,7 @@ CREATE TABLE `guildnews` (
 CREATE TABLE `guildrequests` (
   `applicant` varchar(255) NOT NULL default '',
   `gl_userid` varchar(255) NOT NULL default ''
-) ENGINE=MyISAM;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
 # Dumping data for table `guildrequests`
@@ -263,7 +263,7 @@ CREATE TABLE `guildthreads` (
   `datestamp` varchar(20) NOT NULL default '',
   `guildname` varchar(100) NOT NULL default '',
   PRIMARY KEY  (`topicid`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
 # Dumping data for table `guildthreads`
@@ -281,7 +281,7 @@ CREATE TABLE `guildthreads` (
 
 CREATE TABLE `ip_addresses` (
   `ip` varchar(255) NOT NULL default ''
-) ENGINE=MyISAM;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
 # Dumping data for table `ip_addresses`
@@ -303,7 +303,7 @@ CREATE TABLE `messages` (
   `yourid` bigint(255) NOT NULL default '0',
   `mid` bigint(255) NOT NULL default '0',
   `age` bigint(255) NOT NULL default '0'
-) ENGINE=MyISAM;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
 # Dumping data for table `messages`
@@ -420,7 +420,7 @@ CREATE TABLE `military` (
   `irongolem` bigint(255) NOT NULL default '0',
   `dbirongolem` bigint(255) NOT NULL default '0',
   KEY `userid` (`userid`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
 # Dumping data for table `military`
@@ -482,7 +482,7 @@ CREATE TABLE `research` (
   `r17pts` bigint(255) NOT NULL default '0',
   `r18pts` bigint(255) NOT NULL default '0',
   KEY `userid` (`userid`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
 # Dumping data for table `research`
@@ -538,7 +538,7 @@ CREATE TABLE `returntbl` (
   `dogs` bigint(255) NOT NULL default '0',
   `dogtime` bigint(255) NOT NULL default '0',
   KEY `userid` (`userid`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
 # Dumping data for table `returntbl`
@@ -565,7 +565,7 @@ CREATE TABLE `setforums` (
   `message` blob NOT NULL,
   `datestamp` varchar(20) NOT NULL default '',
   PRIMARY KEY  (`topicid`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
 # Dumping data for table `setforums`
@@ -590,7 +590,7 @@ CREATE TABLE `setforumsmsgs` (
   `message` text NOT NULL,
   `datestamp` varchar(20) NOT NULL default '',
   PRIMARY KEY  (`messageid`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
 # Dumping data for table `setforumsmsgs`
@@ -613,7 +613,7 @@ CREATE TABLE `setnews` (
   `setid` bigint(255) NOT NULL default '0',
   `sid` bigint(255) NOT NULL default '0',
   `age` bigint(255) NOT NULL default '0'
-) ENGINE=MyISAM;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
 # Dumping data for table `setnews`
@@ -637,7 +637,7 @@ CREATE TABLE `settlement` (
   `setid` bigint(255) NOT NULL auto_increment,
   `setstrength` bigint(255) NOT NULL default '0',
   PRIMARY KEY  (`setid`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
 # Insert data for table `settlement`
@@ -693,7 +693,7 @@ CREATE TABLE `user` (
   `account_id` int unsigned NOT NULL default '0',
   PRIMARY KEY  (`userid`),
   KEY `account_id` (`account_id`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 #
 # Dumping data for table `user`

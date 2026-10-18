@@ -42,9 +42,9 @@ if (!$db) {
     fwrite(STDERR, "Cannot connect: " . mysqli_connect_error() . "\n");
     exit(2);
 }
-mysqli_set_charset($db, 'utf8mb4');
-
 require_once __DIR__ . '/../app/include/db.php';
+mb_db_session($db);
+
 require_once __DIR__ . '/../app/include/html.php';
 require_once __DIR__ . '/../app/include/news.php';
 

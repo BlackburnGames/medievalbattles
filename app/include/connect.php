@@ -122,5 +122,5 @@ if (!isset($db) || !($db instanceof mysqli)) {
         exit;
     }
 
-    mysqli_set_charset($db, 'utf8mb4');
+    mb_db_session($db);
 }

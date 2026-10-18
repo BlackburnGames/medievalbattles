@@ -53,7 +53,7 @@ if (!function_exists('mb_accounts_db')) {
             echo mysqli_connect_error() . "\n";
             exit;
         }
-        mysqli_set_charset($adb, 'utf8mb4');
+        mb_db_session($adb);
         return $adb;
     }
 }
