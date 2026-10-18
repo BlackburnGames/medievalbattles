@@ -138,9 +138,16 @@ while($INC_ID < $max_UID + 1) {
         $ironmod = $ironmod + .15;
         break;
 
+        // The Demon's gold and iron deltas are gamedata's; every other modifier
+        // in these two switches is still a literal. The fixture is a Human
+        // "Warrior" -- not one of the seven classes -- a Demon Cleric, whose
+        // class has no case here, and a Giant Ranger with one farm and no
+        // mills, and those are the only rows the golden master computes.
+        // Even the Demon's civilian delta is unobserved: the Demon is
+        // overcrowded, and the decay below replaces $civmod outright.
         case"Demon";
-        $gpmod = $gpmod + .5;
-        $ironmod = $ironmod + .5;
+        $gpmod = $gpmod + $GAMEDATA['races']['Demon']['gpmod_delta'];
+        $ironmod = $ironmod + $GAMEDATA['races']['Demon']['ironmod_delta'];
         $civmod = $civmod - .10;
         break;
 

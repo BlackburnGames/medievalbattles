@@ -88,6 +88,13 @@ $GAMEDATA['exploring'] = array(
  * Races. Deltas are applied on top of the economy base, mirroring the
  * engine's order (class first, then race). update.php:82-115.
  * Off/def modifier: attack/defANDoff.php:55-66, functions.php:304-314.
+ *
+ * Two entries are definitions: the Demon's gold and iron deltas, which
+ * update.php reads. They are the only race or class economy values the tick
+ * golden master computes -- the fixture's other empires are a Human, whose
+ * one tick-side rate needs explorers in the field, and a Giant whose food
+ * delta rounds away on a single farm -- so everything else here is still
+ * transcribed and cited. See docs/modernization.md.
  * ------------------------------------------------------------------ */
 $GAMEDATA['races'] = array(
     'Angel' => array(
@@ -98,9 +105,9 @@ $GAMEDATA['races'] = array(
     ),
     'Demon' => array(
         'flavor'   => 'Cast out of the Angelic Order, the Demons enslave the weak and wage war on the strong.',
-        'gpmod_delta'       => +0.5,   // update.php:97
-        'ironmod_delta'     => +0.5,   // update.php:98
-        'civ_mod_delta'     => -0.10,  // update.php:99
+        'gpmod_delta'       => +0.5,   // read by update.php
+        'ironmod_delta'     => +0.5,   // read by update.php
+        'civ_mod_delta'     => -0.10,  // update.php:99 -- masked by overcrowding in the fixture
         'offdef_delta'      => +0.10,  // defANDoff.php:65
         'warrior_cost_mult' => 0.75,   // functions.php:254
         'bans'     => array('Priests', 'Priest weapons'),  // military.php:121, wconstruct.php:433+

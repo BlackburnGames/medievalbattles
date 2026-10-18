@@ -730,6 +730,28 @@ attribute.
   the two on Advanced Farming score nothing either, which is the existing quirk.
   Nothing here changed that.
 
+  **Of the race and class modifiers, two are definitions: the Demon's gold and
+  iron deltas.** Lowering either from 0.5 to 0.45 fails the run — the idle
+  Demon's gold by 750, its iron by 2. Everything else in the tick's two
+  modifier switches is a literal still, because the fixture cannot see it, and
+  each of these was checked by perturbing the engine and watching the golden
+  master pass:
+
+  - **No class modifier is computed at all.** The tester's class is `Warrior`,
+    which is not one of the seven — `signup.php` cannot produce it, so no
+    `case` matches — the Demon is a Cleric, which has no economy case, and the
+    Giant's Ranger lumber bonus multiplies a mill count of zero.
+  - **The Demon's civilian delta is masked.** The Demon has 1,300 civilians in
+    room for 1,000, so the overcrowding decay replaces `$civmod` outright and
+    the delta never reaches the arithmetic; setting it to −0.50 passes.
+  - **The Giant's food delta rounds away.** One farm at 0.5 or at 0.6 both round
+    to one food, and so would anything below 1.0.
+  - **The Human's explore rate needs explorers in the field**, and nobody has
+    any, so the land gain is zero whatever the rate.
+
+  All four want a fixture change, which moves the golden, which is a re-accept
+  that has to be its own reviewed step rather than a side effect of this one.
+
 ### The barter system, switched back on
 
 `barter.php` opened with an echo and a `die()` above every other statement in
