@@ -23,6 +23,7 @@ The reference material lives in `docs/`. Read the relevant one before working in
 | [docs/porting-notes.md](docs/porting-notes.md) | Touching data access, error handling or the Docker image |
 | [docs/game-manual.md](docs/game-manual.md) | Changing any game value or engine formula |
 | [docs/modernization.md](docs/modernization.md) | Deciding what to work on next |
+| [docs/rulesets.md](docs/rulesets.md) | Changing gameplay, or moving a value into `gamedata.php` — design for running classic and modern rules side by side, not yet built |
 | [docs/v7-design-notes.md](docs/v7-design-notes.md) | Reference only — it describes a **different, unbuilt game**. Never answer a question about game behaviour from it. |
 
 Four things load-bearing enough to repeat here:

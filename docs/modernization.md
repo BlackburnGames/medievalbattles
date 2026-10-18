@@ -716,6 +716,9 @@ attribute.
 - **Invert the manual dependency** so the engine reads `$GAMEDATA` rather than
   its inline literals. **Started: the economy block is inverted.**
 
+  This is also the prerequisite for [rulesets.md](rulesets.md): every literal
+  left in the engine is a classic value a modern ruleset cannot override.
+
   `include/gamedata.php` was a one-way copy. Every value carries a `file:line`
   citation back to the engine and keeping the two in step was a review rule —
   and a rule is not a mechanism, so the manual could go stale between the change
