@@ -520,6 +520,23 @@ attribute.
   they refuse, before the two attacks, so a guard that leaks a general also
   fails the news assertions behind it.
 
+  **The two ways an empire ends were two broken copies of one operation.**
+  `preferences.php`'s account deletion was written from `attack.php`'s
+  destroyed-empire branch — it still carried the attack's variable names — and
+  by now each had lost something the other kept. The attack withdrew the
+  destroyed empire's vote with `WHERE ename='$V_check'`, an array in a string,
+  so it matched an empire called "Array"; and its `DELETE FROM militaryWHERE`
+  never parsed, so the army row outlived the empire. The deletion looked up a
+  led guild by `owner='$ename'` — `owner` holds a userid — deleted from
+  `guildrequest`, which is not the table, never told the settlement it had
+  lost a member, and finished with `DROP TABLE main` and `DROP TABLE msgs`, the
+  per-guild tables of an older schema named from two variables nothing sets.
+  Both call `mb_empire_remove()` in `app/include/empire.php` now, which does
+  everything either copy got right, once, keyed on the userid. Neither path
+  can be crawled whole, so `tests/empire-remove.php` drives it on scratch rows;
+  the attack branch was also driven by hand, and on the old code it left the
+  military row and the vote behind.
+
   **And a raid could field golems it did not own.** The form in
   `include/attack/table.php` offers both golem fields on all three attack
   pages, but only `attack.php` read and checked them. That alone would have

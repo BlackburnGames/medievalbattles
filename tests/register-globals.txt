@@ -83,8 +83,6 @@ app/include/nexplode.php	r7pts
 app/index.php	data
 app/input.posts.php	replies
 app/intel.php	empireattacked
-app/preferences.php	GIDD
-app/preferences.php	GN
 app/research.php	assages
 app/setstrength.php	placeno
 app/sforum.php	offset

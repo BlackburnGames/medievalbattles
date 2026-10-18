@@ -200,18 +200,6 @@ else	{
 		
 		mb_news_set($db, "$clock", 'red', "$ename has deleted their account", $setid, 0);
 	  
-		// Withdraw the vote this account was casting. Copied from attack.php's
-		// destroyed-empire cleanup, where $empvalue and $empireattacked name the
-		// empire being destroyed; here the empire being destroyed is the caller,
-		// so neither name meant anything -- $empvalue was whatever the request
-		// said, and the UPDATE filtered on an $empireattacked nothing assigns,
-		// so it matched ename='' and the vote stayed where it was. $votefor is
-		// the caller's own, from functions.php. A vote for yourself goes with
-		// the row.
-		if($votefor != 'None' AND $votefor != $ename)	 {
-			mysqli_query($db, "UPDATE user SET vote=vote-1 WHERE ename=" . mb_sql_str($db, $votefor));
-		}
-
 	  	echo "<div align=center><font class=yellow>Your account has been deleted.</font></div>";
 
 		$subject = "Account deleted";
@@ -226,34 +214,12 @@ else	{
 		print(mb_h($mailsend));
 
 
-		// check user
-		$gresult = mysqli_query($db, "SELECT owner FROM guild WHERE owner=$userid");
-		$guildcheck = mysqli_fetch_array($gresult);
-		
-		if($guildcheck[0] == $userid)	{
-			//	select guild name
-				$guild_info_query = mysqli_query($db, "SELECT * FROM guild WHERE owner='$ename'");
-				$guild_info = mysqli_fetch_array($guild_info_query);
-		
-			mysqli_query($db, "UPDATE user SET guild='None' WHERE guild='$guild_info[gname]'");
-			mysqli_query($db, "DELETE FROM guildrequest WHERE gl_userid='$userid'");
-				
-			$tblname = "$GN" . "main" ."$GIDD";
-			$tblname2 = "$GN" . "msgs" . "$GIDD";	
+		// The vote, the guild it leads, the settlement's member count and the
+		// six rows -- see include/empire.php for what this branch used to do
+		// instead, which included two DROP TABLEs.
+		require_once __DIR__ . '/include/empire.php';
+		mb_empire_remove($db, $userid);
 
-			mysqli_query($db, "DELETE FROM guild WHERE owner='$userid'");
-			mysqli_query($db, "DROP TABLE $tblname");
-			mysqli_query($db, "DROP TABLE $tblname2");
-		}
-	
-		mysqli_query($db, "DELETE FROM user WHERE $q_cred"); 
-		mysqli_query($db, "DELETE FROM military WHERE $q_cred");
-		mysqli_query($db, "DELETE FROM buildings WHERE $q_cred");
-		mysqli_query($db, "DELETE FROM research WHERE $q_cred");
-		mysqli_query($db, "DELETE FROM returntbl WHERE $q_cred");
-		mysqli_query($db, "DELETE FROM explore WHERE $q_cred");
-		mysqli_query($db, "UPDATE user SET votefor='None' WHERE votefor='$ename'");
-		
 		unset($_SESSION['login'], $_SESSION['email'], $_SESSION['pw']);
 		$login = $email = $pw = '';
 

@@ -290,40 +290,17 @@ else	{
 	if($evu['land'] - $landgain == 0)	{	
 		include("include/connect.php");
 		
-		$no_members = mysqli_query($db, "SELECT members FROM settlement WHERE setid ='$evu[setid]'");
-			$mem_no = mb_db_result($no_members,"mem_no");
-
-		mysqli_query($db, "UPDATE settlement SET members = members - 1 WHERE setid='$evu[setid]'");
-
 		$subject = "Account destroyed";
 		$body = "You have been destroyed by $ename.  If there is any spots open, you are welcome to signup again.";
 		$from = "From: support@medievalbattles.com\r\nbcc: phb@sendhost\r\nContent-type: text/plain\r\nX-mailer: PHP/" . phpversion();
 		$mailsend = mail("$evu[email]","$subject","$body","$from");
 		
-		// check votefor
-		$V_result = mysqli_query($db, "SELECT votefor FROM user WHERE userid=" . mb_sql_int($empvalue));
-		$V_check = mysqli_fetch_array($V_result);
-		
-		if($V_check[0] != 'None')	{	mysqli_query($db, "UPDATE user SET vote=vote-1 WHERE ename='$V_check'");	}
-
-		$gresult = mysqli_query($db, "SELECT * FROM guild WHERE owner='$evu[userid]'");
-		$guild = mysqli_fetch_array($gresult);
-
-		if($guild['owner'] == $evu['userid'])	{
-				$gresult1 = mysqli_query($db, "SELECT * FROM guild WHERE owner='$evu[userid]'");
-				$setno = mysqli_fetch_array($gresult1);
-
-				mysqli_query($db, "UPDATE user SET guild='None' WHERE guild='$guild[gname]'");
-				mysqli_query($db, "DELETE FROM guild WHERE owner='$evu[userid]'");
-		}
-		
-		mysqli_query($db, "DELETE FROM user WHERE userid=" . mb_sql_int($empvalue));
-		mysqli_query($db, "DELETE FROM militaryWHERE userid=" . mb_sql_int($empvalue));
-		mysqli_query($db, "DELETE FROM buildings WHERE userid=" . mb_sql_int($empvalue));
-		mysqli_query($db, "DELETE FROM research WHERE userid=" . mb_sql_int($empvalue));
-		mysqli_query($db, "DELETE FROM returntbl WHERE userid=" . mb_sql_int($empvalue));
-		mysqli_query($db, "DELETE FROM explore WHERE userid=" . mb_sql_int($empvalue)); 
-		mysqli_query($db, "UPDATE user SET votefor='None' WHERE votefor='$evu[ename]'");
+		// The same removal an account deletion does, which this branch was the
+		// original of. Its own copy withdrew the vote with an array in the
+		// WHERE clause and never parsed its military DELETE; include/empire.php
+		// has the whole list.
+		require_once __DIR__ . '/include/empire.php';
+		mb_empire_remove($db, $evu['userid']);
 	}
 }
 }

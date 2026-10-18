@@ -34,6 +34,15 @@ if ! docker compose exec -T web php /repo/tests/news-render.php; then
   status=1
 fi
 
+# Removing an empire with a guild, votes and a settlement attached -- the two
+# ways an empire ends, neither of which the crawl can take whole. Scratch ids,
+# so order-independent.
+echo
+echo "=== empire removal ==="
+if ! docker compose exec -T web php /repo/tests/empire-remove.php; then
+  status=1
+fi
+
 # Concurrent requests against one barter listing. Needs the fixture's listings,
 # which the crawl consumes, so it gets a fresh database of its own.
 echo
