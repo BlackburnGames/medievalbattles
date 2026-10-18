@@ -121,6 +121,37 @@
   says: You can't construct Lumber Mills, because you haven't researched Archery yet!
   (no change)
 
+### quirk-explore-human
+# QUIRK: an empire of race Human exploring. The tick applies only the Human rate, whatever the explore page says, and prices mountains on land.
+
+> tick
+    buildings [1] amts 100 -> 102, aland 850 -> 865
+
+### quirk-explore-angel
+# QUIRK: an empire of race Angel exploring. The tick applies only the Human rate, whatever the explore page says, and prices mountains on land.
+
+> tick
+    buildings [1] amts 100 -> 102, aland 850 -> 863
+
+### quirk-explore-demon
+# QUIRK: an empire of race Demon exploring. The tick applies only the Human rate, whatever the explore page says, and prices mountains on land.
+
+> tick
+    buildings [1] amts 100 -> 102, aland 850 -> 863
+
+### quirk-explore-giant
+# QUIRK: an empire of race Giant exploring. The tick applies only the Human rate, whatever the explore page says, and prices mountains on land.
+
+> tick
+    buildings [1] amts 100 -> 102, aland 850 -> 863
+
+### quirk-explore-small-empire
+# QUIRK: under 23 land a land costs no explorers at all -- round(land * 0.8) / 20 floors to 0 -- and the tick divides by it.
+
+> tick
+  php:  Fatal error: Uncaught DivisionByZeroError: Division by zero (update.php)
+  (no change)
+
 ### blank-boxes-buildings-uhome
 # buildings.php with uhome filled in and every other box empty, as a browser sends it.
 

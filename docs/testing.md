@@ -77,6 +77,13 @@ so a third would be a scenario list and nothing else. Golden file
 `tests/golden/actions.txt`; `php tests/actions-golden.php <name>` runs one
 scenario, and the same review rule and `quirk-` convention apply.
 
+**A scenario can run the tick** as one of its requests, `array(TICK, array())`,
+which runs `update.php` from the repo root as the cron does. Everything the
+tick touches moves, and that is the tick golden master's to pin, so a scenario
+that ticks names the columns it is about in `show` and only those are printed.
+The `explore-` scenarios use it: the tick golden master's fixture has no
+explorers in the field, so nothing else exercises the exploring rates.
+
 **The `blank-boxes-` scenarios submit each form as a browser does**, one box
 filled and every other box sent as `""`. That is not the same request as
 leaving the other fields out, and it is the one that matters: PHP 8 does not

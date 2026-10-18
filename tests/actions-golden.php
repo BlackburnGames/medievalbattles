@@ -146,6 +146,42 @@ $SCENARIOS = array(
 );
 
 /*
+ * Explorers in the field, and one tick. At 1,000 land every exploring rate
+ * needs a different number of explorers per land -- 40 for a Human at 0.8, 42
+ * at 0.85, 45 at the default 0.9, 47 at 0.95 -- so 600 out gains a different
+ * amount for each. Mountains are 200, so priced on mountains 100 explorers buy
+ * several times what they would priced on land. Only the open land and
+ * mountain columns are shown, where the gain lands: the rest of the tick is
+ * the tick golden master's.
+ */
+$exploreShow = array('buildings' => array('aland', 'amts'));
+$exploring = function ($race) use ($T) {
+    // The tick recounts user.land from the buildings, so open land makes up
+    // the difference: 150 built and 850 open.
+    return array(set('user', $T, array('race' => $race, 'land' => 1000, 'mts' => 200)),
+                 set('buildings', $T, array('aland' => 850)),
+                 set('explore', $T, array('expland' => 600, 'expmt' => 100)));
+};
+foreach (array('Human', 'Angel', 'Demon', 'Giant') as $race) {
+    $SCENARIOS[] = array(
+        'name'  => 'quirk-explore-' . strtolower($race),
+        'why'   => "QUIRK: an empire of race $race exploring. The tick applies only the Human rate, whatever the explore page says, and prices mountains on land.",
+        'setup' => $exploring($race),
+        'show'  => $exploreShow,
+        'requests' => array(array(TICK, array())),
+    );
+}
+$SCENARIOS[] = array(
+    'name'  => 'quirk-explore-small-empire',
+    'why'   => 'QUIRK: under 23 land a land costs no explorers at all -- round(land * 0.8) / 20 floors to 0 -- and the tick divides by it.',
+    'setup' => array(set('user', $T, array('land' => 20)),
+        set('buildings', $T, array('home' => 5, 'barrack' => 5, 'farm' => 5, 'aland' => 5)),
+        set('explore', $T, array('expland' => 10))),
+    'show'  => $exploreShow,
+    'requests' => array(array(TICK, array())),
+);
+
+/*
  * Every order form, submitted as a browser submits it: one box filled and
  * every other box sent empty. The scenarios above leave the other boxes out,
  * which PHP reads as null; a browser sends "", which PHP 8 does not read as 0

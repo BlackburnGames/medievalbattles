@@ -65,6 +65,14 @@ function researched($userid, array $projects)
  * ------------------------------------------------------------------ */
 
 /**
+ * A request that runs the tick rather than a page: array(TICK, array()).
+ * Everything the tick touches moves -- every empire's gold and food, every
+ * timer -- and that is the tick golden master's to pin, so a scenario that
+ * ticks names the columns it is about in `show`, as table => columns.
+ */
+const TICK = '(tick)';
+
+/**
  * Run every scenario, or only the one named on the command line. $fields, if
  * given, maps a page and its fields to what is actually posted -- the combat
  * pages all want a submit flag the scenarios would otherwise each repeat.
@@ -98,23 +106,36 @@ function runScenarios(array $scenarios, $fields = null)
 
         foreach ($s['requests'] as $req) {
             list($page, $posted) = $req;
-            if ($fields !== null) {
-                $posted = $fields($page, $posted);
-            }
 
             $before = snapshot($db);
-            $body = $client->post('/' . $page, $posted);
-            $after = snapshot($db);
+            if ($page === TICK) {
+                $log = runTick();
+                $after = snapshot($db);
+                echo "\n> tick\n";
+                foreach (tickDiagnostics($log) as $line) {
+                    echo "  php:  $line\n";
+                }
+            } else {
+                if ($fields !== null) {
+                    $posted = $fields($page, $posted);
+                }
+                $body = $client->post('/' . $page, $posted);
+                $after = snapshot($db);
 
-            echo "\n> $page " . http_build_query($posted, '', ' ') . "\n";
-            if ($client->lastStatus !== 200) {
-                echo "  HTTP {$client->lastStatus}\n";
+                echo "\n> $page " . http_build_query($posted, '', ' ') . "\n";
+                if ($client->lastStatus !== 200) {
+                    echo "  HTTP {$client->lastStatus}\n";
+                }
+                foreach (pageSays($body) as $line) {
+                    echo "  says: $line\n";
+                }
+                foreach (diagnostics($body) as $line) {
+                    echo "  php:  $line\n";
+                }
             }
-            foreach (pageSays($body) as $line) {
-                echo "  says: $line\n";
-            }
-            foreach (diagnostics($body) as $line) {
-                echo "  php:  $line\n";
+            if (isset($s['show'])) {
+                $before = only($before, $s['show']);
+                $after = only($after, $s['show']);
             }
             $changes = changes($before, $after);
             foreach ($changes as $line) {
@@ -360,6 +381,59 @@ function diagnostics($body)
         if (!in_array($line, $out, true)) {
             $out[] = $line;
         }
+    }
+    return $out;
+}
+
+/* ------------------------------------------------------------------ *
+ * The tick.
+ * ------------------------------------------------------------------ */
+
+/** Run update.php as the cron would -- from the repo root, which it needs. */
+function runTick()
+{
+    $root = realpath(__DIR__ . '/../..');
+    return (string) shell_exec('cd ' . escapeshellarg($root) . ' && php update.php 2>&1');
+}
+
+/**
+ * The tick's diagnostics, on the same terms as a page's: errors and failed
+ * queries, not reads of unassigned names, deduplicated and without line
+ * numbers. The CLI may print each twice, once to the log and once inline.
+ */
+function tickDiagnostics($log)
+{
+    $text = strip_tags($log);
+    preg_match_all('#(?:PHP )?(Warning|Fatal error|Parse error):\s*(.*?) in (?:/repo/)?(\S+?)(?::\d+| on line \d+)#', $text, $m, PREG_SET_ORDER);
+    $out = array();
+    foreach ($m as $hit) {
+        $message = trim($hit[2]);
+        if ($hit[1] === 'Warning' && strpos($message, 'mysqli_') === false) {
+            continue;
+        }
+        $message = preg_replace('#\s+in /\S+:\d+\s+Stack trace:.*$#s', '', $message);
+        $line = "{$hit[1]}: $message ({$hit[3]})";
+        if (!in_array($line, $out, true)) {
+            $out[] = $line;
+        }
+    }
+    return $out;
+}
+
+/** A snapshot cut down to the tables and columns named, as table => columns. */
+function only(array $state, array $show)
+{
+    $out = array();
+    foreach ($show as $table => $columns) {
+        if (!isset($state[$table])) {
+            continue;
+        }
+        $keep = array_flip($columns);
+        $keyed = array();
+        foreach ($state[$table]['keyed'] as $id => $row) {
+            $keyed[$id] = array_intersect_key($row, $keep);
+        }
+        $out[$table] = array('keyed' => $keyed, 'bag' => array());
     }
     return $out;
 }
