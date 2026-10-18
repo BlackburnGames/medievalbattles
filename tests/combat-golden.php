@@ -211,7 +211,7 @@ $SCENARIOS = array(
 
     array(
         'name'  => 'resource-win',
-        'why'   => 'Resource raid won: 8% of gold, iron and civilians. QUIRK: and of lumber, but it is read off the military row, which has no lumber column, so it is always 0.',
+        'why'   => 'Resource raid won: 8% of gold, iron, lumber and civilians, each rounded. Lumber was read off the military row, which has no lumber column, and so was always 0.',
         'setup' => array($strong, $defenders, $defenderStats,
             set('user', $D, array('gp' => 10000, 'iron' => 5000, 'lumber' => 3333)),
             set('military', $D, array('civ' => 1000))),

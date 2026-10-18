@@ -149,19 +149,19 @@
     user [3] land 250 -> 225, nno 0 -> 1
 
 ### resource-win
-# Resource raid won: 8% of gold, iron and civilians. QUIRK: and of lumber, but it is read off the military row, which has no lumber column, so it is always 0.
+# Resource raid won: 8% of gold, iron, lumber and civilians, each rounded. Lumber was read off the military row, which has no lumber column, and so was always 0.
 
 > attackr.php attack=1 empvalue=3 uwarrior=300
-  says: Success! You have managed to gain 800 gold pieces, 400 iron, 0 lumber, and 80 civilians from PoorSerf(2)! Your losses: 3 warriors
-  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 800 gold pieces, 400 iron, 0 lumber, and 80 civilians. | class=yellow | yourid=3
+  says: Success! You have managed to gain 800 gold pieces, 400 iron, 267 lumber, and 80 civilians from PoorSerf(2)! Your losses: 3 warriors
+  + empnews news=We have unsuccessfully defended our empire against TestLord (1) and lost 800 gold pieces, 400 iron, 267 lumber, and 80 civilians. | class=yellow | yourid=3
   + guildnews news=TestLord (1) successfully attacked PoorSerf (2) for resources | class=yellow | gnid=0 | age=0 | gid=1
     military [1] warriors 300 -> 0, civ 1200 -> 1280
     military [3] wizards 10 -> 9, priests 10 -> 9, archers 5 -> 4, civ 1000 -> 920
     returntbl [1] war4 0 -> 297, time4 0 -> 6
   + setnews news=PoorSerf (2) lost resources to TestLord (1) | class=lg | setid=2 | sid=0 | age=0
   + setnews news=TestLord (1) successfully attacked PoorSerf (2) for resources | class=yellow | setid=1 | sid=0 | age=0
-    user [1] gp 300000 -> 300800, iron 5000 -> 5400, fleets 2 -> 1
-    user [3] gp 10000 -> 9200, iron 5000 -> 4600, nno 0 -> 1
+    user [1] gp 300000 -> 300800, iron 5000 -> 5400, lumber 4000 -> 4267, fleets 2 -> 1
+    user [3] gp 10000 -> 9200, iron 5000 -> 4600, lumber 3333 -> 3066, nno 0 -> 1
 
 ### resource-win-in-debt
 # A defender with negative gold yields none, rather than a negative gain.
