@@ -76,49 +76,28 @@ if(!IsSet($update)) {
   mysqli_query($db, "UPDATE buildings SET dwp='$dwp' WHERE email='$email' AND pw='$pw'");
   mysqli_query($db, "UPDATE buildings SET dlmill='$dlmill' WHERE email='$email' AND pw='$pw'");
 
-//  determines how long building are under development
+//  determines how long building are under development: a tick per building,
+//  at most 20, both scaled by the modifiers. A queue already running keeps the
+//  ticks it has and the order adds its own, so the modifiers apply only to what
+//  this order builds -- and a timer for a building it does not build is left
+//  alone. They used to be applied to every timer on every order.
 
   if($res['r16pts'] >= 100000)  { $adv_constr = 0.5;  }
   else  { $adv_constr = 1;  }
   if($race == 'Night Elf')  { $constr_mod = 2;  }
   else  { $constr_mod = 1;  }
+  $constr_mult = $adv_constr * $constr_mod;
+  $constr_cap = 20 * $constr_mult;
 
-##  homes
-  if($uhome >= 20)  { $Hhrs = ((20 / $adv_constr) * $constr_mod);  }
-  elseif($uhome < 20) { $Hhrs = ((($Hhrs + $uhome) / $adv_constr) * $constr_mod); }
-  elseif($Hhrs > 20)   {  $Hhrs = ((20 / $adv_constr) * $constr_mod);  }
-##  barracks
-  if($ubarrack >= 20) { $Bhrs = ((20 / $adv_constr) * $constr_mod);  }
-  elseif($ubarrack < 20)  { $Bhrs = ((($Bhrs + $ubarrack) / $adv_constr) * $constr_mod);  }
-  elseif($Bhrs > 20)   {  $Bhrs = ((20 / $adv_constr) * $constr_mod);  }
-##  farms
-  if($ufarm >= 20)  { $Fhrs = ((20 / $adv_constr) * $constr_mod);  }
-  elseif($ufarm < 20) { $Fhrs = ((($Fhrs + $ufarm) / $adv_constr) * $constr_mod); }
-  elseif($Fhrs > 20)   {  $Fhrs = ((20 / $adv_constr) * $constr_mod);  }
-##  wooden platforms
-  if($uwp >= 20)   {  $Whrs = ((20 / $adv_constr) * $constr_mod); }
-  elseif($uwp < 20)  {  $Whrs = ((($Whrs + $uwp) / $adv_constr) * $constr_mod); }
-  elseif($Whrs > 20)  { $Whrs = ((20 / $adv_constr) * $constr_mod); }
-##  lumber mills
-  if($ulmill >= 20) { $Lhrs = ((20 / $adv_constr) * $constr_mod);  }
-  elseif($ulmill < 20)  { $Lhrs = ((($Lhrs + $ulmill) / $adv_constr) * $constr_mod);  }
-  elseif($Lhrs > 20)   {  $Lhrs = ((20 / $adv_constr) * $constr_mod);  }
-##  gold mines
-  if($ugm >= 20)   {  $Ghrs = ((20 / $adv_constr) * $constr_mod);  }
-  elseif($ugm < 20)  {  $Ghrs = ((($Ghrs + $ugm) / $adv_constr) * $constr_mod); }
-  elseif($Ghrs > 20)   {  $Ghrs = ((20 / $adv_constr) * $constr_mod);  }
-##  iron mines
-  if($uim >= 20)  { $Ihrs = ((20 / $adv_constr) * $constr_mod); }
-  elseif($uim < 20) { $Ihrs = ((($Ihrs + $uim) / $adv_constr) * $constr_mod); }
-  elseif($Ihrs > 20)  { $Ihrs = ((20 / $adv_constr) * $constr_mod); }
-
-If($Hhrs > 20)  { $Hhrs = ((20 / $adv_constr) * $constr_mod);  }
-If($Bhrs > 20)  { $Bhrs = ((20 / $adv_constr) * $constr_mod);   }
-If($Fhrs > 20)  { $Fhrs = ((20 / $adv_constr) * $constr_mod);    }
-If($Whrs > 20)   {  $Whrs = ((20 / $adv_constr) * $constr_mod);  }
-If($Lhrs > 20)  { $Lhrs = ((20 / $adv_constr) * $constr_mod);   }
-If($Ghrs > 20)  { $Ghrs = ((20 / $adv_constr) * $constr_mod);   }
-If($Ihrs > 20)  { $Ihrs = ((20 / $adv_constr) * $constr_mod);   }
+  // Rounded up: half a tick still has to be waited for, and a timer of 0 is
+  // one the tick never builds.
+  if($uhome > 0)    { $Hhrs = ceil(min($Hhrs + $uhome * $constr_mult, $constr_cap));  }
+  if($ubarrack > 0) { $Bhrs = ceil(min($Bhrs + $ubarrack * $constr_mult, $constr_cap));  }
+  if($ufarm > 0)    { $Fhrs = ceil(min($Fhrs + $ufarm * $constr_mult, $constr_cap));  }
+  if($uwp > 0)      { $Whrs = ceil(min($Whrs + $uwp * $constr_mult, $constr_cap));  }
+  if($ulmill > 0)   { $Lhrs = ceil(min($Lhrs + $ulmill * $constr_mult, $constr_cap));  }
+  if($ugm > 0)      { $Ghrs = ceil(min($Ghrs + $ugm * $constr_mult, $constr_cap));  }
+  if($uim > 0)      { $Ihrs = ceil(min($Ihrs + $uim * $constr_mult, $constr_cap));  }
 
   mysqli_query($db, "UPDATE buildings SET Hhrs ='$Hhrs' WHERE email='$email' AND pw='$pw'");
   mysqli_query($db, "UPDATE buildings SET Bhrs ='$Bhrs' WHERE email='$email' AND pw='$pw'");

@@ -51,15 +51,15 @@ $GAMEDATA['economy'] = array(
 
 /* ------------------------------------------------------------------ *
  * Buildings. Costs: functions.php:280-283, buildings.php:41-47.
- * Timing: buildings.php:81-129, update.php:388-408.
+ * Timing: buildings.php:79-100, update.php:458-478.
  * ------------------------------------------------------------------ */
 $GAMEDATA['buildings'] = array(
     'cost_base'        => 300,    // functions.php:280-283: 300 + 4 * count
     'cost_per_owned'   => 4,      //   (count includes buildings under construction)
     'cost_cap'         => 20000,  // functions.php:281,283
     'demolish_cost'    => 75,     // dbuildings.php:41,55
-    'ticks_per_building' => 1,    // buildings.php:87-108: queue of N takes N ticks
-    'ticks_cap'        => 20,     // buildings.php:87: queues of 20+ take 20 ticks
+    'ticks_per_building' => 1,    // buildings.php:94-100: queue of N takes N ticks
+    'ticks_cap'        => 20,     // buildings.php:90: queues of 20+ take 20 ticks, scaled as the timer is
     'land'  => array(
         'Home'            => 'Houses your civilian population; each provides room for 20 civilians. Without homes there is no population, and without population there are no recruits.',
         'Barrack'         => 'Houses warriors, wizards, priests and archers -- 50 troops each (35 for Humans). With no free space you cannot train more of those units.',
@@ -145,7 +145,7 @@ $GAMEDATA['races'] = array(
         'civ_mod_delta' => -0.25,  // update.php:113
         'offdef_delta'  => -0.10,  // read by include/modifier.php
         'return_time_mult' => 0.75,   // attack/calculations.php:102-105
-        'build_time_mult' => 2,    // buildings.php:83
+        'build_time_mult' => 2,    // buildings.php:87
         'starts_with'   => array('4-10 Archers'),  // checksignup.php:130
         'bans'     => array(),
     ),
@@ -346,7 +346,7 @@ $GAMEDATA['armor'] = array(
 
 /* ------------------------------------------------------------------ *
  * Research. Points: research_queries.php, research.php:26-80,
- * update.php:464-479. Effects: update.php:116-130, buildings.php:81,
+ * update.php:464-479. Effects: update.php:116-130, buildings.php:85,
  * military.php:76-85, animate.php:12.
  * ------------------------------------------------------------------ */
 $GAMEDATA['research'] = array(
@@ -366,7 +366,7 @@ $GAMEDATA['research'] = array(
     array('Archery',              125000, '',                'Unlocks Archers, Catapults, Lumber Mills, and archer equipment', 'All'),
     array('Demolitions',          125000, '',                'Unlocks Suicide Civilians', 'All'),
     array('Advanced Farming',     100000, '',                'Each farm produces 2.5 food per tick instead of 0.5', 'All'),
-    array('Advanced Construction', 100000, '',               'Alters construction times (see Known Quirks)', 'All'),
+    array('Advanced Construction', 100000, '',               'Halves construction time, and the 20-tick cap with it', 'All'),
     array('Animation',            125000, '',                'Unlocks Golems', 'All who can field wizards'),
     array('Advanced Animation',   125000, 'Animation',       'Unlocks Iron Golems', 'All who can field wizards'),
 );
@@ -448,7 +448,6 @@ $GAMEDATA['exp_values'] = array(
  * truth and so Phase 3 has a checklist.
  * ------------------------------------------------------------------ */
 $GAMEDATA['quirks'] = array(
-    'Advanced Construction divides the build timer by 0.5, which DOUBLES construction time instead of halving it. Worse, every build order applies the construction modifiers again to every queue already running, including the building types the order does not touch -- so a Night Elf, or anyone with Advanced Construction, doubles every timer they have each time they build anything. And the 20-tick cap is tested after the modifiers, so a Night Elf queue of 11 homes, 22 ticks, is pushed straight to 40. (buildings.php:81-121)',
     'The Scepter of Zakarum sets its speed on equip but never its power, so the listed power is not actually applied. (equip.php:199)',
     'The explore page shows special rates for Angels (fewer explorers needed) and Demons (more needed), but the tick only implements the Human rate; everyone else gets the default. (include/S_EXPLORE.php:33-36 vs update.php:88)',
     'Night Elves are dealt 4-10 archers at signup, but the free Archery research is immediately overwritten unless they are also Rangers. (checksignup.php:130-134)',

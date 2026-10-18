@@ -12,8 +12,9 @@
  *
  * Chosen by branch, as combat's are: a queue under the cap and over it, an
  * order added to a queue already running, each construction modifier alone
- * and both together, and one scenario per recorded quirk so the bug is pinned
- * as it is today.
+ * and both together. A recorded quirk gets a quirk- scenario pinning it as it
+ * is, and the fix renames it and keeps it; the construction quirk went that
+ * way.
  *
  *   bash tests/actions-golden.sh            compare against tests/golden/actions.txt
  *   bash tests/actions-golden.sh --accept   re-accept after an intended change
@@ -84,23 +85,29 @@ $SCENARIOS = array(
     /* ---- the construction modifiers ---- */
 
     array(
-        'name'  => 'quirk-advanced-construction',
-        'why'   => 'QUIRK: Advanced Construction divides the timer by 0.5, doubling it, and applies itself again to every queue already running -- the farms, which this order does not touch, double too.',
+        'name'  => 'advanced-construction',
+        'why'   => 'Advanced Construction halves the timer, rounded up: five homes in three ticks. It divided by 0.5, doubling it, and doubled every queue already running -- the farms, which this order does not touch, went from 4 to 8.',
         'setup' => array(researched($T, array(16)), $farmsUnderway),
         'requests' => array($build(array('uhome' => 5))),
     ),
     array(
-        'name'  => 'quirk-advanced-construction-capped',
-        'why'   => 'QUIRK: the cap scales with the modifier, so Advanced Construction caps a queue at 40.',
+        'name'  => 'advanced-construction-capped',
+        'why'   => 'The cap scales with the modifier, so Advanced Construction caps a queue at 10. It was 40.',
         'setup' => array(researched($T, array(16))),
         'requests' => array($build(array('uhome' => 25))),
     ),
     array(
-        'name'  => 'quirk-night-elf-requeue',
-        'why'   => 'QUIRK: Night Elves build at half speed, and every order doubles every queue already running again -- the homes under way and the farms the order does not touch.',
+        'name'  => 'night-elf-requeue',
+        'why'   => 'A Night Elf adding three homes to a queue with 12 ticks left adds six: 18. Every order used to double every queue already running, so this came out at 30 and was capped to 40, and the farms the order does not touch went from 4 to 8.',
         'setup' => array(set('user', $T, array('race' => 'Night Elf')),
             underway($T, array('dhome' => 6, 'Hhrs' => 12)), $farmsUnderway),
         'requests' => array($build(array('uhome' => 3))),
+    ),
+    array(
+        'name'  => 'night-elf-under-cap',
+        'why'   => 'Eleven homes take a Night Elf 22 ticks, under its cap of 40. The cap was tested against the doubled timer and 20, so anything over ten homes took 40.',
+        'setup' => array(set('user', $T, array('race' => 'Night Elf'))),
+        'requests' => array($build(array('uhome' => 11))),
     ),
     array(
         'name'  => 'night-elf-capped',
@@ -109,8 +116,8 @@ $SCENARIOS = array(
         'requests' => array($build(array('uhome' => 25))),
     ),
     array(
-        'name'  => 'quirk-night-elf-advanced-construction',
-        'why'   => 'QUIRK: a Night Elf with Advanced Construction, both modifiers on one queue. Meant to cancel; today they compound to four times.',
+        'name'  => 'night-elf-advanced-construction',
+        'why'   => 'A Night Elf with Advanced Construction: the two modifiers cancel, five homes in five ticks. They compounded to four times, 20.',
         'setup' => array(set('user', $T, array('race' => 'Night Elf')), researched($T, array(16))),
         'requests' => array($build(array('uhome' => 5))),
     ),

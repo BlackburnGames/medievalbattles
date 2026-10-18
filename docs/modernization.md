@@ -477,6 +477,19 @@ attribute.
   `$adv_const`, which nothing assigns, so any queue that came out over 20
   divided by null: on 8.3 a blank page with the gold already spent and the
   timer never written, on 5.6 a timer of 0, which the tick never builds.
+
+  **The order forms did not work on 8.3, and pinning construction is how that
+  came out.** `tests/actions-golden.php` is the combat harness pointed at
+  build orders, written so the Advanced Construction quirk could be fixed
+  against a golden master. Its first run died on every order that left a box
+  empty, and submitting every other form the way a browser does showed the
+  same thing everywhere: PHP 8 reads `""` as neither 0 nor a number, so
+  `"" < 0` refused training, disbanding, exploring and the rest as negative,
+  and `"" + ""` killed the build and research pages. See
+  [porting-notes.md](porting-notes.md). With that fixed, the quirk turned out
+  to be three defects in one: the timer was divided by 0.5, every order
+  reapplied both construction modifiers to every timer running, and the cap
+  was tested after them. Each modifier now scales only what an order adds.
 - **Authorization.** **The forums are done — both the moderation pages and the
   four post handlers. The rest is not.** Nothing outside the forums checks that
   you own what you are acting on beyond the queries' own `WHERE` clauses.

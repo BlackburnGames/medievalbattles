@@ -320,6 +320,10 @@ A share of the batch finishes each tick rather than all of it at the end. Adding
 batch already under construction <b>extends the timer for the whole batch</b>, so it is
 usually better to let a batch finish than to keep topping it up.</p>
 
+<p>Advanced Construction halves both the time per building and the cap, and a Night Elf
+takes twice as long on both. Either applies only to the buildings an order adds: a
+batch already under way keeps the ticks it has left.</p>
+
 <!-- ============================================================ -->
 <h2 class="section"><a name="economy"></a>Economy and Population <a class="top" href="#toc">top</a></h2>
 
