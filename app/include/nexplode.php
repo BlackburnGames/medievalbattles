@@ -36,10 +36,6 @@ $uwarrior     = mb_input('uwarrior');
 $uwizard      = mb_input('uwizard');
 $uwp          = mb_input('uwp');
 
-//donate
-$donateg = implode("", explode(",", $donateg));
-$donatei = implode("", explode(",", $donatei));
-
 //empire
 $iron = implode("", explode(",", $iron));
 $gp = implode("", explode(",", $gp));
@@ -49,7 +45,6 @@ $lumber = implode("", explode(",", $lumber));
 
 //military
 $maxciv = implode("", explode(",", $maxciv));
-$maxtrain = implode("", explode(",", $maxtrain));
 $priestc = implode("", explode(",", $priestc));
 $wizardc = implode("", explode(",", $wizardc));
 $warriorc = implode("", explode(",", $warriorc));
@@ -68,13 +63,11 @@ $dbpri2 = implode("", explode(",", $dbpri2));
 $dbarch = implode("", explode(",", $dbarch));
 $dbarch2 = implode("", explode(",", $dbarch2));
 $explorers = implode("", explode(",", $explorers));
-$dogs = implode("", explode(",", $dogs));
 $thieves = implode("", explode(",", $thieves));
 $sages = implode("", explode(",", $sages));
 $dbexplorer = implode("", explode(",", $dbexplorer));
 $dbthief = implode("", explode(",", $dbthief));
 $dbssage = implode("", explode(",", $dbsage));
-$ascientist = implode("", explode(",", $ascientists));
 $aexplorers = implode("", explode(",", $aexplorers));
 $tsages = implode("", explode(",", $tsages));
 $texplorers = implode("", explode(",", $texplorers));
@@ -122,21 +115,8 @@ $ugm = implode("", explode(",", $ugm));
 $uim = implode("", explode(",", $uim));
 
 //research
-$r1 = implode("", explode(",", $r1));
-$r2 = implode("", explode(",", $r2));
-$r3 = implode("", explode(",", $r3));
-$r4 = implode("", explode(",", $r4));
-$r5 = implode("", explode(",", $r5));
-$r6 = implode("", explode(",", $r6));
-$r7 = implode("", explode(",", $r7));
-$r1pts = implode("", explode(",", $r1pts));
-$r2pts = implode("", explode(",", $r2pts));
-$r3pts = implode("", explode(",", $r3pts));
-$r4pts = implode("", explode(",", $r4pts));
-$r5pts = implode("", explode(",", $r5pts));
-$r6pts = implode("", explode(",", $r6pts));
-$r7pts = implode("", explode(",", $r7pts));
-
+// No $r1-$r7 or $r1pts-$r7pts: functions.php reads research into $res, and the
+// two pages that assign $r1-$r7 do it from $res after this file has run.
 $ur1 = implode("", explode(",", $ur1));
 $ur2 = implode("", explode(",", $ur2));
 $ur3 = implode("", explode(",", $ur3));
