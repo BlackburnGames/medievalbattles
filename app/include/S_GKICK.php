@@ -1,7 +1,7 @@
 <?
 
 // Retrieve Guild Name
-$guild_name_query = mysqli_query($db, "SELECT gname FROM guild WHERE owner='$userid'");
+$guild_name_query = mb_query($db, "SELECT gname FROM guild WHERE owner=?", array($userid));
 	$guild_name = mb_db_result($guild_name_query, "guild_name");
 
 echo "

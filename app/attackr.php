@@ -113,7 +113,7 @@ else	{
 	//include offense, defense values and ename, land, aland
 	include("include/attack/defANDoff.php");
 					
-	$EMPs_guild_query = mysqli_query($db, "SELECT guild FROM user WHERE userid='$evu[userid]'");
+	$EMPs_guild_query = mb_query($db, "SELECT guild FROM user WHERE userid=?", array($evu['userid']));
 		$EMPs_guild = mb_db_result($EMPs_guild_query,"EMPs_guild");
 
 	// Nothing above zero, not merely nothing typed: a field of "0" passed the
@@ -169,7 +169,7 @@ else	{
 		}			
 								
 
-		mysqli_query($db, "UPDATE user SET nno = nno+1 WHERE userid=" . mb_sql_int($empvalue));
+		mb_query($db, "UPDATE user SET nno = nno+1 WHERE userid=?", array((int) $empvalue));
 
 		mb_news_emp($db, "$clock", 'yellow', "We have successfully defended our empire against $ename ($setid)", $empvalue);
 		echo"<div align=center><font class=yellow>You have failed to attack $evu[ename]!</font><br><br><font class=orange>$your_losses<br><br></font></div>";
@@ -220,7 +220,7 @@ else	{
 		include("include/attack/rdrop.php");
 		include("include/attack/table.php");
 
-		mysqli_query($db, "UPDATE user SET nno = nno + 1 WHERE userid=" . mb_sql_int($empvalue));
+		mb_query($db, "UPDATE user SET nno = nno + 1 WHERE userid=?", array((int) $empvalue));
 
 		mb_news_emp($db, "$clock", 'yellow', "We have unsuccessfully defended our empire against $ename ($setid) and lost $gpgain gold pieces, $irongain iron, $lumbergain lumber, and $civgain civilians.", $empvalue);
 		die();

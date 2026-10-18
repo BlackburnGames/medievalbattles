@@ -17,7 +17,7 @@ include("include/connect.php");
 include("include/forum_guard.php");
 mb_forum_require_sl($sl);
 
-$result= mysqli_query($db, "SELECT topicid, setid FROM setforums WHERE setid='$setid' AND topicid='$topicid'") or die("Error! " . mysqli_error($db));
+$result= mb_query($db, "SELECT topicid, setid FROM setforums WHERE setid=? AND topicid=?", array($setid, $topicid)) or die("Error! " . mysqli_error($db));
 $settlement_check = mysqli_fetch_array($result);
 
 if($setid != $settlement_check['setid'])	{
@@ -35,10 +35,10 @@ $r_topic = $topic;
 
 // Who leads this settlement, for the (SL) badge. One lookup, before the
 // loop -- the badge is rendered now rather than stored; see mb_sl_badge().
-$mb_sl_q = mysqli_query($db, "SELECT ename FROM user WHERE sl='yes' AND setid=" . mb_sql_int($setid));
+$mb_sl_q = mb_query($db, "SELECT ename FROM user WHERE sl='yes' AND setid=?", array((int) $setid));
 $mb_leader = mb_db_result($mb_sl_q, "ename");
 
-$result1 = mysqli_query($db, "SELECT name, topic, message, lastpost FROM setforums WHERE topicid='$topicid' AND setid='$setid'") or die("Error!". mysqli_error($db));
+$result1 = mb_query($db, "SELECT name, topic, message, lastpost FROM setforums WHERE topicid=? AND setid=?", array($topicid, $setid)) or die("Error!". mysqli_error($db));
 
 if ($result1) { 
 echo"

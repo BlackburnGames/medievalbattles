@@ -66,7 +66,7 @@ if (!IsSet($change)) {
     } else {
 
       //  take the vote back from the old empire and set votefor to none
-      mysqli_query($db, "UPDATE user SET vote = vote - 1 WHERE ename=" . mb_sql_str($db, $votefor) . " AND vote > 0");
+      mb_query($db, "UPDATE user SET vote = vote - 1 WHERE ename=? AND vote > 0", array($votefor));
       mysqli_query($db, "UPDATE user SET votefor='None' WHERE $q_cred");
 
       mb_settlement_elect($db, $setid);
@@ -79,7 +79,7 @@ if (!IsSet($change)) {
   else {
 
     //  the empire voted for, which has to be in your settlement
-    $selected = mysqli_query($db, "SELECT ename, setid FROM user WHERE userid=" . mb_sql_int($empvalue));
+    $selected = mb_query($db, "SELECT ename, setid FROM user WHERE userid=?", array((int) $empvalue));
       $target = $selected ? mysqli_fetch_array($selected) : null;
 
     if(!$target OR $target['setid'] != $setid)  {
@@ -91,10 +91,10 @@ if (!IsSet($change)) {
 
     //  move the vote: off the old empire, if there was one, and onto this one
     if($votefor != 'None')  {
-      mysqli_query($db, "UPDATE user SET vote = vote - 1 WHERE ename=" . mb_sql_str($db, $votefor) . " AND vote > 0");
+      mb_query($db, "UPDATE user SET vote = vote - 1 WHERE ename=? AND vote > 0", array($votefor));
     }
     mysqli_query($db, "UPDATE user SET votefor=" . mb_sql_str($db, $fename) . " WHERE $q_cred");
-    mysqli_query($db, "UPDATE user SET vote = vote + 1 WHERE userid=" . mb_sql_int($empvalue));
+    mb_query($db, "UPDATE user SET vote = vote + 1 WHERE userid=?", array((int) $empvalue));
 
     mb_settlement_elect($db, $setid);
 

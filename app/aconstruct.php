@@ -56,11 +56,11 @@ else	{
 	}
 	$cs = 4;
 	 				
-		mysqli_query($db, "UPDATE user SET iron ='$iron' WHERE email='$email' AND pw='$pw'"); 
-		mysqli_query($db, "UPDATE user SET exp2 ='$exp2' WHERE email='$email' AND pw='$pw'"); 
-		mysqli_query($db, "UPDATE user SET gp ='$gp' WHERE email='$email' AND pw='$pw'");  
-		mysqli_query($db, "UPDATE military SET cs ='$cs' WHERE email='$email' AND pw='$pw'");
-		mysqli_query($db, "UPDATE military SET warriorarm= '1' WHERE email='$email' AND pw='$pw'");
+		mb_query($db, "UPDATE user SET iron =? WHERE email=? AND pw=?", array($iron, $email, $pw)); 
+		mb_query($db, "UPDATE user SET exp2 =? WHERE email=? AND pw=?", array($exp2, $email, $pw)); 
+		mb_query($db, "UPDATE user SET gp =? WHERE email=? AND pw=?", array($gp, $email, $pw));  
+		mb_query($db, "UPDATE military SET cs =? WHERE email=? AND pw=?", array($cs, $email, $pw));
+		mb_query($db, "UPDATE military SET warriorarm= '1' WHERE email=? AND pw=?", array($email, $pw));
 					
 	echo "$PREFIX Chain Shirts are under construction. $SUFFIX";
 	include("include/S_ARMOR.php");
@@ -103,11 +103,11 @@ else	{
 	}
 	$cm = 12;
 	 
-		mysqli_query($db, "UPDATE user SET iron ='$iron' WHERE email='$email' AND pw='$pw'"); 
-		mysqli_query($db, "UPDATE user SET exp2 ='$exp2' WHERE email='$email' AND pw='$pw'"); 
-		mysqli_query($db, "UPDATE user SET gp ='$gp' WHERE email='$email' AND pw='$pw'");  
-		mysqli_query($db, "UPDATE military SET cm ='$cm' WHERE email='$email' AND pw='$pw'");
-		mysqli_query($db, "UPDATE military SET warriorarm= '2' WHERE email='$email' AND pw='$pw'");
+		mb_query($db, "UPDATE user SET iron =? WHERE email=? AND pw=?", array($iron, $email, $pw)); 
+		mb_query($db, "UPDATE user SET exp2 =? WHERE email=? AND pw=?", array($exp2, $email, $pw)); 
+		mb_query($db, "UPDATE user SET gp =? WHERE email=? AND pw=?", array($gp, $email, $pw));  
+		mb_query($db, "UPDATE military SET cm =? WHERE email=? AND pw=?", array($cm, $email, $pw));
+		mb_query($db, "UPDATE military SET warriorarm= '2' WHERE email=? AND pw=?", array($email, $pw));
 
 	echo "$PREFIX Chain Mail is under construction. $SUFFIX";
 	include("include/S_ARMOR.php");
@@ -156,11 +156,11 @@ else	{
 	}
 	$bp = 20;
 	 
-		mysqli_query($db, "UPDATE user SET iron ='$iron' WHERE email='$email' AND pw='$pw'"); 
-	  	mysqli_query($db, "UPDATE user SET exp2 ='$exp2' WHERE email='$email' AND pw='$pw'"); 
-	  	mysqli_query($db, "UPDATE user SET gp ='$gp' WHERE email='$email' AND pw='$pw'");  
-	  	mysqli_query($db, "UPDATE military SET bp ='$bp' WHERE email='$email' AND pw='$pw'");
-		mysqli_query($db, "UPDATE military SET warriorarm= '3' WHERE email='$email' AND pw='$pw'");
+		mb_query($db, "UPDATE user SET iron =? WHERE email=? AND pw=?", array($iron, $email, $pw)); 
+	  	mb_query($db, "UPDATE user SET exp2 =? WHERE email=? AND pw=?", array($exp2, $email, $pw)); 
+	  	mb_query($db, "UPDATE user SET gp =? WHERE email=? AND pw=?", array($gp, $email, $pw));  
+	  	mb_query($db, "UPDATE military SET bp =? WHERE email=? AND pw=?", array($bp, $email, $pw));
+		mb_query($db, "UPDATE military SET warriorarm= '3' WHERE email=? AND pw=?", array($email, $pw));
 
 	echo "$PREFIX Breast Plates are under construction. $SUFFIX";
 	include("include/S_ARMOR.php");
@@ -216,11 +216,11 @@ else	{
 	$exp2 = $exp2 + 60000;
 	$fp = 28;
 	 
-		mysqli_query($db, "UPDATE user SET iron ='$iron' WHERE email='$email' AND pw='$pw'"); 
-	  	mysqli_query($db, "UPDATE user SET exp2 ='$exp2' WHERE email='$email' AND pw='$pw'"); 
-	  	mysqli_query($db, "UPDATE user SET gp ='$gp' WHERE email='$email' AND pw='$pw'");  
-	  	mysqli_query($db, "UPDATE military SET fp ='$fp' WHERE email='$email' AND pw='$pw'");
-		mysqli_query($db, "UPDATE military SET warriorarm= '4' WHERE email='$email' AND pw='$pw'");
+		mb_query($db, "UPDATE user SET iron =? WHERE email=? AND pw=?", array($iron, $email, $pw)); 
+	  	mb_query($db, "UPDATE user SET exp2 =? WHERE email=? AND pw=?", array($exp2, $email, $pw)); 
+	  	mb_query($db, "UPDATE user SET gp =? WHERE email=? AND pw=?", array($gp, $email, $pw));  
+	  	mb_query($db, "UPDATE military SET fp =? WHERE email=? AND pw=?", array($fp, $email, $pw));
+		mb_query($db, "UPDATE military SET warriorarm= '4' WHERE email=? AND pw=?", array($email, $pw));
 
 	echo "$PREFIX Medieval Armor is under construction. $SUFFIX";
 	include("include/S_ARMOR.php");
@@ -259,11 +259,11 @@ else	{
 	}
 	$ga = 14;
 	 
-		mysqli_query($db, "UPDATE user SET iron ='$iron' WHERE email='$email' AND pw='$pw'"); 
-	  	mysqli_query($db, "UPDATE user SET exp2 ='$exp2' WHERE email='$email' AND pw='$pw'"); 
-	  	mysqli_query($db, "UPDATE user SET gp ='$gp' WHERE email='$email' AND pw='$pw'");  
-	  	mysqli_query($db, "UPDATE military SET ga ='$ga' WHERE email='$email' AND pw='$pw'");
-		mysqli_query($db, "UPDATE military SET priestarm= '1' WHERE email='$email' AND pw='$pw'");
+		mb_query($db, "UPDATE user SET iron =? WHERE email=? AND pw=?", array($iron, $email, $pw)); 
+	  	mb_query($db, "UPDATE user SET exp2 =? WHERE email=? AND pw=?", array($exp2, $email, $pw)); 
+	  	mb_query($db, "UPDATE user SET gp =? WHERE email=? AND pw=?", array($gp, $email, $pw));  
+	  	mb_query($db, "UPDATE military SET ga =? WHERE email=? AND pw=?", array($ga, $email, $pw));
+		mb_query($db, "UPDATE military SET priestarm= '1' WHERE email=? AND pw=?", array($email, $pw));
 
 	echo "$PREFIX Golden Armor is under construction. $SUFFIX";
 	include("include/S_ARMOR.php");
@@ -309,11 +309,11 @@ else	{
 	$exp2 = $exp2 + 60000;
 	$ba = 34;
 	 
-		mysqli_query($db, "UPDATE user SET iron ='$iron' WHERE email='$email' AND pw='$pw'"); 
-	  	mysqli_query($db, "UPDATE user SET exp2 ='$exp2' WHERE email='$email' AND pw='$pw'"); 
-	  	mysqli_query($db, "UPDATE user SET gp ='$gp' WHERE email='$email' AND pw='$pw'");  
-	  	mysqli_query($db, "UPDATE military SET ba ='$ba' WHERE email='$email' AND pw='$pw'");
-		mysqli_query($db, "UPDATE military SET priestarm= '2' WHERE email='$email' AND pw='$pw'");
+		mb_query($db, "UPDATE user SET iron =? WHERE email=? AND pw=?", array($iron, $email, $pw)); 
+	  	mb_query($db, "UPDATE user SET exp2 =? WHERE email=? AND pw=?", array($exp2, $email, $pw)); 
+	  	mb_query($db, "UPDATE user SET gp =? WHERE email=? AND pw=?", array($gp, $email, $pw));  
+	  	mb_query($db, "UPDATE military SET ba =? WHERE email=? AND pw=?", array($ba, $email, $pw));
+		mb_query($db, "UPDATE military SET priestarm= '2' WHERE email=? AND pw=?", array($email, $pw));
 
 	echo "$PREFIX Blessed Armor is under construction. $SUFFIX";
 	include("include/S_ARMOR.php");
@@ -346,10 +346,10 @@ else	{
 	}
 	$tr = 10;
 	 
-		mysqli_query($db, "UPDATE user SET exp2 ='$exp2' WHERE email='$email' AND pw='$pw'"); 
-	  	mysqli_query($db, "UPDATE user SET gp ='$gp' WHERE email='$email' AND pw='$pw'");  
-	  	mysqli_query($db, "UPDATE military SET tr ='$tr' WHERE email='$email' AND pw='$pw'");
-		mysqli_query($db, "UPDATE military SET wizardarm= '1' WHERE email='$email' AND pw='$pw'");
+		mb_query($db, "UPDATE user SET exp2 =? WHERE email=? AND pw=?", array($exp2, $email, $pw)); 
+	  	mb_query($db, "UPDATE user SET gp =? WHERE email=? AND pw=?", array($gp, $email, $pw));  
+	  	mb_query($db, "UPDATE military SET tr =? WHERE email=? AND pw=?", array($tr, $email, $pw));
+		mb_query($db, "UPDATE military SET wizardarm= '1' WHERE email=? AND pw=?", array($email, $pw));
 
 	echo "$PREFIX Travellers Robe is under construction. $SUFFIX";
 	include("include/S_ARMOR.php");
@@ -387,10 +387,10 @@ else	{
 	}
 	$mr = 20;
 	 
-		mysqli_query($db, "UPDATE user SET exp2 ='$exp2' WHERE email='$email' AND pw='$pw'"); 
-	  	mysqli_query($db, "UPDATE user SET gp ='$gp' WHERE email='$email' AND pw='$pw'");  
-	  	mysqli_query($db, "UPDATE military SET mr ='$mr' WHERE email='$email' AND pw='$pw'");
-		mysqli_query($db, "UPDATE military SET wizardarm= '2' WHERE email='$email' AND pw='$pw'");
+		mb_query($db, "UPDATE user SET exp2 =? WHERE email=? AND pw=?", array($exp2, $email, $pw)); 
+	  	mb_query($db, "UPDATE user SET gp =? WHERE email=? AND pw=?", array($gp, $email, $pw));  
+	  	mb_query($db, "UPDATE military SET mr =? WHERE email=? AND pw=?", array($mr, $email, $pw));
+		mb_query($db, "UPDATE military SET wizardarm= '2' WHERE email=? AND pw=?", array($email, $pw));
 
 	echo "$PREFIX Magicians Robe is under construction. $SUFFIX";
 	include("include/S_ARMOR.php");
@@ -442,11 +442,11 @@ else	{
 	$exp2 = $exp2 + 50000;
 	$ma = 30;
 	 
-		mysqli_query($db, "UPDATE user SET iron ='$iron' WHERE email='$email' AND pw='$pw'"); 
-	  	mysqli_query($db, "UPDATE user SET exp2 ='$exp2' WHERE email='$email' AND pw='$pw'"); 
-	  	mysqli_query($db, "UPDATE user SET gp ='$gp' WHERE email='$email' AND pw='$pw'");  
-	  	mysqli_query($db, "UPDATE military SET ma ='$ma' WHERE email='$email' AND pw='$pw'");
-		mysqli_query($db, "UPDATE military SET wizardarm= '3' WHERE email='$email' AND pw='$pw'");
+		mb_query($db, "UPDATE user SET iron =? WHERE email=? AND pw=?", array($iron, $email, $pw)); 
+	  	mb_query($db, "UPDATE user SET exp2 =? WHERE email=? AND pw=?", array($exp2, $email, $pw)); 
+	  	mb_query($db, "UPDATE user SET gp =? WHERE email=? AND pw=?", array($gp, $email, $pw));  
+	  	mb_query($db, "UPDATE military SET ma =? WHERE email=? AND pw=?", array($ma, $email, $pw));
+		mb_query($db, "UPDATE military SET wizardarm= '3' WHERE email=? AND pw=?", array($email, $pw));
 
 	echo "$PREFIX You have successfully constructed Mythril Armor for your army. $SUFFIX";
 	include("include/S_ARMOR.php");

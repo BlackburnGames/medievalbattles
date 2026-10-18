@@ -28,18 +28,13 @@ include("include/forum_guard.php");
 // filed a thread under the guildname 'None'.
 mb_forum_require_guild($empireguild);
 
-$q_topic   = mb_sql_str($db, $topic);
-$q_message = mb_sql_str($db, $message);
-$q_ename   = mb_sql_str($db, $ename);
-$q_guild   = mb_sql_str($db, $empireguild);
-$q_topicid = mb_sql_int($topicid);
 
 if ($addtopic) {
 
-	$result = mysqli_query($db, "INSERT INTO guildthreads (name, topic, message, datestamp, guildname)		VALUES ($q_ename, $q_topic, $q_message, '$clock', $q_guild)");
+	$result = mb_query($db, "INSERT INTO guildthreads (name, topic, message, datestamp, guildname)		VALUES (?, ?, ?, ?, ?)", array($ename, $topic, $message, $clock, $empireguild));
 
-	$result4 = mysqli_query($db, "UPDATE guildthreads SET lastpost='$clock' WHERE topic=$q_topic AND guildname = $q_guild");
-	$result6 = mysqli_query($db, "UPDATE guildthreads SET lastposter=$q_ename WHERE topic=$q_topic AND guildname = $q_guild");
+	$result4 = mb_query($db, "UPDATE guildthreads SET lastpost=? WHERE topic=? AND guildname = ?", array($clock, $topic, $empireguild));
+	$result6 = mb_query($db, "UPDATE guildthreads SET lastposter=? WHERE topic=? AND guildname = ?", array($ename, $topic, $empireguild));
 
 	header ("Location: gforums.php");
 }
@@ -54,11 +49,11 @@ elseif ($addreply) {
 
 	// See input.posts.php: the INSERT was being run twice, the second time with
 	// its own return value as the query string.
-	$result1 = mysqli_query($db, "INSERT INTO guildmsgs (name, topic, topicid, message, datestamp)	VALUES ($q_ename, $q_topic, $q_topicid, $q_message, '$clock')");
+	$result1 = mb_query($db, "INSERT INTO guildmsgs (name, topic, topicid, message, datestamp)	VALUES (?, ?, ?, ?, ?)", array($ename, $topic, (int) $topicid, $message, $clock));
 	$lastid = mysqli_insert_id($db);
 
-	$result5 = mysqli_query($db, "UPDATE guildthreads SET lastpost='$clock' WHERE topicid=$q_topicid");
-	$result2 = mysqli_query($db, "UPDATE guildthreads SET lastposter=$q_ename WHERE topicid=$q_topicid");
+	$result5 = mb_query($db, "UPDATE guildthreads SET lastpost=? WHERE topicid=?", array($clock, (int) $topicid));
+	$result2 = mb_query($db, "UPDATE guildthreads SET lastposter=? WHERE topicid=?", array($ename, (int) $topicid));
 
 
 	header ("Location: topicg.php?topicid=$topicid");

@@ -12,12 +12,12 @@ include("common.php");
 include("include/connect.php");
 
 
-$numresults=mysqli_query($db, "SELECT topicid FROM setforums WHERE setid=$setid");
+$numresults=mb_query($db, "SELECT topicid FROM setforums WHERE setid=?", array($setid));
 $numrows=mysqli_num_rows($numresults);
 
 // Who leads this settlement, for the (SL) badge. One lookup, before the
 // loop -- the badge is rendered now rather than stored; see mb_sl_badge().
-$mb_sl_q = mysqli_query($db, "SELECT ename FROM user WHERE sl='yes' AND setid=" . mb_sql_int($setid));
+$mb_sl_q = mb_query($db, "SELECT ename FROM user WHERE sl='yes' AND setid=?", array((int) $setid));
 $mb_leader = mb_db_result($mb_sl_q, "ename");
 
 $query = "SELECT topicid, name, topic, replies, lastpost, lastposter FROM setforums WHERE setid = '$setid' ORDER by lastpost DESC";
@@ -39,7 +39,7 @@ echo "
 					</tr>";										
 	while ($r = mysqli_fetch_array($result)) {
 
-		$topicreplies = mysqli_query($db, "SELECT count(topicid) FROM setforumsmsgs WHERE topicid=" . mb_sql_int($r['topicid']));
+		$topicreplies = mb_query($db, "SELECT count(topicid) FROM setforumsmsgs WHERE topicid=?", array((int) $r['topicid']));
 		$treplies = mb_db_result($topicreplies, "treplies");
 
 echo "

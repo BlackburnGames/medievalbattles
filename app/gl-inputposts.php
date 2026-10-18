@@ -19,7 +19,7 @@ include("include/connect.php");
 
 include("include/session.php");
 
-$uename = mysqli_query($db, "SELECT ename FROM user WHERE email='$email' AND pw='$pw'");
+$uename = mb_query($db, "SELECT ename FROM user WHERE email=? AND pw=?", array($email, $pw));
 	$ename = mb_db_result($uename,"ename");
 
 include("commong.php");
@@ -33,7 +33,6 @@ include("include/forum_guard.php");
 mb_forum_require_gl($db, $userid, $empireguild);
 
 $q_topic   = mb_sql_str($db, $topic);
-$q_message = mb_sql_str($db, $message);
 $q_ename   = mb_sql_str($db, $ename);
 $q_guild   = mb_sql_str($db, $empireguild);
 $q_topicid = mb_sql_int($topicid);
@@ -41,7 +40,7 @@ $q_topicid = mb_sql_int($topicid);
 if ($addtopic) {
 
 	$replies = "0";
-	$result = mysqli_query($db, "INSERT INTO guildthreads (name, topic, replies, message, datestamp, guildname) VALUES ($q_ename, $q_topic, '$replies', $q_message, '$clock', $q_guild)");
+	$result = mb_query($db, "INSERT INTO guildthreads (name, topic, replies, message, datestamp, guildname) VALUES (?, ?, ?, ?, ?, ?)", array($ename, $topic, $replies, $message, $clock, $empireguild));
 
 	$query4 = "UPDATE guildthreads SET lastpost='$clock' WHERE topic=$q_topic AND guildname = $q_guild";
 	$result4 = mysqli_query($db, $query4);
@@ -65,7 +64,7 @@ elseif ($addreply) {
 	// names. Every statement in this branch matched on the id alone.
 	mb_forum_require_guild_thread($db, $topicid, $empireguild);
 
-	$result1 = mysqli_query($db, "INSERT INTO guildmsgs (name, topic, topicid, message, datestamp) VALUES ($q_ename, $q_topic, $q_topicid, $q_message, '$clock')");
+	$result1 = mb_query($db, "INSERT INTO guildmsgs (name, topic, topicid, message, datestamp) VALUES (?, ?, ?, ?, ?)", array($ename, $topic, (int) $topicid, $message, $clock));
 	$lastid = mysqli_insert_id($db);
 
 	$query5 = "UPDATE guildthreads SET lastpost='$clock' WHERE topicid=$q_topicid";

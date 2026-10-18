@@ -38,7 +38,7 @@ if($uwarrior > 0)	{
 		$warcol = "war" . "$tfleets";
 	mysqli_query($db, "UPDATE returntbl SET $warcol='$subwar' WHERE email='$email' AND pw='$pw'");
 	$warriors = $warriors - $uwarrior;
-	mysqli_query($db, "UPDATE military SET warriors='$warriors' WHERE email='$email' AND pw='$pw'");
+	mb_query($db, "UPDATE military SET warriors=? WHERE email=? AND pw=?", array($warriors, $email, $pw));
 }
 if($uwizard > 0)	{		
 	$subwiz = (($uwizard * $wizhp) - $divided_pts) / $wizhp;
@@ -47,7 +47,7 @@ if($uwizard > 0)	{
 		$wizcol = "wiz" . "$tfleets";
 	mysqli_query($db, "UPDATE returntbl SET $wizcol='$subwiz' WHERE email='$email' AND pw='$pw'");
 	$wizards = $wizards - $uwizard;
-	mysqli_query($db, "UPDATE military SET wizards='$wizards' WHERE email='$email' AND pw='$pw'");
+	mb_query($db, "UPDATE military SET wizards=? WHERE email=? AND pw=?", array($wizards, $email, $pw));
 }
 if($upriest > 0)	{		
 	$subpri = (($upriest * $prihp) - $divided_pts) / $prihp;
@@ -56,7 +56,7 @@ if($upriest > 0)	{
 		$pricol = "pri" . "$tfleets";
 	mysqli_query($db, "UPDATE returntbl SET $pricol='$subpri' WHERE email='$email' AND pw='$pw'");
 	$priests = $priests - $upriest;
-	mysqli_query($db, "UPDATE military SET priests='$priests' WHERE email='$email' AND pw='$pw'");
+	mb_query($db, "UPDATE military SET priests=? WHERE email=? AND pw=?", array($priests, $email, $pw));
 }
 if($uarcher > 0)	{
 	$subarch = (($uarcher * $archhp) - $divided_pts) / $archhp;
@@ -65,7 +65,7 @@ if($uarcher > 0)	{
 		$archcol = "arch" . "$tfleets";
 	mysqli_query($db, "UPDATE returntbl SET $archcol='$subarch' WHERE email='$email' AND pw='$pw'");
 	$archers = $archers - $uarcher;
-	mysqli_query($db, "UPDATE military SET archers='$archers' WHERE email='$email' AND pw='$pw'");
+	mb_query($db, "UPDATE military SET archers=? WHERE email=? AND pw=?", array($archers, $email, $pw));
 }
 if($ugolem > 0)	{
 	$subgolem = (($ugolem * $golemhp) - $divided_pts) / $golemhp;
@@ -74,7 +74,7 @@ if($ugolem > 0)	{
 		$golemcol = "golem" . "$tfleets";
 	mysqli_query($db, "UPDATE returntbl SET $golemcol='$subgolem' WHERE email='$email' AND pw='$pw'");
 	$golem = $golem - $ugolem;
-	mysqli_query($db, "UPDATE military SET golem='$golem' WHERE email='$email' AND pw='$pw'");
+	mb_query($db, "UPDATE military SET golem=? WHERE email=? AND pw=?", array($golem, $email, $pw));
 }
 if($uirongolem > 0)	{
 	$subirongolem = (($uirongolem * $irongolemhp) - $divided_pts) / $irongolemhp;
@@ -83,7 +83,7 @@ if($uirongolem > 0)	{
 		$irongolemcol = "irongolem" . "$tfleets";
 	mysqli_query($db, "UPDATE returntbl SET $irongolemcol='$subirongolem' WHERE email='$email' AND pw='$pw'");
 	$irongolem = $irongolem - $uirongolem;
-	mysqli_query($db, "UPDATE military SET irongolem='$irongolem' WHERE email='$email' AND pw='$pw'");
+	mb_query($db, "UPDATE military SET irongolem=? WHERE email=? AND pw=?", array($irongolem, $email, $pw));
 }
 	
 if($uwarrior > 0 AND $uwarrior != "")	{	$wspeed = $warspeedw + $warspeeda;	}
@@ -106,7 +106,7 @@ if($race == 'Night Elf')	{
 
 $returning = "time" . "$tfleets";
 mysqli_query($db, "UPDATE returntbl SET $returning='$R_time' WHERE email='$email' AND pw='$pw'");
-mysqli_query($db, "UPDATE user SET fleets = fleets - 1 WHERE email='$email' AND pw='$pw'");
+mb_query($db, "UPDATE user SET fleets = fleets - 1 WHERE email=? AND pw=?", array($email, $pw));
 
 ############################
 ##	losses for empire being attacked

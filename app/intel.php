@@ -41,13 +41,13 @@ else	{
 	// thief checks had passed, and nothing asked whether the row existed: an id
 	// that named nobody "succeeded", spent the thieves and rendered a report on
 	// an empty empire.
-	$result = mysqli_query($db, "SELECT * FROM user WHERE userid=" . mb_sql_int($empvalue));
+	$result = mb_query($db, "SELECT * FROM user WHERE userid=?", array((int) $empvalue));
 	$evu = mysqli_fetch_array($result);
 
-	$result1 = mysqli_query($db, "SELECT * FROM military WHERE userid=" . mb_sql_int($empvalue));
+	$result1 = mb_query($db, "SELECT * FROM military WHERE userid=?", array((int) $empvalue));
 	$evm = mysqli_fetch_array($result1);
 
-	$result2 = mysqli_query($db, "SELECT wp FROM buildings WHERE userid=" . mb_sql_int($empvalue));
+	$result2 = mb_query($db, "SELECT wp FROM buildings WHERE userid=?", array((int) $empvalue));
 	$evb = mysqli_fetch_array($result2);
 
 	if(!$evu)	{
@@ -90,7 +90,7 @@ else	{
 			// The arithmetic around $send is MySQL's, not PHP's, so it launders
 			// nothing -- the parameter is still a piece of the statement text.
 			mysqli_query($db, "UPDATE military SET thieves = round($thieves - (" . mb_sql_int($send) . " * .1)) WHERE email='$email' AND pw='$pw'");
-			mysqli_query($db, "UPDATE user SET nno = nno + 1 WHERE userid=" . mb_sql_int($empvalue));
+			mb_query($db, "UPDATE user SET nno = nno + 1 WHERE userid=?", array((int) $empvalue));
 			mb_news_emp($db, "$clock", 'yellow', "$ename ($setid) has failed to gather information on you", $empvalue);
 			
 			include("include/S_INTEL.php");
@@ -99,7 +99,7 @@ else	{
 		else	{
 	
 			mysqli_query($db, "UPDATE military SET thieves = round($thieves - (" . mb_sql_int($send) . " * .03)) WHERE email='$email' AND pw='$pw'");
-			mysqli_query($db, "UPDATE user SET nno = nno + 1 WHERE userid=" . mb_sql_int($empvalue));
+			mb_query($db, "UPDATE user SET nno = nno + 1 WHERE userid=?", array((int) $empvalue));
 			mb_news_emp($db, "$clock", 'yellow', "Thieves have gathered intelligence on your empire", $empvalue);
 
 			$tempmodifier = 1.00;

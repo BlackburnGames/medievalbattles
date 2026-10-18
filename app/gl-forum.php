@@ -9,7 +9,7 @@ if($empireguild == 'None')	{
 }
 
 //	are they a gl?
-$gresult = mysqli_query($db, "SELECT owner FROM guild WHERE owner='$userid'");
+$gresult = mb_query($db, "SELECT owner FROM guild WHERE owner=?", array($userid));
 $gnamecheck = mysqli_fetch_array($gresult);
 			
 if($gnamecheck[0] != $userid)	{
@@ -38,7 +38,7 @@ echo "
 					</tr>";									
 	while ($r = mysqli_fetch_array($result)) {
 
-	$topic_replies_query = mysqli_query($db, "SELECT count(topicid) FROM guildmsgs WHERE topicid=" . mb_sql_int($r['topicid'])) or die(mysqli_error($db));
+	$topic_replies_query = mb_query($db, "SELECT count(topicid) FROM guildmsgs WHERE topicid=?", array((int) $r['topicid'])) or die(mysqli_error($db));
 		$topic_replies = mb_db_result($topic_replies_query, "topic_replies");
 
 echo "

@@ -31,9 +31,9 @@ else  {
 
   $aexplorers = $aexplorers - ($exploreland + $exploremt);
 
-  mysqli_query($db, "UPDATE military SET explorers='$explorers' WHERE email='$email' AND pw='$pw'");
-  mysqli_query($db, "UPDATE explore SET expland='$expland' WHERE email='$email' AND pw='$pw'");
-  mysqli_query($db, "UPDATE explore SET expmt='$expmt' WHERE email='$email' AND pw='$pw'");
+  mb_query($db, "UPDATE military SET explorers=? WHERE email=? AND pw=?", array($explorers, $email, $pw));
+  mb_query($db, "UPDATE explore SET expland=? WHERE email=? AND pw=?", array($expland, $email, $pw));
+  mb_query($db, "UPDATE explore SET expmt=? WHERE email=? AND pw=?", array($expmt, $email, $pw));
 
   echo"<div align=center>You have successfully sent your explorer(s).</font></div>";
   include("include/S_EXPLORE.php");

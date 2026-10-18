@@ -66,12 +66,12 @@ if(($race != 'Giant') AND ($race != 'Angel') AND ($class != 'Ranger') AND ($clas
 		 	$dbgolem = $dbgolem + $ugolem;
 		 	$dbirongolem = $dbirongolem + $uirongolem;
 		
-			mysqli_query($db, "UPDATE user SET gp='$gp' WHERE email='$email' AND pw='$pw'");  
-			mysqli_query($db, "UPDATE user SET iron='$iron' WHERE email='$email' AND pw='$pw'");  
-		  	mysqli_query($db, "UPDATE military SET wizards='$wizards' WHERE email='$email' AND pw='$pw'");
+			mb_query($db, "UPDATE user SET gp=? WHERE email=? AND pw=?", array($gp, $email, $pw));  
+			mb_query($db, "UPDATE user SET iron=? WHERE email=? AND pw=?", array($iron, $email, $pw));  
+		  	mb_query($db, "UPDATE military SET wizards=? WHERE email=? AND pw=?", array($wizards, $email, $pw));
 	 
-		  	mysqli_query($db, "UPDATE military SET dbgolem='$dbgolem' WHERE email='$email' AND pw='$pw'");
-		  	mysqli_query($db, "UPDATE military SET dbirongolem='$dbirongolem' WHERE email='$email' AND pw='$pw'");
+		  	mb_query($db, "UPDATE military SET dbgolem=? WHERE email=? AND pw=?", array($dbgolem, $email, $pw));
+		  	mb_query($db, "UPDATE military SET dbirongolem=? WHERE email=? AND pw=?", array($dbirongolem, $email, $pw));
 
 			echo"<div align=center><font class=yellow>Your orders have been carried out.</font></div>";
 			include("include/animate_table.php");

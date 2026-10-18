@@ -62,19 +62,19 @@ if(!IsSet($update)) {
   $max_land = $max_land - ($uhome + $ubarrack + $ufarm + $ulmill + $uwp);
   $max_mt = $max_mt - ($ugm + $uim);
 
-  mysqli_query($db, "UPDATE user SET gp ='$gp' WHERE email='$email' AND pw='$pw'");
-  mysqli_query($db, "UPDATE user SET exp2 ='$forexp2' WHERE email='$email' AND pw='$pw'");
+  mb_query($db, "UPDATE user SET gp =? WHERE email=? AND pw=?", array($gp, $email, $pw));
+  mb_query($db, "UPDATE user SET exp2 =? WHERE email=? AND pw=?", array($forexp2, $email, $pw));
 
-  mysqli_query($db, "UPDATE buildings SET amts='$amts' WHERE email='$email' AND pw='$pw'");
-  mysqli_query($db, "UPDATE buildings SET dgm='$dgm' WHERE email='$email' AND pw='$pw'");
-  mysqli_query($db, "UPDATE buildings SET dim='$dim' WHERE email='$email' AND pw='$pw'");
+  mb_query($db, "UPDATE buildings SET amts=? WHERE email=? AND pw=?", array($amts, $email, $pw));
+  mb_query($db, "UPDATE buildings SET dgm=? WHERE email=? AND pw=?", array($dgm, $email, $pw));
+  mb_query($db, "UPDATE buildings SET dim=? WHERE email=? AND pw=?", array($dim, $email, $pw));
 
-  mysqli_query($db, "UPDATE buildings SET aland='$aland' WHERE email='$email' AND pw='$pw'");
-  mysqli_query($db, "UPDATE buildings SET dhome='$dhome' WHERE email='$email' AND pw='$pw'");
-  mysqli_query($db, "UPDATE buildings SET dbarrack='$dbarrack' WHERE email='$email' AND pw='$pw'");
-  mysqli_query($db, "UPDATE buildings SET dfarm= '$dfarm' WHERE email='$email' AND pw='$pw'");
-  mysqli_query($db, "UPDATE buildings SET dwp='$dwp' WHERE email='$email' AND pw='$pw'");
-  mysqli_query($db, "UPDATE buildings SET dlmill='$dlmill' WHERE email='$email' AND pw='$pw'");
+  mb_query($db, "UPDATE buildings SET aland=? WHERE email=? AND pw=?", array($aland, $email, $pw));
+  mb_query($db, "UPDATE buildings SET dhome=? WHERE email=? AND pw=?", array($dhome, $email, $pw));
+  mb_query($db, "UPDATE buildings SET dbarrack=? WHERE email=? AND pw=?", array($dbarrack, $email, $pw));
+  mb_query($db, "UPDATE buildings SET dfarm= ? WHERE email=? AND pw=?", array($dfarm, $email, $pw));
+  mb_query($db, "UPDATE buildings SET dwp=? WHERE email=? AND pw=?", array($dwp, $email, $pw));
+  mb_query($db, "UPDATE buildings SET dlmill=? WHERE email=? AND pw=?", array($dlmill, $email, $pw));
 
 //  determines how long building are under development: a tick per building,
 //  at most 20, both scaled by the modifiers. A queue already running keeps the
@@ -99,13 +99,13 @@ if(!IsSet($update)) {
   if($ugm > 0)      { $Ghrs = ceil(min($Ghrs + $ugm * $constr_mult, $constr_cap));  }
   if($uim > 0)      { $Ihrs = ceil(min($Ihrs + $uim * $constr_mult, $constr_cap));  }
 
-  mysqli_query($db, "UPDATE buildings SET Hhrs ='$Hhrs' WHERE email='$email' AND pw='$pw'");
-  mysqli_query($db, "UPDATE buildings SET Bhrs ='$Bhrs' WHERE email='$email' AND pw='$pw'");
-  mysqli_query($db, "UPDATE buildings SET Fhrs ='$Fhrs' WHERE email='$email' AND pw='$pw'");
-  mysqli_query($db, "UPDATE buildings SET Whrs ='$Whrs' WHERE email='$email' AND pw='$pw'");
-  mysqli_query($db, "UPDATE buildings SET Lhrs ='$Lhrs' WHERE email='$email' AND pw='$pw'");
-  mysqli_query($db, "UPDATE buildings SET Ghrs ='$Ghrs' WHERE email='$email' AND pw='$pw'");
-  mysqli_query($db, "UPDATE buildings SET Ihrs ='$Ihrs' WHERE email='$email' AND pw='$pw'");
+  mb_query($db, "UPDATE buildings SET Hhrs =? WHERE email=? AND pw=?", array($Hhrs, $email, $pw));
+  mb_query($db, "UPDATE buildings SET Bhrs =? WHERE email=? AND pw=?", array($Bhrs, $email, $pw));
+  mb_query($db, "UPDATE buildings SET Fhrs =? WHERE email=? AND pw=?", array($Fhrs, $email, $pw));
+  mb_query($db, "UPDATE buildings SET Whrs =? WHERE email=? AND pw=?", array($Whrs, $email, $pw));
+  mb_query($db, "UPDATE buildings SET Lhrs =? WHERE email=? AND pw=?", array($Lhrs, $email, $pw));
+  mb_query($db, "UPDATE buildings SET Ghrs =? WHERE email=? AND pw=?", array($Ghrs, $email, $pw));
+  mb_query($db, "UPDATE buildings SET Ihrs =? WHERE email=? AND pw=?", array($Ihrs, $email, $pw));
 
   echo"<div align=center><font class=yellow>Your orders have been carried out.</font></div>";
   include("include/S_BUILD.php");

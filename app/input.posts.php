@@ -19,9 +19,9 @@ include("include/connect.php");
 		
 include("include/session.php");
 
-$uename = mysqli_query($db, "SELECT ename FROM user WHERE email='$email' AND pw='$pw'");
+$uename = mb_query($db, "SELECT ename FROM user WHERE email=? AND pw=?", array($email, $pw));
 	$ename = mb_db_result($uename,"ename");
-$usetid = mysqli_query($db, "SELECT setid FROM user WHERE email='$email' AND pw='$pw'");
+$usetid = mb_query($db, "SELECT setid FROM user WHERE email=? AND pw=?", array($email, $pw));
 	$setid = mb_db_result($usetid,"setid");
 
 
@@ -35,10 +35,6 @@ include("include/forum_guard.php");
 
 // $ename is escaped alongside the request values. It is read back out of the
 // `user` row rather than off the request, but the player chose it at signup.
-$q_topic   = mb_sql_str($db, $topic);
-$q_message = mb_sql_str($db, $message);
-$q_ename   = mb_sql_str($db, $ename);
-$q_topicid = mb_sql_int($topicid);
 
 if ($addtopic) {
 	$replies = 0;   // a new topic has none
@@ -47,10 +43,10 @@ if ($addtopic) {
 	// was stamped with the empty string and displayed a blank date ever after.
 	// The reply below, and both branches of sl-input.posts.php writing the same
 	// two tables, have always used $clock.
-	$result = mysqli_query($db, "INSERT INTO setforums (setid, name, topic, replies, message, datestamp)	VALUES (" . mb_sql_int($setid) . ", $q_ename, $q_topic, '$replies', $q_message, '$clock')");
+	$result = mb_query($db, "INSERT INTO setforums (setid, name, topic, replies, message, datestamp)	VALUES (?, ?, ?, ?, ?, ?)", array((int) $setid, $ename, $topic, $replies, $message, $clock));
 
-	$topic_lastpost = mysqli_query($db, "UPDATE setforums SET lastpost='$clock' WHERE topic=$q_topic AND setid=" . mb_sql_int($setid) . "");
-	$topic_lastposter = mysqli_query($db, "UPDATE setforums SET lastposter=$q_ename WHERE topic=$q_topic AND setid=" . mb_sql_int($setid) . "");
+	$topic_lastpost = mb_query($db, "UPDATE setforums SET lastpost=? WHERE topic=? AND setid=?", array($clock, $topic, (int) $setid));
+	$topic_lastposter = mb_query($db, "UPDATE setforums SET lastposter=? WHERE topic=? AND setid=?", array($ename, $topic, (int) $setid));
 
 	header ("Location: sforum.php");
 }
@@ -72,11 +68,11 @@ elseif ($addreply) {
 	// successful INSERT that is mysqli_query($db, "1") -- a syntax error; on a
 	// failed one it is the empty string, which is a fatal on PHP 8. It also
 	// reset the insert id that $lastid reads. The second call is gone.
-	$result1 = mysqli_query($db, "INSERT INTO setforumsmsgs (setid, name, topic, topicid, message, datestamp)	 VALUES (" . mb_sql_int($setid) . ", $q_ename, $q_topic, $q_topicid, $q_message, '$clock')");
+	$result1 = mb_query($db, "INSERT INTO setforumsmsgs (setid, name, topic, topicid, message, datestamp)	 VALUES (?, ?, ?, ?, ?, ?)", array((int) $setid, $ename, $topic, (int) $topicid, $message, $clock));
 	$lastid = mysqli_insert_id($db);
 
-	$reply_lastpost = mysqli_query($db, "UPDATE setforums SET lastpost='$clock' WHERE topicid=$q_topicid AND setid=" . mb_sql_int($setid) . "");
-	$reply_lastposter = mysqli_query($db, "UPDATE setforums SET lastposter=$q_ename WHERE topicid=$q_topicid AND setid=" . mb_sql_int($setid) . "");
+	$reply_lastpost = mb_query($db, "UPDATE setforums SET lastpost=? WHERE topicid=? AND setid=?", array($clock, (int) $topicid, (int) $setid));
+	$reply_lastposter = mb_query($db, "UPDATE setforums SET lastposter=? WHERE topicid=? AND setid=?", array($ename, (int) $topicid, (int) $setid));
 
 	header ("Location: topic.php?topicid=$topicid");
 }

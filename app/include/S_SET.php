@@ -8,9 +8,9 @@ $snum = mb_input('snum');
 if($snum != "")  {  $N_NUM = $snum; }
 if($snum == "") { $N_NUM = $csnum;  }
 
-$ssettlementpic = mysqli_query($db, "SELECT setpic FROM settlement WHERE setid = " . mb_sql_int($N_NUM));
+$ssettlementpic = mb_query($db, "SELECT setpic FROM settlement WHERE setid = ?", array((int) $N_NUM));
   $settlepic = mb_db_result($ssettlementpic, "setpic", 0);
-$ssettlementname = mysqli_query($db, "SELECT setname FROM settlement WHERE setid = " . mb_sql_int($N_NUM));
+$ssettlementname = mb_query($db, "SELECT setname FROM settlement WHERE setid = ?", array((int) $N_NUM));
   $settlename = mb_db_result($ssettlementname, "setname", 0);
 
 echo "
@@ -47,22 +47,22 @@ $query_string = "SELECT userid, ename, race, class, mts, land, exp, guild FROM u
 $result_id = mysqli_query($db, $query_string);
 while ($row = mysqli_fetch_row($result_id))  {
 
-  $ONLINE_NO = mysqli_query($db, "SELECT online FROM user WHERE userid=" . mb_sql_int($row[0]) . "");
+  $ONLINE_NO = mb_query($db, "SELECT online FROM user WHERE userid=?", array((int) $row[0]));
     $OLINE = mb_db_result($ONLINE_NO,"OLINE");
 
   if($OLINE == 1) { $O_line = "<font class=red>*</font>";  }
   else  { $O_line = ""; }
 
   //  check to see if sl is there
-  $SL_result = mysqli_query($db, "SELECT sl FROM user WHERE userid=" . mb_sql_int($row[0]) . "");
+  $SL_result = mb_query($db, "SELECT sl FROM user WHERE userid=?", array((int) $row[0]));
     $SLcheck = mysqli_fetch_array($SL_result);
 
   if($SLcheck[0] == 'yes')  {
-    $SL_SELECT = mysqli_query($db, "SELECT ename FROM user WHERE sl='yes' AND setid=" . mb_sql_int($N_NUM));
+    $SL_SELECT = mb_query($db, "SELECT ename FROM user WHERE sl='yes' AND setid=?", array((int) $N_NUM));
       $SL_S = mb_db_result($SL_SELECT,"SL_S");
   }
 
-  $SAFEMODECHECK = mysqli_query($db, "SELECT safemode FROM user WHERE  userid=" . mb_sql_int($row[0]) . "");
+  $SAFEMODECHECK = mb_query($db, "SELECT safemode FROM user WHERE  userid=?", array((int) $row[0]));
     $S_M_CHECK = mb_db_result($SAFEMODECHECK,"S_M_CHECK");
 
   $color = "#404040";
@@ -87,7 +87,7 @@ while ($row = mysqli_fetch_row($result_id))  {
     <td bgcolor=$color><font class=$yclass>" . mb_h($row[7]) . "</td>\n";
 }
 
-  $COUNT_MEMBERS = mysqli_query($db, "SELECT count(userid) FROM user WHERE setid = " . mb_sql_int($N_NUM));
+  $COUNT_MEMBERS = mb_query($db, "SELECT count(userid) FROM user WHERE setid = ?", array((int) $N_NUM));
     $C_MEM = mb_db_result($COUNT_MEMBERS,"C_MEM");
 
   $totT = $C_MEM;
@@ -107,7 +107,7 @@ while($C_MEM < 10 AND $totT < 10) {
 echo "
 </table><br>";
 
-$SET_STRENGTH = mysqli_query($db, "SELECT sum(exp) FROM user WHERE setid=" . mb_sql_int($N_NUM));
+$SET_STRENGTH = mb_query($db, "SELECT sum(exp) FROM user WHERE setid=?", array((int) $N_NUM));
   $S_STRENGTH = mb_db_result($SET_STRENGTH,"S_STRENGTH");
   $S_STRENGTH = number_format($S_STRENGTH);
 

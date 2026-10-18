@@ -27,8 +27,10 @@
  *   mb_sql_str($db, X)  bound as X
  *   mb_sql_int(X)       bound as (int) X
  *
- * A bare value that is a numeric string is compared or computed by MySQL as a
- * number, exactly as the interpolated digits were.
+ * A bare value is only bound in a WHERE comparison or after LIMIT. In a SET or
+ * in arithmetic it is left, because mb_query() writes a non-integer value as a
+ * quoted string, and MySQL computes with a quoted '2.5' as a double where it
+ * computed with a bare 2.5 as an exact decimal -- ROUND() of the two can differ.
  */
 
 if (PHP_SAPI !== 'cli') {
@@ -312,9 +314,10 @@ function mb_build(array $pieces)
         }
         // Bare: only as the whole right-hand side of a comparison in a WHERE
         // clause, or after LIMIT / OFFSET. Never where a name may go, and never
-        // in a SET or in arithmetic -- MySQL reads a number written into the SQL
-        // as an exact decimal and a bound value otherwise, and ROUND() of the
-        // two can differ, so those are left for a person to look at.
+        // in a SET or in arithmetic -- MySQL reads a bare number as an exact
+        // decimal and a quoted one, which is what mb_query() writes for anything
+        // but an int, as a double, and ROUND() of the two can differ. Those are
+        // left for a person to look at.
         $before = rtrim($sql);
         $after = ltrim($next);
         if (preg_match('/^[A-Za-z0-9_.]/', $next)) {

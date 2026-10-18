@@ -27,13 +27,12 @@ else	{
 	// The empire name is typed into the form, and the address and settlement id
 	// are read back out of the row it names -- so all three reach the DELETEs
 	// below, and the last of them removes an account.
-	$q_empre = mb_sql_str($db, $empre);
 
 	//SELECTING SETID
-		$empreset = mysqli_query($db, "SELECT setid FROM user WHERE ename=$q_empre");
+		$empreset = mb_query($db, "SELECT setid FROM user WHERE ename=?", array($empre));
 		$esetid = mb_db_result($empreset,"esetid");
 	//SELECTING EMAIL
-		$theiremail = mysqli_query($db, "SELECT email FROM user WHERE ename=$q_empre");
+		$theiremail = mb_query($db, "SELECT email FROM user WHERE ename=?", array($empre));
 		$tmail = mb_db_result($theiremail,"tmail");
 
 	// No such empire: say so rather than running six unfiltered DELETEs. With
@@ -44,17 +43,16 @@ else	{
 		die();
 	}
 
-	$q_tmail = mb_sql_str($db, $tmail);
 	$news    = "[b]{$empre}[/b] has been deleted by an administrator";
 
 	mb_news_set($db, "$clock", 'red', $news, $esetid, 0);
 
-	mysqli_query($db, "DELETE FROM buildings WHERE email=$q_tmail");
-	mysqli_query($db, "DELETE FROM military WHERE email=$q_tmail");
-	mysqli_query($db, "DELETE FROM returntbl WHERE email=$q_tmail");
-	mysqli_query($db, "DELETE FROM research WHERE email=$q_tmail");
-	mysqli_query($db, "DELETE FROM explore WHERE email=$q_tmail");
-	mysqli_query($db, "DELETE FROM user WHERE email=$q_tmail");
+	mb_query($db, "DELETE FROM buildings WHERE email=?", array($tmail));
+	mb_query($db, "DELETE FROM military WHERE email=?", array($tmail));
+	mb_query($db, "DELETE FROM returntbl WHERE email=?", array($tmail));
+	mb_query($db, "DELETE FROM research WHERE email=?", array($tmail));
+	mb_query($db, "DELETE FROM explore WHERE email=?", array($tmail));
+	mb_query($db, "DELETE FROM user WHERE email=?", array($tmail));
 
 	echo "<center>" . htmlspecialchars($empre) . " has been deleted.<br>";
 	die();

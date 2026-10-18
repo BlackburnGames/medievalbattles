@@ -56,9 +56,9 @@ else  {
 
     $maxciv = $maxciv - $urecruit;
     $recruits = $recruits + $urecruit;
-    mysqli_query($db, "UPDATE user SET gp='$gp' WHERE email='$email' AND pw='$pw'");
-      mysqli_query($db, "UPDATE military SET recruits='$recruits' WHERE email='$email' AND pw='$pw'");
-      mysqli_query($db, "UPDATE military SET maxciv='$maxciv' WHERE email='$email' AND pw='$pw'");
+    mb_query($db, "UPDATE user SET gp=? WHERE email=? AND pw=?", array($gp, $email, $pw));
+      mb_query($db, "UPDATE military SET recruits=? WHERE email=? AND pw=?", array($recruits, $email, $pw));
+      mb_query($db, "UPDATE military SET maxciv=? WHERE email=? AND pw=?", array($maxciv, $email, $pw));
 
     echo"<div align=center><font class=yellow>Your civilians have been recruited.</font></div>";
     include("include/S_RCIV.php");
@@ -160,20 +160,20 @@ else  {
       $dbcatapult3 = $dbcatapult3 + $ucatapult;
       $dbsuicide3 = $dbsuicide3 + $usuicide;
 
-      mysqli_query($db, "UPDATE user SET gp='$gp' WHERE email='$email' AND pw='$pw'");
-      mysqli_query($db, "UPDATE user SET lumber='$lumber' WHERE email='$email' AND pw='$pw'");
-      mysqli_query($db, "UPDATE military SET recruits='$recruits' WHERE email='$email' AND pw='$pw'");
+      mb_query($db, "UPDATE user SET gp=? WHERE email=? AND pw=?", array($gp, $email, $pw));
+      mb_query($db, "UPDATE user SET lumber=? WHERE email=? AND pw=?", array($lumber, $email, $pw));
+      mb_query($db, "UPDATE military SET recruits=? WHERE email=? AND pw=?", array($recruits, $email, $pw));
 
-      mysqli_query($db, "UPDATE military SET dbsage='$dbsage' WHERE email='$email' AND pw='$pw'");
-      mysqli_query($db, "UPDATE military SET dbthief='$dbthief' WHERE email='$email' AND pw='$pw'");
-      mysqli_query($db, "UPDATE military SET dbexplorer='$dbexplorer' WHERE email='$email' AND pw='$pw'");
-      mysqli_query($db, "UPDATE military SET dbpri2='$dbpri2' WHERE email='$email' AND pw='$pw'");
-      mysqli_query($db, "UPDATE military SET dbwiz2='$dbwiz2' WHERE email='$email' AND pw='$pw'");
-      mysqli_query($db, "UPDATE military SET dbwar2='$dbwar2' WHERE email='$email' AND pw='$pw'");
-      mysqli_query($db, "UPDATE military SET dbarch2='$dbarch2' WHERE email='$email' AND pw='$pw'");
+      mb_query($db, "UPDATE military SET dbsage=? WHERE email=? AND pw=?", array($dbsage, $email, $pw));
+      mb_query($db, "UPDATE military SET dbthief=? WHERE email=? AND pw=?", array($dbthief, $email, $pw));
+      mb_query($db, "UPDATE military SET dbexplorer=? WHERE email=? AND pw=?", array($dbexplorer, $email, $pw));
+      mb_query($db, "UPDATE military SET dbpri2=? WHERE email=? AND pw=?", array($dbpri2, $email, $pw));
+      mb_query($db, "UPDATE military SET dbwiz2=? WHERE email=? AND pw=?", array($dbwiz2, $email, $pw));
+      mb_query($db, "UPDATE military SET dbwar2=? WHERE email=? AND pw=?", array($dbwar2, $email, $pw));
+      mb_query($db, "UPDATE military SET dbarch2=? WHERE email=? AND pw=?", array($dbarch2, $email, $pw));
 
-      mysqli_query($db, "UPDATE military SET dbcatapult3='$dbcatapult3' WHERE email='$email' AND pw='$pw'");
-      mysqli_query($db, "UPDATE military SET dbsuicide3='$dbsuicide3' WHERE email='$email' AND pw='$pw'");
+      mb_query($db, "UPDATE military SET dbcatapult3=? WHERE email=? AND pw=?", array($dbcatapult3, $email, $pw));
+      mb_query($db, "UPDATE military SET dbsuicide3=? WHERE email=? AND pw=?", array($dbsuicide3, $email, $pw));
 
 
       echo"<div align=center><font class=yellow>Your orders have been carried out.</font></div>";

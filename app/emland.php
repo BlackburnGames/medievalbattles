@@ -25,9 +25,9 @@ echo "
 	$placeno = 0;
 	while ($row = mysqli_fetch_row($result_id))	{
 
-		$SETID_SELECT = mysqli_query($db, "SELECT setid FROM user WHERE ename=" . mb_sql_str($db, $row[0]) . "");	
+		$SETID_SELECT = mb_query($db, "SELECT setid FROM user WHERE ename=?", array($row[0]));	
 	   		$SID_S = mb_db_result($SETID_SELECT,"SID_S");
-		$EMPS_SET_GUILD = mysqli_query($db, "SELECT guild FROM user WHERE userid=" . mb_sql_int($row[4]) . "");	
+		$EMPS_SET_GUILD = mb_query($db, "SELECT guild FROM user WHERE userid=?", array((int) $row[4]));	
 	   		$E_S_G = mb_db_result($EMPS_SET_GUILD,"E_S_G");
 		
 		$E_S_G = "[$E_S_G]";

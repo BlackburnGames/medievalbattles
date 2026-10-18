@@ -3,10 +3,10 @@ include("include/igtop.php");
 
 $pageid = $_GET['pageid'];
 
-$set_notice_query = $db->query("SELECT setnotice FROM settlement WHERE setid='$setid'");
+$set_notice_query = mb_query($db, "SELECT setnotice FROM settlement WHERE setid=?", array($setid));
   $setnotice = mysqli_fetch_array($set_notice_query);
 
-$guild_notice_query = $db->query("SELECT notice FROM guild WHERE gname=" . mb_sql_str($db, $empireguild) . "");
+$guild_notice_query = mb_query($db, "SELECT notice FROM guild WHERE gname=?", array($empireguild));
   $guildnotice = mysqli_fetch_array($guild_notice_query);
 
 echo"
@@ -58,7 +58,7 @@ echo "        </tr>
 <br><br>
 <?php
 // are they a guild leader?
-$guild_leader_query = $db->query("SELECT owner FROM guild WHERE owner='$userid'");
+$guild_leader_query = mb_query($db, "SELECT owner FROM guild WHERE owner=?", array($userid));
   $GL = mysqli_fetch_array($guild_leader_query);
 
 echo "<div align=center>
@@ -69,7 +69,7 @@ if($GL[0] == $userid)   { echo "<b>&nbsp;[&nbsp;<a href=guildconfig.php>Guild Ma
 echo "</b></div><br><br>";
 
 if ($pageid == 'news')  {
-  $empnews_sel = $db->query("SELECT count(yourid) FROM empnews WHERE yourid='$userid'") or die(mysqli_error($db));
+  $empnews_sel = mb_query($db, "SELECT count(yourid) FROM empnews WHERE yourid=?", array($userid)) or die(mysqli_error($db));
   $emp_sel = mb_db_result($empnews_sel, 0);
 
 
@@ -78,7 +78,7 @@ if ($pageid == 'news')  {
     die();
   }
 
-  $db->query("UPDATE user SET nno='0' WHERE email='$email' AND pw='$pw'");
+  mb_query($db, "UPDATE user SET nno='0' WHERE email=? AND pw=?", array($email, $pw));
 
 echo "
     <table border=0 bordercolor=#404040 width=80% align=center cellspacing=1>

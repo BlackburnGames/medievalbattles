@@ -28,7 +28,7 @@ mb_forum_require_guild_thread($db, $topicid, $empireguild);
 // is decidable and the audit can see it.
 $r_topic = $topic;
 
-$result1 = mysqli_query($db, "SELECT name, topic, message, lastpost FROM guildthreads WHERE topicid='$topicid' AND guildname=" . mb_sql_str($db, $empireguild)) or die("Error! " . mysqli_error($db));
+$result1 = mb_query($db, "SELECT name, topic, message, lastpost FROM guildthreads WHERE topicid=? AND guildname=?", array($topicid, $empireguild)) or die("Error! " . mysqli_error($db));
 
 if ($result1) { 
 	echo"

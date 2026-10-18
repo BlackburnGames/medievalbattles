@@ -21,12 +21,11 @@ $result_id = mysqli_query($db, $query_string);
 $row_num = 0;
 while ($row = mysqli_fetch_row($result_id))	{
 
-	$q_seller = mb_sql_int($row[6]);
 
-	$result = mysqli_query($db, "SELECT setid FROM user WHERE userid=$q_seller");
+	$result = mb_query($db, "SELECT setid FROM user WHERE userid=?", array((int) $row[6]));
 	$s_sel = mysqli_fetch_array($result);
 		$s_sel = $s_sel[0];
-		if($s_sel == "")	 {	mysqli_query($db, "DELETE FROM barter WHERE userid=$q_seller");	}
+		if($s_sel == "")	 {	mb_query($db, "DELETE FROM barter WHERE userid=?", array((int) $row[6]));	}
 
 	// Both links pointed at barter.php, which lists only the open board. So
 	// every guild listing's Barter link went to the handler that refuses to

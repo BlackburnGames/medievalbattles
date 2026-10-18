@@ -23,9 +23,9 @@ else	{
 	
 	include("include/S_SINFOS.php");
 
-	mysqli_query($db, "UPDATE settlement SET setpic =" . mb_sql_str($db, $theseturl) . " WHERE setid='$setid'");
-	mysqli_query($db, "UPDATE settlement SET setname =" . mb_sql_str($db, $thesetname) . " WHERE  setid='$setid'");
-	mysqli_query($db, "UPDATE settlement SET setnotice =" . mb_sql_str($db, $thesetnotice) . " WHERE  setid='$setid'");
+	mb_query($db, "UPDATE settlement SET setpic =? WHERE setid=?", array($theseturl, $setid));
+	mb_query($db, "UPDATE settlement SET setname =? WHERE  setid=?", array($thesetname, $setid));
+	mb_query($db, "UPDATE settlement SET setnotice =? WHERE  setid=?", array($thesetnotice, $setid));
 
 	echo "<div align=center>Your settlement information has been updated.</div>";
 	include("include/S_SINFO.php");

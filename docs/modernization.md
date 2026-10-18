@@ -98,15 +98,34 @@ In progress. The known work, in no committed order:
   every site can be checked by a suite that proves behaviour did not move;
   rewriting 1300 interpolations into bind calls in one go cannot.
 
-  **They are under way now, a page at a time.** `mb_query($db, $sql, $params)`
-  in `app/include/db.php` prepares the statement and binds each value by its
-  PHP type, so the value never enters the SQL text. The audit reads its SQL
-  argument as a sink like `mysqli_query()`'s and its params array as safe, so
-  interpolating into a converted query is still caught. The pre-login pages
-  went first, because they are the ones a stranger reaches: `checksignup.php`
-  (every value, computed ones included), `checklogin.php`,
-  `activate_account.php`, `index.php`, and `mb_password_store()`, which the
-  login's MD5 upgrade runs. A converted page has no `mb_sql_str()` left in it.
+  **Most of it is done: 696 unbound queries down to 135.**
+  `mb_query($db, $sql, $params)` in `app/include/db.php` takes `?`
+  placeholders and a list of values, so no call site writes a value into SQL
+  by hand. The audit reads its SQL argument as a sink like `mysqli_query()`'s
+  and its params array as safe, so interpolating into a converted query is
+  still caught, and `tests/unbound-queries-audit.php` counts what is left per
+  file as a ratchet.
+
+  **The values are substituted by `mb_query()`, not sent as a server-side
+  prepared statement, and that was learned the hard way.** The first version
+  prepared and bound. It passed every test on the pages converted by hand, and
+  then the bulk conversion lost guild leaders their forum link: a prepared
+  statement's result is natively typed, so `guild.owner` came back as the int
+  1, and the navbar's `$owner === $userid` compared it with the string "1".
+  Every query this code was written against returns strings, and it compares
+  with `===` on them throughout. `mb_query()` now escapes each value with the
+  driver for the connection's character set and writes it in, an int as an
+  integer literal — what PDO does by default — so every result is exactly what
+  it was. Server-side prepares would mean auditing those comparisons first.
+
+  The pre-login pages and the shared helpers were converted by hand, then
+  `tools/bind-queries.php` did 561 calls in one pass across 71 files. Every
+  bare value it bound was reviewed, and that review is why it no longer binds
+  one in a `SET` or in arithmetic: MySQL computes with a quoted `'2.5'` as a
+  double and a bare `2.5` as an exact decimal, and `ROUND()` of the two can
+  differ. The 135 left are those, statements held in a variable, names built
+  from variables, and a few escaped variables whose source the tool could not
+  pin down — for converting by hand.
 
   The last 36 were not a random 36, and none of the three groups was closed by
   escaping alone:

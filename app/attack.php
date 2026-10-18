@@ -112,7 +112,7 @@ else	{
 	elseif($evu['land'] < 200 AND $evu['land'] >=10)	{	$landgain = 10;	}
 	else	{	$landgain = $evu['land'];	 }
 					
-	$EMPs_guild_query = mysqli_query($db, "SELECT guild FROM user WHERE userid='$evu[userid]'");
+	$EMPs_guild_query = mb_query($db, "SELECT guild FROM user WHERE userid=?", array($evu['userid']));
 		$EMPs_guild = mb_db_result($EMPs_guild_query,"EMPs_guild");
 
 	// Nothing above zero, not merely nothing typed: a field of "0" passed the
@@ -172,7 +172,7 @@ else	{
 			mb_news_guild($db, "$clock", 'orange', "$evu[ename] ($evu[setid]) successfully defended their land against $ename ($setid)", $tgid['0'], $gnid);
 		}
 						
-		mysqli_query($db, "UPDATE user SET nno = nno + 1 WHERE userid=" . mb_sql_int($empvalue));
+		mb_query($db, "UPDATE user SET nno = nno + 1 WHERE userid=?", array((int) $empvalue));
 
 		mb_news_emp($db, "$clock", 'yellow', "We have successfully defended our empire against $ename ($setid)", $empvalue);
 					
@@ -279,7 +279,7 @@ else	{
 	if($landgain >= 10 AND $evu['land'] - $landgain >= 1)	{
 		echo"<div align=center><font class=yellow>You have conquered $landgain land from $evu[ename]($evu[setid])!</font><br><br><font class=orange>$your_losses<br><br></font>";
 					
-		mysqli_query($db, "UPDATE user SET nno = nno + 1 WHERE userid=" . mb_sql_int($empvalue));				
+		mb_query($db, "UPDATE user SET nno = nno + 1 WHERE userid=?", array((int) $empvalue));				
 		mb_news_emp($db, "$clock", 'yellow', "We have unsuccessfully defended our empire against $ename ($setid) and lost $landgain land", $empvalue);
 		include("include/attack/ldrop.php");
 		include("include/attack/table.php");

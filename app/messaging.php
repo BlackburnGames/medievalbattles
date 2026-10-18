@@ -34,12 +34,11 @@ else	{
 	}
 	else	{
 
-		$q_empvalue = mb_sql_int($empvalue);
 
-		$empattacked = mysqli_query($db, "SELECT ename FROM user WHERE userid=$q_empvalue");
+		$empattacked = mb_query($db, "SELECT ename FROM user WHERE userid=?", array((int) $empvalue));
 		$empireattacked = mb_db_result($empattacked,"empireattacked");
 
-		$THE_MNO = mysqli_query($db, "SELECT mno FROM user WHERE userid=$q_empvalue");
+		$THE_MNO = mb_query($db, "SELECT mno FROM user WHERE userid=?", array((int) $empvalue));
 		$T_MNO = mb_db_result($THE_MNO,"T_MNO");
 
 		$yourmid = mysqli_query($db, "SELECT max(mid) FROM messages");	
@@ -49,8 +48,8 @@ else	{
 		$thenum = $T_MNO + 1;
 		// Stored as typed; mb_rich() renders it. See include/html.php.
 
-		mysqli_query($db, "UPDATE user SET mno='$thenum' WHERE userid=$q_empvalue");
-		mysqli_query($db, "INSERT INTO messages (origin, datesent, yourid, message, mid)		VALUES	(" . mb_sql_str($db, $ename) . ", '$clock', $q_empvalue, " . mb_sql_str($db, $umessage) . ", " . mb_sql_int($ymid) . ") ");
+		mb_query($db, "UPDATE user SET mno=? WHERE userid=?", array($thenum, (int) $empvalue));
+		mb_query($db, "INSERT INTO messages (origin, datesent, yourid, message, mid)		VALUES	(?, ?, ?, ?, ?) ", array($ename, $clock, (int) $empvalue, $umessage, (int) $ymid));
 	
 		echo"<div align=center><font class=yellow>Your message has been sent to " . mb_h($empireattacked) . ".</font></div></center>";
 		include("include/S_MESS.php"); 

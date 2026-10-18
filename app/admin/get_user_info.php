@@ -29,7 +29,7 @@ else	{
 
 	$clock = date("m/d/y, H:ia");
 
-	$result = mysqli_query($db, "SELECT * FROM user WHERE ename=" . mb_sql_str($db, $empre));
+	$result = mb_query($db, "SELECT * FROM user WHERE ename=?", array($empre));
 		$evu = mysqli_fetch_array($result);
 
 	// The five queries below all filter on $evu[userid]. With no such empire
@@ -42,19 +42,19 @@ else	{
 
 	$q_evuid = mb_sql_int($evu['userid']);
 
-	$result1 = mysqli_query($db, "SELECT * FROM military WHERE userid=$q_evuid");
+	$result1 = mb_query($db, "SELECT * FROM military WHERE userid=?", array((int) $evu['userid']));
 		$evm = mysqli_fetch_array($result1);
 
-	$result2 = mysqli_query($db, "SELECT * FROM buildings WHERE userid=$q_evuid");
+	$result2 = mb_query($db, "SELECT * FROM buildings WHERE userid=?", array((int) $evu['userid']));
 		$evb = mysqli_fetch_array($result2);
 
-	$result3 = mysqli_query($db, "SELECT * FROM returntbl WHERE userid=$q_evuid");
+	$result3 = mb_query($db, "SELECT * FROM returntbl WHERE userid=?", array((int) $evu['userid']));
 		$evr = mysqli_fetch_array($result3);
 
-	$result4 = mysqli_query($db, "SELECT * FROM research WHERE userid=$q_evuid");
+	$result4 = mb_query($db, "SELECT * FROM research WHERE userid=?", array((int) $evu['userid']));
 		$evres = mysqli_fetch_array($result4);
 
-	$result5 = mysqli_query($db, "SELECT * FROM explore WHERE userid=$q_evuid");
+	$result5 = mb_query($db, "SELECT * FROM explore WHERE userid=?", array((int) $evu['userid']));
 		$eve = mysqli_fetch_array($result5);
 
 echo"
@@ -176,7 +176,7 @@ echo"
 	// all, so this counted the news belonging to userid '' -- i.e. none, for
 	// everybody. The empire news table below it therefore never rendered for
 	// any user, whatever news they had. It wants the empire being looked at.
-	$empnews_sel = mysqli_query($db, "SELECT count(yourid) FROM empnews WHERE yourid=$q_evuid");
+	$empnews_sel = mb_query($db, "SELECT count(yourid) FROM empnews WHERE yourid=?", array((int) $evu['userid']));
 	$emp_sel = mb_db_result($empnews_sel,"emp_sel");
 	
 	if($emp_sel == 0 OR $emp_sel == "")	{

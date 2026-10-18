@@ -221,19 +221,19 @@ while($INC_ID < $max_UID + 1) {
 
       if($ret['time1'] == 1)  {
         mysqli_query($db, "UPDATE military SET warriors = warriors + $ret[war1], wizards = wizards + $ret[wiz1], priests = priests + $ret[pri1], archers = archers + $ret[arch1], golem = golem + $ret[golem1], irongolem = irongolem + $ret[irongolem1]  WHERE userid='$INC_ID'");
-        mysqli_query($db, "UPDATE user SET fleets = fleets + 1 WHERE userid='$INC_ID'");
+        mb_query($db, "UPDATE user SET fleets = fleets + 1 WHERE userid=?", array($INC_ID));
       }
       if($ret['time2'] == 1)   {
         mysqli_query($db, "UPDATE military SET warriors = warriors + $ret[war2], wizards = wizards + $ret[wiz2], priests = priests + $ret[pri2], archers = archers + $ret[arch2], golem = golem + $ret[golem2], irongolem = irongolem + $ret[irongolem2] WHERE userid='$INC_ID'");
-        mysqli_query($db, "UPDATE user SET fleets = fleets + 1 WHERE userid='$INC_ID'");
+        mb_query($db, "UPDATE user SET fleets = fleets + 1 WHERE userid=?", array($INC_ID));
       }
       if($ret['time3'] == 1)  {
         mysqli_query($db, "UPDATE military SET warriors = warriors + $ret[war3], wizards = wizards + $ret[wiz3], priests = priests + $ret[pri3], archers = archers + $ret[arch3], golem = golem + $ret[golem3], irongolem = irongolem + $ret[irongolem3] WHERE userid='$INC_ID'");
-        mysqli_query($db, "UPDATE user SET fleets = fleets + 1 WHERE userid='$INC_ID'");
+        mb_query($db, "UPDATE user SET fleets = fleets + 1 WHERE userid=?", array($INC_ID));
       }
       if($ret['time4'] == 1)  {
         mysqli_query($db, "UPDATE military SET warriors = warriors + $ret[war4], wizards = wizards + $ret[wiz4], priests = priests + $ret[pri4], archers = archers + $ret[arch4], golem = golem + $ret[golem4], irongolem = irongolem + $ret[irongolem4] WHERE userid='$INC_ID'");
-        mysqli_query($db, "UPDATE user SET fleets = fleets + 1 WHERE userid='$INC_ID'");
+        mb_query($db, "UPDATE user SET fleets = fleets + 1 WHERE userid=?", array($INC_ID));
       }
 ##################
 ### Research Updater
@@ -251,7 +251,7 @@ while($INC_ID < $max_UID + 1) {
 ##################
   echo "<p>Updating Activation System...</p>";
 
-  mysqli_query($db, "UPDATE emailvalidate SET clock= clock - 1 WHERE clock > 0 AND userid ='$INC_ID'");
+  mb_query($db, "UPDATE emailvalidate SET clock= clock - 1 WHERE clock > 0 AND userid =?", array($INC_ID));
 
   if($validate['clock'] == 1 AND $validate['check'] == 1)  {
     mb_news_set($db, "$clock", 'red', "$user[ename] has been deleted for inactivity.", $user['setid'], 0);
@@ -266,14 +266,14 @@ This email is automated. Your reply will not be recieved.";
     $from = "From: account_deleted@medievalbattles.com\r\nbcc: phb@sendhost\r\nContent-type: text/plain\r\nX-mailer: PHP/" . phpversion();
     $mailsend = mail("$email", "$subject", "$body", "$from");
 
-    mysqli_query($db, "DELETE FROM user WHERE email='$user[email]' AND pw='$user[pw]'");
-    mysqli_query($db, "DELETE FROM military WHERE email='$user[email]' AND pw='$user[pw]'");
-    mysqli_query($db, "DELETE FROM buildings WHERE email='$user[email]' AND pw='$user[pw]'");
-    mysqli_query($db, "DELETE FROM research WHERE email='$user[email]' AND pw='$user[pw]'");
-    mysqli_query($db, "DELETE FROM returntbl WHERE email='$user[email]' AND pw='$user[pw]'");
-    mysqli_query($db, "DELETE FROM explore WHERE email='$user[email]' AND pw='$user[pw]'");
-    mysqli_query($db, "DELETE FROM emailvalidate WHERE userid='$INC_ID'");
-    mysqli_query($db, "UPDATE user SET votefor='None' WHERE votefor='$user[ename]'");
+    mb_query($db, "DELETE FROM user WHERE email=? AND pw=?", array($user['email'], $user['pw']));
+    mb_query($db, "DELETE FROM military WHERE email=? AND pw=?", array($user['email'], $user['pw']));
+    mb_query($db, "DELETE FROM buildings WHERE email=? AND pw=?", array($user['email'], $user['pw']));
+    mb_query($db, "DELETE FROM research WHERE email=? AND pw=?", array($user['email'], $user['pw']));
+    mb_query($db, "DELETE FROM returntbl WHERE email=? AND pw=?", array($user['email'], $user['pw']));
+    mb_query($db, "DELETE FROM explore WHERE email=? AND pw=?", array($user['email'], $user['pw']));
+    mb_query($db, "DELETE FROM emailvalidate WHERE userid=?", array($INC_ID));
+    mb_query($db, "UPDATE user SET votefor='None' WHERE votefor=?", array($user['ename']));
   }
 
 ##################
@@ -281,7 +281,7 @@ This email is automated. Your reply will not be recieved.";
 ##################
   echo "<p>Updating Inactive Deletion System...</p>";
 
-  mysqli_query($db, "UPDATE user SET countdown= countdown - 1 WHERE userid ='$INC_ID'");
+  mb_query($db, "UPDATE user SET countdown= countdown - 1 WHERE userid =?", array($INC_ID));
 
   if($user['countdown'] == 1)  {
     mb_news_set($db, "$clock", 'red', "$user[ename] has been deleted for inactivity.", $user['setid'], 0);
@@ -296,14 +296,14 @@ This email is automated. Your reply will not be recieved.";
     $from = "From: account_deleted@medievalbattles.com\r\nbcc: phb@sendhost\r\nContent-type: text/plain\r\nX-mailer: PHP/" . phpversion();
     $mailsend = mail("$email", "$subject", "$body", "$from");
 
-    mysqli_query($db, "DELETE FROM user WHERE email='$user[email]' AND pw='$user[pw]'");
-    mysqli_query($db, "DELETE FROM military WHERE email='$user[email]' AND pw='$user[pw]'");
-    mysqli_query($db, "DELETE FROM buildings WHERE email='$user[email]' AND pw='$user[pw]'");
-    mysqli_query($db, "DELETE FROM research WHERE email='$user[email]' AND pw='$user[pw]'");
-    mysqli_query($db, "DELETE FROM returntbl WHERE email='$user[email]' AND pw='$user[pw]'");
-    mysqli_query($db, "DELETE FROM explore WHERE email='$user[email]' AND pw='$user[pw]'");
-    mysqli_query($db, "DELETE FROM emailvalidate WHERE userid='$INC_ID'");
-    mysqli_query($db, "UPDATE user SET votefor='None' WHERE votefor='$user[ename]'");
+    mb_query($db, "DELETE FROM user WHERE email=? AND pw=?", array($user['email'], $user['pw']));
+    mb_query($db, "DELETE FROM military WHERE email=? AND pw=?", array($user['email'], $user['pw']));
+    mb_query($db, "DELETE FROM buildings WHERE email=? AND pw=?", array($user['email'], $user['pw']));
+    mb_query($db, "DELETE FROM research WHERE email=? AND pw=?", array($user['email'], $user['pw']));
+    mb_query($db, "DELETE FROM returntbl WHERE email=? AND pw=?", array($user['email'], $user['pw']));
+    mb_query($db, "DELETE FROM explore WHERE email=? AND pw=?", array($user['email'], $user['pw']));
+    mb_query($db, "DELETE FROM emailvalidate WHERE userid=?", array($INC_ID));
+    mb_query($db, "UPDATE user SET votefor='None' WHERE votefor=?", array($user['ename']));
   }
 
 ##################
@@ -320,8 +320,8 @@ This email is automated. Your reply will not be recieved.";
   $land_rc = $built_land_rc + $constructing_land_rc + $build['aland'];
   $mtn_rc = $built_mtn_rc + $constructing_mtn_rc + $build['amts'];
 
-  mysqli_query($db, "UPDATE user SET land='$land_rc' WHERE userid='$INC_ID'") or die("Error in query! " . mysqli_error($db));
-  mysqli_query($db, "UPDATE user SET mts='$mtn_rc' WHERE userid='$INC_ID'") or die("Error in query! " . mysqli_error($db));
+  mb_query($db, "UPDATE user SET land=? WHERE userid=?", array($land_rc, $INC_ID)) or die("Error in query! " . mysqli_error($db));
+  mb_query($db, "UPDATE user SET mts=? WHERE userid=?", array($mtn_rc, $INC_ID)) or die("Error in query! " . mysqli_error($db));
 
 ##################
 ### Experience Recalculator (XPRC)
@@ -405,7 +405,7 @@ This email is automated. Your reply will not be recieved.";
   $xprc_equipment = $priest_armor + $wizard_armor + $warrior_armor + $archer_weapon + $priest_weapon + $warrior_weapon;
   $xprc = $xprc_units + $xprc_equipment;
 
-  mysqli_query($db, "UPDATE user SET exp='$xprc' WHERE userid='$INC_ID'");
+  mb_query($db, "UPDATE user SET exp=? WHERE userid=?", array($xprc, $INC_ID));
 
 
   $INC_ID = $INC_ID + 1;
@@ -542,9 +542,9 @@ This email is automated. Your reply will not be recieved.";
   $msg_ttl   = $GAMEDATA['timers']['message_ttl_ticks'];
   $exp_floor = $GAMEDATA['timers']['exp_floor'];
 
-  mysqli_query($db, "DELETE FROM messages WHERE age='$msg_ttl'");
-  mysqli_query($db, "DELETE FROM setnews WHERE age='$msg_ttl'");
-  mysqli_query($db, "DELETE FROM guildnews WHERE age='$msg_ttl'");
+  mb_query($db, "DELETE FROM messages WHERE age=?", array($msg_ttl));
+  mb_query($db, "DELETE FROM setnews WHERE age=?", array($msg_ttl));
+  mb_query($db, "DELETE FROM guildnews WHERE age=?", array($msg_ttl));
 
   mysqli_query($db, "UPDATE user SET exp = $exp_floor WHERE exp < $exp_floor");
   mysqli_query($db, "UPDATE game_info SET tick = 'no'");
@@ -554,9 +554,9 @@ This email is automated. Your reply will not be recieved.";
   // to walk to 30 over a table of ten.
   $SET_MAX = mb_settlement_count($db);
   while($SET_INC < $SET_MAX + 1)  {
-    $SET_STRENGTH = mysqli_query($db, "SELECT sum(exp) FROM user WHERE setid = '$SET_INC'");
+    $SET_STRENGTH = mb_query($db, "SELECT sum(exp) FROM user WHERE setid = ?", array($SET_INC));
       $S_STRENGTH = mb_db_result($SET_STRENGTH, 0, 0);
-    mysqli_query($db, "UPDATE settlement SET setstrength = '$S_STRENGTH' WHERE setid='$SET_INC'");
+    mb_query($db, "UPDATE settlement SET setstrength = ? WHERE setid=?", array($S_STRENGTH, $SET_INC));
     $SET_INC = $SET_INC + 1;
   }
 
@@ -564,11 +564,11 @@ This email is automated. Your reply will not be recieved.";
     $MAX_GID = mb_db_result($MAX_GUILDID, 0, 0);
 
   while($GUILD_INC < $MAX_GID + 1)  {
-    $guild_name_query = mysqli_query($db, "SELECT gname FROM guild WHERE gid='$GUILD_INC'");
+    $guild_name_query = mb_query($db, "SELECT gname FROM guild WHERE gid=?", array($GUILD_INC));
       $guild_name = mysqli_fetch_array($guild_name_query);
-    $guild_user_exp = mysqli_query($db, "SELECT sum(exp) FROM user WHERE guild='$guild_name[gname]'");
+    $guild_user_exp = mb_query($db, "SELECT sum(exp) FROM user WHERE guild=?", array($guild_name['gname']));
       $user_exp = mb_db_result($guild_user_exp, 0, 0);
-    mysqli_query($db, "UPDATE guild SET strength='$user_exp' WHERE gid='$GUILD_INC'");
+    mb_query($db, "UPDATE guild SET strength=? WHERE gid=?", array($user_exp, $GUILD_INC));
 
     $GUILD_INC = $GUILD_INC + 1;
   }

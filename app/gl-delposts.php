@@ -62,11 +62,10 @@ else	{
 	// settlement equivalent had at least been scoping by setid all along.
 	// guildmsgs carries no guildname of its own, so the thread is confirmed
 	// first and both deletes hang off that.
-	$q_tid = mb_sql_int($tid);
 	mb_forum_require_guild_thread($db, $tid, $empireguild);
 
-	mysqli_query($db, "DELETE FROM guildthreads WHERE topicid=$q_tid");
-	mysqli_query($db, "DELETE FROM guildmsgs WHERE topicid=$q_tid");
+	mb_query($db, "DELETE FROM guildthreads WHERE topicid=?", array((int) $tid));
+	mb_query($db, "DELETE FROM guildmsgs WHERE topicid=?", array((int) $tid));
 
 	header ("Location: gl-forum.php");
 }
@@ -87,15 +86,14 @@ else	{
 	//
 	// The message's thread has to be in the caller's guild, which takes a join:
 	// guildmsgs has a topicid but no guildname.
-	$q_mid = mb_sql_int($mid);
-	$owned = mysqli_query($db, "SELECT m.messageid FROM guildmsgs m JOIN guildthreads t ON t.topicid = m.topicid WHERE m.messageid=$q_mid AND t.guildname=" . mb_sql_str($db, $empireguild));
+	$owned = mb_query($db, "SELECT m.messageid FROM guildmsgs m JOIN guildthreads t ON t.topicid = m.topicid WHERE m.messageid=? AND t.guildname=?", array((int) $mid, $empireguild));
 
 	if (!$owned || !mysqli_num_rows($owned)) {
 		echo "<div align=center><font class=yellow>That post is not in your guild.</font></div>";
 		die();
 	}
 
-	mysqli_query($db, "DELETE FROM guildmsgs WHERE messageid=$q_mid");
+	mb_query($db, "DELETE FROM guildmsgs WHERE messageid=?", array((int) $mid));
 
 	header ("Location: gl-topic.php?topicid=" . (int) $tid);
 }

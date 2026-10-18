@@ -41,7 +41,7 @@ if(!IsSet($empnews))	{
 else	{	
 	
 	echo "<div align=center><font class=yellow>Your Empire News has been deleted</a><br>";
-	mysqli_query($db, "DELETE FROM empnews WHERE yourid='$userid'");
+	mb_query($db, "DELETE FROM empnews WHERE yourid=?", array($userid));
 	include("include/chngpw_table.php");
 	include("include/S_PREF.php");
 	include("include/S_PD.php");
@@ -125,7 +125,7 @@ else	{
 		die();
 	}
 
-	$E_Result = mysqli_query($db, "SELECT email FROM user WHERE email=" . mb_sql_str($db, $cnewemail));
+	$E_Result = mb_query($db, "SELECT email FROM user WHERE email=?", array($cnewemail));
 	$New_Email = mysqli_fetch_array($E_Result);
 
 	$New_Email[0] = strtolower($New_Email[0]);

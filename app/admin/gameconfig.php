@@ -128,9 +128,8 @@ if (IsSet($action)) {
 
 if (IsSet($daccount)) {
 	$clock   = date("m/d/y, H:ia");
-	$q_empre = mb_sql_str($db, $empre);
 
-	$theiremail = mysqli_query($db, "SELECT email FROM user WHERE ename=$q_empre");
+	$theiremail = mb_query($db, "SELECT email FROM user WHERE ename=?", array($empre));
 	$tmail      = mb_db_result($theiremail, "tmail");
 
 	// No such empire: stop. With $tmail unset every DELETE below read
@@ -143,14 +142,14 @@ if (IsSet($daccount)) {
 
 	// An administrator's account is not deleted from here, the admin running
 	// this page's own included. Revoke the flag first: bin/admin.php.
-	$empreadmin = mysqli_query($db, "SELECT admin FROM user WHERE ename=$q_empre");
+	$empreadmin = mb_query($db, "SELECT admin FROM user WHERE ename=?", array($empre));
 	if ((int) mb_db_result($empreadmin, "empreadmin") === 1) {
 		echo "<b>" . htmlspecialchars($empre) . " is an administrator. Revoke that first, with bin/admin.php.</b><br><br>";
 		echo "<a href=gameconfig.php>Return</a></center>";
 		die();
 	}
 
-	$empreset = mysqli_query($db, "SELECT setid FROM user WHERE ename=$q_empre");
+	$empreset = mb_query($db, "SELECT setid FROM user WHERE ename=?", array($empre));
 	$esetid   = mb_db_result($empreset, "esetid");
 
 	// The old spelling built a table name -- "setnews" . $esetid -- and
@@ -158,16 +157,15 @@ if (IsSet($daccount)) {
 	// used since before db.sql, and it also meant a settlement id from the
 	// database was interpolated outside quotes as an identifier.
 	$news    = "[b]{$empre}[/b] has been deleted by an administrator";
-	$q_tmail = mb_sql_str($db, $tmail);
 
 	mb_news_set($db, "$clock", 'red', $news, $esetid, 0);
 
-	mysqli_query($db, "DELETE FROM buildings WHERE email=$q_tmail");
-	mysqli_query($db, "DELETE FROM military WHERE email=$q_tmail");
-	mysqli_query($db, "DELETE FROM returntbl WHERE email=$q_tmail");
-	mysqli_query($db, "DELETE FROM research WHERE email=$q_tmail");
-	mysqli_query($db, "DELETE FROM explore WHERE email=$q_tmail");
-	mysqli_query($db, "DELETE FROM user WHERE email=$q_tmail");
+	mb_query($db, "DELETE FROM buildings WHERE email=?", array($tmail));
+	mb_query($db, "DELETE FROM military WHERE email=?", array($tmail));
+	mb_query($db, "DELETE FROM returntbl WHERE email=?", array($tmail));
+	mb_query($db, "DELETE FROM research WHERE email=?", array($tmail));
+	mb_query($db, "DELETE FROM explore WHERE email=?", array($tmail));
+	mb_query($db, "DELETE FROM user WHERE email=?", array($tmail));
 
 	echo "<b>" . htmlspecialchars($empre) . " has been deleted.</b><br><br>";
 	echo "<a href=gameconfig.php>Return</a></center>";

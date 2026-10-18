@@ -22,13 +22,12 @@ while ($row = mysqli_fetch_row($result_id))	{
 	// The seller's userid comes back from the listing row, so it is stored
 	// data rather than request input and the first-order audit cannot see it.
 	// It is still interpolated into two queries, one of which deletes.
-	$q_seller = mb_sql_int($row[6]);
 
-	$result = mysqli_query($db, "SELECT setid FROM user WHERE userid=$q_seller");
+	$result = mb_query($db, "SELECT setid FROM user WHERE userid=?", array((int) $row[6]));
 	$s_sel = mysqli_fetch_array($result);
 		$s_sel = $s_sel[0];
 		// A listing whose seller no longer exists is swept up here.
-		if($s_sel == "")	 {	mysqli_query($db, "DELETE FROM barter WHERE userid=$q_seller");	}
+		if($s_sel == "")	 {	mb_query($db, "DELETE FROM barter WHERE userid=?", array((int) $row[6]));	}
 
 	if($row[0] == $ename)	{	$endnow = "<br><a href=" . mb_attr("barter.php?end=true&bid=$row[5]") . ">End</a>";	}
 	else	{	$endnow = "";	}

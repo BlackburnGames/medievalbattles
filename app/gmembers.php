@@ -18,7 +18,7 @@ if(!IsSet($leave))	{
 else	{	
 	
 	//	insert leaving msg into guild news
-	$guild_id_query = mysqli_query($db, "SELECT gid, owner FROM guild WHERE gname=" . mb_sql_str($db, $empireguild) . "");
+	$guild_id_query = mb_query($db, "SELECT gid, owner FROM guild WHERE gname=?", array($empireguild));
 		$guild_id = mysqli_fetch_array($guild_id_query);
 
 	$Guild_MaxID = mysqli_query($db, "SELECT max(gnid) FROM guildnews");
@@ -33,7 +33,7 @@ else	{
 	echo "<div align=center><font class=yellow>You have left $empireguild</a><br>";
 	
 	mb_news_guild($db, "$clock", 'blue', "$ename has left $empireguild", $guild_id['gid'], $gnid);
-	mysqli_query($db, "UPDATE user SET guild='None' WHERE email='$email' AND pw='$pw'");
+	mb_query($db, "UPDATE user SET guild='None' WHERE email=? AND pw=?", array($email, $pw));
 }
 
 //	display all empires in your guild
@@ -55,9 +55,9 @@ $result_id = mysqli_query($db, $query_string);
 $num = 0;
 while ($row = mysqli_fetch_row($result_id))	{
 		
-	$SETID_SELECT = mysqli_query($db, "SELECT setid FROM user WHERE ename=" . mb_sql_str($db, $row[0]) . "");	
+	$SETID_SELECT = mb_query($db, "SELECT setid FROM user WHERE ename=?", array($row[0]));	
 		$t_setid = mb_db_result($SETID_SELECT, "t_setid");
-	$ONLINE_NO = mysqli_query($db, "SELECT online FROM user WHERE userid=" . mb_sql_int($row[4]) . "");	
+	$ONLINE_NO = mb_query($db, "SELECT online FROM user WHERE userid=?", array((int) $row[4]));	
 		$OLINE = mb_db_result($ONLINE_NO, "OLINE");
 	
 	if($OLINE == 1)	{	$O_line = "<font class=red>*</font>";	 }
@@ -77,7 +77,7 @@ while ($row = mysqli_fetch_row($result_id))	{
 		<td class='inner2'>" . mb_h($row[5]) . "</td>\n";
 }
 
-$guild_strength_query = mysqli_query($db, "SELECT sum(exp) FROM user WHERE guild=" . mb_sql_str($db, $empireguild) . "");
+$guild_strength_query = mb_query($db, "SELECT sum(exp) FROM user WHERE guild=?", array($empireguild));
 	$guild_strength_total = mb_db_result($guild_strength_query, "guild_strength_total");
 	$guild_strength_total = number_format($guild_strength_total);
 

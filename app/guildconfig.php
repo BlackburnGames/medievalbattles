@@ -26,7 +26,7 @@ $q_auserid = mb_sql_int($auserid);
 $q_remp    = mb_sql_int($remp);
 
 // are they a guild leader?
-	$guild_owner_result = mysqli_query($db, "SELECT owner FROM guild WHERE owner='$userid'");
+	$guild_owner_result = mb_query($db, "SELECT owner FROM guild WHERE owner=?", array($userid));
 	$guild_owner = mysqli_fetch_array($guild_owner_result);
 			
 if($guild_owner['owner'] != $userid)	{
@@ -34,13 +34,13 @@ if($guild_owner['owner'] != $userid)	{
 	die();
 }
 else	{
-	$guild_info = mysqli_query($db, "SELECT info FROM guild WHERE owner='$userid'");
+	$guild_info = mb_query($db, "SELECT info FROM guild WHERE owner=?", array($userid));
 		$ginfo = mb_db_result($guild_info,"ginfo");
-	$guild_flag = mysqli_query($db, "SELECT flag FROM guild WHERE owner='$userid'");
+	$guild_flag = mb_query($db, "SELECT flag FROM guild WHERE owner=?", array($userid));
 		$gflag = mb_db_result($guild_flag,"gflag");
-	$guild_notice = mysqli_query($db, "SELECT notice FROM guild WHERE owner='$userid'");
+	$guild_notice = mb_query($db, "SELECT notice FROM guild WHERE owner=?", array($userid));
 		$gnotice = mb_db_result($guild_notice,"gnotice");
-	$C_PW = mysqli_query($db, "SELECT cpw FROM guild WHERE owner='$userid'");
+	$C_PW = mb_query($db, "SELECT cpw FROM guild WHERE owner=?", array($userid));
 		$C_pass = mb_db_result($C_PW,"C_pass");
 }
 
@@ -53,16 +53,16 @@ if(!IsSet($accept))	{
 }
 else	{	
 	// retrieve necessary guild info
-	$guild_info_query = mysqli_query($db, "SELECT * FROM guild WHERE owner='$userid'");
+	$guild_info_query = mb_query($db, "SELECT * FROM guild WHERE owner=?", array($userid));
 		$guild_info = mysqli_fetch_array($guild_info_query);
 	// get number of members
-	$guild_members_query = mysqli_query($db, "SELECT count(ename) FROM user WHERE guild=" . mb_sql_str($db, $guild_info['gname']) . "");
+	$guild_members_query = mb_query($db, "SELECT count(ename) FROM user WHERE guild=?", array($guild_info['gname']));
 		$guild_members = mb_db_result($guild_members_query, "guild_members");
 	// get their empire name
-	$applicant_ename_query = mysqli_query($db, "SELECT ename FROM user WHERE userid=$q_auserid");
+	$applicant_ename_query = mb_query($db, "SELECT ename FROM user WHERE userid=?", array((int) $auserid));
 		$applicant_ename = mysqli_fetch_array($applicant_ename_query);
 	// get their current guild
-	$current_guild_query = mysqli_query($db, "SELECT guild FROM user WHERE userid=$q_auserid");
+	$current_guild_query = mb_query($db, "SELECT guild FROM user WHERE userid=?", array((int) $auserid));
 		$current_guild = mysqli_fetch_array($current_guild_query);
 
 	/*
@@ -76,7 +76,7 @@ else	{
 	 * "AND gl_userid='$userid'", which is what says this was an omission rather
 	 * than a design.
 	 */
-	$request_check = mysqli_query($db, "SELECT applicant FROM guildrequests WHERE applicant=$q_auserid AND gl_userid='$userid'");
+	$request_check = mb_query($db, "SELECT applicant FROM guildrequests WHERE applicant=? AND gl_userid=?", array((int) $auserid, $userid));
 
 	if(!$request_check || !mysqli_num_rows($request_check))	{
 		echo "<div align=center><font class=yellow>That empire has not asked to join your guild.</font></div>";
@@ -88,7 +88,7 @@ else	{
 		die();
 	}
 	elseif($current_guild['guild'] == 'None')	{
-		mysqli_query($db, "UPDATE user SET guild=" . mb_sql_str($db, $guild_info['gname']) . " WHERE userid=$q_auserid");
+		mb_query($db, "UPDATE user SET guild=? WHERE userid=?", array($guild_info['gname'], (int) $auserid));
 		mb_news_emp($db, "$clock", 'blue', "You were accepted into $guild_info[gname].", $q_auserid);
 
 		$Guild_MaxID = mysqli_query($db, "SELECT max(gnid) FROM guildnews");
@@ -96,7 +96,7 @@ else	{
 			$gnid = $mgnid + 1;
 	
 		mb_news_guild($db, "$clock", 'blue', "$applicant_ename[ename] has joined $empireguild", $guild_info['gid'], $gnid);
-		mysqli_query($db, "DELETE FROM guildrequests WHERE applicant=$q_auserid");
+		mb_query($db, "DELETE FROM guildrequests WHERE applicant=?", array((int) $auserid));
 
 		echo "<div align=center><font class=yellow><b>" . mb_h($applicant_ename['ename']) . " has been accepted into the guild!</b></font></div>";
 		die();
@@ -110,13 +110,13 @@ if(!IsSet($reject))	{
 }
 else	{	
 	// retrieve necessary guild info
-	$guild_info_query = mysqli_query($db, "SELECT * FROM guild WHERE owner='$userid'");
+	$guild_info_query = mb_query($db, "SELECT * FROM guild WHERE owner=?", array($userid));
 		$guild_info = mysqli_fetch_array($guild_info_query);
 	// get their empire name
-	$applicant_ename_query = mysqli_query($db, "SELECT ename FROM user WHERE userid=$q_auserid");
+	$applicant_ename_query = mb_query($db, "SELECT ename FROM user WHERE userid=?", array((int) $auserid));
 		$applicant_ename = mysqli_fetch_array($applicant_ename_query);
 	// get their current guild
-	$current_guild_query = mysqli_query($db, "SELECT guild FROM user WHERE userid=$q_auserid");
+	$current_guild_query = mb_query($db, "SELECT guild FROM user WHERE userid=?", array((int) $auserid));
 		$current_guild = mysqli_fetch_array($current_guild_query);
 
 	/*
@@ -125,7 +125,7 @@ else	{
 	 * line ahead of it was not, so a leader could file "You were rejected from"
 	 * into any empire's news by typing the id.
 	 */
-	$request_check = mysqli_query($db, "SELECT applicant FROM guildrequests WHERE applicant=$q_auserid AND gl_userid='$userid'");
+	$request_check = mb_query($db, "SELECT applicant FROM guildrequests WHERE applicant=? AND gl_userid=?", array((int) $auserid, $userid));
 
 	if(!$request_check || !mysqli_num_rows($request_check))	{
 		echo "<div align=center><font class=yellow>That empire has not asked to join your guild.</font></div>";
@@ -134,7 +134,7 @@ else	{
 
 	if(($current_guild['guild'] == 'None') OR ($current_guild['guild'] != 'None'))	 {
 		mb_news_emp($db, "$clock", 'blue', "You were rejected from $guild_info[gname].", $q_auserid);
-		mysqli_query($db, "DELETE FROM guildrequests WHERE applicant=$q_auserid AND gl_userid='$userid'");
+		mb_query($db, "DELETE FROM guildrequests WHERE applicant=? AND gl_userid=?", array((int) $auserid, $userid));
 
 		echo "<div align=center><font class=yellow><b>" . mb_h($applicant_ename['ename']) . " has been rejected from the guild!</b></font></div>";
 		die();
@@ -149,9 +149,9 @@ if(!IsSet($change))	{
 }
 else	{
 	include("include/S_SINFOS.php");
-	mysqli_query($db, "UPDATE guild SET info=" . mb_sql_str($db, $info) . " WHERE owner='$userid'");
-	mysqli_query($db, "UPDATE guild SET notice=" . mb_sql_str($db, $notice) . " WHERE owner='$userid'");
-	mysqli_query($db, "UPDATE guild SET flag=" . mb_sql_str($db, $flag) . " WHERE owner='$userid'");
+	mb_query($db, "UPDATE guild SET info=? WHERE owner=?", array($info, $userid));
+	mb_query($db, "UPDATE guild SET notice=? WHERE owner=?", array($notice, $userid));
+	mb_query($db, "UPDATE guild SET flag=? WHERE owner=?", array($flag, $userid));
 	echo "<div align=center><font class=yellow><br>Guild Settings Updated!</font></div>";
 	include("include/S_GCONFIG.php");
 	include("include/S_GKICK.php");
@@ -167,13 +167,13 @@ if(!IsSet($kick))	{
 }
 else	{
 	// retrieve necessary guild info
-	$guild_info_query = mysqli_query($db, "SELECT * FROM guild WHERE owner='$userid'");
+	$guild_info_query = mb_query($db, "SELECT * FROM guild WHERE owner=?", array($userid));
 		$guild_info = mysqli_fetch_array($guild_info_query);
 	// get their empire name
-	$empire_info_query = mysqli_query($db, "SELECT ename FROM user WHERE userid=$q_remp");
+	$empire_info_query = mb_query($db, "SELECT ename FROM user WHERE userid=?", array((int) $remp));
 		$empire_info = mysqli_fetch_array($empire_info_query);
 	// get their current guild
-	$current_guild_query = mysqli_query($db, "SELECT guild FROM user WHERE userid=$q_remp");
+	$current_guild_query = mb_query($db, "SELECT guild FROM user WHERE userid=?", array((int) $remp));
 		$current_guild = mysqli_fetch_array($current_guild_query);
 
 	if($remp == 'ns')		{
@@ -196,9 +196,9 @@ else	{
 	}
 	else	{
 		$new_mem = $guild_info['mem'] - 1;
-		mysqli_query($db, "UPDATE user SET guild='None' WHERE userid=$q_remp");
-		mysqli_query($db, "UPDATE guild SET mem=" . mb_sql_int($new_mem) . " WHERE owner='$userid'");	
-		mysqli_query($db, "DELETE FROM barter WHERE seller=" . mb_sql_str($db, $empire_info[0]) . " AND guild=" . mb_sql_str($db, $empireguild) . "");
+		mb_query($db, "UPDATE user SET guild='None' WHERE userid=?", array((int) $remp));
+		mb_query($db, "UPDATE guild SET mem=? WHERE owner=?", array((int) $new_mem, $userid));	
+		mb_query($db, "DELETE FROM barter WHERE seller=? AND guild=?", array($empire_info[0], $empireguild));
 		mb_news_emp($db, "$clock", 'blue', "You were removed from $guild_info[gname].", $q_remp);
 		mb_news_guild($db, "$clock", 'blue', "$empire_info[0] has been removed from the guild.", $guild_info['gid'], 0);
 
@@ -218,14 +218,14 @@ if(!IsSet($deleteg))	{
 else	{
 	if($C_pass == $cpw)	 {
 		//	determine guild name
-		$GuildName = mysqli_query($db, "SELECT gname FROM guild WHERE owner='$userid'");
+		$GuildName = mb_query($db, "SELECT gname FROM guild WHERE owner=?", array($userid));
 			$GN = mb_db_result($GuildName,"GN");
 		//	determine guild id
-		$GuildID = mysqli_query($db, "SELECT gid FROM guild WHERE owner='$userid'");
+		$GuildID = mb_query($db, "SELECT gid FROM guild WHERE owner=?", array($userid));
 			$GIDD = mb_db_result($GuildID,"GIDD");
 
-		mysqli_query($db, "UPDATE user SET guild='None' WHERE guild=" . mb_sql_str($db, $GN) . "");
-		mysqli_query($db, "DELETE FROM guild WHERE owner='$userid'");
+		mb_query($db, "UPDATE user SET guild='None' WHERE guild=?", array($GN));
+		mb_query($db, "DELETE FROM guild WHERE owner=?", array($userid));
 			
 		echo "<div align=center><font class=yellow>Your guild has been deleted.</font></div>";
 		include("include/S_GDEL.php");

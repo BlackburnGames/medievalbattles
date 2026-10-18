@@ -68,17 +68,17 @@ else  {
     $gm = $gm - $ugm;
     $im = $im - $uim;
 
-    mysqli_query($db, "UPDATE buildings SET amts='$amts' WHERE email='$email' AND pw='$pw'");
-      mysqli_query($db, "UPDATE buildings SET aland='$aland' WHERE email='$email' AND pw='$pw'");
+    mb_query($db, "UPDATE buildings SET amts=? WHERE email=? AND pw=?", array($amts, $email, $pw));
+      mb_query($db, "UPDATE buildings SET aland=? WHERE email=? AND pw=?", array($aland, $email, $pw));
 
-    mysqli_query($db, "UPDATE buildings SET home='$home' WHERE email='$email' AND pw='$pw'");
-      mysqli_query($db, "UPDATE buildings SET barrack='$barrack' WHERE email='$email' AND pw='$pw'");
-      mysqli_query($db, "UPDATE buildings SET farm='$farm' WHERE email='$email' AND pw='$pw'");
-      mysqli_query($db, "UPDATE buildings SET wp='$wp' WHERE email='$email' AND pw='$pw'");
-    mysqli_query($db, "UPDATE buildings SET lmill='$lmill' WHERE email='$email' AND pw='$pw'");
+    mb_query($db, "UPDATE buildings SET home=? WHERE email=? AND pw=?", array($home, $email, $pw));
+      mb_query($db, "UPDATE buildings SET barrack=? WHERE email=? AND pw=?", array($barrack, $email, $pw));
+      mb_query($db, "UPDATE buildings SET farm=? WHERE email=? AND pw=?", array($farm, $email, $pw));
+      mb_query($db, "UPDATE buildings SET wp=? WHERE email=? AND pw=?", array($wp, $email, $pw));
+    mb_query($db, "UPDATE buildings SET lmill=? WHERE email=? AND pw=?", array($lmill, $email, $pw));
 
-    mysqli_query($db, "UPDATE buildings SET gm='$gm' WHERE email='$email' AND pw='$pw'");
-      mysqli_query($db, "UPDATE buildings SET im='$im' WHERE email='$email' AND pw='$pw'");
+    mb_query($db, "UPDATE buildings SET gm=? WHERE email=? AND pw=?", array($gm, $email, $pw));
+      mb_query($db, "UPDATE buildings SET im=? WHERE email=? AND pw=?", array($im, $email, $pw));
 
     echo"<div align=center><font class=yellow>Your orders have been carried out.</font></div>";
     include("include/S_DBUILD.php");

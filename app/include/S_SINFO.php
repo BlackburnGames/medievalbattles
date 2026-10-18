@@ -1,9 +1,9 @@
 <?php
-$ssettlementpic = mysqli_query($db, "SELECT setpic FROM settlement WHERE setid = '$setid'");	
+$ssettlementpic = mb_query($db, "SELECT setpic FROM settlement WHERE setid = ?", array($setid));	
 	$settlepic = mb_db_result($ssettlementpic,"settlepic");	
-$ssettlementname = mysqli_query($db, "SELECT setname FROM settlement WHERE setid = '$setid'");	
+$ssettlementname = mb_query($db, "SELECT setname FROM settlement WHERE setid = ?", array($setid));	
 	$settlename = mb_db_result($ssettlementname,"settlename"); 
-$setnotice = mysqli_query($db, "SELECT setnotice FROM settlement WHERE setid = '$setid'");	
+$setnotice = mb_query($db, "SELECT setnotice FROM settlement WHERE setid = ?", array($setid));	
 	$notice = mb_db_result($setnotice,"notice");
 
 echo "

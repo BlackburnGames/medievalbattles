@@ -14,7 +14,7 @@ $empvalue   = mb_input('empvalue');
 // The counts used here are the ones the page validated, in the page's scope.
 		
 // select user table for the empire being attacked
-$result = mysqli_query($db, "SELECT * FROM user WHERE userid=" . mb_sql_int($empvalue));
+$result = mb_query($db, "SELECT * FROM user WHERE userid=?", array((int) $empvalue));
 $evu = mysqli_fetch_array($result);
 
 // An id that names nobody. Every page that includes this has already passed
@@ -30,11 +30,11 @@ if(!$evu)	{
 }
 
 // select buildings table for the empire being attacked
-$result1 = mysqli_query($db, "SELECT * FROM buildings WHERE userid=" . mb_sql_int($empvalue));
+$result1 = mb_query($db, "SELECT * FROM buildings WHERE userid=?", array((int) $empvalue));
 $evb = mysqli_fetch_array($result1);
 	
 // select military table for the empire being attacked
-$result2 = mysqli_query($db, "SELECT * FROM military WHERE userid=" . mb_sql_int($empvalue));
+$result2 = mb_query($db, "SELECT * FROM military WHERE userid=?", array((int) $empvalue));
 $evm = mysqli_fetch_array($result2);
 
 if($evu['safemode'] > 0)	{
@@ -45,11 +45,11 @@ if($evu['safemode'] > 0)	{
 }
 	
 // Your guild id
-$G_id = mysqli_query($db, "SELECT gid FROM guild WHERE gname=" . mb_sql_str($db, $empireguild) . "");
+$G_id = mb_query($db, "SELECT gid FROM guild WHERE gname=?", array($empireguild));
 $gid = mysqli_fetch_array($G_id);
 
 // Empire being attacked guild id
-$tG_id = mysqli_query($db, "SELECT gid FROM guild WHERE gname=" . mb_sql_str($db, $evu['guild']) . "");
+$tG_id = mb_query($db, "SELECT gid FROM guild WHERE gname=?", array($evu['guild']));
 $tgid = mysqli_fetch_array($tG_id);
 				
 // Each side's own race and class: the attacker's on the attack, the

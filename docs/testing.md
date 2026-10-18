@@ -116,9 +116,10 @@ reason:
   The assignment goes when nothing reads it any more.
 - A bare variable is bound only as the whole right-hand side of a `WHERE`
   comparison or after `LIMIT` / `OFFSET`. In a `SET` or in arithmetic it is
-  left alone: MySQL reads a number written into the SQL as an exact decimal,
-  and `ROUND()` of that and of a bound value can differ on a .5 — and combat
-  and the tick round everywhere.
+  left alone: MySQL reads a bare number as an exact decimal but a quoted one —
+  which is how `mb_query()` writes anything but an int — as a double, and
+  `ROUND()` of the two can differ on a .5. Combat and the tick round
+  everywhere.
 - Anything where a name may go, a value inside quotes with other text, a
   variable concatenated in, or SQL that is itself a variable, is left.
 

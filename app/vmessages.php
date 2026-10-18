@@ -7,8 +7,8 @@ $deletem = mb_input('deletem');
 
 include("include/igtop.php");
 
-mysqli_query($db, "UPDATE user SET mno='0' WHERE email='$email' AND pw='$pw'"); 
-$MSG_COUNT = mysqli_query($db, "SELECT count(message) FROM messages WHERE yourid='$userid'");	
+mb_query($db, "UPDATE user SET mno='0' WHERE email=? AND pw=?", array($email, $pw)); 
+$MSG_COUNT = mb_query($db, "SELECT count(message) FROM messages WHERE yourid=?", array($userid));	
 	$MSG_C = mb_db_result($MSG_COUNT,"MSG_C");
 	
 if($MSG_C == 0)	{
@@ -23,7 +23,7 @@ if(!IsSet($deletem))	{
 	</form>";
 }
 else	{
-	mysqli_query($db, "DELETE FROM messages WHERE yourid='$userid'"); 
+	mb_query($db, "DELETE FROM messages WHERE yourid=?", array($userid)); 
 	echo "<div align='center'><font class='yellow'>All of your messages have been deleted.</font></div>";
 	include("include/S_VMESS.php");
 	die();

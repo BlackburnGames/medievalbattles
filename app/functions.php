@@ -4,12 +4,12 @@ include("include/connect.php");
 include("include/session.php");
 
 // check and make sure email exists
-$EMAIL_RESULT = $db->query("SELECT email FROM user WHERE email='$email' AND pw='$pw'");
+$EMAIL_RESULT = mb_query($db, "SELECT email FROM user WHERE email=? AND pw=?", array($email, $pw));
 $E_Check = mysqli_fetch_array($EMAIL_RESULT);
 
 if($login == 1 && $pw != "" && $email !="") {
 
-	$uuserid = $db->query("SELECT userid FROM user WHERE email = '$email' AND pw = '$pw'");
+	$uuserid = mb_query($db, "SELECT userid FROM user WHERE email = ? AND pw = ?", array($email, $pw));
 	$userid = mb_db_result($uuserid, 0);
 
 	// account validation
@@ -215,7 +215,7 @@ $return = mysqli_fetch_array($return_query);
 		$irongolem4 = $return['irongolem4'];		$IRONGOLEM_4 = $return['irongolem4'];
 		$time4 = $return['time4'];		$TIME_4 = $return['time4'];
 	## fleets
-		$FLEETS_ = $db->query("SELECT fleets FROM user WHERE userid=" . mb_sql_int($userid) . "");
+		$FLEETS_ = mb_query($db, "SELECT fleets FROM user WHERE userid=?", array((int) $userid));
 		$_FLEETS = mb_db_result($FLEETS_, "_FLEETS");
 
 //	total all units together
@@ -571,8 +571,8 @@ $amrbutton = "<form type=get action=aconstruct.php><input class=button type=subm
 		$dim = number_format($dim);
 
 //	update various user info
-	$db->query("UPDATE user SET online='1' WHERE email='$email'");
-	$db->query("UPDATE user SET countdown='336' WHERE email='$email' AND pw='$pw'");
+	mb_query($db, "UPDATE user SET online='1' WHERE email=?", array($email));
+	mb_query($db, "UPDATE user SET countdown='336' WHERE email=? AND pw=?", array($email, $pw));
 
 } else {
 	header("Location: logout.php?pageid=timeout");

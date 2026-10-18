@@ -10,7 +10,7 @@ $topicid = (int) mb_input('topicid');
 include("include/igtop.php");
 include("commong.php");
 
-$result= mysqli_query($db, "SELECT topicid, guildname FROM guildthreads WHERE guildname=" . mb_sql_str($db, $empireguild) . " AND topicid='$topicid'") or die("Error! " . mysqli_error($db));
+$result= mb_query($db, "SELECT topicid, guildname FROM guildthreads WHERE guildname=? AND topicid=?", array($empireguild, $topicid)) or die("Error! " . mysqli_error($db));
 $guild_check = mysqli_fetch_array($result);
 
 if($empireguild != $guild_check['guildname'])	{
@@ -26,7 +26,7 @@ if($empireguild != $guild_check['guildname'])	{
 // is decidable and the audit can see it.
 $r_topic = $topic;
 
-$result1 = mysqli_query($db, "SELECT name, topic, message, lastpost FROM guildthreads WHERE topicid='$topicid'") or die("Error!" . mysqli_error($db));
+$result1 = mb_query($db, "SELECT name, topic, message, lastpost FROM guildthreads WHERE topicid=?", array($topicid)) or die("Error!" . mysqli_error($db));
 
 if ($result1) { 
 	echo"

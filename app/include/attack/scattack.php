@@ -15,7 +15,7 @@ if($setchg == 1)	{
 	}
 
 	include("include/connect.php");
-	mysqli_query($db, "UPDATE user SET csnum=" . mb_sql_int($snum) . " WHERE email='$email' AND pw='$pw'");
+	mb_query($db, "UPDATE user SET csnum=? WHERE email=? AND pw=?", array((int) $snum, $email, $pw));
 	echo "
 		<font class=inner2>You are viewing Settlement " . mb_h($snum) . "</font><br><br>
 			<select name=empvalue>

@@ -4,7 +4,7 @@ include("include/igtop.php");
 
 
 //	determine guild name
-$empire_guild_query = mysqli_query($db, "SELECT guild FROM user WHERE email='$email' AND pw='$pw'");	
+$empire_guild_query = mb_query($db, "SELECT guild FROM user WHERE email=? AND pw=?", array($email, $pw));	
 	$empireguild = mb_db_result($empire_guild_query,"empireguild");
 
 if($empireguild == 'None')	{
@@ -13,7 +13,7 @@ if($empireguild == 'None')	{
 }
 
 //	determine owner
-$guild_owner_query = mysqli_query($db, "SELECT owner FROM guild WHERE gname=" . mb_sql_str($db, $empireguild) . "");	
+$guild_owner_query = mb_query($db, "SELECT owner FROM guild WHERE gname=?", array($empireguild));	
 	$owner_query = mb_db_result($guild_owner_query,"owner_query");
 
 if($owner_query == $userid)	{
@@ -41,7 +41,7 @@ echo "
 					</tr>";									
 	while ($r = mysqli_fetch_array($result)) {
 
-	$topic_replies_query = mysqli_query($db, "SELECT count(topicid) FROM guildmsgs WHERE topicid=" . mb_sql_int($r['topicid']));
+	$topic_replies_query = mb_query($db, "SELECT count(topicid) FROM guildmsgs WHERE topicid=?", array((int) $r['topicid']));
 		$topic_replies = mb_db_result($topic_replies_query, "topic_replies");
 
 echo "

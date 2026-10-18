@@ -35,8 +35,8 @@ else	{
 	include("include/connect.php");
 	mb_forum_require_sl($sl);
 
-	mysqli_query($db, "DELETE FROM setforums WHERE topicid=" . mb_sql_int($tid) . " AND setid='$setid'");
-	mysqli_query($db, "DELETE FROM setforumsmsgs WHERE topicid=" . mb_sql_int($tid) . " AND setid='$setid'");
+	mb_query($db, "DELETE FROM setforums WHERE topicid=? AND setid=?", array((int) $tid, $setid));
+	mb_query($db, "DELETE FROM setforumsmsgs WHERE topicid=? AND setid=?", array((int) $tid, $setid));
 	echo "The post was successfully deleted<br>";
 	echo "Click <a href=index.php>here</a> to go back";
 
@@ -54,7 +54,7 @@ else	{
 
 	// setforumsmsgs carries its own setid, so the caller's settlement scopes
 	// the delete directly -- no join needed, unlike the guild equivalent.
-	mysqli_query($db, "DELETE FROM setforumsmsgs WHERE messageid=" . mb_sql_int($mid) . " AND setid='$setid'");
+	mb_query($db, "DELETE FROM setforumsmsgs WHERE messageid=? AND setid=?", array((int) $mid, $setid));
 
 	/*
 	 * The reply count is decremented by MySQL now, which is what the rest of

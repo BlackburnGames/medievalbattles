@@ -283,7 +283,7 @@ else	{
 
 	// The unread-news counters, relative for the same reason as the rest.
 	mysqli_query($db, "UPDATE user SET nno = nno + 1 WHERE userid=$q_b_userid");
-	mysqli_query($db, "UPDATE user SET nno = nno + 1 WHERE userid=" . mb_sql_int($userid));
+	mb_query($db, "UPDATE user SET nno = nno + 1 WHERE userid=?", array((int) $userid));
 	echo"<font class=yellow><div align=center>You have bartered with " . mb_h($b_seller) . ".<br><br></font></div>";
 	include($mb_panel);
 }
@@ -330,7 +330,7 @@ else	{
 
 	include("include/nexplode.php");
 
-	$bresult = mysqli_query($db, "SELECT count(userid) FROM barter WHERE userid='$userid'");
+	$bresult = mb_query($db, "SELECT count(userid) FROM barter WHERE userid=?", array($userid));
 	$bcheck = mysqli_fetch_array($bresult);
 
 	$cost = implode("", explode(",", $cost));
@@ -387,15 +387,7 @@ else	{
 	$mb_page  = $mb_guild_board ? 'guild' : '';
 	$mb_guild = $mb_guild_board ? $empireguild : '';
 
-	mysqli_query($db, "INSERT INTO barter (seller, cost, type, amount, barterid, userid, method, page, guild)	VALUES	("
-		. mb_sql_str($db, $ename)  . ", "
-		. mb_sql_int($cost)        . ", "
-		. mb_sql_str($db, $type)   . ", "
-		. mb_sql_int($amount)      . ", "
-		. mb_sql_int($maxbid)      . ", '$userid', "
-		. mb_sql_str($db, $method) . ", "
-		. mb_sql_str($db, $mb_page)  . ", "
-		. mb_sql_str($db, $mb_guild) . ") ");
+	mb_query($db, "INSERT INTO barter (seller, cost, type, amount, barterid, userid, method, page, guild)	VALUES	(?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($ename, (int) $cost, $type, (int) $amount, (int) $maxbid, $userid, $method, $mb_page, $mb_guild));
 
 	echo "<font class=yellow><div align=center>Your barter has been placed.</font></div><br><br>";
 	die();

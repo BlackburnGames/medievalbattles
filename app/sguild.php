@@ -27,7 +27,7 @@ echo "
 		$placeno = $placeno + 1;
 		$row[2] = number_format($row[2]);
 		
-		$guild_mem_query = mysqli_query($db, "SELECT count(ename) FROM user WHERE guild=" . mb_sql_str($db, $row[0]) . "");
+		$guild_mem_query = mb_query($db, "SELECT count(ename) FROM user WHERE guild=?", array($row[0]));
 			$guildmem = mb_db_result($guild_mem_query, "guildmem");
 
 echo "

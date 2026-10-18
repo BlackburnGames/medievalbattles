@@ -116,7 +116,7 @@ else	{
 	$mtgain = $evu['mts'] * .1;
 	$mtgain = round($mtgain);
 
-	$EMPs_guild_query = mysqli_query($db, "SELECT guild FROM user WHERE userid='$evu[userid]'");
+	$EMPs_guild_query = mb_query($db, "SELECT guild FROM user WHERE userid=?", array($evu['userid']));
 		$EMPs_guild = mb_db_result($EMPs_guild_query,"EMPs_guild");
 	
 	if($evu['mts'] <= 0)	{
@@ -175,7 +175,7 @@ else	{
 			mb_news_guild($db, "$clock", 'orange', "$evu[ename] ($evu[setid]) successfully defended their mountains against $ename ($setid)", $tgid['0'], 0);
 		}
 							
-		mysqli_query($db, "UPDATE user SET nno = nno + 1 WHERE userid=" . mb_sql_int($empvalue));
+		mb_query($db, "UPDATE user SET nno = nno + 1 WHERE userid=?", array((int) $empvalue));
 		mb_news_emp($db, "$clock", 'yellow', "We have successfully defended our empire against $ename ($setid)", $empvalue);
 		echo"<div align=center><font class=yellow>You have failed to attack $evu[ename]!</font><br><br><font class=orange>$your_losses<br><br></font></div>";
 		include("include/attack/mdrop.php");
@@ -237,8 +237,8 @@ else	{
 		$A_A_Mts = $mts + $mtgain;
 		$A_AMTS = $amts + $mtgain;
 		
-		mysqli_query($db, "UPDATE user SET mts='$A_A_Mts' WHERE email='$email' AND pw='$pw'");
-		mysqli_query($db, "UPDATE buildings SET amts='$A_AMTS' WHERE email='$email' AND pw='$pw'");
+		mb_query($db, "UPDATE user SET mts=? WHERE email=? AND pw=?", array($A_A_Mts, $email, $pw));
+		mb_query($db, "UPDATE buildings SET amts=? WHERE email=? AND pw=?", array($A_AMTS, $email, $pw));
       
 		echo"<div align=center><font class=yellow>You have conquered $mtgain mountains from $evu[ename] ($evu[setid])!</font><br><br><font class=orange>$your_losses<br><br></font></div>";
 		include("include/attack/mdrop.php");
@@ -246,14 +246,14 @@ else	{
 	
 		mysqli_query($db, "UPDATE user SET exp2 = exp2 + ($mtgain * $mtexpa) WHERE email='$email' AND pw='$pw'");
       
-		mysqli_query($db, "UPDATE user SET mts='$tmtloss' WHERE userid = " . mb_sql_int($empvalue));
-		mysqli_query($db, "UPDATE buildings SET amts='$evb[amts]' WHERE userid = " . mb_sql_int($empvalue));
-		mysqli_query($db, "UPDATE buildings SET gm='$evb[gm]' WHERE userid = " . mb_sql_int($empvalue));
-		mysqli_query($db, "UPDATE buildings SET im='$evb[im]' WHERE userid = " . mb_sql_int($empvalue));
-		mysqli_query($db, "UPDATE buildings SET dgm='$evb[dgm]' WHERE userid = " . mb_sql_int($empvalue));
-		mysqli_query($db, "UPDATE buildings SET dim='$evb[dim]' WHERE userid = " . mb_sql_int($empvalue));
+		mb_query($db, "UPDATE user SET mts=? WHERE userid = ?", array($tmtloss, (int) $empvalue));
+		mb_query($db, "UPDATE buildings SET amts=? WHERE userid = ?", array($evb['amts'], (int) $empvalue));
+		mb_query($db, "UPDATE buildings SET gm=? WHERE userid = ?", array($evb['gm'], (int) $empvalue));
+		mb_query($db, "UPDATE buildings SET im=? WHERE userid = ?", array($evb['im'], (int) $empvalue));
+		mb_query($db, "UPDATE buildings SET dgm=? WHERE userid = ?", array($evb['dgm'], (int) $empvalue));
+		mb_query($db, "UPDATE buildings SET dim=? WHERE userid = ?", array($evb['dim'], (int) $empvalue));
 
-		mysqli_query($db, "UPDATE user SET nno = nno + 1 WHERE userid=" . mb_sql_int($empvalue));
+		mb_query($db, "UPDATE user SET nno = nno + 1 WHERE userid=?", array((int) $empvalue));
 
 		mb_news_emp($db, "$clock", 'yellow', "We have unsuccessfully defended our empire against $ename ($setid) and lost $mtgain mountains", $empvalue);
 		die();
