@@ -52,6 +52,15 @@ if ! docker compose exec -T web php /repo/tests/barter-race.php; then
   status=1
 fi
 
+# Sessions over HTTP: cookie flags, fixation, logout, cross-site requests,
+# revocation on a password change, and expiry. Uses poor@ and restores its
+# password, so it needs nothing the barter test consumed.
+echo
+echo "=== sessions ==="
+if ! docker compose exec -T web php /repo/tests/session.php; then
+  status=1
+fi
+
 # Static, so order does not matter; last because it is the port checklist
 # rather than a behavioural test.
 echo

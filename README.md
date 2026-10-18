@@ -10,9 +10,8 @@ historical and educational purposes.
 
 > **Do not expose this to a network.** Every query is still built by string
 > interpolation — escaped where request input reaches it, but not bound — and
-> the stored password hash doubles as a bearer token with no expiry, rotation
-> or CSRF protection. The Docker ports bind to `127.0.0.1` on purpose — leave
-> them that way.
+> the admin area, once past its gate, can delete the world from one link. The
+> Docker ports bind to `127.0.0.1` on purpose — leave them that way.
 
 You need Docker with Compose v2 or newer. Nothing else — there is no PHP,
 MySQL or Composer install required on the host.

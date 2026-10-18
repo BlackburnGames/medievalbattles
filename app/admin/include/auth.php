@@ -90,6 +90,9 @@ if (!function_exists('mb_admin_login')) {
             session_regenerate_id(true);
         }
         $_SESSION['mb_admin'] = true;
+        // The session's 24-hour clock, which include/session.php enforces for
+        // the admin flag as it does for a player login.
+        $_SESSION['mb_auth_at'] = time();
 
         return true;
     }

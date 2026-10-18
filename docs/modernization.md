@@ -374,9 +374,44 @@ attribute.
   an address this would reject, checking it here can only refuse a login that
   could not have matched a row.
 
-  What is still true: the hash is a bearer token with no expiry, no rotation
-  and no CSRF protection around it, and it is in six places. That is the auth
-  model, and replacing it is its own change.
+  ~~What is still true: the hash is a bearer token with no expiry, no rotation
+  and no CSRF protection around it.~~ **Done**, as its own change — see
+  "Sessions" below. The hash is still in six places; that is the schema's,
+  and it does not reach the browser.
+- ~~**Sessions.**~~ **Done.** The hash never left the server — it lives in the
+  session file — so the token anyone could steal was the session id, and the
+  2003 code protected it with nothing. Every session now starts in
+  `app/include/session.php`, which `checklogin.php` used to bypass with a bare
+  `session_start()`:
+
+  - **Fixation.** Strict mode refuses an id the server did not issue, and a
+    login takes a new one. On the old code a login under an id an attacker
+    chose kept it, and the attacker's copy was logged in.
+  - **The cookie** is `HttpOnly` and `SameSite=Strict`, and `Secure` over
+    HTTPS. PHP below 7.3 has no `samesite` parameter, so the attribute rides
+    on the path there; the 5.6 image was built once to see it arrive.
+  - **Expiry.** Two hours idle or twenty-four since login. PHP's collector
+    was the only expiry there was, at its default 24 minutes and with a
+    one-in-a-hundred chance of running on any given request.
+  - **Logout ends the session** — data, file and cookie. It used to unset two
+    keys and leave the session standing.
+  - **Revocation.** Once per request the session's address and hash are
+    checked against the account. A session whose password was changed from
+    elsewhere, or whose account is gone, is logged out rather than left
+    rendering empty pages — which is what makes a password change end the
+    account's other sessions.
+  - **CSRF.** Nearly every action here is a GET link, so form tokens would
+    have left most of the surface open. Instead a request whose
+    `Sec-Fetch-Site` says another site made it gets no session at all: it
+    cannot read, act, log in or log out. A browser too old to send the header
+    is covered by the `SameSite=Strict` cookie, which it will not attach to a
+    cross-site request either. What neither covers is a browser that does
+    neither, which no current one is.
+
+  `tests/session.php` drives every rule over HTTP with curl, because the
+  crawl's client never sends the header, never reads cookie attributes and
+  never reuses a session it is done with. Against the old code it fails 17
+  of its 23 checks.
 - ~~**Error handling.**~~ **Done.** `mysqli_report()` is back on as
   `MYSQLI_REPORT_ERROR` (warnings, not exceptions), the smoke crawl and the tick
   both fail on a query error, and `tests/broken-queries.txt` is empty. Going

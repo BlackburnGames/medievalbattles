@@ -6,10 +6,13 @@ include("include/connect.php");
 // empty array and logging out never marked the player offline.
 include("include/session.php");
 
-mysqli_query($db, "UPDATE user SET online='0' WHERE email='$email' AND pw='$pw'");
+mysqli_query($db, "UPDATE user SET online='0' WHERE email=" . mb_sql_str($db, $email) . " AND pw=" . mb_sql_str($db, $pw));
 
-unset($_SESSION['email']);
-unset($_SESSION['pw']);
+// The whole session, not the two keys it used to unset: the session file, and
+// the id that named it, outlived every logout. A request another site made
+// has no session to end -- include/session.php never started one -- so a
+// cross-site link here cannot log the player out.
+mb_session_end();
 
 echo "You have successfully logged out. <a href=index.php>Click here</a> to log back in.";
 

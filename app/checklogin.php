@@ -1,6 +1,8 @@
 <?php
 
-session_start();
+// Not a bare session_start(): include/session.php sets the cookie and id rules
+// first, and refuses a session to a login another site submitted.
+include("include/session.php");
 
 function callback($buffer) {
   return (preg_replace("nothing", "nothing", $buffer));
@@ -89,9 +91,8 @@ if (mb_password_verify($plain_pw, $stored)) {
 	$db->query("UPDATE user SET csnum='$set' WHERE email=$q_email");
 	unset($_SESSION['bad']);
 	$login = 1;
-	$_SESSION['login'] = $login;
-	$_SESSION['email'] = $email;
-	$_SESSION['pw'] = $pw;
+	// A fresh session id for the logged-in session; see include/session.php.
+	mb_session_login($email, $pw);
 	header("Location: main.php?pageid=news");
 	exit();
 } else {

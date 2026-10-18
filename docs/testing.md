@@ -243,6 +243,25 @@ rather than landing in the unquoted `class=` attribute.
 It writes to the three news tables on ids far outside the fixture's and deletes
 what it wrote, so it is order-independent and safe against a live world.
 
+### `tests/session.php`
+
+What a session id is worth, over HTTP with curl, because the crawl's client
+cannot see any of it: it sends no `Sec-Fetch-Site`, never reads a cookie's
+attributes, and never goes back to a session it has finished with. Each check
+is one rule in `app/include/session.php` — the cookie's `HttpOnly` and
+`SameSite=Strict`; that a planted id is not adopted and a login replaces the
+id it arrived with; that logout ends the session; that a cross-site or
+same-site request gets no session to read, act, log in or log out with; that
+a password change ends the account's other sessions; and that the idle and
+absolute limits hold.
+
+The expiry checks do not wait hours. They wind the clock back in the session
+file itself — PHP's default `key|value;` serialization, which the CLI can read
+because it shares `session.save_path` — and `mb_session_start()` declines to
+start a session in the CLI at all, so the test cannot create one of its own.
+It uses poor@ and restores its password. Against the old session code it
+fails 17 of its 23 checks.
+
 ### `tests/barter-race.php`
 
 The one test that makes requests overlap. The crawl is strictly sequential, so

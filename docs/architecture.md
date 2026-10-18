@@ -47,16 +47,21 @@ loads the logged-in user's entire state into globals (`$gp`, `$civ`, `$land`,
 
 ## Auth
 
-`$_SESSION['email']` plus `$_SESSION['pw']` (the stored password hash) act as a
-bearer credential, and nearly every query filters
-`WHERE email='$email' AND pw='$pw'`.
+`$_SESSION['email']` plus `$_SESSION['pw']` (the stored password hash) are the
+credential, and nearly every query filters
+`WHERE email='$email' AND pw='$pw'`. Both live in the server-side session; what
+the browser holds is the session id, and `app/include/session.php` is what
+guards it — cookie flags, a new id at login, expiry, a full logout, no session
+for a request another site made, and a per-request check that the pair still
+names a row. Every session in the game, the admin area's included, starts
+there.
 
 The hash is **bcrypt** as of Phase 3 — `app/include/password.php`, pinned to
 `PASSWORD_BCRYPT` rather than `PASSWORD_DEFAULT` because
 `include/credentials.php` asserts the alphabet on the way out of the session.
 Rows still holding the old unsalted MD5 verify once and are rehashed in place
-by `checklogin.php`. What did *not* change is the hash's second job: it is the
-bearer token, and every query still compares it for equality, which bcrypt
+by `checklogin.php`. What did *not* change is the hash's second job: it is
+half of the credential every query compares for equality, which bcrypt
 satisfies exactly as MD5 did.
 
 The email/hash pair is **denormalized into `buildings`, `military`, `research`,

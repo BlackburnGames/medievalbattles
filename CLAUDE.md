@@ -8,7 +8,9 @@ Medieval Battles v6 — a PHP/MySQL browser strategy game written in 2003 for PH
 
 The work in progress is a staged modernization. Phase 1 (a running, test-covered baseline in Docker) and Phase 2 (the mechanical port, now **running on PHP 8.3** with the suite green on both 8.3 and 5.6) are done. Phase 3 is the structural and security rewrite. See [docs/modernization.md](docs/modernization.md).
 
-**Do not expose this app to a network.** All ~1300 queries are built by string interpolation with no escaping, and the password hash doubles as a bearer token with no expiry, carried in six denormalized columns. Both container ports bind to 127.0.0.1 deliberately — keep it that way.
+**Do not expose this app to a network.** All ~1300 queries are still built by string interpolation — escaped where request input reaches them, but not bound — and the admin area behind its gate can still delete the world from one link. Both container ports bind to 127.0.0.1 deliberately — keep it that way.
+
+**Every session starts in `app/include/session.php`.** It sets the cookie rules (HttpOnly, SameSite=Strict, strict ids), refuses a session to any request another site made (`Sec-Fetch-Site`), expires sessions after 2 hours idle or 24 hours total, and ends a session whose email and hash no longer name a row — which is how a password change logs out the account's other sessions. Do not call `session_start()` anywhere else, and write the credential only through `mb_session_login()` / `mb_session_rotate()` / `mb_session_end()`. `tests/session.php` holds each rule to account.
 
 ## Documentation
 

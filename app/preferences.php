@@ -94,7 +94,9 @@ else	{
 	$newpw_hash = mb_password_hash($newpw);
 	mb_password_store($db, $email, $pw, $newpw_hash);
 	$pw = $newpw_hash;
-	$_SESSION['pw'] = $pw;
+	// Every other session on this account still holds the old hash, and is
+	// ended by include/session.php on its next request.
+	mb_session_rotate($email, $pw);
 
 	echo"<div align=center><font class=yellow>Your password has been changed.</font></div>";
 	include("include/chngpw_table.php");
@@ -152,7 +154,7 @@ else	{
  	mysqli_query($db, "UPDATE returntbl SET email=$q_newemail WHERE $q_cred") or die(mysqli_error($db));
  	mysqli_query($db, "UPDATE explore SET email=$q_newemail WHERE $q_cred") or die(mysqli_error($db));
 	$email = $newemail;
-	$_SESSION['email'] = $email;
+	mb_session_rotate($email, $pw);
 
 	// The six UPDATEs above have just moved the account onto the new address,
 	// so anything after this point has to filter on that one.
@@ -220,7 +222,7 @@ else	{
 		require_once __DIR__ . '/include/empire.php';
 		mb_empire_remove($db, $userid);
 
-		unset($_SESSION['login'], $_SESSION['email'], $_SESSION['pw']);
+		mb_session_end();
 		$login = $email = $pw = '';
 
 		// Not a redirect. This page has no output buffer and igtop.php has
