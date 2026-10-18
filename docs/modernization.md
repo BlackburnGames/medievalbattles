@@ -498,6 +498,28 @@ attribute.
   and then fall through into the forms of an account that no longer exists; it
   stops with a link instead.
 
+  **The combat pages never asked whether their target existed.** All five —
+  the three army attacks, `scattack.php` and `intel.php` — fetch the empire
+  named by `empvalue` and fight whatever comes back, and an id that names
+  nobody comes back empty. `attack.php` then scored the target as land 0 and
+  took the "destroyed" branch, whose cleanup is keyed on `$evu['userid']`: a
+  `DELETE FROM guild WHERE owner=''` and an `UPDATE ... WHERE votefor=''`, run
+  for an empire that was never there. The others won, raided, suicided or
+  spied on nobody, and every one of them spent the attacker's general or units
+  doing it. The crawl could not see this for the reason the forums could not:
+  its only attacks named a real target, so the arm that should be refused was
+  never driven. The three army pages share `include/attack/defANDoff.php`, so
+  the check is there, ahead of `calculations.php`, which is what actually moves
+  the troops; `intel.php` and `scattack.php` look the target up before counting
+  units now, which is also what lets the crawl reach them with an account that
+  holds no thieves. Two smaller holes went with it. `attack.php`'s "you sent
+  nothing" check ended in `$uirongolem = ""` — an assignment, so it never fired,
+  and an empty attack died dividing by zero — and `scattack.php` had no
+  self-target check at all, which only the guild check had been covering, so a
+  guildless empire could suicide on itself. All three are driven from the arm
+  they refuse, before the two attacks, so a guard that leaks a general also
+  fails the news assertions behind it.
+
   **Every guard is driven from the arm it refuses.** That is what this needed
   and what the suite could not do before: the primary tester leads Testguild and
   settlement 1, so every request they make is allowed, and a gate that answers

@@ -393,6 +393,13 @@ one. That is also why `attackm.php` is not driven: it is the same file shape as
 `attackr.php`, and giving the fixture a third general would hand
 `calculations.php` a fifth army for four return slots.
 
+The refusals go first, and they are the only requests that get `attackm.php`,
+`scattack.php` and `intel.php` past their landing forms. All five combat pages are sent at userid
+999, which names nobody, plus an empty army on `attack.php` and the tester at
+their own empire on `scattack.php`. None of them may consume anything, and the
+fixture makes that checkable for free: a refusal that leaked a general leaves
+the resource raid behind it with none, and its news assertion fails.
+
 **The fixture carries two password formats, and that is coverage rather than
 untidiness.** `idle@` is bcrypt — what `app/include/password.php` writes now —
 while `tester@` and `poor@` keep the unsalted MD5 the game stored until Phase 3,
