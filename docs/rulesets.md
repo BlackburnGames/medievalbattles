@@ -31,8 +31,9 @@ ruleset first lands, but as a marker rather than something to deploy.
 **Classic does not keep bugs on purpose.** Every entry in `$GAMEDATA['quirks']`
 is a defect, not a feature a player would miss: a Night Elf bonus defeated by a
 stray leading space, Advanced Construction doubling build time when it was
-meant to halve it, iron golems coming home as archers. A relaunch is for
-players, and historical accuracy doesn't outweigh something broken.
+meant to halve it, iron golems coming home as archers. (The first and last are
+fixed now, on both rulesets at once.) A relaunch is for players, and historical
+accuracy doesn't outweigh something broken.
 
 That has three consequences:
 

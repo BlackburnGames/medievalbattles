@@ -377,11 +377,12 @@ $GAMEDATA['research'] = array(
 $GAMEDATA['combat'] = array(
     'generals'          => 4,     // db.sql user.fleets default; one per army in the field
     'resource_gain_pct' => 8,     // attackr.php:185-195 -- gold, iron, lumber AND civilians
-    'mountain_gain_pct' => 10,    // attackm.php:80
-    'land_gain_pct'     => 10,    // attack.php:93 -- when target has 200+ land
-    'land_gain_flat'    => 10,    // attack.php:94 -- when target has 10-199 land
-    'suicide_kills'     => 2,     // scattack.php:87,99 -- civilians or thieves per suicide civilian
+    'mountain_gain_pct' => 10,    // attackm.php:116
+    'land_gain_pct'     => 10,    // attack.php:111 -- when target has 200+ land
+    'land_gain_flat'    => 10,    // attack.php:112 -- when target has 10-199 land
+    'suicide_kills'     => 2,     // scattack.php:112,124 -- civilians or thieves per suicide civilian
     'elf_return_mult'   => 0.80,  // attack/calculations.php:98-101
+    'night_elf_return_mult' => 0.75,  // attack/calculations.php:102-105
 );
 
 $GAMEDATA['intel'] = array(
@@ -447,7 +448,7 @@ $GAMEDATA['exp_values'] = array(
  * ------------------------------------------------------------------ */
 $GAMEDATA['quirks'] = array(
     'Advanced Construction divides the build timer by 0.5, which DOUBLES construction time instead of halving it. (buildings.php:81)',
-    'Mountain attacks award the attacker mountains, but a dead loop means the defender\'s mountains are restored by the next tick\'s recalculation. (attackm.php:147, update.php:270-280)',
+    'Mountain attacks award the attacker mountains, but a dead loop means the defender\'s mountains are restored by the next tick\'s recalculation. (attackm.php:193, update.php:331-341)',
     'The Scepter of Zakarum sets its speed on equip but never its power, so the listed power is not actually applied. (equip.php:199)',
     'The explore page shows special rates for Angels (fewer explorers needed) and Demons (more needed), but the tick only implements the Human rate; everyone else gets the default. (include/S_EXPLORE.php:33-36 vs update.php:88)',
     'Night Elves are dealt 4-10 archers at signup, but the free Archery research is immediately overwritten unless they are also Rangers. (checksignup.php:130-134)',

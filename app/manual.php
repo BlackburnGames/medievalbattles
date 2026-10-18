@@ -504,7 +504,8 @@ class modifiers. <b>If your attack power exceeds their defense, you win.</b></p>
 <p>Both sides take losses in proportion to the power thrown at them, win or lose.
 Survivors are unavailable until they return home; return time is set by the slowest
 unit type you sent, and Elves get theirs
-<?php echo round((1 - $GAMEDATA['combat']['elf_return_mult']) * 100); ?>% faster.</p>
+<?php echo round((1 - $GAMEDATA['combat']['elf_return_mult']) * 100); ?>% faster, Night Elves
+<?php echo round((1 - $GAMEDATA['combat']['night_elf_return_mult']) * 100); ?>% faster.</p>
 
 <h3>Types of attack</h3>
 
