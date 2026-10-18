@@ -7,7 +7,9 @@ being changed and why.
 ## Shape of the codebase
 
 Fully procedural: 133 PHP files containing 15 function declarations between
-them. No classes, no framework, no Composer, no autoloader. A page is a file;
+them, as released. (The modernization has since added helpers under
+`app/include/` -- `db.php`, `html.php`, `credentials.php` and the like -- so the
+count today is higher; none of them is a class.) No classes, no framework, no Composer, no autoloader. A page is a file;
 control flow is `include`.
 
 ## Include paths and working directory

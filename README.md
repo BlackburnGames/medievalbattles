@@ -8,10 +8,11 @@ historical and educational purposes.
 
 ## Running it locally
 
-> **Do not expose this to a network.** Every query is built by string
-> interpolation with no escaping, passwords are unsalted MD5, output is
-> unescaped, and `register_globals` is emulated. The Docker ports bind to
-> `127.0.0.1` on purpose — leave them that way.
+> **Do not expose this to a network.** Every query is still built by string
+> interpolation — escaped where request input reaches it, but not bound — and
+> the stored password hash doubles as a bearer token with no expiry, rotation
+> or CSRF protection. The Docker ports bind to `127.0.0.1` on purpose — leave
+> them that way.
 
 You need Docker with Compose v2 or newer. Nothing else — there is no PHP,
 MySQL or Composer install required on the host.
@@ -74,7 +75,8 @@ The revival is staged:
   converted to `mysqli`, array keys and bare-word constants are quoted, and
   `ereg_replace`, `session_register()` and the `register_globals` emulation are
   gone. The suite passes on both 8.3 and 5.6 against the same golden master.
-- **Phase 3 — not started.** Structural and security rewrite.
+- **Phase 3 — in progress.** Structural and security rewrite; see
+  [docs/modernization.md](docs/modernization.md).
 
 The 5.6 image is kept buildable as the behavioural reference:
 
