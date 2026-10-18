@@ -47,14 +47,14 @@ $query_string = "SELECT userid, ename, race, class, mts, land, exp, guild FROM u
 $result_id = mysqli_query($db, $query_string);
 while ($row = mysqli_fetch_row($result_id))  {
 
-  $ONLINE_NO = mysqli_query($db, "SELECT online FROM user WHERE userid='$row[0]'");
+  $ONLINE_NO = mysqli_query($db, "SELECT online FROM user WHERE userid=" . mb_sql_int($row[0]) . "");
     $OLINE = mb_db_result($ONLINE_NO,"OLINE");
 
   if($OLINE == 1) { $O_line = "<font class=red>*</font>";  }
   else  { $O_line = ""; }
 
   //  check to see if sl is there
-  $SL_result = mysqli_query($db, "SELECT sl FROM user WHERE userid='$row[0]'");
+  $SL_result = mysqli_query($db, "SELECT sl FROM user WHERE userid=" . mb_sql_int($row[0]) . "");
     $SLcheck = mysqli_fetch_array($SL_result);
 
   if($SLcheck[0] == 'yes')  {
@@ -62,7 +62,7 @@ while ($row = mysqli_fetch_row($result_id))  {
       $SL_S = mb_db_result($SL_SELECT,"SL_S");
   }
 
-  $SAFEMODECHECK = mysqli_query($db, "SELECT safemode FROM user WHERE  userid='$row[0]'");
+  $SAFEMODECHECK = mysqli_query($db, "SELECT safemode FROM user WHERE  userid=" . mb_sql_int($row[0]) . "");
     $S_M_CHECK = mb_db_result($SAFEMODECHECK,"S_M_CHECK");
 
   $color = "#404040";

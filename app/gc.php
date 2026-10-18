@@ -36,7 +36,7 @@ else	{
 			$g_name = mb_db_result($guild_name,"g_name");
 		$owner_g = mysqli_query($db, "SELECT owner FROM guild WHERE gid=" . mb_sql_int($gid));	
 			$owner = mb_db_result($owner_g,"owner");
-		$THE_MNO = mysqli_query($db, "SELECT mno FROM user WHERE userid='$owner'");	
+		$THE_MNO = mysqli_query($db, "SELECT mno FROM user WHERE userid=" . mb_sql_int($owner) . "");	
 			$T_MNO = mb_db_result($THE_MNO,"T_MNO");
 		$yourmid = mysqli_query($db, "SELECT max(mid) FROM messages");	
 			$ymid = mb_db_result($yourmid,"ymid");
@@ -44,11 +44,11 @@ else	{
 		$ymid = $ymid + 1;
 		$thenum = $T_MNO + 1;
 	  
-		mysqli_query($db, "UPDATE user SET mno ='$thenum' WHERE userid='$owner'");
+		mysqli_query($db, "UPDATE user SET mno ='$thenum' WHERE userid=" . mb_sql_int($owner) . "");
 
 		$umessage = "[b]Sent by Guild Center:[/b]  " . $umessage;
 
-		mysqli_query($db, "INSERT INTO messages (origin, datesent, yourid, message, mid)		VALUES	('$ename', '$clock', '$owner', " . mb_sql_str($db, $umessage) . ", '$ymid') ");
+		mysqli_query($db, "INSERT INTO messages (origin, datesent, yourid, message, mid)		VALUES	(" . mb_sql_str($db, $ename) . ", '$clock', " . mb_sql_int($owner) . ", " . mb_sql_str($db, $umessage) . ", " . mb_sql_int($ymid) . ") ");
 	
 		echo "<div align=center><font class=yellow><b>Your message has been sent to the Guild Leader of " . mb_h($g_name) . ".</b></font></div></center>";
 		unset($_SESSION['gid']);
@@ -93,7 +93,7 @@ if($request == 'yes')	{
 		die();
 	}
 	else	{
-		mysqli_query($db, "INSERT INTO guildrequests (applicant, gl_userid)		VALUES	('$userid', '$guild_info[owner]') ");
+		mysqli_query($db, "INSERT INTO guildrequests (applicant, gl_userid)		VALUES	('$userid', " . mb_sql_str($db, $guild_info['owner']) . ") ");
 		echo "<div align=center><font class=yellow><b>Your request to join <u>" . mb_h($guild_info['gname']) . "</u> has been sent.</b></font></div>";	
 	}	
 }
@@ -172,6 +172,13 @@ else	{
 		include("include/S_GM.php");
 		die();
 	}
+	// See include/credentials.php: the name is interpolated bare on every
+	// guild page once it is stored, and this is the only place it is written.
+	elseif(!mb_valid_gname($creating_guild_name))	{
+		echo "<div align=center><font class=yellow>Guild names may use letters, numbers, spaces and . _ - only!</font></div>";
+		include("include/S_GM.php");
+		die();
+	}
 	elseif($gname == 'None')	{
 		echo "<div align=center><font class=yellow>You cannot pick that name!</font></div>";
 		include("include/S_GM.php");
@@ -224,7 +231,7 @@ else	{
 
 		include("include/connect.php");
 		mysqli_query($db, "INSERT INTO guild (gname, info, gid, datemade, cpw, owner)	 VALUES	(" . mb_sql_str($db, $creating_guild_name) . ", " . mb_sql_str($db, $info) . ", '$new_gid', '$clock', " . mb_sql_str($db, $cpw) . ", '$userid') ");
-		mysqli_query($db, "UPDATE user SET guild=" . mb_sql_str($db, $gname) . " WHERE email='$email' AND pw='$pw'");
+		mysqli_query($db, "UPDATE user SET guild=" . mb_sql_str($db, $creating_guild_name) . " WHERE email='$email' AND pw='$pw'");
 		mysqli_query($db, "DELETE FROM guildrequests WHERE applicant='$userid'");
 						
 		echo"<div align=center><font class=yellow><b><u>" . mb_h($creating_guild_name) . "</u> has been successfully created!</b></font></div>";

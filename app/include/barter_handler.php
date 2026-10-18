@@ -241,7 +241,9 @@ else	{
 	// A buyer who loses the claim at 2 is refunded what 1 took.
 	$q_where_me = " WHERE email=" . mb_sql_str($db, $email) . " AND pw=" . mb_sql_str($db, $pw);
 	$q_cost     = mb_sql_int($b_cost);
-	$mb_col     = ($b_meth == 'gp') ? 'gp' : 'iron';
+	// A column name, so it cannot be quoted: a literal on each side, never the
+	// stored method itself.
+	if ($b_meth == 'gp') { $mb_col = 'gp'; } else { $mb_col = 'iron'; }
 
 	mysqli_query($db, "UPDATE user SET $mb_col = $mb_col - $q_cost" . $q_where_me . " AND $mb_col >= $q_cost");
 	if (mysqli_affected_rows($db) !== 1)	{

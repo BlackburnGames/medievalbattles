@@ -1,0 +1,5 @@
+# SQL injection audit baseline -- see tests/sql-injection-audit.php
+# Request input that reaches a query call unescaped, as file, variable
+# and the quoting context it lands in. This list may only ever SHRINK.
+# Regenerate with: php tests/sql-injection-audit.php --accept
+

@@ -66,6 +66,21 @@ In progress. The known work, in no committed order:
     hand, not by the crawl, which cannot sign up.
   - **Login** escapes the address it records and the empire name it reads back.
 
+  **The second order has its own list now, and it is at zero too.**
+  `--stored` takes a row read back out of the database as a source, the way
+  the output audit's does; it opened at 36. Most were ids and counts, cast.
+  One was the reason to build it: **a guild name was a stored injection any
+  player could fire.** `gc.php` took any fifteen characters and copied the
+  name into every member's `user.guild`, and from there it was interpolated
+  bare — `$empireguild` at eighteen sites, three of them writes. A guild
+  called `a' OR 'a'='a`, once deleted, ran
+  `UPDATE user SET guild='None' WHERE guild='a' OR 'a'='a'` and took every
+  guild's members away; that was driven by hand and it did. The fix is the
+  empire-name fix again — `mb_valid_gname()` at the one place a guild is
+  named — plus escaping all eighteen, because `$empireguild` comes from
+  `functions.php` and the per-file audit could not see any of them. The
+  AIM field was the other free-text value going back into a `SELECT`.
+
   All ~1300 queries
   are built by string interpolation with no escaping. This is the reason the
   app must not be exposed to a network. `tests/sql-injection-audit.php` finds

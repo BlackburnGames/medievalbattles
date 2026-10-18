@@ -46,10 +46,10 @@ if ($addtopic) {
 	// was stamped with the empty string and displayed a blank date ever after.
 	// The reply below, and both branches of sl-input.posts.php writing the same
 	// two tables, have always used $clock.
-	$result = mysqli_query($db, "INSERT INTO setforums (setid, name, topic, replies, message, datestamp)	VALUES ('$setid', $q_ename, $q_topic, '$replies', $q_message, '$clock')");
+	$result = mysqli_query($db, "INSERT INTO setforums (setid, name, topic, replies, message, datestamp)	VALUES (" . mb_sql_int($setid) . ", $q_ename, $q_topic, '$replies', $q_message, '$clock')");
 
-	$topic_lastpost = mysqli_query($db, "UPDATE setforums SET lastpost='$clock' WHERE topic=$q_topic AND setid='$setid'");
-	$topic_lastposter = mysqli_query($db, "UPDATE setforums SET lastposter=$q_ename WHERE topic=$q_topic AND setid='$setid'");
+	$topic_lastpost = mysqli_query($db, "UPDATE setforums SET lastpost='$clock' WHERE topic=$q_topic AND setid=" . mb_sql_int($setid) . "");
+	$topic_lastposter = mysqli_query($db, "UPDATE setforums SET lastposter=$q_ename WHERE topic=$q_topic AND setid=" . mb_sql_int($setid) . "");
 
 	header ("Location: sforum.php");
 }
@@ -71,11 +71,11 @@ elseif ($addreply) {
 	// successful INSERT that is mysqli_query($db, "1") -- a syntax error; on a
 	// failed one it is the empty string, which is a fatal on PHP 8. It also
 	// reset the insert id that $lastid reads. The second call is gone.
-	$result1 = mysqli_query($db, "INSERT INTO setforumsmsgs (setid, name, topic, topicid, message, datestamp)	 VALUES ('$setid', $q_ename, $q_topic, $q_topicid, $q_message, '$clock')");
+	$result1 = mysqli_query($db, "INSERT INTO setforumsmsgs (setid, name, topic, topicid, message, datestamp)	 VALUES (" . mb_sql_int($setid) . ", $q_ename, $q_topic, $q_topicid, $q_message, '$clock')");
 	$lastid = mysqli_insert_id($db);
 
-	$reply_lastpost = mysqli_query($db, "UPDATE setforums SET lastpost='$clock' WHERE topicid=$q_topicid AND setid='$setid'");
-	$reply_lastposter = mysqli_query($db, "UPDATE setforums SET lastposter=$q_ename WHERE topicid=$q_topicid AND setid='$setid'");
+	$reply_lastpost = mysqli_query($db, "UPDATE setforums SET lastpost='$clock' WHERE topicid=$q_topicid AND setid=" . mb_sql_int($setid) . "");
+	$reply_lastposter = mysqli_query($db, "UPDATE setforums SET lastposter=$q_ename WHERE topicid=$q_topicid AND setid=" . mb_sql_int($setid) . "");
 
 	header ("Location: topic.php?topicid=$topicid");
 }

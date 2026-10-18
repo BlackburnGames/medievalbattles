@@ -6,7 +6,7 @@ $pageid = $_GET['pageid'];
 $set_notice_query = $db->query("SELECT setnotice FROM settlement WHERE setid='$setid'");
   $setnotice = mysqli_fetch_array($set_notice_query);
 
-$guild_notice_query = $db->query("SELECT notice FROM guild WHERE gname='$empireguild'");
+$guild_notice_query = $db->query("SELECT notice FROM guild WHERE gname=" . mb_sql_str($db, $empireguild) . "");
   $guildnotice = mysqli_fetch_array($guild_notice_query);
 
 echo"

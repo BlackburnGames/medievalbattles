@@ -18,7 +18,7 @@ if(!IsSet($leave))	{
 else	{	
 	
 	//	insert leaving msg into guild news
-	$guild_id_query = mysqli_query($db, "SELECT gid, owner FROM guild WHERE gname='$empireguild'");
+	$guild_id_query = mysqli_query($db, "SELECT gid, owner FROM guild WHERE gname=" . mb_sql_str($db, $empireguild) . "");
 		$guild_id = mysqli_fetch_array($guild_id_query);
 
 	$Guild_MaxID = mysqli_query($db, "SELECT max(gnid) FROM guildnews");
@@ -50,13 +50,13 @@ echo "
 		<td class='main2'><b class='reg'>Experience</b></td>
 		<td class='main2'><b class='reg'>Last Login</b></td>";
 
-$query_string = "SELECT ename, aim, msn, exp, userid, lastlogin FROM user WHERE guild='$empireguild' ORDER BY exp DESC";
+$query_string = "SELECT ename, aim, msn, exp, userid, lastlogin FROM user WHERE guild=" . mb_sql_str($db, $empireguild) . " ORDER BY exp DESC";
 $result_id = mysqli_query($db, $query_string);
 while ($row = mysqli_fetch_row($result_id))	{
 		
-	$SETID_SELECT = mysqli_query($db, "SELECT setid FROM user WHERE ename='$row[0]'");	
+	$SETID_SELECT = mysqli_query($db, "SELECT setid FROM user WHERE ename=" . mb_sql_str($db, $row[0]) . "");	
 		$t_setid = mb_db_result($SETID_SELECT, "t_setid");
-	$ONLINE_NO = mysqli_query($db, "SELECT online FROM user WHERE userid='$row[4]'");	
+	$ONLINE_NO = mysqli_query($db, "SELECT online FROM user WHERE userid=" . mb_sql_int($row[4]) . "");	
 		$OLINE = mb_db_result($ONLINE_NO, "OLINE");
 	
 	if($OLINE == 1)	{	$O_line = "<font class=red>*</font>";	 }
@@ -76,7 +76,7 @@ while ($row = mysqli_fetch_row($result_id))	{
 		<td class='inner2'>" . mb_h($row[5]) . "</td>\n";
 }
 
-$guild_strength_query = mysqli_query($db, "SELECT sum(exp) FROM user WHERE guild='$empireguild'");
+$guild_strength_query = mysqli_query($db, "SELECT sum(exp) FROM user WHERE guild=" . mb_sql_str($db, $empireguild) . "");
 	$guild_strength_total = mb_db_result($guild_strength_query, "guild_strength_total");
 	$guild_strength_total = number_format($guild_strength_total);
 

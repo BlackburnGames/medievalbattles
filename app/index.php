@@ -14,7 +14,7 @@ if ($computer_id === '') {
   // expire immediately, so a new id was minted on every request.
   setcookie('computer_id', $id, time() + (10 * 365 * 24 * 60 * 60));
 
-  mysqli_query($db, "UPDATE game_info SET last_comp_id='$id'");
+  mysqli_query($db, "UPDATE game_info SET last_comp_id=" . mb_sql_int($id) . "");
 }
 ?>
 <html>

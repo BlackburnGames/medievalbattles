@@ -91,6 +91,30 @@ if (!function_exists('mb_valid_email')) {
     }
 }
 
+if (!function_exists('mb_valid_gname')) {
+    /**
+     * A guild name travels like an empire name, for the same reason: it is
+     * copied into every member's `user.guild`, read back as $empireguild on
+     * every page, and interpolated bare -- "WHERE guild='$empireguild'",
+     * "WHERE gname='$GN'" -- at eighteen sites, three of them writes. gc.php
+     * accepted any fifteen characters, so a guild called `a' OR 'a'='a` was
+     * one leader away from guildconfig.php's "UPDATE user SET guild='None'
+     * WHERE guild='$GN'" emptying every guild in the game. That was driven by
+     * hand, and it did.
+     *
+     * gc.php is the only writer -- no page renames a guild -- so one check
+     * holds it. The sites are escaped as well, so nothing leans on this alone.
+     *
+     * @param  mixed $value
+     * @return bool
+     */
+    function mb_valid_gname($value)
+    {
+        return is_string($value)
+            && preg_match('/^[A-Za-z0-9](?:[A-Za-z0-9 ._\-]{0,13}[A-Za-z0-9._\-])?$/', $value) === 1;
+    }
+}
+
 if (!function_exists('mb_valid_ename')) {
     /**
      * An empire name is not a credential, but it travels like one. It is read

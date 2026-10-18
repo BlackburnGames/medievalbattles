@@ -13,7 +13,7 @@ if($login == 1 && $pw != "" && $email !="") {
 	$userid = mb_db_result($uuserid, 0);
 
 	// account validation
-	$validate_query = "SELECT * FROM emailvalidate WHERE userid='$userid'";
+	$validate_query = "SELECT * FROM emailvalidate WHERE userid=" . mb_sql_int($userid) . "";
 	$validate_result = $db->query($validate_query);
 	$validate = mysqli_fetch_array($validate_result);
 
@@ -219,23 +219,23 @@ $return = mysqli_fetch_array($return_query);
 		$irongolem4 = $return['irongolem4'];		$IRONGOLEM_4 = $return['irongolem4'];
 		$time4 = $return['time4'];		$TIME_4 = $return['time4'];
 	## fleets
-		$FLEETS_ = $db->query("SELECT fleets FROM user WHERE userid='$userid'");
+		$FLEETS_ = $db->query("SELECT fleets FROM user WHERE userid=" . mb_sql_int($userid) . "");
 		$_FLEETS = mb_db_result($FLEETS_, "_FLEETS");
 
 //	total all units together
-	$warquery = "SELECT sum(amount) FROM barter WHERE seller='$ename' AND type='Warrior'";
+	$warquery = "SELECT sum(amount) FROM barter WHERE seller=" . mb_sql_str($db, $ename) . " AND type='Warrior'";
 	$warresult = $db->query($warquery) or die("Error: " . mysqli_error($db));
 	$warcheck = mysqli_fetch_array($warresult);
 
-	$wizquery = "SELECT sum(amount) FROM barter WHERE seller='$ename' AND type='Wizard'";
+	$wizquery = "SELECT sum(amount) FROM barter WHERE seller=" . mb_sql_str($db, $ename) . " AND type='Wizard'";
 	$wizresult = $db->query($wizquery) or die("Error: " . mysqli_error($db));
 	$wizcheck = mysqli_fetch_array($wizresult);
 
-	$priquery = "SELECT sum(amount) FROM barter WHERE seller='$ename' AND type='Priest'";
+	$priquery = "SELECT sum(amount) FROM barter WHERE seller=" . mb_sql_str($db, $ename) . " AND type='Priest'";
 	$priresult = $db->query($priquery) or die("Error: " . mysqli_error($db));
 	$pricheck = mysqli_fetch_array($priresult);
 
-	$archquery = "SELECT sum(amount) FROM barter WHERE seller='$ename' AND type='Archer'";
+	$archquery = "SELECT sum(amount) FROM barter WHERE seller=" . mb_sql_str($db, $ename) . " AND type='Archer'";
 	$archresult = $db->query($archquery) or die("Error: " . mysqli_error($db));
 	$archcheck = mysqli_fetch_array($archresult);
 

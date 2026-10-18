@@ -45,11 +45,11 @@ if($evu['safemode'] > 0)	{
 }
 	
 // Your guild id
-$G_id = mysqli_query($db, "SELECT gid FROM guild WHERE gname='$empireguild'");
+$G_id = mysqli_query($db, "SELECT gid FROM guild WHERE gname=" . mb_sql_str($db, $empireguild) . "");
 $gid = mysqli_fetch_array($G_id);
 
 // Empire being attacked guild id
-$tG_id = mysqli_query($db, "SELECT gid FROM guild WHERE gname='$evu[guild]'");
+$tG_id = mysqli_query($db, "SELECT gid FROM guild WHERE gname=" . mb_sql_str($db, $evu['guild']) . "");
 $tgid = mysqli_fetch_array($tG_id);
 				
 $modifier = 1;

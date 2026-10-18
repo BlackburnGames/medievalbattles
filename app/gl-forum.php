@@ -19,7 +19,7 @@ if($gnamecheck[0] != $userid)	{
 
 include("commong.php");
 
-$query = "SELECT topicid, name, topic, replies, lastpost, lastposter FROM guildthreads WHERE guildname='$empireguild' ORDER by lastpost DESC";
+$query = "SELECT topicid, name, topic, replies, lastpost, lastposter FROM guildthreads WHERE guildname=" . mb_sql_str($db, $empireguild) . " ORDER by lastpost DESC";
 $result= mysqli_query($db, $query) or die("Error in query! " . mysqli_error($db));
 
 if ($result) { 

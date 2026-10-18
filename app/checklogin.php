@@ -88,7 +88,7 @@ if (mb_password_verify($plain_pw, $stored)) {
 	$user_set_query = $db->query("SELECT setid FROM user WHERE email=$q_email AND pw=$q_pw");
 	$set = mb_db_result($user_set_query, "set");
 
-	$db->query("UPDATE user SET csnum='$set' WHERE email=$q_email");
+	$db->query("UPDATE user SET csnum=" . mb_sql_int($set) . " WHERE email=$q_email");
 	unset($_SESSION['bad']);
 	$login = 1;
 	// A fresh session id for the logged-in session; see include/session.php.

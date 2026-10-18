@@ -43,10 +43,10 @@ $q_ename   = mb_sql_str($db, $ename);
 $q_topicid = mb_sql_int($topicid);
 
 if ($addtopic) {
-	$result = mysqli_query($db, "INSERT INTO setforums (setid, name, topic, replies, message, datestamp)	VALUES ('$setid', $q_ename, $q_topic, '$replies', $q_message, '$clock')");
+	$result = mysqli_query($db, "INSERT INTO setforums (setid, name, topic, replies, message, datestamp)	VALUES (" . mb_sql_int($setid) . ", $q_ename, $q_topic, '$replies', $q_message, '$clock')");
 
-	$topic_lastpost = mysqli_query($db, "UPDATE setforums SET lastpost='$clock' WHERE topic=$q_topic AND setid='$setid'");
-	$topic_lastposter = mysqli_query($db, "UPDATE setforums SET lastposter=$q_ename WHERE topic=$q_topic AND setid='$setid'");
+	$topic_lastpost = mysqli_query($db, "UPDATE setforums SET lastpost='$clock' WHERE topic=$q_topic AND setid=" . mb_sql_int($setid) . "");
+	$topic_lastposter = mysqli_query($db, "UPDATE setforums SET lastposter=$q_ename WHERE topic=$q_topic AND setid=" . mb_sql_int($setid) . "");
 
 	header ("Location: sl-forum.php");
 }
@@ -56,11 +56,11 @@ elseif ($addreply) {
 
 	// See input.posts.php: the INSERT was being run twice, the second time with
 	// its own return value as the query string.
-	$result1 = mysqli_query($db, "INSERT INTO setforumsmsgs (setid, name, topic, topicid, message, datestamp)	 VALUES ('$setid', $q_ename, $q_topic, $q_topicid, $q_message, '$clock')");
+	$result1 = mysqli_query($db, "INSERT INTO setforumsmsgs (setid, name, topic, topicid, message, datestamp)	 VALUES (" . mb_sql_int($setid) . ", $q_ename, $q_topic, $q_topicid, $q_message, '$clock')");
 	$lastid = mysqli_insert_id($db);
 
-	$reply_lastpost = mysqli_query($db, "UPDATE setforums SET lastpost='$clock' WHERE topicid=$q_topicid AND setid='$setid'");
-	$reply_lastposter = mysqli_query($db, "UPDATE setforums SET lastposter=$q_ename WHERE topicid=$q_topicid AND setid='$setid'");
+	$reply_lastpost = mysqli_query($db, "UPDATE setforums SET lastpost='$clock' WHERE topicid=$q_topicid AND setid=" . mb_sql_int($setid) . "");
+	$reply_lastposter = mysqli_query($db, "UPDATE setforums SET lastposter=$q_ename WHERE topicid=$q_topicid AND setid=" . mb_sql_int($setid) . "");
 
 	header ("Location: sl-topic.php?topicid=$topicid");
 }

@@ -22,7 +22,7 @@ $color1 = "#303030";
 $color2 = "#460101";
 $color3 = "#303030";
 $tablewidth= "80%";
-	$guild_id_query = mysqli_query($db, "SELECT gid FROM guild WHERE gname='$empireguild'");	
+	$guild_id_query = mysqli_query($db, "SELECT gid FROM guild WHERE gname=" . mb_sql_str($db, $empireguild) . "");	
 		$gid = mb_db_result($guild_id_query, "gid");
 $empireguild = str_replace(" ", "", $empireguild);
 $topicdb = "$empireguild" . "main" . "$gid";

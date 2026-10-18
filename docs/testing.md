@@ -121,8 +121,22 @@ name, `S_WEP.php`'s 24 buttons among them.
 
 Static, like the one above. It marks every variable derived from `mb_input()`
 or a request superglobal, spreads the taint through assignment to a fixpoint,
-and reports what survives into the second argument of `mysqli_query()` — the
-codebase's only query entry point. Baselined in `tests/sql-injection.txt`.
+and reports what survives into a query call — `mysqli_query()` and its
+siblings, or `->query()` on a connection. It matched only the first form until
+the zero it reported turned out to be silent about the sixty object-form calls
+on the signup, login and activation pages. Baselined in
+`tests/sql-injection.txt`.
+
+**`--stored` is the second order**, baselined separately in
+`tests/sql-injection-stored.txt` as the XSS audit does it: a value fetched out
+of the database counts as a source too, because a player typed it. It opened at
+36 and the one it existed for was real — a guild named `a' OR 'a'='a` emptied
+every guild in the game when deleted, because the name is copied into each
+member's row and interpolated bare. It is at zero now. It is per-file like the
+first-order list, so `$empireguild`, which `functions.php` loads, was invisible
+to it in every page that reads it; those eighteen sites were found by grep and
+escaped by hand, and `mb_valid_gname()` holds the name to a safe charset at
+creation.
 
 **The list should only ever shrink**, and it is the Phase 3 SQL worklist.
 Re-accept with `--accept`. Entries carry no line numbers on purpose: a fix

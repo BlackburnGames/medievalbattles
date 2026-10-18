@@ -75,6 +75,14 @@ if ! docker compose exec -T web php /repo/tests/sql-injection-audit.php; then
   status=1
 fi
 
+# The second order: a value read back out of the database and interpolated
+# into a later query. Its own baseline, as with the stored output audit.
+echo
+echo "=== SQL injection audit (stored) ==="
+if ! docker compose exec -T web php /repo/tests/sql-injection-audit.php --stored; then
+  status=1
+fi
+
 echo
 echo "=== unescaped output audit ==="
 if ! docker compose exec -T web php /repo/tests/xss-audit.php; then

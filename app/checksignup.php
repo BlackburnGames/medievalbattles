@@ -95,14 +95,14 @@ if ($signup) {
     $maxset = mb_settlement_count($db);
     $sel_mem = rand(1,$maxset);
   //  extract members from settlement
-    $Random_mem = $db->query("SELECT members FROM settlement WHERE setid='$sel_mem'");
+    $Random_mem = $db->query("SELECT members FROM settlement WHERE setid=" . mb_sql_int($sel_mem) . "");
     $R_Mem = mb_db_result($Random_mem,"R_Mem");
 
   if($least_set != $R_Mem)  {
      $Sett_least = $db->query("SELECT min(members) FROM settlement");
      $least_set = mb_db_result($Sett_least,"least_set");
 
-     $Sel_members = $db->query("SELECT setid FROM settlement WHERE members='$least_set'");
+     $Sel_members = $db->query("SELECT setid FROM settlement WHERE members=" . mb_sql_int($least_set) . "");
      $sel_mem = mb_db_result($Sel_members,"sel_mem");
   }
 
@@ -111,7 +111,7 @@ if ($signup) {
   }
 
   $new_mem = $least_set + 1;
-  $db->query("UPDATE settlement SET members='$new_mem' WHERE setid='$sel_mem'");
+  $db->query("UPDATE settlement SET members='$new_mem' WHERE setid=" . mb_sql_int($sel_mem) . "");
 
   $snum = $sel_mem;
 
@@ -183,7 +183,7 @@ if ($signup) {
       else  { $suicide  = 0;  $r14pts = 0;  }
 
     $db->query("INSERT INTO user (email,  pw, ename, msn, aim, gp, iron, exp, food, land, mts, setid, class, userid, race, safemode, signup_comp_id)
-      VALUES ($q_email, $q_pw, $q_ename, $q_msn, $q_aim, '$gp', '$iron', '0', '1500', '250', '200', '$snum', $q_class, '$newbuserid', $q_race, '48', '$computer_id') ");
+      VALUES ($q_email, $q_pw, $q_ename, $q_msn, $q_aim, '$gp', '$iron', '0', '1500', '250', '200', " . mb_sql_int($snum) . ", $q_class, '$newbuserid', $q_race, '48', '$computer_id') ");
 
     $db->query("INSERT INTO buildings (email, pw, home, barrack, farm, wp, gm, im, aland, amts, userid)
       VALUES ($q_email, $q_pw,'50', '50', '50', '0', '50', '50', '100', '100', '$newbuserid') ");

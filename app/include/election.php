@@ -34,14 +34,14 @@ if (!function_exists('mb_settlement_elect')) {
 
 		$r = mysqli_query($db, "SELECT max(vote) FROM user WHERE setid=$q_set");
 		$row = $r ? mysqli_fetch_row($r) : null;
-		$max = $row ? (int) $row[0] : 0;
+		$max = (int) ($row ? $row[0] : 0);
 
 		if ($max <= 0) {
 			mysqli_query($db, "UPDATE user SET sl='no' WHERE setid=$q_set");
 			return;
 		}
 
-		$r = mysqli_query($db, "SELECT userid FROM user WHERE setid=$q_set AND vote=$max ORDER BY (sl='yes') DESC, userid ASC LIMIT 1");
+		$r = mysqli_query($db, "SELECT userid FROM user WHERE setid=$q_set AND vote=" . mb_sql_int($max) . " ORDER BY (sl='yes') DESC, userid ASC LIMIT 1");
 		$row = $r ? mysqli_fetch_row($r) : null;
 		if (!$row) {
 			return;

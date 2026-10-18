@@ -16,7 +16,7 @@ echo  "
 </div>";
 
 //	determine guild id
-$guild_id_query = mysqli_query($db, "SELECT gid FROM guild WHERE gname='$empireguild'");
+$guild_id_query = mysqli_query($db, "SELECT gid FROM guild WHERE gname=" . mb_sql_str($db, $empireguild) . "");
 	$guild_id = mysqli_fetch_array($guild_id_query);
 
 // display all news in said guild
@@ -29,7 +29,7 @@ echo "
 		<td class=main2 width=20% align=left><b class=reg>Date/Time</b></td>
 		<td class=main2 align=left><b class=reg width=80%>News</b></td>";
 
-$query_string = "SELECT date, news, gnid, class FROM guildnews WHERE gid='$guild_id[gid]' ORDER BY date DESC LIMIT 0, 60";
+$query_string = "SELECT date, news, gnid, class FROM guildnews WHERE gid=" . mb_sql_int($guild_id['gid']) . " ORDER BY date DESC LIMIT 0, 60";
 $result_id = mysqli_query($db, $query_string);
 while ($row = mysqli_fetch_row($result_id))	{
 	$num = $num + 1;

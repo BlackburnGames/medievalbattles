@@ -577,6 +577,21 @@ if (stripos($body, 'has been rejected from the guild') === false) {
 newsShows($target, 'main.php?pageid=news', 'You were rejected from Testguild.', '<font class=blue>');
 
 /*
+ * A guild name that is SQL. gc.php took any fifteen characters, and the name is
+ * then interpolated bare wherever a member's guild is used -- so a guild called
+ * `a' OR 'a'='a`, once deleted, ran "UPDATE user SET guild='None' WHERE
+ * guild='a' OR 'a'='a'" and emptied every guild in the game. PoorSerf is
+ * guildless here, so the refusal is the only thing between it and the INSERT.
+ */
+forumRefuses($target, 'gc.php', array(
+    'create' => '1',
+    'gname'  => "a' OR 'a'='a",
+    'cpw'    => 'pw',
+    'ccpw'   => 'pw',
+    'info'   => 'x',
+), 'Guild names may use', 'app/gc.php: a guild name is not held to include/credentials.php');
+
+/*
  * Joining a guild, end to end, and the arm where nobody asked.
  *
  * guildconfig.php's accept branch wrote the membership from the auserid in the

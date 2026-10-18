@@ -10,7 +10,7 @@ $topicid = (int) mb_input('topicid');
 include("include/igtop.php");
 include("commong.php");
 
-$result= mysqli_query($db, "SELECT topicid, guildname FROM guildthreads WHERE guildname='$empireguild' AND topicid='$topicid'") or die("Error! " . mysqli_error($db));
+$result= mysqli_query($db, "SELECT topicid, guildname FROM guildthreads WHERE guildname=" . mb_sql_str($db, $empireguild) . " AND topicid='$topicid'") or die("Error! " . mysqli_error($db));
 $guild_check = mysqli_fetch_array($result);
 
 if($empireguild != $guild_check['guildname'])	{

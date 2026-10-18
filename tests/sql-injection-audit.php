@@ -54,7 +54,8 @@
 
 $repoRoot = dirname(__DIR__);
 $appRoot  = $repoRoot . '/app';
-$baseline = __DIR__ . '/sql-injection.txt';
+$stored   = in_array('--stored', $argv, true);
+$baseline = __DIR__ . ($stored ? '/sql-injection-stored.txt' : '/sql-injection.txt');
 $accept   = in_array('--accept', $argv, true);
 
 require_once __DIR__ . '/taint-lib.php';
@@ -175,7 +176,7 @@ foreach (mb_app_files($appRoot) as $path) {
     if (strpos($src, 'mysqli_') === false && strpos($src, '->') === false) {
         continue;
     }
-    $tainted = mb_tainted_names($src, $MB_SOURCE_GLOBALS, $MB_SANITIZERS);
+    $tainted = mb_tainted_names($src, $MB_SOURCE_GLOBALS, $MB_SANITIZERS, $stored ? $MB_STORED_CALLS : $MB_SOURCE_CALLS);
     $found   = mb_scan_queries($src, $tainted, $MB_SOURCE_GLOBALS, $MB_SANITIZERS);
     ksort($found);
     foreach ($found as $name => $context) {

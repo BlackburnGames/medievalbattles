@@ -13,7 +13,7 @@ if($empireguild == 'None')	{
 }
 
 //	determine owner
-$guild_owner_query = mysqli_query($db, "SELECT owner FROM guild WHERE gname='$empireguild'");	
+$guild_owner_query = mysqli_query($db, "SELECT owner FROM guild WHERE gname=" . mb_sql_str($db, $empireguild) . "");	
 	$owner_query = mb_db_result($guild_owner_query,"owner_query");
 
 if($owner_query == $userid)	{
@@ -23,7 +23,7 @@ if($owner_query == $userid)	{
 
 include("commong.php");
 
-$query = "SELECT topicid, name, topic, replies, lastpost, lastposter FROM guildthreads WHERE guildname='$empireguild' ORDER by lastpost DESC";
+$query = "SELECT topicid, name, topic, replies, lastpost, lastposter FROM guildthreads WHERE guildname=" . mb_sql_str($db, $empireguild) . " ORDER by lastpost DESC";
 $result= mysqli_query($db, $query) or die("Error in query! " . mysqli_error($db));
 
 if ($result) { 

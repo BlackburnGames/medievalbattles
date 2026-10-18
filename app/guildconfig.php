@@ -56,7 +56,7 @@ else	{
 	$guild_info_query = mysqli_query($db, "SELECT * FROM guild WHERE owner='$userid'");
 		$guild_info = mysqli_fetch_array($guild_info_query);
 	// get number of members
-	$guild_members_query = mysqli_query($db, "SELECT count(ename) FROM user WHERE guild='$guild_info[gname]'");
+	$guild_members_query = mysqli_query($db, "SELECT count(ename) FROM user WHERE guild=" . mb_sql_str($db, $guild_info['gname']) . "");
 		$guild_members = mb_db_result($guild_members_query, "guild_members");
 	// get their empire name
 	$applicant_ename_query = mysqli_query($db, "SELECT ename FROM user WHERE userid=$q_auserid");
@@ -88,7 +88,7 @@ else	{
 		die();
 	}
 	elseif($current_guild['guild'] == 'None')	{
-		mysqli_query($db, "UPDATE user SET guild='$guild_info[gname]' WHERE userid=$q_auserid");
+		mysqli_query($db, "UPDATE user SET guild=" . mb_sql_str($db, $guild_info['gname']) . " WHERE userid=$q_auserid");
 		mb_news_emp($db, "$clock", 'blue', "You were accepted into $guild_info[gname].", $q_auserid);
 
 		$Guild_MaxID = mysqli_query($db, "SELECT max(gnid) FROM guildnews");
@@ -197,8 +197,8 @@ else	{
 	else	{
 		$new_mem = $guild_info['mem'] - 1;
 		mysqli_query($db, "UPDATE user SET guild='None' WHERE userid=$q_remp");
-		mysqli_query($db, "UPDATE guild SET mem='$new_mem' WHERE owner='$userid'");	
-		mysqli_query($db, "DELETE FROM barter WHERE seller='$empire_info[0]' AND guild='$empireguild'");
+		mysqli_query($db, "UPDATE guild SET mem=" . mb_sql_int($new_mem) . " WHERE owner='$userid'");	
+		mysqli_query($db, "DELETE FROM barter WHERE seller=" . mb_sql_str($db, $empire_info[0]) . " AND guild=" . mb_sql_str($db, $empireguild) . "");
 		mb_news_emp($db, "$clock", 'blue', "You were removed from $guild_info[gname].", $q_remp);
 		mb_news_guild($db, "$clock", 'blue', "$empire_info[0] has been removed from the guild.", $guild_info['gid'], 0);
 
@@ -224,7 +224,7 @@ else	{
 		$GuildID = mysqli_query($db, "SELECT gid FROM guild WHERE owner='$userid'");
 			$GIDD = mb_db_result($GuildID,"GIDD");
 
-		mysqli_query($db, "UPDATE user SET guild='None' WHERE guild='$GN'");
+		mysqli_query($db, "UPDATE user SET guild='None' WHERE guild=" . mb_sql_str($db, $GN) . "");
 		mysqli_query($db, "DELETE FROM guild WHERE owner='$userid'");
 			
 		echo "<div align=center><font class=yellow>Your guild has been deleted.</font></div>";
