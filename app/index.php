@@ -85,6 +85,9 @@ if ($computer_id === '') {
         if ($page === '' || !preg_match('/^[A-Za-z0-9_-]+$/', $page) || !file_exists(__DIR__ . '/' . $page . '.php')) {
           $page = "main-site";
         }
+        // The four pages meant to be shown here each put their body in $data,
+        // but the check above admits any .php file in app/.
+        $data = '';
         include($page . ".php");
         echo $data;
       ?>

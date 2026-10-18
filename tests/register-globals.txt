@@ -5,4 +5,3 @@ app/attack.php	ltally
 app/attackm.php	mgain
 app/attackm.php	mtally
 app/include/connect.php	db
-app/index.php	data
