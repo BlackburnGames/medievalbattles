@@ -109,7 +109,7 @@ else
 	else	
 	{
 	 
-	 		$asages = $assages - ($ur1 + $ur2 + $ur3 + $ur4 + $ur5 + $ur6 + $ur7 + $ur8 + $ur9 + $ur10 + $ur11 + $ur12 + $ur13 + $ur14 + $ur15 + $ur16 + $ur17 + $ur18);
+	 		$asages = $asages - ($ur1 + $ur2 + $ur3 + $ur4 + $ur5 + $ur6 + $ur7 + $ur8 + $ur9 + $ur10 + $ur11 + $ur12 + $ur13 + $ur14 + $ur15 + $ur16 + $ur17 + $ur18);
 	 		$sages = $sages - ($ur1 + $ur2 + $ur3 + $ur4 + $ur5 + $ur6 + $ur7 + $ur8 + $ur9 + $ur10 + $ur11 + $ur12 + $ur13 + $ur14 + $ur15 + $ur16 + $ur17 + $ur18);
 	 		$r1 = $res['r1'] + $ur1;
 	 		$r2 = $res['r2'] + $ur2;

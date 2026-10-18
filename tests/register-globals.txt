@@ -7,4 +7,3 @@ app/attackm.php	mtally
 app/buildings.php	adv_const
 app/include/connect.php	db
 app/index.php	data
-app/research.php	assages
