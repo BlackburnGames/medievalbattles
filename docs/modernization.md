@@ -456,6 +456,27 @@ attribute.
   both inventories, kept in a form that shrinks as they are fixed. Treat the
   first as suspects rather than defects — it is per-file and flow-insensitive,
   so a variable assigned in one file and read in another looks unassigned.
+
+  Forty-eight of them were in `functions.php`, `nexplode.php`,
+  `attack/calculations.php` and four pages, and forty-five were dead:
+  `functions.php` summing army totals from the returntbl row before fetching
+  it, `nexplode.php` stripping separators from nineteen names nothing assigns
+  — a donation form, dogs, the pre-rename Scientists, research the panel never
+  reads into those names — and accumulators and loop counters that started
+  from null where they meant zero, plus `index.php`'s content slot, which the
+  four pages meant for it fill but any other `?page=` did not. The affordability loops on the buildings
+  page needed care: they had always started from null, which compares below
+  any numeric string, so a dead `$bcost > $gp` check had never mattered, and
+  initialising them is only safe together with pointing that check at
+  `$b_cost`. The attacker's unit tally is an `elseif` chain and so always 1;
+  that is the combat formula and it stays. `connect.php` reading `$db` is
+  `isset()` guarding a repeat include and stays on the list. **Two were
+  real.** `research.php` reported the sages left after a send from
+  `$assages`, so a successful send always said you had a negative number.
+  And `buildings.php` capped six of its seven construction timers through
+  `$adv_const`, which nothing assigns, so any queue that came out over 20
+  divided by null: on 8.3 a blank page with the gold already spent and the
+  timer never written, on 5.6 a timer of 0, which the tick never builds.
 - **Authorization.** **The forums are done — both the moderation pages and the
   four post handlers. The rest is not.** Nothing outside the forums checks that
   you own what you are acting on beyond the queries' own `WHERE` clauses.
