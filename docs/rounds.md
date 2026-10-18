@@ -272,6 +272,11 @@ fingerprint of the account's address and hash:
 - **How long are ended round databases kept?** Round results are kept
   indefinitely. The raw databases are needed only for anything that wants
   more than the snapshot.
-- **Should an account have a public name across rounds?** Today, the only
-  name is the kingdom's. A persistent handle would make history readable by
-  other players, not just the account's owner.
+- ~~**Should an account have a public name across rounds?**~~ **Yes, and it
+  has one:** `account.handle`, chosen at signup, unique ignoring case, held to
+  the empire-name rule by `mb_valid_handle()`, and shown on the preferences
+  page. A round result should record it beside the kingdom's name, so history
+  reads as the player rather than as a different empire each round. It is
+  not changeable from the game yet; whether it should be — and what history
+  then shows — is a decision for step 3. Accounts moved by
+  `bin/accounts-migrate.php` take their empire's name.

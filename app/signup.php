@@ -15,6 +15,7 @@ $data = "
                 <tr><td>Confirm Email:</td><td><input type='text' name='cemail' size='30' maxlength='254'></td></tr>
                 <tr><td>Password:</td><td><input type='password' name='pw' size='30' maxlength='15'></td></tr>
                 <tr><td>Confirm Password:</td><td><input type='password' size='30' name='cpw' maxlength='15'></td></tr>
+                <tr><td>Player Name:</td><td><input type='text' name='handle' size='30' maxlength='25'></td></tr>
                 <tr><td>Empire Name:</td><td><input type='text' name='ename' size='30' maxlength='25'></td></tr>
                 <tr><td>Race:</td>
                   <td><select name='race'>

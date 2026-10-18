@@ -9,8 +9,9 @@
  * more tables, and the admin flag in `user.admin`. For each kingdom this makes
  * an account with the address, the hash and the flag, and records it in
  * `user.account_id`. Then it drops `email` and `pw` from all six tables and
- * `admin` from `user`, and indexes the five child tables on userid, as db.sql
- * declares them.
+ * `admin` from `user`, carries each kingdom's activation over to its account
+ * and drops `emailvalidate`, and indexes the five child tables on userid, as
+ * db.sql declares them. Each account's public name is its empire's.
  *
  * Re-runnable. A world without `user.email` has been moved, and nothing is
  * done. An address that already has an account keeps that account, and its
@@ -32,6 +33,22 @@ function mb_migrate_has_column($db, $table, $column)
     return $r && mysqli_fetch_row($r);
 }
 
+/**
+ * A public name for an account made from an old kingdom: its empire name,
+ * which signup held to the same rule and kept unique in the round -- never
+ * anything from the address, which is private. A clash with an account that
+ * already exists gets a number.
+ */
+function mb_migrate_handle(array $row)
+{
+    $base = mb_valid_handle($row['ename']) ? $row['ename'] : 'Player ' . (int) $row['userid'];
+    $handle = $base;
+    for ($n = 2; mb_account_handle_taken($handle); $n++) {
+        $handle = substr($base, 0, 25 - strlen(" $n")) . " $n";
+    }
+    return $handle;
+}
+
 if (!mb_migrate_has_column($db, 'user', 'email')) {
     echo "Already moved: user has no email column.\n";
     exit(0);
@@ -42,9 +59,10 @@ if (!mb_migrate_has_column($db, 'user', 'account_id')) {
 }
 
 $hasAdmin = mb_migrate_has_column($db, 'user', 'admin');
+$hasValidate = (bool) mysqli_fetch_row(mysqli_query($db, "SHOW TABLES LIKE 'emailvalidate'"));
 $select = $hasAdmin
-    ? "SELECT userid, email, pw, signup_comp_id, admin FROM user ORDER BY userid"
-    : "SELECT userid, email, pw, signup_comp_id, 0 AS admin FROM user ORDER BY userid";
+    ? "SELECT userid, email, pw, signup_comp_id, ename, admin FROM user ORDER BY userid"
+    : "SELECT userid, email, pw, signup_comp_id, ename, 0 AS admin FROM user ORDER BY userid";
 $rows = array();
 $r = mysqli_query($db, $select); // mb-unbound-ok: one of two literal statements
 while ($row = mysqli_fetch_assoc($r)) {
@@ -57,7 +75,7 @@ foreach ($rows as $row) {
     if ($account) {
         $kept++;
     } else {
-        mb_account_create($row['email'], $row['pw'], $row['signup_comp_id']);
+        mb_account_create($row['email'], mb_migrate_handle($row), $row['pw'], $row['signup_comp_id']);
         $account = mb_account_find($row['email']);
         $made++;
     }
@@ -65,6 +83,21 @@ foreach ($rows as $row) {
         mb_account_set_admin($account['account_id'], true);
     }
     mb_query($db, "UPDATE user SET account_id=? WHERE userid=?", array((int) $account['account_id'], (int) $row['userid']));
+
+    // An account is made unverified. One whose kingdom the old world had
+    // already activated -- emailvalidate.check 2 -- stays activated, or every
+    // existing player would be held at the gate on their next login.
+    if ($hasValidate) {
+        $v = mb_query($db, "SELECT `check` FROM emailvalidate WHERE userid=?", array((int) $row['userid']));
+        $vrow = $v ? mysqli_fetch_row($v) : null;
+        if ($vrow && (int) $vrow[0] === 2) {
+            mb_account_mark_verified($account['account_id']);
+        }
+    }
+}
+
+if ($hasValidate) {
+    mysqli_query($db, "DROP TABLE emailvalidate");
 }
 
 // Only after every kingdom is linked: the copies are what the links were made from.

@@ -41,7 +41,7 @@ foreach ($CASES as $i => $case) {
     $client->get('/index.php');
     $body = $client->post('/checksignup.php', array(
         'signup' => 1, 'email' => $email, 'cemail' => $email, 'pw' => 'pass1234', 'cpw' => 'pass1234',
-        'ename' => "Signup $i", 'race' => $race, 'class' => $class, 'msn' => '', 'aim' => '',
+        'handle' => "Signup Player $i", 'ename' => "Signup $i", 'race' => $race, 'class' => $class, 'msn' => '', 'aim' => '',
     ));
 
     $label = "$race $class";
@@ -70,6 +70,23 @@ foreach ($CASES as $i => $case) {
     }
 }
 
+// A player name is the account's across rounds, and unique ignoring case:
+// the fixture's tester@ is "Tester".
+mysqli_query($db, "UPDATE user SET ip = ''");
+$client = new MbClient($BASE);
+$client->get('/index.php');
+$body = $client->post('/checksignup.php', array(
+    'signup' => 1, 'email' => 'copycat@example.com', 'cemail' => 'copycat@example.com', 'pw' => 'pass1234', 'cpw' => 'pass1234',
+    'handle' => 'TESTER', 'ename' => 'Copycat', 'race' => 'Human', 'class' => 'Fighter', 'msn' => '', 'aim' => '',
+));
+$made = (int) mysqli_fetch_row(mysqli_query($adb, "SELECT count(*) FROM account WHERE email = 'copycat@example.com'"))[0];
+if ($made !== 0 || stripos($body, 'already being used') === false) {
+    echo "FAIL: a signup took the player name TESTER, which Tester already has\n";
+    $failures++;
+} else {
+    echo "ok: a player name already taken, in any case, is refused\n";
+}
+
 // An address with an apostrophe, which is legal and which the game refused
 // while addresses were interpolated into its queries. It signs up, logs in,
 // and comes back escaped in the preferences form's attribute.
@@ -79,7 +96,7 @@ $client = new MbClient($BASE);
 $client->get('/index.php');
 $body = $client->post('/checksignup.php', array(
     'signup' => 1, 'email' => $obrien, 'cemail' => $obrien, 'pw' => 'pass1234', 'cpw' => 'pass1234',
-    'ename' => 'Obrien', 'race' => 'Human', 'class' => 'Fighter', 'msn' => '', 'aim' => '',
+    'handle' => 'Obrien Player', 'ename' => 'Obrien', 'race' => 'Human', 'class' => 'Fighter', 'msn' => '', 'aim' => '',
 ));
 $client = new MbClient($BASE);
 $client->get('/index.php');
@@ -104,8 +121,10 @@ if ($client->lastStatus !== 302) {
         stripos((new MbClient($BASE))->get($link . str_repeat('0', 32)), 'Validation code is incorrect') !== false;
     $checks['the mailed link activates it'] =
         stripos((new MbClient($BASE))->get($link . $acct['verify_code']), 'has been activated') !== false;
+    $prefs = $client->get('/preferences.php');
     $checks['after which the game lets it in, the address shown escaped'] =
-        strpos($client->get('/preferences.php'), 'value="o&#039;brien@example.com"') !== false;
+        strpos($prefs, 'value="o&#039;brien@example.com"') !== false;
+    $checks['and the player name it chose is shown'] = strpos($prefs, 'Obrien Player') !== false;
     foreach ($checks as $what => $ok) {
         echo ($ok ? 'ok' : 'FAIL') . ": $obrien: $what\n";
         $failures += $ok ? 0 : 1;
@@ -124,7 +143,7 @@ foreach (array($lapsed => 'Lapsed', $fresh => 'Fresh') as $addr => $name) {
     $c->get('/index.php');
     $c->post('/checksignup.php', array(
         'signup' => 1, 'email' => $addr, 'cemail' => $addr, 'pw' => 'pass1234', 'cpw' => 'pass1234',
-        'ename' => $name, 'race' => 'Human', 'class' => 'Fighter', 'msn' => '', 'aim' => '',
+        'handle' => "$name Player", 'ename' => $name, 'race' => 'Human', 'class' => 'Fighter', 'msn' => '', 'aim' => '',
     ));
 }
 $hours = $GAMEDATA['timers']['activation_hours'] + 1;

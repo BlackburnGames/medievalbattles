@@ -1,6 +1,7 @@
 <?php
 /**
- * What an email address, an empire name and a guild name are allowed to be.
+ * What an email address, a player name, an empire name and a guild name are
+ * allowed to be.
  *
  * This began with one entry on tests/sql-injection.txt that could not be fixed
  * where it was reported. preferences.php let a player choose a new address,
@@ -101,5 +102,20 @@ if (!function_exists('mb_valid_ename')) {
     {
         return is_string($value)
             && preg_match('/^[A-Za-z0-9](?:[A-Za-z0-9 ._\-]{0,23}[A-Za-z0-9._\-])?$/', $value) === 1;
+    }
+}
+
+if (!function_exists('mb_valid_handle')) {
+    /**
+     * A player's public name, kept by the account across rounds. The empire
+     * name's rule, for the same reasons: it is shown on pages other players
+     * read, and a positive charset keeps lookalikes and markup out.
+     *
+     * @param  mixed $value
+     * @return bool
+     */
+    function mb_valid_handle($value)
+    {
+        return mb_valid_ename($value);
     }
 }

@@ -67,7 +67,7 @@ if (!function_exists('mb_account_find')) {
     function mb_account_find($email)
     {
         $r = mb_query(mb_accounts_db(),
-            "SELECT account_id, email, pw, admin, verified_at, verify_code, created FROM account WHERE email=?", array((string) $email));
+            "SELECT account_id, email, handle, pw, admin, verified_at, verify_code, created FROM account WHERE email=?", array((string) $email));
         $row = $r ? mysqli_fetch_assoc($r) : null;
         return $row ? $row : null;
     }
@@ -82,7 +82,7 @@ if (!function_exists('mb_account_get')) {
     function mb_account_get($account_id)
     {
         $r = mb_query(mb_accounts_db(),
-            "SELECT account_id, email, pw, admin, verified_at, verify_code, created FROM account WHERE account_id=?", array((int) $account_id));
+            "SELECT account_id, email, handle, pw, admin, verified_at, verify_code, created FROM account WHERE account_id=?", array((int) $account_id));
         $row = $r ? mysqli_fetch_assoc($r) : null;
         return $row ? $row : null;
     }
@@ -112,6 +112,15 @@ if (!function_exists('mb_account_emails')) {
     }
 }
 
+if (!function_exists('mb_account_handle_taken')) {
+    /** Whether another account already has this public name, ignoring case. */
+    function mb_account_handle_taken($handle)
+    {
+        $r = mb_query(mb_accounts_db(), "SELECT 1 FROM account WHERE handle=?", array((string) $handle));
+        return $r && mysqli_fetch_row($r);
+    }
+}
+
 if (!function_exists('mb_account_create')) {
     /**
      * Make an account, unverified, with the code its confirmation link will
@@ -120,11 +129,11 @@ if (!function_exists('mb_account_create')) {
      *
      * @return int  the new account's id
      */
-    function mb_account_create($email, $hash, $computer_id)
+    function mb_account_create($email, $handle, $hash, $computer_id)
     {
         $adb = mb_accounts_db();
-        mb_query($adb, "INSERT INTO account (email, pw, signup_comp_id, created, verify_code) VALUES (?, ?, ?, NOW(), ?)",
-            array((string) $email, (string) $hash, (string) $computer_id, bin2hex(random_bytes(16))));
+        mb_query($adb, "INSERT INTO account (email, handle, pw, signup_comp_id, created, verify_code) VALUES (?, ?, ?, ?, NOW(), ?)",
+            array((string) $email, (string) $handle, (string) $hash, (string) $computer_id, bin2hex(random_bytes(16))));
         return (int) mysqli_insert_id($adb);
     }
 }

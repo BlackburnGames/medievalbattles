@@ -1,0 +1,26 @@
+# Template for the server's public_html/.htaccess. Server-owned: deploy.sh
+# never sends or deletes it, because it holds the database password. The
+# repo's own app/.htaccess (error_reporting 1, display_errors on) is NOT
+# shipped -- it would show PHP's messages to players.
+#
+# Install:  scp deploy/htaccess.example siteground-mb:www/jacobp259.sg-host.com/public_html/.htaccess
+# then edit the values on the server. SiteGround prefixes database and user
+# names; use the names exactly as Site Tools > Site > MySQL shows them.
+#
+# Whether SetEnv reaches getenv() and whether php_flag is honoured on this host
+# is what deploy/probe.sh checks -- run it before relying on either.
+
+# PHP version (Site Tools > Devs > PHP Manager writes this line too).
+AddHandler application/x-httpd-php83 .php .php5 .php4 .php3
+
+# Read by app/include/connect.php and app/include/accounts.php.
+SetEnv MB_DB_HOST localhost
+SetEnv MB_DB_NAME CHANGEME_round_db
+SetEnv MB_ACCOUNTS_DB_NAME CHANGEME_accounts_db
+SetEnv MB_DB_USER CHANGEME_user
+SetEnv MB_DB_PASS CHANGEME_password
+SetEnv MB_REPORT_QUERIES 1
+
+# The include directories are only ever require'd, never requested. Serving
+# them runs each one standalone, out of the context it was written for.
+RedirectMatch 404 ^/(admin/)?include/

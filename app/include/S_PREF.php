@@ -3,6 +3,9 @@
 	<tr>
 		<td class=main colspan=2><b>Update Preferences</b></td>
     <tr>
+		<td class=main2><b>Player Name:</b></td>
+		<td class=inner2><?php echo mb_h($mb_account ? $mb_account['handle'] : ''); ?></td>
+	<tr>
 		<td class=main2><b>Email:</b></td>
 		<td class=inner2><input type="text" name="newemail" maxlength=254 value="<?
 

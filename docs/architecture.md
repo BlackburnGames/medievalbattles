@@ -53,7 +53,8 @@ loads the logged-in user's entire state into globals (`$gp`, `$civ`, `$land`,
 **Two databases.** The round (`MB_DB_NAME`, `mbv6`, `db.sql`) is the world:
 kingdoms and everything hanging off them. The accounts database beside it
 (`MB_ACCOUNTS_DB_NAME`, `mb_accounts`, `db/accounts.sql`) holds one table,
-`account` — address, password hash, admin flag — and outlasts the round, so
+`account` — address, public player name, password hash, admin flag, whether
+the address is confirmed — and outlasts the round, so
 nothing that ends a kingdom deletes a login. `app/include/accounts.php` opens
 its connection on first use. The kingdom is linked to its account by `user.account_id`, not by
 address: an address can change, and an ended round keeps the one it had.

@@ -11,6 +11,9 @@ $cemail = $_POST['cemail'];
 $pw = $_POST['pw'];
 $cpw = $_POST['cpw'];
 $ename = $_POST['ename'];
+// The account's public name, the same in every round; the empire name is
+// only this round's. Ignored when an existing account signs up again.
+$handle = isset($_POST['handle']) ? trim((string) $_POST['handle']) : '';
 $race = $_POST['race'];
 $class = $_POST['class'];
 $msn = $_POST['msn'];
@@ -95,6 +98,9 @@ if ($signup) {
   $account = mb_account_find($email);
   if ($account && !mb_password_verify($pw, $account['pw'])) { echo mb_h($email) . " is already being used!";  die(); }
   if ($account && mb_kingdom_find($db, $account['account_id'])) { echo mb_h($email) . " is already being used!";  die(); }
+  // A new account names its player. An existing one already has a name.
+  if (!$account && !mb_valid_handle($handle)) { echo "Player names may use letters, numbers, spaces and . _ - only, up to 25 characters!";  die(); }
+  if (!$account && mb_account_handle_taken($handle)) { echo mb_h($handle) . " is already being used!";  die(); }
 
   //  select minimum amount of members
     $Sett_least = mb_query($db, "SELECT min(members) FROM settlement");
@@ -142,9 +148,9 @@ if ($signup) {
     if ($account) {
       $email = $account['email'];
       $account_id = (int) $account['account_id'];
-    } elseif (!($account_id = mb_account_create($email, mb_password_hash($pw), $computer_id))) {
-      // Another signup took the address between the check and here; the
-      // accounts table's unique key refused this one.
+    } elseif (!($account_id = mb_account_create($email, $handle, mb_password_hash($pw), $computer_id))) {
+      // Another signup took the address or the name between the check and
+      // here; the accounts table's unique keys refused this one.
       echo mb_h($email) . " is already being used!";  die();
     }
 

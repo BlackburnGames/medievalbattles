@@ -15,6 +15,11 @@ CREATE TABLE `account` (
   `account_id` int unsigned NOT NULL AUTO_INCREMENT,
   -- mb_valid_email() refuses anything longer than this column.
   `email` varchar(254) NOT NULL,
+  -- The player's public name, the same in every round: what round history
+  -- and the rankings of past rounds show, where a kingdom's name is only that
+  -- round's. Chosen at signup, unique ignoring case, held to the empire-name
+  -- rule by mb_valid_handle(). Never the address, which is private.
+  `handle` varchar(25) NOT NULL,
   -- bcrypt, or the legacy unsalted MD5 that checklogin.php rehashes on the
   -- way through. Bound in every query that touches it, never interpolated.
   `pw` varchar(255) NOT NULL,
@@ -32,5 +37,6 @@ CREATE TABLE `account` (
   -- The code the link carries: 32 hex characters, compared with hash_equals().
   `verify_code` varchar(64) NOT NULL DEFAULT '',
   PRIMARY KEY (`account_id`),
-  UNIQUE KEY `email` (`email`)
+  UNIQUE KEY `email` (`email`),
+  UNIQUE KEY `handle` (`handle`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

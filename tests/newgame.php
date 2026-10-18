@@ -152,7 +152,7 @@ foreach ($WIPES as $wipe => $form) {
         $client->get('/index.php');
         $client->post('/checksignup.php', array(
             'signup' => 1, 'email' => $twinEmail, 'cemail' => $twinEmail, 'pw' => 'pass1234', 'cpw' => 'pass1234',
-            'ename' => "Twin $id", 'race' => $a['race'], 'class' => $a['class'], 'msn' => '', 'aim' => '',
+            'handle' => "Twin Player $id", 'ename' => "Twin $id", 'race' => $a['race'], 'class' => $a['class'], 'msn' => '', 'aim' => '',
         ));
         $twinRow = mysqli_fetch_row(mysqli_query($db, "SELECT userid FROM user WHERE ename = 'Twin $id'"));
         if (!$twinRow) {
@@ -216,7 +216,7 @@ foreach ($WIPES as $wipe => $form) {
     }
     mysqli_query($db, "UPDATE user SET ip = ''");
     $rejoin = array('signup' => 1, 'email' => $NOT_ADMIN, 'cemail' => $NOT_ADMIN, 'pw' => 'wrong', 'cpw' => 'wrong',
-        'ename' => 'Returned Serf', 'race' => 'Giant', 'class' => 'Ranger', 'msn' => '', 'aim' => '');
+        'handle' => 'Ignored On Rejoin', 'ename' => 'Returned Serf', 'race' => 'Giant', 'class' => 'Ranger', 'msn' => '', 'aim' => '');
     $back->post('/checksignup.php', $rejoin);
     if (kingdomsOf($db, $adb, $NOT_ADMIN) !== 0) {
         fail("$wipe: signup gave $NOT_ADMIN's address a kingdom without its password");

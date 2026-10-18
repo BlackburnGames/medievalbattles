@@ -1,0 +1,15 @@
+# Template for ~/.mb-env on the server: the tick's database settings, read by
+# mb/tick.sh. Server-owned and never deployed.
+#
+# Install:  scp deploy/mb-env.example siteground-mb:.mb-env
+#           ssh siteground-mb 'chmod 600 ~/.mb-env'
+# then edit the values to match public_html/.htaccess.
+MB_DB_HOST=localhost
+MB_DB_NAME=CHANGEME_round_db
+MB_ACCOUNTS_DB_NAME=CHANGEME_accounts_db
+MB_DB_USER=CHANGEME_user
+MB_DB_PASS=CHANGEME_password
+MB_REPORT_QUERIES=1
+
+# Leave at 0 while update.php still mails a hardcoded address every tick.
+MB_TICK_MAIL=0
