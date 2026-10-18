@@ -28,7 +28,7 @@ changed number was intended. Re-accept with `--accept`.
 
 Pins combat — `attack.php`, `attackr.php`, `attackm.php`, `scattack.php` and
 the two shared includes — which the tick never runs and the crawl drives only
-far enough to prove it renders. Thirty-seven scenarios, each from a fresh
+far enough to prove it renders. Thirty-nine scenarios, each from a fresh
 fixture: `tests/combat-golden.php` drops every table and reloads `db.sql` and
 `db/seed.sql` itself, applies a few `UPDATE`s to set up the two armies, logs in
 as `tester@` and posts the attack. It prints what the page said and **every
