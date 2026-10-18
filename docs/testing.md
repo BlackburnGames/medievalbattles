@@ -94,6 +94,37 @@ build anything without filling in all seven boxes. The crawl could not see it
 because it follows links and never fills a form in. `mb_count()` is the fix;
 see `app/include/request.php`.
 
+### `tests/unbound-queries-audit.php`
+
+How many queries in each file still build their SQL out of values instead of
+binding them with `mb_query()`: a variable interpolated or concatenated into
+the SQL argument, or a variable holding the whole statement. A query with no
+values in it is not counted, and neither is a value in `mb_query()`'s params
+array. The baseline, `tests/unbound-queries.txt`, holds a count per file rather
+than a list of entries, so the comparison is its own: a file may have fewer
+than its baseline, never more, and a file the baseline does not list may have
+none. `--list <file>` prints each call; `--accept` lowers the baseline after a
+conversion. It scans `update.php` as well as `app/`.
+
+`tools/bind-queries.php` does most conversions. It rewrites a call only when
+every value in it is unambiguously a value, and reports the rest with the
+reason:
+
+- `'$x'` or `\"$x\"` quoted in the SQL becomes a bound value; so do
+  `mb_sql_str($db, X)` and `mb_sql_int(X)`, and a `$q_x` variable holding one
+  of those, when it is assigned once and nothing in `X` is reassigned after.
+  The assignment goes when nothing reads it any more.
+- A bare variable is bound only as the whole right-hand side of a `WHERE`
+  comparison or after `LIMIT` / `OFFSET`. In a `SET` or in arithmetic it is
+  left alone: MySQL reads a number written into the SQL as an exact decimal,
+  and `ROUND()` of that and of a bound value can differ on a .5 — and combat
+  and the tick round everywhere.
+- Anything where a name may go, a value inside quotes with other text, a
+  variable concatenated in, or SQL that is itself a variable, is left.
+
+`--bare` lists every unquoted value it would bind, with the SQL either side,
+for review.
+
 ### `tests/signup.php`
 
 What a new empire starts with. The crawl cannot sign up — `checksignup.php`

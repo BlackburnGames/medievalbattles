@@ -81,9 +81,13 @@ if (!function_exists('mb_query')) {
      * literal: tests/sql-injection-audit.php reads it as a query sink like
      * mysqli_query(), and the params array as safe.
      *
-     * Each value is bound by its PHP type: int as an integer, float as a
-     * double, anything else as a string -- null included, as '', which is
-     * what interpolating it produced and what mb_sql_str() produces.
+     * An int is bound as an integer. Anything else is bound as a string --
+     * null as '', which is what interpolating it produced and what
+     * mb_sql_str() produces, and a float as the digits PHP would have
+     * interpolated. That last is on purpose: MySQL reads a number written into
+     * the SQL as an exact decimal and a bound double as approximate, and
+     * ROUND() of the two can differ on a .5. A string carrying the same digits
+     * is converted exactly as the quoted literal it replaces was.
      *
      * Failures report the way every other query in the app does: connect.php's
      * MYSQLI_REPORT_ERROR turns a failed prepare or execute into a warning,
@@ -108,8 +112,6 @@ if (!function_exists('mb_query')) {
             foreach ($params as $value) {
                 if (is_int($value)) {
                     $types .= 'i';
-                } elseif (is_float($value)) {
-                    $types .= 'd';
                 } else {
                     $types .= 's';
                     $value = (string) $value;

@@ -106,6 +106,14 @@ if ! docker compose exec -T web php /repo/tests/sql-injection-audit.php --stored
   status=1
 fi
 
+# Queries that still build their SQL out of values rather than binding them
+# with mb_query(). Per-file counts that may only fall.
+echo
+echo "=== unbound queries audit ==="
+if ! docker compose exec -T web php /repo/tests/unbound-queries-audit.php; then
+  status=1
+fi
+
 echo
 echo "=== unescaped output audit ==="
 if ! docker compose exec -T web php /repo/tests/xss-audit.php; then
