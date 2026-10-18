@@ -94,7 +94,9 @@ function mb_scan_globals($src)
             $depth = 0;
             $open  = false;
             for ($j = $i + 1; $j < $n; $j++) {
-                if ($t[$j] === '{') {
+                // "{$x}" and "${x}" in a string open with a token of their own
+                // and close with a plain '}'.
+                if ($t[$j] === '{' || (is_array($t[$j]) && in_array($t[$j][0], array(T_CURLY_OPEN, T_DOLLAR_OPEN_CURLY_BRACES), true))) {
                     $depth++;
                     $open = true;
                 } elseif ($t[$j] === '}') {

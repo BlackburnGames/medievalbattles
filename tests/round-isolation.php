@@ -187,6 +187,29 @@ $admin = login($BASE, 'tester@example.com', 'test1234');
 $admin->post('/admin/gameconfig.php', array('empre' => 'PoorSerf', 'daccount' => 'Delete'));
 after('deleting PoorSerf', count_of($db, "SELECT count(*) FROM user WHERE round_id = 1 AND ename = 'PoorSerf'") === 0);
 
+// dempire.php deletes by name too, through the same function.
+load_world($db);
+$admin = login($BASE, 'tester@example.com', 'test1234');
+$admin->post('/admin/dempire.php', array('empre' => 'PoorSerf', 'daccount' => 'Delete'));
+after('dempire.php deleting PoorSerf', count_of($db, "SELECT count(*) FROM user WHERE round_id = 1 AND ename = 'PoorSerf'") === 0);
+$body = $admin->post('/admin/dempire.php', array('empre' => 'TestLord', 'daccount' => 'Delete'));
+check('dempire.php refuses an administrator\'s kingdom', stripos($body, 'is an administrator') !== false
+    && count_of($db, "SELECT count(*) FROM user WHERE round_id = 1 AND ename = 'TestLord'") === 1);
+
+// Every admin action writes, and none of them answers a link: the same
+// requests as GETs leave the world as it was.
+load_world($db);
+$admin = login($BASE, 'tester@example.com', 'test1234');
+$messages = count_of($db, "SELECT count(*) FROM messages");
+$admin->get('/admin/gameconfig.php?action=messages');
+$admin->get('/admin/gameconfig.php?empre=PoorSerf&daccount=Delete');
+$admin->get('/admin/dempire.php?empre=PoorSerf&daccount=Delete');
+$admin->get('/admin/rounds.php?step=end&sure=yes');
+check('a GET to an admin action does nothing',
+    count_of($db, "SELECT count(*) FROM messages") === $messages
+    && count_of($db, "SELECT count(*) FROM user WHERE round_id = 1 AND ename = 'PoorSerf'") === 1
+    && count_of($db, "SELECT count(*) FROM `round` WHERE round_id = 1 AND status = 'running'") === 1);
+
 // A player aiming at the ended round. Every id in round 2 is a real row --
 // the audit passes a query that filters on one -- so it is the page that has
 // to see the target is not in the player's round. Round 2's kingdom 101 has

@@ -582,16 +582,6 @@ This email is automated. Your reply will not be recieved.";
     $GUILD_INC = $GUILD_INC + 1;
   }
 
-echo "Sending email to Mako informing him of the tick.<BR>";
-
-$message = "Tick successfully completed [" . date('r') . "]";
-$subject = "Tick completed";
-$email = "shoxfusion@gmail.com";
-
-mail("$email", "$subject", $message,
-"From: MB_Tick\r\n"
-."Reply-To: no_reply@medievalbattles.com\r\n"
-."X-Mailer: PHP/" . phpversion());
-
-echo "Email sent.<BR>";
-?>
+// The tick used to mail the original author's address on every run, from
+// every install. Whether a tick ran is the cron log's to say.
+echo "<p>Tick complete.</p>";

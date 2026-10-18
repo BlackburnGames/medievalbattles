@@ -55,3 +55,38 @@ if (!function_exists('mb_admin_kingdoms')) {
         return $rows;
     }
 }
+
+if (!function_exists('mb_admin_delete_kingdom')) {
+    /**
+     * Delete a kingdom of the current round, by its name: what dempire.php and
+     * gameconfig.php's delete form both do.
+     *
+     * They did it twice, each deleting six tables by hand -- leaving the
+     * kingdom's votes cast, any guild it led leaderless and its settlement's
+     * count one too high -- and only gameconfig.php refused an
+     * administrator's. Both come here: an administrator's kingdom is refused,
+     * the settlement is told, and include/empire.php's mb_empire_remove()
+     * does the rest, as for any other end of an empire. The account is kept.
+     *
+     * @return string  what happened, as plain text
+     */
+    function mb_admin_delete_kingdom($db, $ename)
+    {
+        require_once __DIR__ . '/../../include/empire.php';
+        $r = mb_query($db, "SELECT userid, setid, account_id FROM user WHERE round_id=? AND ename=?",
+            array((int) mb_round_current($db), (string) $ename));
+        $row = $r ? mysqli_fetch_assoc($r) : null;
+        if (!$row) {
+            return "No empire called $ename.";
+        }
+        // The flag is the account's; revoke it first, with bin/admin.php.
+        $account = mb_account_get($row['account_id']);
+        if ($account && (int) $account['admin'] === 1) {
+            return "$ename is an administrator. Revoke that first, with bin/admin.php.";
+        }
+        include __DIR__ . '/../../include/clock.php';
+        mb_news_set($db, "$clock", 'red', "[b]{$ename}[/b] has been deleted by an administrator", $row['setid'], 0);
+        mb_empire_remove($db, $row['userid']);
+        return "$ename has been deleted.";
+    }
+}

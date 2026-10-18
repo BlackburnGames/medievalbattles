@@ -39,11 +39,14 @@
 include("include/auth.php");
 mb_admin_require();
 
-// Request input, formerly supplied by register_globals.
-include("include/request.php");
-$action   = mb_input('action');
-$empre    = mb_input('empre');
-$daccount = mb_input('daccount');
+// Every action here writes, so each is read from a POST body and nowhere
+// else: a link -- a query string, a crawler, a prefetch -- does nothing.
+$post = function ($key) {
+	return isset($_POST[$key]) ? (string) $_POST[$key] : null;
+};
+$action   = $post('action');
+$empre    = $post('empre');
+$daccount = $post('daccount');
 
 include("include/igtop.php");
 
@@ -117,49 +120,10 @@ if (IsSet($action)) {
 // --- delete one account ------------------------------------------------------
 
 if (IsSet($daccount)) {
-	$clock   = date("m/d/y, H:ia");
-
-	$theirid = mb_query($db, "SELECT userid FROM user WHERE round_id=? AND ename=?", array($mb_round, $empre));
-	$tuid    = mb_db_result($theirid, "tuid");
-
-	// No such empire: stop. With the old address-keyed DELETEs an unset value
-	// read `email=''`, which matched any row whose address happened to be blank.
-	if ($tuid === null) {
-		echo "<b>No empire called " . htmlspecialchars($empre) . ".</b><br><br>";
-		echo "<a href=gameconfig.php>Return</a></center>";
-		die();
-	}
-
-	// An administrator's kingdom is not deleted from here, the admin running
-	// this page's own included. Revoke the flag first: bin/admin.php. The
-	// flag is the account's, and user.account_id is what links the two.
-	$empreacct = mb_query($db, "SELECT account_id FROM user WHERE round_id=? AND ename=?", array($mb_round, $empre));
-	$empreaccount = mb_account_get(mb_db_result($empreacct, "empreacct"));
-	if ($empreaccount && (int) $empreaccount['admin'] === 1) {
-		echo "<b>" . htmlspecialchars($empre) . " is an administrator. Revoke that first, with bin/admin.php.</b><br><br>";
-		echo "<a href=gameconfig.php>Return</a></center>";
-		die();
-	}
-
-	$empreset = mb_query($db, "SELECT setid FROM user WHERE round_id=? AND ename=?", array($mb_round, $empre));
-	$esetid   = mb_db_result($empreset, "esetid");
-
-	// The old spelling built a table name -- "setnews" . $esetid -- and
-	// inserted into it. That is the per-settlement schema this game has not
-	// used since before db.sql, and it also meant a settlement id from the
-	// database was interpolated outside quotes as an identifier.
-	$news    = "[b]{$empre}[/b] has been deleted by an administrator";
-
-	mb_news_set($db, "$clock", 'red', $news, $esetid, 0);
-
-	mb_query($db, "DELETE FROM buildings WHERE userid=?", array((int) $tuid));
-	mb_query($db, "DELETE FROM military WHERE userid=?", array((int) $tuid));
-	mb_query($db, "DELETE FROM returntbl WHERE userid=?", array((int) $tuid));
-	mb_query($db, "DELETE FROM research WHERE userid=?", array((int) $tuid));
-	mb_query($db, "DELETE FROM explore WHERE userid=?", array((int) $tuid));
-	mb_query($db, "DELETE FROM user WHERE userid=?", array((int) $tuid));
-
-	echo "<b>" . htmlspecialchars($empre) . " has been deleted.</b><br><br>";
+	// include/kingdoms.php, shared with dempire.php: refuses an administrator's,
+	// and removes the rest through mb_empire_remove().
+	require_once __DIR__ . '/include/kingdoms.php';
+	echo "<b>" . htmlspecialchars(mb_admin_delete_kingdom($db, (string) $empre)) . "</b><br><br>";
 	echo "<a href=gameconfig.php>Return</a></center>";
 	die();
 }

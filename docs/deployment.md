@@ -35,11 +35,11 @@ the one that could quietly break the game, and is resolved.
    The full suite passes on 8.4 with every golden master untouched (see
    modernization.md).
 
-2. **The tick mails a hardcoded address** (`update.php`, "Sending email to
-   Mako") on every run — the original author's. Locally `sendmail_path` is
-   `/bin/true`. `deploy/tick.sh` sets the same, so cron cannot send it, but
-   the line should go. Signup, preferences and `attack.php` also mail
-   whatever address a player gives, and on the host those deliver for real.
+2. ~~**The tick mailed a hardcoded address**~~ on every run — the original
+   author's. The line is gone. Signup, preferences and `attack.php` still
+   mail whatever address a player gives, and on the host those deliver for
+   real. Locally `sendmail_path` is `/bin/true`, and `deploy/tick.sh` sets
+   the same for cron.
 
 3. **Exposure.** CLAUDE.md: do not expose this app to a network. Until that
    decision is made the whole site sits behind Site Tools > Security >

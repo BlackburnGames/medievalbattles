@@ -878,6 +878,15 @@ attribute.
   This does not make the area safe to expose. What is behind the gate still
   interpolates, still echoes raw, and still deletes the world from one link.
 
+  (Since then: it binds and escapes like the rest; the world wipes are
+  retired for rounds ([rounds.md](rounds.md)); and every admin action reads
+  a POST body alone, so a link does nothing. `dempire.php`'s form said
+  `type=post`, which is not an attribute, and so had always submitted by GET.
+  Its delete and gameconfig.php's share `mb_admin_delete_kingdom()` now,
+  which refuses an administrator's kingdom and removes the rest through
+  `mb_empire_remove()` — they each deleted six tables by hand, and left the
+  kingdom's votes, its guild and its settlement count behind.)
+
   **What the survey found.** One leak and two pages that could not work:
 
   - **Guilds whose names differed only by a space shared one forum.**
