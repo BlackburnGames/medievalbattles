@@ -410,14 +410,31 @@ $GAMEDATA['settlements'] = array(
 );
 
 /* ------------------------------------------------------------------ *
- * Experience values. update.php:288-301 -- your score is recomputed
- * from scratch every tick as a snapshot of what you currently hold.
+ * Experience values -- your score is recomputed from scratch every tick
+ * as a snapshot of what you currently hold.
+ *
+ * Eight of the fourteen are definitions: update.php's experience
+ * recalculator reads them. The other six are still transcribed and cited,
+ * because no fixture empire holds those units -- the golden master multiplies
+ * their weights by zero, so a transcription error there would pass, and
+ * inverting them would be a claim rather than a check. manual.php renders
+ * this array in order, so the two kinds stay interleaved.
  * ------------------------------------------------------------------ */
 $GAMEDATA['exp_values'] = array(
-    'Land' => 8, 'Mountain' => 5, 'Recruit' => 5,
-    'Sage' => 10, 'Thief' => 10, 'Explorer' => 10,
-    'Warrior' => 23, 'Priest' => 22, 'Wizard' => 20, 'Archer' => 26,
-    'Suicide Civilian' => 28, 'Catapult' => 33, 'Golem' => 30, 'Iron Golem' => 35,
+    'Land'             => 8,   // read by update.php: user.land
+    'Mountain'         => 5,   // read by update.php: user.mts
+    'Recruit'          => 5,   // read by update.php
+    'Sage'             => 10,  // read by update.php -- assigned sages only, see docs/modernization.md
+    'Thief'            => 10,  // update.php:357
+    'Explorer'         => 10,  // update.php:356 -- held, and out exploring
+    'Warrior'          => 23,  // read by update.php: at home and in the field
+    'Priest'           => 22,  // read by update.php: at home and in the field
+    'Wizard'           => 20,  // read by update.php: at home and in the field
+    'Archer'           => 26,  // read by update.php: at home and in the field
+    'Suicide Civilian' => 28,  // update.php:360
+    'Catapult'         => 33,  // update.php:361
+    'Golem'            => 30,  // update.php:363
+    'Iron Golem'       => 35,  // update.php:364
 );
 
 /* ------------------------------------------------------------------ *

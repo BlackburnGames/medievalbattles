@@ -21,6 +21,7 @@ include("app/include/clock.php");
  * reader of it already has.
  */
 $ECON = $GAMEDATA['economy'];
+$XP   = $GAMEDATA['exp_values'];
 
 echo "<p>Starting update process</p>";
 
@@ -338,18 +339,27 @@ This email is automated. Your reply will not be recieved.";
   echo "<p>Updating Experience Calculations...</p>";
 
   //  calculate all units
-  $warrior_exp = (($mil['warriors'] + $ret['war1'] + $ret['war2'] + $ret['war3'] + $ret['war4']) * 23);
-  $wizard_exp = (($mil['wizards'] + $ret['wiz1'] + $ret['wiz2'] + $ret['wiz3'] + $ret['wiz4']) * 20);
-  $priest_exp = (($mil['priests'] + $ret['pri1'] + $ret['pri2'] + $ret['pri3'] + $ret['pri4']) * 22);
-  $archer_exp = (($mil['archers'] + $ret['arch1'] + $ret['arch2'] + $ret['arch3'] + $ret['arch4']) * 26);
-  $scientist_exp = (($mil['scientists'] + $res['r1'] + $res['r2'] + $res['r3'] + $res['r4'] + $res['r5'] + $res['r6'] + $res['r7'] + $res['r8'] + $res['r9'] + $res['r10'] + $res['r11'] + $res['r12'] + $res['r13'] + $res['r14']) * 10);
+  //
+  // The score weights. Eight are gamedata's, and they are the eight the
+  // fixture holds, so the golden master multiplies each by a non-zero count.
+  // The other six are still literals: no fixture empire owns a thief, an
+  // explorer, a suicide civilian, a catapult or either golem, so the tick
+  // multiplies those weights by zero and a wrong one would pass.
+  $warrior_exp = (($mil['warriors'] + $ret['war1'] + $ret['war2'] + $ret['war3'] + $ret['war4']) * $XP['Warrior']);
+  $wizard_exp = (($mil['wizards'] + $ret['wiz1'] + $ret['wiz2'] + $ret['wiz3'] + $ret['wiz4']) * $XP['Wizard']);
+  $priest_exp = (($mil['priests'] + $ret['pri1'] + $ret['pri2'] + $ret['pri3'] + $ret['pri4']) * $XP['Priest']);
+  $archer_exp = (($mil['archers'] + $ret['arch1'] + $ret['arch2'] + $ret['arch3'] + $ret['arch4']) * $XP['Archer']);
+  // Not the sages you hold: military.scientists is the unit's pre-rename
+  // column and nothing writes it, so only sages assigned to the first fourteen
+  // projects score. See docs/modernization.md.
+  $scientist_exp = (($mil['scientists'] + $res['r1'] + $res['r2'] + $res['r3'] + $res['r4'] + $res['r5'] + $res['r6'] + $res['r7'] + $res['r8'] + $res['r9'] + $res['r10'] + $res['r11'] + $res['r12'] + $res['r13'] + $res['r14']) * $XP['Sage']);
   $explorer_exp = (($mil['explorers'] + $explore['expland'] + $explore['expmt']) * 10);
   $thief_exp = $mil['thieves'] * 10;
-  $land_exp = $user['land'] * 8;
-  $mountain_exp = $user['mts'] * 5;
+  $land_exp = $user['land'] * $XP['Land'];
+  $mountain_exp = $user['mts'] * $XP['Mountain'];
   $suicide_exp = $mil['suicide'] * 28;
   $catapult_exp = $mil['catapult'] * 33;
-  $recruits_exp = $mil['recruits'] * 5;
+  $recruits_exp = $mil['recruits'] * $XP['Recruit'];
   $golem_exp = $mil['golem'] * 30;
   $irongolem_exp = $mil['irongolem'] * 35;
 

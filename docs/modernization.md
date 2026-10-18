@@ -707,6 +707,29 @@ attribute.
   `$snum > null`, which refuses every settlement in the game on a page that
   still renders.
 
+  **The score weights are next, and only eight of the fourteen.** The
+  experience recalculator reads Land, Mountain, Recruit, Sage, Warrior, Priest,
+  Wizard and Archer from `$GAMEDATA['exp_values']`. Those are the eight the
+  fixture holds, so the tick multiplies each by a non-zero count, and each was
+  checked on its own: raising any one by a single point fails the run — Land
+  moves all three empires and both settlements, Sage moves the tester by 5. The
+  other six — Thief, Explorer, Suicide Civilian, Catapult and both golems —
+  are still literals in `update.php` and still cited. No fixture empire owns
+  one, so the tick multiplies their weights by zero: setting each of them to 99
+  in the engine passes the golden master untouched. Inverting them would be the
+  claim this work exists to replace with a check, so they wait for a fixture
+  that holds them, which means re-accepting the golden on purpose.
+
+  Inverting the Sage weight surfaced a disagreement, recorded here rather than
+  as a quirk. The manual says a sage is worth 10 points, and the tester holds
+  eight, but the score never counts the sages you hold: it reads
+  `military.scientists`, the unit's pre-rename column, which nothing writes —
+  the same orphan the barter's Scientist landed in, below — plus the sages
+  *assigned* to the first fourteen projects. Of the tester's 5,880 points, 50
+  are sages, from the five on Fireball; the eight in reserve score nothing, and
+  the two on Advanced Farming score nothing either, which is the existing quirk.
+  Nothing here changed that.
+
 ### The barter system, switched back on
 
 `barter.php` opened with an echo and a `die()` above every other statement in
