@@ -22,6 +22,7 @@ echo "
 
 	$query_string = "SELECT ename, mts, land, exp, userid FROM user ORDER BY mts DESC LIMIT 0,40";
 	$result_id = mysqli_query($db, $query_string);
+	$placeno = 0;
 	while ($row = mysqli_fetch_row($result_id))	{
 
 		$SETID_SELECT = mysqli_query($db, "SELECT setid FROM user WHERE ename=" . mb_sql_str($db, $row[0]) . "");	

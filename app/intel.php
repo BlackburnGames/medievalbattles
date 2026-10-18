@@ -83,7 +83,9 @@ else	{
 	else	{
 
 		if($send < $evm['thieves'])	{
-			echo"<div align=center><font class=yellow>You have failed to gather information on $empireattacked and lost 10% of your thieves.</div></align>";
+			// $empireattacked was never assigned here -- the attack pages' name for the
+			// target, copied in -- so the failure message named nobody.
+			echo"<div align=center><font class=yellow>You have failed to gather information on " . mb_h($evu['ename']) . " and lost 10% of your thieves.</div></align>";
 		
 			// The arithmetic around $send is MySQL's, not PHP's, so it launders
 			// nothing -- the parameter is still a piece of the statement text.

@@ -31,6 +31,7 @@ echo "
 
 $query_string = "SELECT date, news, gnid, class FROM guildnews WHERE gid=" . mb_sql_int($guild_id['gid']) . " ORDER BY date DESC LIMIT 0, 60";
 $result_id = mysqli_query($db, $query_string);
+$num = 0;
 while ($row = mysqli_fetch_row($result_id))	{
 	$num = $num + 1;
 echo "

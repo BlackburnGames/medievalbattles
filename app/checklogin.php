@@ -10,6 +10,12 @@ function callback($buffer) {
 // ob_start("callback");
 
 $email = $_POST['email'];
+// The browser id index.php hands out, which the admin area lists accounts by
+// to spot one player running several. Interpolated below and read nowhere --
+// it was a register_globals read of the cookie -- so current_comp_id had been
+// recorded blank on every login since the shim went. The client sets it, so it
+// is held to the integer index.php issues.
+$computer_id = isset($_COOKIE['computer_id']) ? (string) (int) $_COOKIE['computer_id'] : '';
 // The password as typed. It used to be md5()d on this line and never seen
 // again, because the digest was both the thing compared and the thing stored;
 // with a salted hash the comparison needs the plaintext, and the value that
@@ -83,7 +89,7 @@ if (mb_password_verify($plain_pw, $stored)) {
 	$db->query("UPDATE user SET countdown='336' WHERE email=$q_email AND pw=$q_pw");
 	$db->query("UPDATE user SET lastlogin='$clock' WHERE ename=$q_ename");
 	$db->query("UPDATE user SET online='1' WHERE ename=$q_ename");
-	$db->query("UPDATE user SET current_comp_id='$computer_id' WHERE ename=$q_ename");
+	$db->query("UPDATE user SET current_comp_id=" . mb_sql_str($db, $computer_id) . " WHERE ename=$q_ename");
 
 	$user_set_query = $db->query("SELECT setid FROM user WHERE email=$q_email AND pw=$q_pw");
 	$set = mb_db_result($user_set_query, "set");

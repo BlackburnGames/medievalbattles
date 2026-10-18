@@ -41,6 +41,7 @@ $q_ename   = mb_sql_str($db, $ename);
 $q_topicid = mb_sql_int($topicid);
 
 if ($addtopic) {
+	$replies = 0;   // a new topic has none
 	// $clock, not $datestamp. Only commong.php sets $datestamp, and this page
 	// includes common.php -- the settlement half -- so a new settlement topic
 	// was stamped with the empty string and displayed a blank date ever after.

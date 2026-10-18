@@ -13,6 +13,9 @@ $race = $_POST['race'];
 $class = $_POST['class'];
 $msn = $_POST['msn'];
 $aim = $_POST['aim'];
+// As in checklogin.php: the cookie index.php issues, which signup_comp_id
+// records and nothing had read since register_globals went.
+$computer_id = isset($_COOKIE['computer_id']) ? (string) (int) $_COOKIE['computer_id'] : '';
 
 if ($signup) {
 
@@ -183,7 +186,7 @@ if ($signup) {
       else  { $suicide  = 0;  $r14pts = 0;  }
 
     $db->query("INSERT INTO user (email,  pw, ename, msn, aim, gp, iron, exp, food, land, mts, setid, class, userid, race, safemode, signup_comp_id)
-      VALUES ($q_email, $q_pw, $q_ename, $q_msn, $q_aim, '$gp', '$iron', '0', '1500', '250', '200', " . mb_sql_int($snum) . ", $q_class, '$newbuserid', $q_race, '48', '$computer_id') ");
+      VALUES ($q_email, $q_pw, $q_ename, $q_msn, $q_aim, '$gp', '$iron', '0', '1500', '250', '200', " . mb_sql_int($snum) . ", $q_class, '$newbuserid', $q_race, '48', " . mb_sql_str($db, $computer_id) . ") ");
 
     $db->query("INSERT INTO buildings (email, pw, home, barrack, farm, wp, gm, im, aland, amts, userid)
       VALUES ($q_email, $q_pw,'50', '50', '50', '0', '50', '50', '100', '100', '$newbuserid') ");

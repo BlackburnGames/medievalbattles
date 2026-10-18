@@ -16,6 +16,7 @@ echo "
 
 $query_string = "SELECT seller, type, amount, method, cost, barterid, userid FROM barter WHERE page != 'guild' ORDER BY type ASC";
 $result_id = mysqli_query($db, $query_string);
+$row_num = 0;
 while ($row = mysqli_fetch_row($result_id))	{
 
 	// The seller's userid comes back from the listing row, so it is stored

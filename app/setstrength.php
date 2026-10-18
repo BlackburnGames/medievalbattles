@@ -21,6 +21,7 @@ echo "
 
 	$query_string = "SELECT setname, setid, setstrength FROM settlement ORDER BY setstrength DESC LIMIT 0,20";
 	$result_id = mysqli_query($db, $query_string);
+	$placeno = 0;
 	while ($row = mysqli_fetch_row($result_id))	{
 
 		$placeno = $placeno + 1;

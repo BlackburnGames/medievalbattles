@@ -52,6 +52,7 @@ echo "
 
 $query_string = "SELECT ename, aim, msn, exp, userid, lastlogin FROM user WHERE guild=" . mb_sql_str($db, $empireguild) . " ORDER BY exp DESC";
 $result_id = mysqli_query($db, $query_string);
+$num = 0;
 while ($row = mysqli_fetch_row($result_id))	{
 		
 	$SETID_SELECT = mysqli_query($db, "SELECT setid FROM user WHERE ename=" . mb_sql_str($db, $row[0]) . "");	

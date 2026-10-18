@@ -6,7 +6,6 @@ echo "<br><br>";
 include("common.php");
 include("include/connect.php");
 
-if (empty($offset))  {  $offset=0;  }
 
 $numresults=mysqli_query($db, "SELECT topicid FROM setforums WHERE setid=$setid");
 $numrows=mysqli_num_rows($numresults);

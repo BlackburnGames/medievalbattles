@@ -43,6 +43,7 @@ $q_ename   = mb_sql_str($db, $ename);
 $q_topicid = mb_sql_int($topicid);
 
 if ($addtopic) {
+	$replies = 0;   // a new topic has none
 	$result = mysqli_query($db, "INSERT INTO setforums (setid, name, topic, replies, message, datestamp)	VALUES (" . mb_sql_int($setid) . ", $q_ename, $q_topic, '$replies', $q_message, '$clock')");
 
 	$topic_lastpost = mysqli_query($db, "UPDATE setforums SET lastpost='$clock' WHERE topic=$q_topic AND setid=" . mb_sql_int($setid) . "");

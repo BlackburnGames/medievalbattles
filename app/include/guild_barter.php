@@ -18,6 +18,7 @@ echo "
 // `user` row rather than from a literal, so it is escaped like any other value.
 $query_string = "SELECT seller, type, amount, method, cost, barterid, userid FROM barter WHERE page='guild' AND guild=" . mb_sql_str($db, $empireguild) . " ORDER BY type ASC";
 $result_id = mysqli_query($db, $query_string);
+$row_num = 0;
 while ($row = mysqli_fetch_row($result_id))	{
 
 	$q_seller = mb_sql_int($row[6]);
