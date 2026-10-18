@@ -431,6 +431,52 @@ foreach ($closure as $from => $reached) {
     }
 }
 
+// What the request supplies to an include that is not one of the shared ones.
+//
+// The rule above credits only $sharedIncludes, so a value a page hands to its
+// own include -- attack.php assigning $uwarrior and then including
+// include/attack/defANDoff.php, which reads it -- looked like a request
+// parameter. The Phase 2 port took the audit at its word and gave those
+// includes their own mb_input() copies, which silently replaced every count the
+// pages had checked: the golem exploit. So credit the page, but only when it
+// is true of every request that can run the file. An entry page is a file
+// nothing includes; for each one whose closure reaches F, some OTHER file in
+// that closure must assign the name. Flow-insensitive like everything here --
+// it does not ask whether the assignment comes first -- but quantified over
+// every entry, so one page that forgets the name keeps the read reported.
+$writes = array();
+$includedBy = array();
+foreach ($closure as $from => $reached) {
+    list($w, , ) = mb_scan_globals(file_get_contents("$appRoot/$from"));
+    $writes[$from] = $w;
+    foreach ($reached as $to => $_) {
+        if ($to !== $from) {
+            $includedBy[$to] = true;
+        }
+    }
+}
+function mb_supplied_by_every_entry($name, $self, array $closure, array $writes, array $includedBy)
+{
+    $entries = 0;
+    foreach ($closure as $entry => $reached) {
+        if (isset($includedBy[$entry]) || !isset($reached[$self]) || $entry === $self) {
+            continue;
+        }
+        $entries++;
+        $found = false;
+        foreach ($reached as $f => $_) {
+            if ($f !== $self && isset($writes[$f][$name])) {
+                $found = true;
+                break;
+            }
+        }
+        if (!$found) {
+            return false;
+        }
+    }
+    return $entries > 0;
+}
+
 $current = array();
 foreach ($files as $path) {
     $rel  = ltrim(str_replace(str_replace('\\', '/', $repoRoot), '', $path), '/');
@@ -448,6 +494,9 @@ foreach ($files as $path) {
             if ($sources) {
                 continue;
             }
+        }
+        if (mb_supplied_by_every_entry($name, $self, $closure, $writes, $includedBy)) {
+            continue;
         }
         $names[] = $name;
     }

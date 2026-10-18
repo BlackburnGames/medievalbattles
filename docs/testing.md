@@ -103,6 +103,20 @@ looks unassigned. Both readings have to be checked before acting:
   against it, so four news rows went to setid 0 rather than to the settlement
   being raided. Fixed, which is what took the list from 161 to 159.
 
+**A page now provides names to its own includes**, not only the shared ones —
+and the reason is a bug the old rule caused rather than a false positive it
+reported. `attack.php` reads and checks `$uwarrior` and five siblings, then
+includes `include/attack/defANDoff.php`, which reads them. The audit only
+credited `$sharedIncludes`, so those reads looked like request parameters, and
+the Phase 2 port gave both combat includes their own `mb_input()` copies. Those
+replaced every count the pages had validated — which is how a resource raid
+could field 100,000 golems it did not own. The rule is quantified over
+**entries**, files nothing includes: a name read in F is provided if, for every
+entry whose closure reaches F, some other file in that closure assigns it. One
+page that forgets the name keeps the read reported. It took the list from 157
+to 91; every entry it removed is an include whose includers all assign the
+name, `S_WEP.php`'s 24 buttons among them.
+
 ### `tests/sql-injection-audit.php`
 
 Static, like the one above. It marks every variable derived from `mb_input()`
