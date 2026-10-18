@@ -470,6 +470,17 @@ attribute.
   not applied, and the request that follows is filed through `gc.php` rather
   than seeded, so the accept is proved against a row the game itself wrote.
 
+  **The reject branch had the scope and filed the news ahead of it.** Its
+  `DELETE` said `AND gl_userid='$userid'`, which is what made it look fixed,
+  but "You were rejected from" went into the `auserid`'s empire news one line
+  earlier, so a leader could write that line into any empire's news by typing
+  an id. The crawl could not see it because `guildconfig.php?reject` was in
+  `$SKIP`, and because the row lands in the victim's news rather than the
+  leader's response. It asks the accept branch's question first now, and both
+  arms are driven before the join: the refusal is asserted on PoorSerf's own
+  news page while no request exists, then a request filed through `gc.php` is
+  genuinely rejected and its news line asserted.
+
   **Every guard is driven from the arm it refuses.** That is what this needed
   and what the suite could not do before: the primary tester leads Testguild and
   settlement 1, so every request they make is allowed, and a gate that answers

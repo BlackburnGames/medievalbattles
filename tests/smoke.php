@@ -477,6 +477,49 @@ if (stripos($body, 'not Settlement Leader') === false) {
 }
 
 /*
+ * Rejecting a join request, both arms, before the join below needs the row.
+ *
+ * guildconfig.php's reject branch scoped its DELETE to the leader's own
+ * requests but filed "You were rejected from <guild>" into the auserid's empire
+ * news before looking for one, so a leader could write that line into any
+ * empire's news by typing an id. The refusal is driven while PoorSerf has
+ * genuinely not applied, and asserted on PoorSerf's own news page -- the
+ * leader's response alone cannot show a row the handler wrote somewhere else.
+ *
+ * Then a real request through gc.php and a real rejection, which is the arm
+ * the check must not break. PoorSerf applies again below for the accept, so
+ * nothing after this depends on it.
+ */
+$body = $tester->get('/guildconfig.php?reject=true&auserid=3');
+$visited++;
+inspect('guildconfig.php?reject (no request)', $body, $tester->lastStatus);
+if (stripos($body, 'has not asked to join') === false) {
+    $failures['guildconfig.php | rejected an empire that never applied'] =
+        'app/guildconfig.php: the reject branch does not check guildrequests';
+}
+$body = $target->get('/main.php?pageid=news');
+$visited++;
+inspect('main.php?pageid=news (after refused reject)', $body, $target->lastStatus);
+if (strpos($body, 'You were rejected from') !== false) {
+    $failures['guildconfig.php | filed rejection news for an empire that never applied'] =
+        'app/guildconfig.php: the reject branch writes empnews before checking guildrequests';
+}
+
+$body = $target->get('/gc.php?request=yes&req_guild=Testguild');
+$visited++;
+$scriptsHit['gc.php'] = true;
+inspect('gc.php?request=yes (to be rejected)', $body, $target->lastStatus);
+
+$body = $tester->get('/guildconfig.php?reject=true&auserid=3');
+$visited++;
+inspect('guildconfig.php?reject', $body, $tester->lastStatus);
+if (stripos($body, 'has been rejected from the guild') === false) {
+    $failures['guildconfig.php | refused to reject a genuine join request'] =
+        'app/guildconfig.php: the guildrequests check is refusing a real applicant';
+}
+newsShows($target, 'main.php?pageid=news', 'You were rejected from Testguild.', '<font class=blue>');
+
+/*
  * Joining a guild, end to end, and the arm where nobody asked.
  *
  * guildconfig.php's accept branch wrote the membership from the auserid in the

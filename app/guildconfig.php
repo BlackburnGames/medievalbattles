@@ -119,6 +119,19 @@ else	{
 	$current_guild_query = mysqli_query($db, "SELECT guild FROM user WHERE userid=$q_auserid");
 		$current_guild = mysqli_fetch_array($current_guild_query);
 
+	/*
+	 * The same question the accept branch asks, for the same reason. The
+	 * DELETE below was always scoped to this leader's requests, but the news
+	 * line ahead of it was not, so a leader could file "You were rejected from"
+	 * into any empire's news by typing the id.
+	 */
+	$request_check = mysqli_query($db, "SELECT applicant FROM guildrequests WHERE applicant=$q_auserid AND gl_userid='$userid'");
+
+	if(!$request_check || !mysqli_num_rows($request_check))	{
+		echo "<div align=center><font class=yellow>That empire has not asked to join your guild.</font></div>";
+		die();
+	}
+
 	if(($current_guild['guild'] == 'None') OR ($current_guild['guild'] != 'None'))	 {
 		mb_news_emp($db, "$clock", 'blue', "You were rejected from $guild_info[gname].", $q_auserid);
 		mysqli_query($db, "DELETE FROM guildrequests WHERE applicant=$q_auserid AND gl_userid='$userid'");
