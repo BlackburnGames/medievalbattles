@@ -1182,7 +1182,10 @@ function forumRefuses(MbClient $client, $path, array $fields, $needle, $why)
 
     $body = postForm($client, $path, $fields);
     if (stripos($body, $needle) === false) {
-        $failures[$path . ' | accepted a write it should have refused'] = $why;
+        // Keyed on the needle too: attack.php and scattack.php each have two
+        // refusal arms, and keyed on the path alone the second failure
+        // overwrote the first.
+        $failures[$path . " | accepted a write it should have refused ($needle)"] = $why;
     }
 }
 
