@@ -357,7 +357,7 @@ This email is automated. Your reply will not be recieved.";
   $golem_exp = $mil['golem'] * 30;
   $irongolem_exp = $mil['irongolem'] * 35;
 
-  $xprc_units = $warrior_exp + $wizard_exp + $priest_exp + $archer_exp + $thief_exp + $explorer_exp + $dog_exp + $sage_exp + $land_exp + $mountain_exp + $suicide_exp + $catapult_exp + $recruits_exp + $golem_exp + $irongolem_exp;
+  $xprc_units = $warrior_exp + $wizard_exp + $priest_exp + $archer_exp + $thief_exp + $explorer_exp + $sage_exp + $land_exp + $mountain_exp + $suicide_exp + $catapult_exp + $recruits_exp + $golem_exp + $irongolem_exp;
 
   //  calculate all weapons
   if($mil['warriorwep'] == 0) { $warrior_weapon = 0;  } // dagger
@@ -571,6 +571,12 @@ This email is automated. Your reply will not be recieved.";
   while($GUILD_INC < $MAX_GID + 1)  {
     $guild_name_query = mb_query($db, "SELECT gname FROM guild WHERE gid=?", array($GUILD_INC));
       $guild_name = mysqli_fetch_array($guild_name_query);
+    // An id with no guild: a deleted one, or none at all in a round with no
+    // guilds yet, when min and max are both empty. There is nothing to sum.
+    if (!$guild_name) {
+      $GUILD_INC = $GUILD_INC + 1;
+      continue;
+    }
     $guild_user_exp = mb_query($db, "SELECT sum(exp) FROM user WHERE round_id=? AND guild=?", array($round_id, $guild_name['gname']));
       $user_exp = mb_db_result($guild_user_exp, 0, 0);
     mb_query($db, "UPDATE guild SET strength=? WHERE gid=?", array($user_exp, $GUILD_INC));
