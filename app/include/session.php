@@ -53,10 +53,24 @@ if (!function_exists('mb_session_cross_site')) {
 	 * cookie below instead, which keeps the session id off cross-site requests
 	 * by itself.
 	 *
+	 * Same-origin is not enough on its own. A guild flag and a settlement
+	 * picture are URLs a player chooses, shown to everyone as an <img>; one
+	 * that pointed back at the game -- preferences.php?update=1&newemail=... --
+	 * was fetched same-origin, with the viewer's cookie, and acted as them.
+	 * So a request the browser made to fetch an image, script, style or any
+	 * other resource gets no session either, whoever made it: the game's
+	 * pages are only ever navigated to, and Sec-Fetch-Dest says which.
+	 *
 	 * @return bool
 	 */
 	function mb_session_cross_site()
 	{
+		if (isset($_SERVER['HTTP_SEC_FETCH_DEST'])) {
+			$dest = strtolower($_SERVER['HTTP_SEC_FETCH_DEST']);
+			if (!in_array($dest, array('document', 'iframe', 'frame', 'empty'), true)) {
+				return true;
+			}
+		}
 		if (!isset($_SERVER['HTTP_SEC_FETCH_SITE'])) {
 			return false;
 		}

@@ -173,6 +173,15 @@ check('a login another site submits does not log anyone in', $r['sid'] === null 
 check('a request the player\'s own pages make still works', loggedIn($s, array('Sec-Fetch-Site: same-origin')));
 check('so does one the player typed', loggedIn($s, array('Sec-Fetch-Site: none')));
 
+// A player-chosen image -- a guild flag, a settlement picture -- pointing back
+// at the game is fetched same-origin with the viewer's cookie. It must not act.
+$img = array('Sec-Fetch-Site: same-origin', 'Sec-Fetch-Dest: image', 'Sec-Fetch-Mode: no-cors');
+check('an image loaded by one of the game pages gets no session', !loggedIn($s, $img));
+req('preferences.php?update=1&newemail=' . urlencode($EMAIL) . '&newaim=IMGPROBE', $s, null, $img);
+check('...so a flag pointed at preferences.php changes nothing', strpos(req('preferences.php', $s)['body'], 'IMGPROBE') === false);
+check('nor does a script or a stylesheet', !loggedIn($s, array('Sec-Fetch-Site: same-origin', 'Sec-Fetch-Dest: script')) && !loggedIn($s, array('Sec-Fetch-Site: same-origin', 'Sec-Fetch-Dest: style')));
+check('a page the player navigates to still works', loggedIn($s, array('Sec-Fetch-Site: same-origin', 'Sec-Fetch-Dest: document', 'Sec-Fetch-Mode: navigate')));
+
 // --- 5. A password change ends the other sessions. ---
 $one = login();
 $two = login();
