@@ -35,6 +35,15 @@ SetEnv MB_MAIL_FROM noreply@jacobp259.sg-host.com
 php_flag display_errors off
 php_flag log_errors on
 
+# No page of the game may be stored by a shared cache. SiteGround's caching
+# proxy (X-Proxy-Cache) stores any response that sets no cookie -- the front
+# page, the manual, and a logged-in player's game page, whose session cookie
+# was set on an earlier request -- and serves the copy to whoever asks next.
+# Stylesheets and images may still be cached.
+<FilesMatch "\.php$">
+    Header set Cache-Control "private, no-store"
+</FilesMatch>
+
 # The include directories are only ever require'd, never requested. Serving
 # them runs each one standalone, out of the context it was written for.
 RedirectMatch 404 ^/(admin/)?include/

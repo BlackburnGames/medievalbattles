@@ -6,6 +6,16 @@ https://jacobp259.sg-host.com/ — `deploy.sh --go --public`; the deployed
 commit is in `mb/REVISION`. What was left of the first deploy is in "First
 deploy, in order".
 
+**SiteGround caches pages in front of PHP** (`X-Proxy-Cache`): any response
+that sets no cookie is stored and served to whoever asks next — the front
+page, the manual, and potentially a logged-in player's game page, whose
+session cookie was set on an earlier request. The `.htaccess` sends
+`Cache-Control: private, no-store` on every `.php` response, which it honours
+for new responses. What was cached before that line went in has to be
+flushed in Site Tools > Speed > Caching; a `PURGE` from the server is refused.
+The game does not want the dynamic cache at all, and it can be switched off
+there.
+
 A request with no `User-Agent` gets a 403 from SiteGround before it reaches
 PHP. Browsers always send one; `tests/lib/client.php` does not, so the
 suite's client cannot be pointed at the live site — use curl with a browser's
