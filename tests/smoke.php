@@ -61,7 +61,6 @@ $MAX_ADMIN_PAGES = 40;
 // the coverage report at the end of the run flags one that is missing.
 $ADMIN_PAGES = array(
     'admin/index.php',
-    'admin/main.php',
     'admin/gameconfig.php',
     'admin/rounds.php',
     'admin/dempire.php',
@@ -951,7 +950,7 @@ $admin = login($BASE, 'tester@example.com', 'test1234');
 // a page served out of /admin/ -- and extractLinks() normalises every href to
 // a path from the docroot, so without this the admin pass walks straight out
 // into the game as a client with no player session.
-crawl($admin, array('admin/main.php'), $MAX_ADMIN_PAGES, 'admin/');
+crawl($admin, array('admin/index.php'), $MAX_ADMIN_PAGES, 'admin/');
 adminActions($admin, $MB_ADMIN_ACTIONS);
 
 /**
@@ -1023,9 +1022,9 @@ function adminActions(MbClient $admin, array $actions)
 
     // The admin who ran every action is still one: the bulk actions empty
     // tables of the round, and none of them touches an account.
-    $admin->get('/admin/main.php');
+    $admin->get('/admin/index.php');
     if ($admin->lastStatus !== 200) {
-        $failures['admin/main.php | the admin was locked out by a bulk action'] =
+        $failures['admin/index.php | the admin was locked out by a bulk action'] =
             'app/admin/gameconfig.php: an administrator must survive every bulk action';
     }
 }
