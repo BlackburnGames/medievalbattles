@@ -39,7 +39,12 @@ all night, and your round is over. Players today will not put up with it.
 - **A limit on hits taken.** A kingdom can be hit only a few times a day, with
   a cooldown after each.
 - **Protection for new and late joiners**, and some way for a late joiner to
-  catch up rather than start hopelessly behind.
+  catch up rather than start hopelessly behind. The game already has half of
+  this: a new kingdom starts in safe mode for 48 ticks, a day
+  (`safemode_ticks`), during which it can neither attack nor be attacked.
+  What it lacks is the catch-up, and anything after that first day — once
+  safe mode runs out, any kingdom can hit any other, of any size, as often as
+  it has the army for.
 
 ### 2. Runaway leaders
 
