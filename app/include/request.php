@@ -5,14 +5,18 @@
  * The compat layer injects every $_GET/$_POST/$_COOKIE key into the global
  * scope, which is the vulnerability the setting was removed for: any global
  * the code has not assigned yet can be set by the caller. mb_input() reads the
- * same three arrays in the same order, but only for a name the page asks for
+ * first two of them in the same order, but only for a name the page asks for
  * by hand, so nothing else in scope can be overwritten from outside.
  *
  * Two details make it a drop-in replacement:
  *
- * 1. GPC precedence. The shim loops $_GET, then $_POST, then $_COOKIE,
- *    assigning as it goes, so a later source wins -- cookie beats post beats
- *    get, matching PHP 4's variables_order default. Reproduced here.
+ * 1. GP precedence. The shim loops $_GET, then $_POST, assigning as it
+ *    goes, so a later source wins -- post beats get, as PHP 4's
+ *    variables_order did. Cookies came last and beat both, and no longer
+ *    count: no page wants a parameter from a cookie, and a cookie is one
+ *    thing a sibling site on a shared domain (*.sg-host.com) can set. A
+ *    cookie named update and one named newemail would have changed the
+ *    next player to open preferences.php.
  *
  * 2. The default is null, NOT "". Under register_globals a parameter that was
  *    not sent left the variable *unset*, and this codebase branches on
@@ -43,9 +47,6 @@ if (!function_exists('mb_input')) {
         }
         if (array_key_exists($name, $_POST)) {
             $default = $_POST[$name];
-        }
-        if (array_key_exists($name, $_COOKIE)) {
-            $default = $_COOKIE[$name];
         }
         return $default;
     }
