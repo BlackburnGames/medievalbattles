@@ -25,6 +25,11 @@ else	{
 
 	include("include/nexplode.php");
 
+	// A whole number, as every other order form's counts are. It was compared
+	// and subtracted as typed, so send=0.5 passed "> 0", killed a civilian and
+	// cost nothing: MySQL rounded the stored suicide - 0.5 back up.
+	$send = mb_count($send);
+
 	if($safemode > 0)	 {
 		echo "<div align=center><font class=yellow>You can't attack when you are in safe mode!</font></div>";
 		include("include/attack/scattack.php");
@@ -98,7 +103,7 @@ else	{
 		include("include/attack/scattack.php");
 		die();
 	}
-	elseif($toatk == 'ns')	{
+	elseif($toatk !== 'civ' && $toatk !== 'thieve')	{
 		echo"<div align=center><font class=yellow>You must choose a type of unit to suicide on!</font></div>";
 		include("include/attack/scattack.php");
 		die();

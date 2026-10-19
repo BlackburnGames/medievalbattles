@@ -461,6 +461,20 @@
     military [3] thieves 30 -> 0
     user [3] nno 0 -> 1
 
+### suicide-refused-fraction
+# Half a unit is none. It used to kill a civilian and cost nothing.
+
+> scattack.php suicideatk=1 empvalue=3 send=0.5 toatk=civ
+  says: You didn't send any units!
+  (no change)
+
+### suicide-refused-target
+# Only civilians and thieves can be suicided on. Anything else spent the units and killed nothing.
+
+> scattack.php suicideatk=1 empvalue=3 send=10 toatk=wizards
+  says: You must choose a type of unit to suicide on!
+  (no change)
+
 ### modifier-fighter
 # A Human Fighter. Its modifier scales the attack; the Giant Ranger defending scales its own defence at 1.25.
 

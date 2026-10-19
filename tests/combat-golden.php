@@ -323,6 +323,18 @@ $SCENARIOS = array(
         'setup' => array(set('military', $A, array('suicide' => 50)), set('military', $D, array('civ' => 300, 'thieves' => 30))),
         'requests' => array(array('scattack.php', array('suicideatk' => 1, 'empvalue' => $D, 'send' => 40, 'toatk' => 'thieve'))),
     ),
+    array(
+        'name'  => 'suicide-refused-fraction',
+        'why'   => 'Half a unit is none. It used to kill a civilian and cost nothing.',
+        'setup' => array(set('military', $A, array('suicide' => 50)), set('military', $D, array('civ' => 300, 'thieves' => 30))),
+        'requests' => array(array('scattack.php', array('suicideatk' => 1, 'empvalue' => $D, 'send' => '0.5', 'toatk' => 'civ'))),
+    ),
+    array(
+        'name'  => 'suicide-refused-target',
+        'why'   => 'Only civilians and thieves can be suicided on. Anything else spent the units and killed nothing.',
+        'setup' => array(set('military', $A, array('suicide' => 50)), set('military', $D, array('civ' => 300, 'thieves' => 30))),
+        'requests' => array(array('scattack.php', array('suicideatk' => 1, 'empvalue' => $D, 'send' => 10, 'toatk' => 'wizards'))),
+    ),
 );
 
 /*
