@@ -159,6 +159,12 @@ fingerprint of the account's address and hash:
 - **Login authenticates the account.** If the account has a kingdom in a
   running round, the player goes into the game. If not, they go to the round
   list, where they can join an open round or read their history.
+- **A forgotten password is reset by mail.** `index.php?page=forgot` mails
+  a link to `index.php?page=reset`, good once for an hour, and only while the
+  address and password are the ones it was issued against; setting the new
+  password ends the account's sessions and confirms its address. Limited per
+  account and per IP, and answered the same whether the address has an
+  account or not. `app/include/password_reset.php`.
 - **History lists the account's round results:** every round it played, with
   the kingdom, its rank and its final standing, plus each round's top kingdoms
   and guilds.

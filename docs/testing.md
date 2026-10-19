@@ -204,6 +204,16 @@ is refused in the same words; twenty failures from one IP refuse every address
 from it. Every request in the suite comes from one address, so it reloads the
 schema before and after — what it leaves behind would refuse the next test.
 
+### `tests/password-reset.php`
+
+Asking for a link answers an address with no account the same way and makes
+it no row; a link sets the password, after which the old one fails, the new
+one logs in, and the session from before is ended; a used, expired or
+wrong-token link is refused, and so is one issued before a password change;
+an account is sent at most three links an hour. Links are made in-process,
+since local mail goes nowhere and the table holds only token hashes. Reloads
+the schema before and after.
+
 ### `tests/smoke.php`
 
 Crawls every reachable page, failing on any PHP fatal, parse error or warning

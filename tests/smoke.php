@@ -197,6 +197,8 @@ $UNREACHABLE = array(
     // tests/signup.php drives both, on an account it signs up.
     'activate_account.php' => 'auth flow: needs an unverified account; driven by tests/signup.php',
     'activate_code.php'    => 'auth flow: needs an unverified account; driven by tests/signup.php',
+    // Reached only from a mailed link, which carries a token the crawl cannot have.
+    'reset.php'            => 'auth flow: needs a reset link; driven by tests/password-reset.php',
 );
 
 $baseline = loadBaseline($BASELINE_FILE);

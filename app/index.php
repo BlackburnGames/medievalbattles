@@ -49,6 +49,9 @@ if ($computer_id === '') {
         <tr>
           <td align="right" colspan=2><input class=button type=submit value=Login></td>
         </tr>
+        <tr>
+          <td align="right" colspan=2><a href="index.php?page=forgot">Forgot your password?</a></td>
+        </tr>
       </table>
     </td>
     <td><img src="images/meb.gif" align=right></td>
@@ -67,6 +70,7 @@ if ($computer_id === '') {
                 <td>
                   <a href="index.php">Main</a><br>
                   <a href="index.php?page=signup">Sign Up</a><br>
+                  <a href="index.php?page=forgot">Forgot Password</a><br>
                   <!-- <a href="index.php?page=game_scores">Scores</a><br> -->
                   <a href="manual.php" target="_blank">Manual</a><br>
                 </td>

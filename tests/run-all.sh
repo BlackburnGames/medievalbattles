@@ -82,6 +82,14 @@ if ! docker compose exec -T web php /repo/tests/login-throttle.php; then
   status=1
 fi
 
+# Forgotten passwords: a mailed link that sets a new one, once. Reloads the
+# schema likewise.
+echo
+echo "=== password reset ==="
+if ! docker compose exec -T web php /repo/tests/password-reset.php; then
+  status=1
+fi
+
 # A round ended into its results, and the next opened, joined, started and
 # ticked alone, through bin/round.php. Reloads the schema likewise.
 echo

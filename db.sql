@@ -889,3 +889,30 @@ CREATE TABLE `login_failure` (
   KEY `email_at` (`email`, `at`),
   KEY `ip_at` (`ip`, `at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+# --------------------------------------------------------
+
+#
+# Table structure for table `password_reset`
+#
+-- One row per reset link mailed by forgot.php: app/include/password_reset.php.
+-- Rows older than a day are swept on each new request, and an account's rows
+-- are deleted when one of its links is used. Not a round's: the account's.
+
+CREATE TABLE `password_reset` (
+  `reset_id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `account_id` int unsigned NOT NULL,
+  -- SHA-256 of the link's token, which is never stored.
+  `token_hash` char(64) NOT NULL,
+  -- mb_account_fingerprint() when the link was issued: a link stops working
+  -- once the address or the password has changed since.
+  `fp` char(64) NOT NULL,
+  -- Who asked, for the per-IP limit.
+  `ip` varchar(45) NOT NULL,
+  `created` datetime NOT NULL,
+  `expires` datetime NOT NULL,
+  PRIMARY KEY (`reset_id`),
+  KEY `account_created` (`account_id`, `created`),
+  KEY `ip_created` (`ip`, `created`),
+  KEY `created` (`created`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -187,4 +187,5 @@ All in `deploy/`, run from the repo root in Git Bash.
     ```
 
     `admin password` sets a random temporary password for a player who has
-    forgotten theirs, until the game has a reset of its own.
+    forgotten theirs and cannot use the game's own reset (`forgot.php`), which
+    mails a link to their address.

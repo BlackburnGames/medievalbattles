@@ -52,6 +52,7 @@ if (!mb_valid_email($email)) {
 	mb_login_failed($db, $email, $mb_ip);
 	unset($_SESSION['login'], $_SESSION['userid'], $_SESSION['mb_account'], $_SESSION['mb_account_fp']);
 	echo "Your email or password is incorrect.<br>";
+	echo "<a href=index.php?page=forgot>Forgot your password?</a><br>";
 	echo "<a href=index.php>Login again.</a>";
 	exit();
 }
@@ -112,6 +113,7 @@ if ($account && mb_password_verify($plain_pw, $stored)) {
 	mb_login_failed($db, $email, $mb_ip);
 	unset($_SESSION['login'], $_SESSION['userid'], $_SESSION['mb_account'], $_SESSION['mb_account_fp']);
 	echo "Your email or password is incorrect.<br>";
+	echo "<a href=index.php?page=forgot>Forgot your password?</a><br>";
 	echo "<a href=index.php>Login again.</a>";
 	exit();
 }
