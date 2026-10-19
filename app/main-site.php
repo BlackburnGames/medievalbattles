@@ -1,4 +1,21 @@
 <?php
+// The front page's body, which index.php prints. Its numbers are the game's
+// own, from include/gamedata.php, so the page cannot drift from the rules.
+//
+// It used to be the 2007 relaunch's post: signups opening February 19th,
+// 2007, ticks "at the Sabin server speed of every five minutes", bug reports
+// to a 2007 address, and "4 different races ... 4 different classes" in a
+// game that has seven of each.
+require_once __DIR__ . '/include/gamedata.php';
+
+$mb_races   = count($GAMEDATA['races']);
+$mb_classes = count($GAMEDATA['classes']);
+$mb_safe    = (int) $GAMEDATA['timers']['safemode_ticks'];
+$mb_idle    = (int) $GAMEDATA['timers']['inactivity_ticks'];
+// One tick every half hour: the cron schedule (docs/deployment.md).
+$mb_safe_hours = $mb_safe / 2;
+$mb_idle_days  = $mb_idle / 48;
+
 $data = "
 <table width=100% border=1 bordercolor=#990000 cellspacing=3 cellpadding=8>
 	<tr>
@@ -12,28 +29,26 @@ $data = "
 									<hr color=#660000 width=45%>
 									<center><b>What is Medieval Battles?</b></center>
 									<hr color=#660000 width=45%>
-									&nbsp; &nbsp; Medieval Battles is a text-based online game that is based off of AD&D. You can choose from 4 different races and be 1 of 4 different classes. Each class has it's own set of advantages and disadvantages. Train your civilians into recruits. Train your recruits into your army. You can train wizards, warriors, priests and archers then go out and conquer more land or mountains to expand your empire. You can even explore for land/mountains too.<br>
+									&nbsp; &nbsp; Medieval Battles is a text-based online game that is based off of AD&amp;D. You can choose from $mb_races different races and be one of $mb_classes different classes. Each has its own set of advantages and disadvantages. Train your civilians into recruits. Train your recruits into your army. You can train wizards, warriors, priests and archers then go out and conquer more land or mountains to expand your empire. You can even explore for land and mountains too.<br>
 									<br>
-									&nbsp; &nbsp; Join guilds, or make your own guild and go up agaisnt other guilds. Or you can just sit back and watch your guild grow. Build better and stronger weapons to equip your troops with. Research new spells for your wizards to cast in battle. Make friends or enemys and show everyone else what you are really made of!
+									&nbsp; &nbsp; Join guilds, or make your own guild and go up against other guilds. Or you can just sit back and watch your guild grow. Build better and stronger weapons to equip your troops with. Research new spells for your wizards to cast in battle. Make friends or enemies and show everyone else what you are really made of!
 								</td>
 							</tr>
 							<tr>
 								<td valign=top>
 									<hr color=#660000 width=45%>
-									<center><b>Isn't this v6? Why is it back?</b></center>
+									<center><b>Medieval Battles is back</b></center>
 									<hr color=#660000 width=45%>
-									&nbsp; &nbsp; We, or I (Mako), promised to bring it back into the v8 engine and that never happened. Well it's not in the v8 engine, but it's v6 in it's old glory, like you remember.<br><br>
-									&nbsp; &nbsp; v6: Kupo Remix is going to have bugs and we'll see what we can do to keep them to a bare minimum. Some things probably won't work at all due to us not being able to track down the proper v6 database dump, but again we'll see what we can do to keep that to a bare minimum. You are more than welcome to submit bug reports to support@decoymedia.com. I'd recommend to you that you do not get your hopes up for having immediate bug fixes, or bug fixes at all. The whole purpose of bringing v6 back for right now is to give you all something to do while we finalize Version 8.<br><br>
-									&nbsp; &nbsp; So enjoy this piece of nostalgia.<br><br>
-									<i>Jon Ursenbach<br>Decoy Media</i>
+									&nbsp; &nbsp; This is Medieval Battles v6, the 2003 game, running again on a modern server. It plays as it always did, with a good many old bugs fixed along the way. If you find one that is left, there is a link to report it inside the game.
 								</td>
 							</tr>
 							<tr>
 								<td valign=top>
 									<hr color=#660000 width=45%>
-									<center><b>Important Info</b></center>
+									<center><b>How to play</b></center>
 									<hr color=#660000 width=45%>
-									<center>&nbsp; &nbsp; Signups open up on February 19th, 2007 @ 9am PST. Ticks will commence 24 hours later.<br>Ticks will run at the Sabin server speed of every five minutes.</center>
+									&nbsp; &nbsp; <a href=index.php?page=signup>Sign up</a> for an account, follow the activation link you are emailed, then log in and join the current round with a kingdom of your own. Your account carries over from round to round; each round you found a new kingdom.<br><br>
+									&nbsp; &nbsp; The game ticks every 30 minutes. A new kingdom is in safe mode for its first $mb_safe ticks ($mb_safe_hours hours), and a kingdom whose owner has not logged in for $mb_idle ticks ($mb_idle_days days) is deleted. Your account is kept, and you can join again.
 								</td>
 							</tr>
 						</table>
