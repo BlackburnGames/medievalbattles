@@ -1168,24 +1168,33 @@ found was in the gaps between them.
   MySQL rounded the stored `suicide - 0.5` back up. Pinned in the combat
   golden, with the target type now restricted to the two that mean
   something.
+- **Two requests at once on one kingdom wrote over each other.** Every
+  action page reads the kingdom into globals once (`functions.php`) and
+  writes back absolute totals — `SET gp=?`, `SET warriors=?` — with nothing
+  holding the row. With two logins a purchase raced against a no-op order
+  kept its gold (3 runs in 6), barter's relative debit raced against
+  `disband.php`'s absolute write doubled an army (5 → 80 warriors in eight),
+  and six simultaneous votes for yourself counted six. `functions.php` now
+  takes a per-kingdom `GET_LOCK` before it reads, held to the end of the
+  request (`mb_kingdom_lock()`, `include/db.php`), and the tick takes every
+  kingdom's before it runs, so it waits for pages in flight.
+  `tests/kingdom-race.php` races a build against a no-op recruit: seven free
+  builds in ten without the lock, none with it.
 
 **Open, most serious first:**
 
-1. **Lost updates: one kingdom, two requests at once.** Every action page
-   reads the kingdom into globals once (`functions.php`) and writes back
-   absolute values — `SET gp=?`, `SET warriors=?` — with no lock. A player
-   with two sessions can race a purchase against a no-op order and keep the
-   gold (confirmed: 3 runs in 6), or race barter's relative debit against
-   `disband.php`'s absolute write and double their army (confirmed: 5 → 80
-   warriors in eight). The same holds for attacks spending one army twice.
-   The fix is one rule rather than a page at a time: a per-kingdom lock taken
-   in `functions.php` before the read and held to the end of the request
-   (`GET_LOCK`, or `SELECT … FOR UPDATE` in a transaction), which also makes
-   the tick wait for requests in flight.
-2. **Settlement elections can be stuffed by the same race** (`govt.php`):
-   six parallel votes for yourself took six votes and the leadership,
-   confirmed. Votes should be counted (`COUNT(*) WHERE votefor=…`), not kept
-   as a counter.
+1. **Two kingdoms' requests can still race each other.** The lock is the
+   acting kingdom's. An attack writes the defender's buildings and units as
+   absolute totals too (`attack.php`, `attackm.php`), so a defender's own
+   order landing at the same moment can undo the attack or be undone by it.
+   Taking the target's lock as well — in id order, to avoid deadlock — or
+   moving those writes to relative updates closes it.
+2. **Elections still keep a counter** (`govt.php`, `vote = vote ± 1`, by
+   name). The lock serialises one voter's requests, so each re-reads the
+   vote it is moving — which should stop the stuffing, though no test races
+   it yet; counting votes
+   (`COUNT(*) WHERE votefor=…`) would make the counter impossible to get
+   wrong at all.
 3. **Unverified accounts can join a round and post** — the activation gate is
    only in `igtop.php`, which `join.php` and the forum handlers never
    include — and the activation mail can be resent without limit. Signup is

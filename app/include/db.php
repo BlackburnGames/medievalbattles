@@ -262,3 +262,34 @@ if (!function_exists('mb_db')) {
         return $link;
     }
 }
+
+if (!function_exists('mb_kingdom_lock')) {
+    /**
+     * Hold a kingdom for the rest of the request: one request at a time each.
+     *
+     * Every action page reads the kingdom into globals once (functions.php) and
+     * writes back totals worked out from that read -- `SET gp=?`, `SET
+     * warriors=?` -- in separate statements. Two requests on the same kingdom
+     * at once, from two logins, each wrote over the other: a purchase raced
+     * against a no-op order kept its gold, a barter listing raced against
+     * disband.php doubled the army, six votes at once each counted. PHP's
+     * session lock serialises one session's requests, not one kingdom's.
+     *
+     * So the kingdom is locked before it is read, and stays locked until the
+     * connection closes at the end of the request. GET_LOCK names are global
+     * to the MySQL server -- a shared host's, other tenants included -- so the
+     * name carries the database's. The tick takes every kingdom's lock before
+     * it runs (update.php), so it waits for requests already reading and they
+     * wait for it.
+     *
+     * @param mysqli $db
+     * @param int    $userid
+     * @param int    $timeout seconds to wait for a request already holding it
+     * @return bool whether the lock is held
+     */
+    function mb_kingdom_lock($db, $userid, $timeout = 10)
+    {
+        $result = mb_query($db, "SELECT GET_LOCK(CONCAT('mb:', DATABASE(), ':k', ?), ?)", array((int) $userid, (int) $timeout));
+        return $result && (int) mb_db_result($result, 0) === 1;
+    }
+}

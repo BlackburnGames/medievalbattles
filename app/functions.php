@@ -10,6 +10,14 @@ if($login == 1 && $userid != "") {
 	// Whether the address is confirmed is the account's, and include/session.php
 	// has already read it: $mb_account_verified.
 
+	// One request at a time per kingdom, from before the read to the end of the
+	// request: everything below is a snapshot the page writes back. See
+	// mb_kingdom_lock() in include/db.php.
+	if(!mb_kingdom_lock($db, $userid))	{
+		if(!headers_sent())	{	header('Retry-After: 5', true, 503);	}
+		die("<div align=center><font class=yellow>Your kingdom is busy with another order. Try again in a moment.</font></div>");
+	}
+
 	// select all armors
 	$armor_result = mb_query($db, "SELECT * FROM military WHERE userid=?", array($userid));
 	$armor = mysqli_fetch_array($armor_result);

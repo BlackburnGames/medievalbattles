@@ -107,6 +107,13 @@ if ! docker compose exec -T web php /repo/tests/barter-race.php; then
   status=1
 fi
 
+# Two orders at once on one kingdom: the per-kingdom lock (include/db.php).
+echo
+echo "=== kingdom concurrency ==="
+if ! docker compose exec -T web php /repo/tests/kingdom-race.php; then
+  status=1
+fi
+
 # Sessions over HTTP: cookie flags, fixation, logout, cross-site requests,
 # revocation on a password change, and expiry. Uses poor@ and restores its
 # password, so it needs nothing the barter test consumed.

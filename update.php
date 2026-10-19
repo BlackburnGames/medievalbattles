@@ -38,6 +38,24 @@ if (!$round_id) {
 }
 
   mysqli_query($db, "UPDATE game_info SET tick='yes'");
+
+/*
+ * Every kingdom's lock, in userid order, before anything is read. A page holds
+ * its kingdom's from before it reads to the end of the request and writes back
+ * totals from that read (mb_kingdom_lock(), include/db.php), so a request in
+ * flight across the tick wrote the tick's gains away, or delivered a finished
+ * build twice. With tick='yes' set first no new page gets past igtop.php; the
+ * tick waits here for the ones already running. Pages only ever take one lock,
+ * so taking them in order cannot deadlock.
+ */
+$lock_kingdoms = mb_query($db, "SELECT userid FROM user WHERE round_id=? ORDER BY userid", array($round_id));
+while ($lock_row = mysqli_fetch_row($lock_kingdoms)) {
+  if (!mb_kingdom_lock($db, $lock_row[0], 60)) {
+    mysqli_query($db, "UPDATE game_info SET tick = 'no'");
+    fwrite(STDERR, "update.php: kingdom $lock_row[0] stayed busy for 60 seconds; tick skipped\n");
+    exit(1);
+  }
+}
   $mb_ids = mysqli_fetch_row(mb_query($db, "SELECT min(userid), max(userid) FROM user WHERE round_id=?", array($round_id)));
   $max_UID = (int) $mb_ids[1];
 
