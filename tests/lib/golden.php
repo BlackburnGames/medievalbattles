@@ -245,6 +245,18 @@ function joinRound($base, $email, $pass, $ename, $race, $class)
     $client = new MbClient($base);
     $client->get('/index.php');
     $client->post('/checklogin.php', array('email' => $email, 'pw' => $pass, 'login' => 'Login'));
+    // Only what the form offers, as a browser would send it. The options once
+    // carried their own quote marks in their values -- value='"Night Elf"' --
+    // so every race a player picked was refused, while a join posting the
+    // names directly passed.
+    $form = $client->get('/rounds.php');
+    preg_match_all('/<option value="([^"]*)">/', $form, $m);
+    $offered = array_map('html_entity_decode', $m[1]);
+    foreach (array($race, $class) as $choice) {
+        if (!in_array($choice, $offered, true)) {
+            return array($client, "the join form does not offer $choice; it offers: " . implode(', ', $offered));
+        }
+    }
     $body = $client->post('/join.php', array(
         'join' => 1, 'ename' => $ename, 'race' => $race, 'class' => $class, 'msn' => '', 'aim' => '',
     ));

@@ -67,12 +67,12 @@ if (!$round) {
 	echo "<tr><td>Empire Name:</td><td><input type='text' name='ename' size='30' maxlength='25'></td></tr>";
 	echo "<tr><td>Race:</td><td><select name='race'><option selected value='ns'>-----------</option>";
 	foreach (array_keys($GAMEDATA['races']) as $race) {
-		echo "<option value='" . mb_attr($race) . "'>" . mb_h($race) . "</option>";
+		echo "<option value=" . mb_attr($race) . ">" . mb_h($race) . "</option>";
 	}
 	echo "</select></td></tr>";
 	echo "<tr><td>Class:</td><td><select name='class'><option selected value='ns'>-------------------</option>";
 	foreach (array_keys($GAMEDATA['classes']) as $class) {
-		echo "<option value='" . mb_attr($class) . "'>" . mb_h($class) . "</option>";
+		echo "<option value=" . mb_attr($class) . ">" . mb_h($class) . "</option>";
 	}
 	echo "</select></td></tr>";
 	echo "<tr><td>MSN:</td><td><input type='text' name='msn' size='30' maxlength='50'></td></tr>";
