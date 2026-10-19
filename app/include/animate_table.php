@@ -29,6 +29,11 @@ if($wizards == 0 OR $gp == 0 OR $iron == 0)	{
 	$max_iron_golem = 0;
 }
 
+// The research animate.php asks for before it trains either. The max used to
+// count only wizards, gold and iron, so it offered golems the order refused.
+if($res['r17pts'] < 125000)	{	$max_golem = 0;	}
+if($res['r18pts'] < 125000)	{	$max_iron_golem = 0;	}
+
 $dbgolem = number_format($dbgolem);
 $dbirongolem = number_format($dbirongolem);
 $golem = number_format($golem);
