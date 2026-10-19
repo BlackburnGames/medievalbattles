@@ -391,7 +391,7 @@ function normalise($value)
  */
 function pageSays($body)
 {
-    $marker = "Don't get your hopes up, however.";
+    $marker = "and we'll see what we can do to fix it.</font></div>";
     $at = strpos($body, $marker);
     if ($at === false) {
         // PHP's own messages are reported by diagnostics(), and quoting them
