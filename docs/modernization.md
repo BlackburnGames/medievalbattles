@@ -1181,41 +1181,40 @@ found was in the gaps between them.
   `tests/kingdom-race.php` races a build against a no-op recruit: seven free
   builds in ten without the lock, none with it.
 
+- **An attack raced its defender's own orders**, each writing the other's
+  totals away, because the lock was only the attacker's. The three attack
+  pages and `scattack.php` take the target's lock too before reading it
+  (`mb_kingdom_lock_target()`). A defender attacking back the same instant
+  is a lock cycle MySQL refuses rather than waits on; the attack says the
+  empire is busy, and the tick, which takes every lock, starts over.
+- **Election counts are counted, not kept.** `vote` was a counter moved by
+  one; `mb_settlement_elect()` now sets it from `votefor` before choosing,
+  so no order of votes can make it drift. `tests/kingdom-race.php` sends six
+  votes for yourself at once and gets one.
+
 **Open, most serious first:**
 
-1. **Two kingdoms' requests can still race each other.** The lock is the
-   acting kingdom's. An attack writes the defender's buildings and units as
-   absolute totals too (`attack.php`, `attackm.php`), so a defender's own
-   order landing at the same moment can undo the attack or be undone by it.
-   Taking the target's lock as well — in id order, to avoid deadlock — or
-   moving those writes to relative updates closes it.
-2. **Elections still keep a counter** (`govt.php`, `vote = vote ± 1`, by
-   name). The lock serialises one voter's requests, so each re-reads the
-   vote it is moving — which should stop the stuffing, though no test races
-   it yet; counting votes
-   (`COUNT(*) WHERE votefor=…`) would make the counter impossible to get
-   wrong at all.
-3. **Unverified accounts can join a round and post** — the activation gate is
+1. **Unverified accounts can join a round and post** — the activation gate is
    only in `igtop.php`, which `join.php` and the forum handlers never
    include — and the activation mail can be resent without limit. Signup is
    unthrottled.
-4. **The address can be changed without the password** (`preferences.php`),
+2. **The address can be changed without the password** (`preferences.php`),
    and a password or address change does not rotate the session id, because
    the page has printed its frame before the handler runs.
-5. **A disbanded guild's forum passes to the next guild of the same name**,
+3. **A disbanded guild's forum passes to the next guild of the same name**,
    matched case-insensitively; and **a guild named `none`** (anything but
    exactly `None`) is, to SQL, every guildless kingdom's guild — their
    contacts in its member list, their battles in its news.
-6. **The forum ids are `smallint`**, 32,767 across every guild or settlement
+4. **The forum ids are `smallint`**, 32,767 across every guild or settlement
    and round, and posting is unlimited: one script ends posting everywhere.
    Messages, join requests and posts have no rate or size limits.
-7. **The barracks cap ignores the order being placed** (`military.php`), and
+5. **The barracks cap ignores the order being placed** (`military.php`), and
    **an unknown spell name keeps the warrior's weapon power** (`equip.php`).
-8. **The host's `.htaccess` carries protections the repo does not ship** —
+6. **The host's `.htaccess` carries protections the repo does not ship** —
    the include 404, `display_errors off`, `Cache-Control` — and PHP Manager
    writes the same file. No security headers (HSTS, `frame-ancestors`,
    `nosniff`). A failed connection echoes the database user.
-9. **Smaller:** the login throttle can be raced and used to lock an address
+7. **Smaller:** the login throttle can be raced and used to lock an address
    out; a race can give an account two kingdoms in a round (no unique key on
    `user(account_id, round_id)`); signup, login and forgot reveal whether an
    address has an account; an empty password is accepted; the `computer_id`

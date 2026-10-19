@@ -45,16 +45,34 @@ if (!$round_id) {
  * totals from that read (mb_kingdom_lock(), include/db.php), so a request in
  * flight across the tick wrote the tick's gains away, or delivered a finished
  * build twice. With tick='yes' set first no new page gets past igtop.php; the
- * tick waits here for the ones already running. Pages only ever take one lock,
- * so taking them in order cannot deadlock.
+ * tick waits here for the ones already running.
+ *
+ * An attack is the one page that holds two -- its own, then its target's
+ * (mb_kingdom_lock_target()) -- so it can meet the tick holding the second and
+ * waiting for the first. MySQL breaks such a cycle by refusing one GET_LOCK;
+ * if that is the tick's, it lets go of everything and starts over, and the
+ * attack, which needs no more locks, finishes in the meantime.
  */
+$lock_ids = array();
 $lock_kingdoms = mb_query($db, "SELECT userid FROM user WHERE round_id=? ORDER BY userid", array($round_id));
 while ($lock_row = mysqli_fetch_row($lock_kingdoms)) {
-  if (!mb_kingdom_lock($db, $lock_row[0], 60)) {
-    mysqli_query($db, "UPDATE game_info SET tick = 'no'");
-    fwrite(STDERR, "update.php: kingdom $lock_row[0] stayed busy for 60 seconds; tick skipped\n");
-    exit(1);
+  $lock_ids[] = (int) $lock_row[0];
+}
+$lock_held = false;
+for ($lock_try = 1; $lock_try <= 5 && !$lock_held; $lock_try++) {
+  $lock_held = true;
+  foreach ($lock_ids as $lock_id) {
+    if (!@mb_kingdom_lock($db, $lock_id, 60)) {
+      $lock_held = false;
+      mysqli_query($db, "SELECT RELEASE_ALL_LOCKS()");
+      break;
+    }
   }
+}
+if (!$lock_held) {
+  mysqli_query($db, "UPDATE game_info SET tick = 'no'");
+  fwrite(STDERR, "update.php: could not hold every kingdom after 5 tries; tick skipped\n");
+  exit(1);
 }
   $mb_ids = mysqli_fetch_row(mb_query($db, "SELECT min(userid), max(userid) FROM user WHERE round_id=?", array($round_id)));
   $max_UID = (int) $mb_ids[1];

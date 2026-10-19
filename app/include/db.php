@@ -293,3 +293,30 @@ if (!function_exists('mb_kingdom_lock')) {
         return $result && (int) mb_db_result($result, 0) === 1;
     }
 }
+
+if (!function_exists('mb_kingdom_lock_target')) {
+    /**
+     * Hold the kingdom an attack is aimed at, as well as the attacker's own.
+     *
+     * An attack writes the defender's land, buildings and units -- several of
+     * them as totals worked out from what it read -- so a defender's own order
+     * running at the same moment wrote the attack away, or was written away by
+     * it. The attacker already holds its own lock (functions.php), so taking
+     * the target's second can meet a defender attacking back the same instant,
+     * each holding one and waiting for the other. MySQL refuses the second
+     * GET_LOCK of such a cycle with a deadlock error rather than waiting; that
+     * is a refusal like any other here, so its warning is not reported.
+     *
+     * @param mysqli $db
+     * @param int    $target
+     * @param int    $self the acting kingdom, whose lock is already held
+     * @return bool whether the target's lock is held
+     */
+    function mb_kingdom_lock_target($db, $target, $self)
+    {
+        if ((int) $target === (int) $self) {
+            return true;
+        }
+        return @mb_kingdom_lock($db, $target, 5);
+    }
+}

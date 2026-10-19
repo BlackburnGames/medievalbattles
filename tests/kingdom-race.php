@@ -120,7 +120,19 @@ for ($i = 0; $i < $ROUNDS; $i++) {
 check('the build order queued homes at all', (int) one($db, "SELECT dhome FROM buildings WHERE userid=1") > 0);
 check("no home was built for nothing in $ROUNDS racing rounds", $free === 0, "$free free");
 
-foreach (array($build, $recruit) as $jar) {
+// Six votes for yourself at once, from six logins. The count used to be a
+// counter moved by one, and each request saw no earlier vote to take back:
+// the exposure review got six votes and the leadership out of it. The count
+// is taken from votefor now (mb_settlement_elect()), so it is one.
+$voters = array();
+for ($i = 0; $i < 6; $i++) {
+    $voters[] = array(session($BASE), 'govt.php', array('change' => 1, 'empvalue' => 1));
+}
+postTogether($BASE, $voters);
+check('six simultaneous votes for yourself count once', (int) one($db, "SELECT vote FROM user WHERE userid=1") === 1,
+    'vote=' . one($db, "SELECT vote FROM user WHERE userid=1"));
+
+foreach (array_merge(array($build, $recruit), array_column($voters, 0)) as $jar) {
     @unlink($jar);
 }
 

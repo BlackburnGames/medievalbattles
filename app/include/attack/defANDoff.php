@@ -13,6 +13,15 @@ $empvalue   = mb_input('empvalue');
 // into $cdefense below; calculations.php then took them off a stock of zero.
 // The counts used here are the ones the page validated, in the page's scope.
 		
+// The defender is locked before it is read, as the attacker was in
+// functions.php: everything below is a snapshot written back.
+if(!mb_kingdom_lock_target($db, $empvalue, $userid))	{
+	echo"<div align=center><font class=yellow>That empire is busy. Try again in a moment.</font></div><br><br>";
+	include("include/attack/mdrop.php");
+	include("include/attack/table.php");
+	die();
+}
+
 // select user table for the empire being attacked
 $result = mb_query($db, "SELECT * FROM user WHERE round_id=? AND userid=?", array((int) $round_id, (int) $empvalue));
 $evu = mysqli_fetch_array($result);

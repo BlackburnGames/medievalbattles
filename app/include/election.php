@@ -17,7 +17,7 @@
 
 if (!function_exists('mb_settlement_elect')) {
 	/**
-	 * Recount one settlement and set its leader.
+	 * Count one settlement's votes and set its leader.
 	 *
 	 * The leader is the member with the most votes. On a tie the sitting
 	 * leader keeps the seat if they are among the tied, and otherwise the
@@ -31,6 +31,14 @@ if (!function_exists('mb_settlement_elect')) {
 	function mb_settlement_elect($db, $setid)
 	{
 		$setid = (int) $setid;
+
+		// The count is taken from the votes, not kept beside them. `vote` used
+		// to move by one as votes were cast and withdrawn, and every move was a
+		// chance to get it wrong: six votes sent at once from six logins each
+		// added one and took nothing away, and the counter crowned the result.
+		// `votefor` is the vote itself -- one per member, overwritten when it
+		// moves -- so counting it cannot drift.
+		mb_query($db, "UPDATE user u LEFT JOIN (SELECT votefor, COUNT(*) AS n FROM user WHERE setid=? GROUP BY votefor) v ON v.votefor = u.ename SET u.vote = COALESCE(v.n, 0) WHERE u.setid=?", array($setid, $setid));
 
 		$r = mb_query($db, "SELECT max(vote) FROM user WHERE setid=?", array($setid));
 		$row = $r ? mysqli_fetch_row($r) : null;

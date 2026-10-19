@@ -47,6 +47,13 @@ else	{
 	// spent the units.
 	include("include/connect.php");
 
+	// The target is locked before it is read: see mb_kingdom_lock_target().
+	if(!mb_kingdom_lock_target($db, $empvalue, $userid))	{
+		echo"<div align=center><font class=yellow>That empire is busy. Try again in a moment.</font></div>";
+		include("include/attack/scattack.php");
+		die();
+	}
+
 	// select user values
 		$result = mb_query($db, "SELECT * FROM user WHERE round_id=? AND userid=?", array((int) $round_id, (int) $empvalue));
 		$evu = mysqli_fetch_array($result);

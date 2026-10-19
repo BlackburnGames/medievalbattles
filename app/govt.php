@@ -46,9 +46,9 @@ if (!IsSet($change)) {
 
   include("include/connect.php");
 
-  // The counts move relative to what is stored -- vote = vote - 1 -- where they
-  // used to be read, adjusted and written back, which loses a vote whenever two
-  // members change theirs at once.
+  // A vote is the voter's votefor and nothing else; the counts are taken from
+  // those by mb_settlement_elect() (include/election.php). They used to be
+  // kept as counters moved by one, which simultaneous votes got wrong.
   if($empvalue == 'ns') {
     echo"<div align=center><font class=yellow>You did not specify anyone to vote for.</font></div><br>";
     include("include/S_GOVT.php");
@@ -62,8 +62,7 @@ if (!IsSet($change)) {
       die();
     } else {
 
-      //  take the vote back from the old empire and set votefor to none
-      mb_query($db, "UPDATE user SET vote = vote - 1 WHERE round_id=? AND ename=? AND vote > 0", array((int) $round_id, $votefor));
+      //  withdraw the vote; mb_settlement_elect() counts what is left
       mb_query($db, "UPDATE user SET votefor='None' WHERE userid=?", array($userid));
 
       mb_settlement_elect($db, $setid);
@@ -86,12 +85,8 @@ if (!IsSet($change)) {
     }
     $fename = $target['ename'];
 
-    //  move the vote: off the old empire, if there was one, and onto this one
-    if($votefor != 'None')  {
-      mb_query($db, "UPDATE user SET vote = vote - 1 WHERE round_id=? AND ename=? AND vote > 0", array((int) $round_id, $votefor));
-    }
+    //  cast or move the vote; mb_settlement_elect() counts it
     mb_query($db, "UPDATE user SET votefor=? WHERE userid=?", array($fename, $userid));
-    mb_query($db, "UPDATE user SET vote = vote + 1 WHERE userid=?", array((int) $empvalue));
 
     mb_settlement_elect($db, $setid);
 
