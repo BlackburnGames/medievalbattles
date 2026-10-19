@@ -105,7 +105,7 @@ $GAMEDATA['races'] = array(
         'civ_mod_delta'    => +0.10,  // update.php:126
         'priest_cost_mult' => 0.75,   // functions.php:249
         'explore_exp_num'  => 0.85,   // read by mb_explore_rate() -- fewer explorers needed per land
-        'bans'     => array('Golems and Iron Golems'),  // animate.php:4, trade.php:4
+        'bans'     => array('Golems and Iron Golems'),  // animate.php:11
     ),
     'Demon' => array(
         'flavor'   => 'Cast out of the Angelic Order, the Demons enslave the weak and wage war on the strong.',

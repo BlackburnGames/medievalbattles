@@ -42,7 +42,6 @@ aconstruct.php?update2=1&uhome=10&ufarm=5
 wconstruct.php?shortsword=1
 equip.php?update=1&uwarrior=3
 military.php?recruit=1&urecruit=25
-trade.php?trains=1&ugolem=2
 animate.php?trains=1&ugolem=1
 disband.php?trains=1&uwarrior=2
 cexplore.php?cexploreland=3&cexploremt=1

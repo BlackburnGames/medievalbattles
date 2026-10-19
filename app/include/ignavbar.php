@@ -29,8 +29,7 @@ echo "
   <tr><td class=navbartxt>$maintitle</td></tr>
   <tr><td class=navbartxt><a href=status.php?pageid=production>Empire Status</a></td></tr>
   <tr><td class=navbartxt><a href=settlement.php?change=1&snum=$csnum>View Settlements</a></td></tr>
-  <!--<tr><td class=navbartxt><a href=barter.php>Barter</a></td></tr>-->
-  <tr><td class=navbartxt><a href=trade.php>Trade</a></td></tr>
+  <tr><td class=navbartxt><a href=barter.php>Barter</a></td></tr>
 <!-- display settlement pages -->
   <tr><td class=main><b class=other><font class=orange>Development</b></td></tr>
   <tr><td class=navbartxt><a href=buildings.php>Buildings</a> &nbsp;|&nbsp; <a href=explore.php>Explore</a></td></tr>
