@@ -1,8 +1,17 @@
 # Deployment
 
 Where the game runs outside Docker, how code gets there, and what has to be
-true before it can. **Nothing is deployed yet.** The host is provisioned and
-the scripts exist; what is left is in "First deploy, in order".
+true before it can. **Deployed, and public, since 2026-10-18** at
+https://jacobp259.sg-host.com/ — `deploy.sh --go --public`; the deployed
+commit is in `mb/REVISION`. What was left of the first deploy is in "First
+deploy, in order".
+
+A request with no `User-Agent` gets a 403 from SiteGround before it reaches
+PHP. Browsers always send one; `tests/lib/client.php` does not, so the
+suite's client cannot be pointed at the live site — use curl with a browser's
+agent. The first live walk (2026-10-18) signed up, verified, logged in to the
+round list, joined, loaded seven game pages and deleted the account, with no
+PHP diagnostics on any page.
 
 ## Blockers
 
@@ -128,14 +137,14 @@ All in `deploy/`, run from the repo root in Git Bash.
 ## First deploy, in order
 
 1. ~~Blocker 1: the suite green on MySQL 8.4.~~ Done.
-2. Site Tools > Security > Protected URLs: protect `/`. `deploy.sh` refuses
-   a site that does not answer 401 unless it is given `--public`, which is
-   the decision to open the game to players.
+2. ~~Site Tools > Security > Protected URLs.~~ Not used: the game went out
+   public (2026-10-18), so every deploy passes `--public`. `deploy.sh`
+   refuses a site that does not answer 401 without it.
 3. ~~Site Tools > Site > MySQL: one database and one user with all
    privileges on it.~~ Done 2026-10-18, both labelled `medievalbattles`
    (Site Tools generates their names; they go in `MB_DB_NAME` and
    `MB_DB_USER`).
-4. Install `public_html/.htaccess` and `~/.mb-env` from the templates, with
+4. ~~Install `public_html/.htaccess` and `~/.mb-env` from the templates,~~ Done 2026-10-18 (the PHP Manager's original is `~/htaccess.before-mb`), with
    the database's names and password, and `MB_SITE_URL` / `MB_MAIL_FROM`.
    The `.htaccess` replaces the one PHP Manager wrote; the template carries
    the same `AddHandler` line.
@@ -149,10 +158,9 @@ All in `deploy/`, run from the repo root in Git Bash.
    migrations, and on an empty database they build the schema — the
    baseline, then rounds, round results and login failures. The world they
    build is round 1, running, with ten settlements and no kingdoms.
-7. `bash deploy/deploy.sh`, read the dry run (its migrations section should
-   list all four as down), then `--go`.
-8. Run `bash ~/www/jacobp259.sg-host.com/mb/tick.sh` by hand once and read
-   `~/logs/tick.log`.
+7. ~~`bash deploy/deploy.sh`~~ Done: all four migrations ran.
+8. ~~Run a tick by hand.~~ Done. The first showed two warnings no fixture
+   tick could — a world with no guilds — both fixed and redeployed.
 9. Site Tools > Devs > Cron Jobs: the same command, every 30 minutes
    (`*/30 * * * *`). The game's clocks are counted in ticks at that rate:
    inactivity deletion is 336 ticks, which the mail calls a week, and safe
