@@ -1136,6 +1136,88 @@ loses the claim is refunded.
 
 The crawl cannot see a race, so `tests/barter-race.php` makes one.
 
+### The exposure review (2026-10-18)
+
+The game went public before anyone had looked at it whole, as an attacker
+would. Five reviews did, the day it went up, one per area: accounts and
+admin, the economy pages, combat, the social pages, and the served surface
+(that one with read-only requests to the live site). Each class closed
+before it — injection, output, sessions, the admin POSTs — held. What they
+found was in the gaps between them.
+
+**Fixed:**
+
+- **`index.php?page=index` included itself until PHP gave out**, one
+  unauthenticated request for 143 MB and ~64,000 writes to the visitor
+  counter, live. `?page=` admitted any `.php` in `app/`. It is an allowlist
+  of the six pages the front page links.
+- **A player-chosen image acted as everyone who saw it.** The guild flag and
+  the settlement picture are URLs shown as `<img>`. Pointed back at the game,
+  the browser fetched them same-origin with the viewer's cookie, so the
+  `Sec-Fetch-Site` refusal let them through and they ran as the viewer —
+  `preferences.php?update=1&newemail=…` and a forgotten-password mail was
+  an account takeover, an administrator's included; `scattack.php` turned
+  every viewer of the guild list into an attacker. A request the browser
+  makes for an image, script or style (`Sec-Fetch-Dest`) now gets no
+  session (`tests/session.php`).
+- **A cookie could supply any request parameter.** `mb_input()` read
+  `$_COOKIE` last, so it won; on a shared parent domain (`*.sg-host.com`) a
+  sibling site can set one. It reads GET and POST only.
+- **Half a suicide unit killed a civilian and cost nothing**, repeatable
+  until a kingdom was empty: `send` was never made a whole number, and
+  MySQL rounded the stored `suicide - 0.5` back up. Pinned in the combat
+  golden, with the target type now restricted to the two that mean
+  something.
+
+**Open, most serious first:**
+
+1. **Lost updates: one kingdom, two requests at once.** Every action page
+   reads the kingdom into globals once (`functions.php`) and writes back
+   absolute values — `SET gp=?`, `SET warriors=?` — with no lock. A player
+   with two sessions can race a purchase against a no-op order and keep the
+   gold (confirmed: 3 runs in 6), or race barter's relative debit against
+   `disband.php`'s absolute write and double their army (confirmed: 5 → 80
+   warriors in eight). The same holds for attacks spending one army twice.
+   The fix is one rule rather than a page at a time: a per-kingdom lock taken
+   in `functions.php` before the read and held to the end of the request
+   (`GET_LOCK`, or `SELECT … FOR UPDATE` in a transaction), which also makes
+   the tick wait for requests in flight.
+2. **Settlement elections can be stuffed by the same race** (`govt.php`):
+   six parallel votes for yourself took six votes and the leadership,
+   confirmed. Votes should be counted (`COUNT(*) WHERE votefor=…`), not kept
+   as a counter.
+3. **Unverified accounts can join a round and post** — the activation gate is
+   only in `igtop.php`, which `join.php` and the forum handlers never
+   include — and the activation mail can be resent without limit. Signup is
+   unthrottled.
+4. **The address can be changed without the password** (`preferences.php`),
+   and a password or address change does not rotate the session id, because
+   the page has printed its frame before the handler runs.
+5. **A disbanded guild's forum passes to the next guild of the same name**,
+   matched case-insensitively; and **a guild named `none`** (anything but
+   exactly `None`) is, to SQL, every guildless kingdom's guild — their
+   contacts in its member list, their battles in its news.
+6. **The forum ids are `smallint`**, 32,767 across every guild or settlement
+   and round, and posting is unlimited: one script ends posting everywhere.
+   Messages, join requests and posts have no rate or size limits.
+7. **The barracks cap ignores the order being placed** (`military.php`), and
+   **an unknown spell name keeps the warrior's weapon power** (`equip.php`).
+8. **The host's `.htaccess` carries protections the repo does not ship** —
+   the include 404, `display_errors off`, `Cache-Control` — and PHP Manager
+   writes the same file. No security headers (HSTS, `frame-ancestors`,
+   `nosniff`). A failed connection echoes the database user.
+9. **Smaller:** the login throttle can be raced and used to lock an address
+   out; a race can give an account two kingdoms in a round (no unique key on
+   `user(account_id, round_id)`); signup, login and forgot reveal whether an
+   address has an account; an empty password is accepted; the `computer_id`
+   cookie is forgeable; a logged-out redirect in `functions.php` has no
+   `exit`; barter amounts may be fractional; demolishing ignores lumber
+   mills in its gold check.
+
+The combat review ended before reporting past its third finding (the
+army-spent-twice race above); `intel.php`, `attackm.php` and `attackr.php`
+want a second look on their own.
+
 ### Prerequisite: coverage — done
 
 The smoke crawl reached 39 of 69 top-level scripts when Phase 3 opened. It
