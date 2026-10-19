@@ -83,14 +83,16 @@ if ($computer_id === '') {
     <td valign="top">
       <?php
         // Was include($_GET['page'] . ".php") with no filtering at all, which
-        // let any local .php file be pulled in via a traversal path. basename()
-        // strips directory components and the file must actually exist here.
-        $page = isset($_GET['page']) ? basename((string) $_GET['page']) : '';
-        if ($page === '' || !preg_match('/^[A-Za-z0-9_-]+$/', $page) || !file_exists(__DIR__ . '/' . $page . '.php')) {
+        // let any local .php file be pulled in via a traversal path. It then
+        // admitted any .php file in app/ -- including index.php itself, so
+        // ?page=index recursed until PHP gave out, one counter write per
+        // level for a visitor with no computer_id. Only the pages meant to
+        // be shown here are; each puts its body in $data.
+        $pages = array('main-site', 'signup', 'forgot', 'reset', 'about_us', 'game_scores');
+        $page = isset($_GET['page']) && is_string($_GET['page']) ? $_GET['page'] : '';
+        if (!in_array($page, $pages, true)) {
           $page = "main-site";
         }
-        // The four pages meant to be shown here each put their body in $data,
-        // but the check above admits any .php file in app/.
         $data = '';
         include($page . ".php");
         echo $data;
