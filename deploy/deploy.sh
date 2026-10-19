@@ -10,7 +10,7 @@
 #
 # Layout on the server (see docs/deployment.md):
 #   $SITE/public_html   <- app/          (the docroot)
-#   $SITE/mb            <- update.php, bin/, db/, db.sql, tick.sh, vendor/
+#   $SITE/mb            <- update.php, bin/, db/, db.sql, tick.sh, cli.sh, vendor/
 #   $SITE/mb/app        -> ../public_html, so update.php and bin/ find app/ as they do locally
 #
 # Server-owned files are never sent and never deleted: public_html/.htaccess
@@ -98,7 +98,7 @@ echo "$mode: $short ($(git log -1 --format=%s "$sha")) -> $HOST_ALIAS:~/$SITE"
 # server's rsync moves it into place, so a dropped connection leaves the live
 # site as it was rather than half-written.
 stage=".mb-deploy/$sha"
-git archive --format=tar "$sha" app update.php bin db db.sql deploy/tick.sh \
+git archive --format=tar "$sha" app update.php bin db db.sql deploy/tick.sh deploy/cli.sh \
 | ssh "$HOST_ALIAS" "rm -rf ~/$stage && mkdir -p ~/$stage && tar -x -C ~/$stage"
 
 echo "== vendor (composer install --no-dev, from $short's composer.lock)"
@@ -116,7 +116,7 @@ SITE="$HOME/$1"; SHA="$2"; GO="$3"
 STAGE="$HOME/.mb-deploy/$SHA"
 trap 'rm -rf "$STAGE"' EXIT
 
-mv "$STAGE/deploy/tick.sh" "$STAGE/tick.sh"; rmdir "$STAGE/deploy"
+mv "$STAGE/deploy/tick.sh" "$STAGE/tick.sh"; mv "$STAGE/deploy/cli.sh" "$STAGE/cli.sh"; rmdir "$STAGE/deploy"
 echo "$SHA" > "$STAGE/REVISION"
 
 flags=(-rlt --delete --checksum --itemize-changes)

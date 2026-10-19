@@ -165,14 +165,16 @@ All in `deploy/`, run from the repo root in Git Bash.
    (`*/30 * * * *`). The game's clocks are counted in ticks at that rate:
    inactivity deletion is 336 ticks, which the mail calls a week, and safe
    mode is 48, a day.
-10. The first administrator: sign up on the site, then from the repo
-    root —
+10. ~~The first administrator.~~ Done 2026-10-18. On the server, `bin/`'s
+    commands go through `mb/cli.sh`, which loads `~/.mb-env` and runs the
+    8.3 CLI. Run bare, they fall back to the local stack's settings and
+    MySQL refuses them ("Access denied for user mb"):
 
     ```bash
-    ssh siteground-mb 'cd ~/www/jacobp259.sg-host.com/mb && set -a && . ~/.mb-env && set +a \
-      && /usr/local/php83/bin/php-cli bin/admin.php verify YOU@EXAMPLE.COM \
-      && /usr/local/php83/bin/php-cli bin/admin.php grant YOU@EXAMPLE.COM'
+    cd ~/www/jacobp259.sg-host.com/mb
+    ./cli.sh admin grant YOU@EXAMPLE.COM      # also: list, revoke, verify, password
+    ./cli.sh round list                       # also: open <name>, start, end
     ```
 
-    `verify` only if the activation mail has not arrived. Rounds are then
-    run from `admin/rounds.php` or `bin/round.php` the same way.
+    `admin password` sets a random temporary password for a player who has
+    forgotten theirs, until the game has a reset of its own.
