@@ -44,10 +44,13 @@
     $max_suicide = ($gp / $suicidec);
     if($max_suicide > $recruits)  { $max_suicide = $recruits;  }
       $max_suicide = floor($max_suicide);
-  //  catapult
-    $max_catapult = ($gp / 5000);
+  //  catapult: 5,000 gold and 200 lumber each, as military.php charges. The
+  //  max used to ignore the lumber, and then took the suicide unit's max
+  //  instead of its own, so a kingdom with no lumber was offered catapults
+  //  that training then refused.
+    $max_catapult = min($gp / 5000, implode("", explode(",", $lumber)) / 200);
     if($max_catapult > $recruits) { $max_catapult = $recruits;   }
-      $max_catapult = floor($max_suicide);
+      $max_catapult = floor($max_catapult);
   }
 
   if($recruits == 0 OR $gp == 0)  {
